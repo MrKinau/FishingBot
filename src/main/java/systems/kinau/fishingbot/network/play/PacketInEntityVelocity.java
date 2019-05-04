@@ -6,7 +6,6 @@
 package systems.kinau.fishingbot.network.play;
 
 import com.google.common.io.ByteArrayDataOutput;
-import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -16,10 +15,10 @@ import java.io.IOException;
 
 public class PacketInEntityVelocity extends Packet {
 
-    static short lastY = -1;
+    private static short lastY = -1;
 
     @Override
-    public void write(ByteArrayDataOutput out) throws IOException { }
+    public void write(ByteArrayDataOutput out) { }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
@@ -31,9 +30,8 @@ public class PacketInEntityVelocity extends Packet {
         in.readShort();
         if(Math.abs(y) > 350) {
             networkHandler.getFishingManager().fish();
-        } else if(lastY == 0 && y == 0) {
+        } else if(lastY == 0 && y == 0) {               //Sometimes Minecraft does not push the bobber down, but this workaround works good
             networkHandler.getFishingManager().fish();
-            FishingBot.getLog().warning("Bot is stuck. Trying to restart!");
         }
         lastY = y;
     }

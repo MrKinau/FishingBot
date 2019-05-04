@@ -13,6 +13,7 @@ import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.io.ByteArrayDataOutput;
 import javafx.util.Pair;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.Constants;
 import systems.kinau.fishingbot.network.NetworkHandler;
@@ -23,12 +24,15 @@ import systems.kinau.fishingbot.network.utils.PacketHelper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PacketInEntityMetadata extends Packet {
 
+    private static final List<Integer> FISH_IDS = Arrays.asList(625, 626, 627, 628);
+
     @Override
-    public void write(ByteArrayDataOutput out) throws IOException { }
+    public void write(ByteArrayDataOutput out) { }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
@@ -38,8 +42,7 @@ public class PacketInEntityMetadata extends Packet {
         readWatchableObjects(in, networkHandler);
     }
 
-    public List readWatchableObjects(ByteArrayDataInputWrapper in, NetworkHandler networkHandler) throws IOException{
-        ArrayList var1 = null;
+    private void readWatchableObjects(ByteArrayDataInputWrapper in, NetworkHandler networkHandler) {
         while(true) {
             if (in.getAvailable() == 0)
                 break;
@@ -76,7 +79,9 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     }
                     case 5: {
-                        if (in.readBoolean()) { }
+                        if (in.readBoolean()) {
+                            //Chat is missing
+                        }
                         break;
                     }
                     case 6: {
@@ -88,21 +93,28 @@ public class PacketInEntityMetadata extends Packet {
                         byte count = in.readByte();
                         List<Pair<String, Short>> enchantments = readNBT(in);
 
-                        String name = ItemHandler.getItemName(itemID);
+                        String name = ItemHandler.getItemName(itemID).replace("minecraft:", "");
                         FishingBot.getLog().info("Caught \"" + name + "\"");
+
+                        if(FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL)
+                            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + name + "\""));
+                        else if(FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL_BUT_FISH && !FISH_IDS.contains(itemID))
+                            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + name + "\""));
 
                         if (enchantments.isEmpty())
                             break;
 
-                        name = name.replace("minecraft:", "");
+                        if(FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_ENCHANTED)
+                            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + name + "\""));
+                        else if(FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && itemID == 779)
+                            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + name + "\""));
 
-                        networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + name + "\""));
                         Thread.sleep(200);
 
                         if (!enchantments.isEmpty()) {
                             for (Pair<String, Short> enchantment : enchantments) {
-                                networkHandler.sendPacket(new PacketOutChat("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanicLevel(enchantment.getValue())));
-                                FishingBot.getLog().info("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanicLevel(enchantment.getValue()));
+                                networkHandler.sendPacket(new PacketOutChat("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue())));
+                                FishingBot.getLog().info("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue()));
                             }
                         }
 
@@ -196,8 +208,6 @@ public class PacketInEntityMetadata extends Packet {
 
 
         }
-
-        return var1;
     }
 
     private List<Pair<String, Short>> readNBT(ByteArrayDataInputWrapper in) {
@@ -226,11 +236,11 @@ public class PacketInEntityMetadata extends Packet {
                     }
                 }
             }
-        } catch (IOException e) { }
+        } catch (IOException ignored) { }
         return enchList;
     }
 
-    public String getRomanicLevel(int number) {
+    private String getRomanLevel(int number) {
         switch (number) {
             case 1: return "I";
             case 2: return "II";

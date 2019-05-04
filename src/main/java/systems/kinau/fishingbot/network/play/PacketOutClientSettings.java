@@ -16,15 +16,15 @@ import java.io.IOException;
 public class PacketOutClientSettings extends Packet {
 
     @Override
-    public void write(ByteArrayDataOutput out) throws IOException {
-        PacketHelper.writeString(out, "lol_aa");
+    public void write(ByteArrayDataOutput out) {
+        PacketHelper.writeString(out, "lol_aa"); //use speach "LOLCAT", lol
         out.writeByte(1); //render-distance
-        PacketHelper.writeVarInt(out, 2); //chat hidden
+        PacketHelper.writeVarInt(out, 0); //chat enabled
         out.writeBoolean(true); //support colors
         out.writeByte(128); //skin bitmask
         PacketHelper.writeVarInt(out, 1); //right = main hand
     }
 
     @Override
-    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException { }
+    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) { }
 }

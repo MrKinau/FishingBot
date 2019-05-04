@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 public class FishingBot {
 
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
+    @Getter static ConfigManager config;
 
     private String[] args;
 
@@ -35,7 +36,6 @@ public class FishingBot {
     @Getter private Socket socket;
     @Getter private NetworkHandler net;
 
-    @Getter private ConfigManager config;
     @Getter private AuthData authData;
 
     @Getter private FishingManager fishingManager;
@@ -52,7 +52,7 @@ public class FishingBot {
             ConsoleHandler ch;
             if(!logsFolder.exists() && !logsFolder.mkdir() && logsFolder.isDirectory())
                 throw new IOException("Could not create logs folder!");
-            log.addHandler(fh = new FileHandler("logs/log.%g.log"));
+            log.addHandler(fh = new FileHandler("logs/log%g.log", 0, 15));
             log.addHandler(ch = new ConsoleHandler());
             log.setUseParentHandlers(false);
             LogFormatter formatter = new LogFormatter();
@@ -63,7 +63,7 @@ public class FishingBot {
             System.exit(1);
         }
 
-        this.config = new ConfigManager(new File("config.properties"));
+        config = new ConfigManager(new File("config.properties"));
 
         //Authenticate player if online-mode is set
         if(getConfig().isOnlineMode())

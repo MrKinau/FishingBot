@@ -53,3 +53,16 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
+# Mine
+.idea/compiler.xml
+.idea/copyright/
+.idea/encodings.xml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/vcs.xml
+FishingBot.iml
+dependency-reduced-pom.xml
+logs/
+src/test/
+target/
+config.properties

@@ -23,6 +23,7 @@ import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -140,8 +141,6 @@ public class NetworkHandler {
                 FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
             }
         }
-
-//        FishingBot.getLog().info("SENT PACKET: " + packet.getClass().getSimpleName());
     }
 
     public void readData() throws IOException {
@@ -161,7 +160,7 @@ public class NetworkHandler {
 
     }
 
-    public void readUncompressed() throws IOException {
+    private void readUncompressed() throws IOException {
         int len1 = PacketHelper.readVarInt(in);
         int[] types = PacketHelper.readVarIntt(in);
         int type = types[0];
@@ -171,7 +170,7 @@ public class NetworkHandler {
         readPacket(len, type, new ByteArrayDataInputWrapper(data));
     }
 
-    public void readUncompressed(int len) throws IOException {
+    private void readUncompressed(int len) throws IOException {
         byte[] data = new byte[len];
         in.readFully(data, 0, len);
         ByteArrayDataInputWrapper bf = new ByteArrayDataInputWrapper(data);
@@ -179,7 +178,7 @@ public class NetworkHandler {
         readPacket(len, type, bf);
     }
 
-    public void readCompressed(int plen, int dlen) throws IOException {
+    private void readCompressed(int plen, int dlen) throws IOException {
         if (dlen >= getThreshold()) {
             byte[] data = new byte[plen];
             in.readFully(data, 0, plen);
@@ -202,7 +201,7 @@ public class NetworkHandler {
         }
     }
 
-    public void readPacket(int len, int packetId, ByteArrayDataInputWrapper buf) throws IOException {
+    private void readPacket(int len, int packetId, ByteArrayDataInputWrapper buf) throws IOException {
         Class<? extends Packet> clazz = null;
 
         switch (state) {
