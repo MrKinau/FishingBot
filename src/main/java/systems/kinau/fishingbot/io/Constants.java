@@ -8,6 +8,6 @@ package systems.kinau.fishingbot.io;
 public class Constants {
 
     public static final int PROTOCOL_ID = 477;
-    public static final String PREFIX = "FishingBot v2.0 - ";
+    public static final String PREFIX = "FishingBot v2.1 - ";
 
 }
