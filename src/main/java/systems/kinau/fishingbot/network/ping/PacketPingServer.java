@@ -15,7 +15,6 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -32,26 +31,26 @@ public class PacketPingServer extends Packet {
     @Override
     public void write(ByteArrayDataOutput out) throws IOException{
         ByteArrayDataOutput buf = ByteStreams.newDataOutput();
-        PacketHelper.writeVarInt(buf, 0);
-        PacketHelper.writeVarInt(buf, 4);
-        PacketHelper.writeString(buf, serverName);
+        writeVarInt(0, buf);
+        writeVarInt(4, buf);
+        writeString(serverName, buf);
         buf.writeShort(serverPort);
-        PacketHelper.writeVarInt(buf, 1);
+        writeVarInt(1, buf);
 
         send(buf, receiver);
 
         buf = ByteStreams.newDataOutput();
-        PacketHelper.writeVarInt(buf, 0);
+        writeVarInt(0, buf);
         send(buf, receiver);
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
-        PacketHelper.readVarInt(sender); //ignore
-        int id = PacketHelper.readVarInt(sender);
+        readVarInt(sender); //ignore
+        int id = readVarInt(sender);
 
         if (id == 0) {
-            String pong = PacketHelper.readString(sender);
+            String pong = readString(sender);
             JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
             if(root.getAsJsonObject("version").get("protocol").getAsInt() != 477)
                 FishingBot.getLog().warning("This server is not running a supported protocol version! You might not connect!");
@@ -61,7 +60,7 @@ public class PacketPingServer extends Packet {
 
     private void send(ByteArrayDataOutput buf, DataOutputStream out) throws IOException {
         ByteArrayDataOutput sender = ByteStreams.newDataOutput();
-        PacketHelper.writeVarInt(sender, buf.toByteArray().length);
+        writeVarInt(buf.toByteArray().length, sender);
         sender.write(buf.toByteArray());
         out.write(sender.toByteArray());
         out.flush();

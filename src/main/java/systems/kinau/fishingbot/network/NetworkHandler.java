@@ -17,13 +17,11 @@ import systems.kinau.fishingbot.network.login.*;
 import systems.kinau.fishingbot.network.play.*;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.security.PublicKey;
-import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -98,13 +96,13 @@ public class NetworkHandler {
         //Add Packet ID from current PacketRegistry
         switch (getState()) {
             case HANDSHAKE:
-                PacketHelper.writeVarInt(buf, getHandshakeRegistry().getId(packet.getClass()));
+                Packet.writeVarInt(getHandshakeRegistry().getId(packet.getClass()), buf);
                 break;
             case LOGIN:
-                PacketHelper.writeVarInt(buf, getLoginRegistry_OUT().getId(packet.getClass()));
+                Packet.writeVarInt(getLoginRegistry_OUT().getId(packet.getClass()), buf);
                 break;
             case PLAY:
-                PacketHelper.writeVarInt(buf, getPlayRegistry_OUT().getId(packet.getClass()));
+                Packet.writeVarInt(getPlayRegistry_OUT().getId(packet.getClass()), buf);
                 break;
         }
 
@@ -118,10 +116,10 @@ public class NetworkHandler {
         if(getThreshold() > 0) {
             //Send packet (with 0 threshold)
             ByteArrayDataOutput send1 = ByteStreams.newDataOutput();
-            PacketHelper.writeVarInt(send1, 0);//do not compress... lol
+            Packet.writeVarInt(0, send1);//do not compress... lol
             send1.write(buf.toByteArray());
             ByteArrayDataOutput send2 = ByteStreams.newDataOutput();
-            PacketHelper.writeVarInt(send2, send1.toByteArray().length);
+            Packet.writeVarInt(send1.toByteArray().length, send2);
             send2.write(send1.toByteArray());
             try {
                 out.write(send2.toByteArray());
@@ -132,7 +130,7 @@ public class NetworkHandler {
         } else {
             //Send packet (without threshold)
             ByteArrayDataOutput send = ByteStreams.newDataOutput();
-            PacketHelper.writeVarInt(send, buf.toByteArray().length);
+            Packet.writeVarInt(buf.toByteArray().length, send);
             send.write(buf.toByteArray());
             try {
                 out.write(send.toByteArray());
@@ -145,8 +143,8 @@ public class NetworkHandler {
 
     public void readData() throws IOException {
         if (getThreshold() > 0) {
-            int plen1 = PacketHelper.readVarInt(in);
-            int[] dlens = PacketHelper.readVarIntt(in);
+            int plen1 = Packet.readVarInt(in);
+            int[] dlens = Packet.readVarIntt(in);
             int dlen = dlens[0];
             int plen = plen1 - dlens[1];
             if (dlen == 0) { //this packet isn't compressed
@@ -161,8 +159,8 @@ public class NetworkHandler {
     }
 
     private void readUncompressed() throws IOException {
-        int len1 = PacketHelper.readVarInt(in);
-        int[] types = PacketHelper.readVarIntt(in);
+        int len1 = Packet.readVarInt(in);
+        int[] types = Packet.readVarIntt(in);
         int type = types[0];
         int len = len1 - types[1];
         byte[] data = new byte[len];
@@ -174,7 +172,7 @@ public class NetworkHandler {
         byte[] data = new byte[len];
         in.readFully(data, 0, len);
         ByteArrayDataInputWrapper bf = new ByteArrayDataInputWrapper(data);
-        int type = PacketHelper.readVarInt(bf);
+        int type = Packet.readVarInt(bf);
         readPacket(len, type, bf);
     }
 
@@ -194,7 +192,7 @@ public class NetworkHandler {
                 inflater.end();
             }
             ByteArrayDataInputWrapper buf = new ByteArrayDataInputWrapper(uncompressed);
-            int type = PacketHelper.readVarInt(buf);
+            int type = Packet.readVarInt(buf);
             readPacket(dlen, type, buf);
         } else {
             throw new IOException("Data was smaller than threshold!");

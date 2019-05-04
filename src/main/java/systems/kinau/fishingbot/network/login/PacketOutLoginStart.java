@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import java.io.IOException;
 
@@ -23,7 +22,7 @@ public class PacketOutLoginStart extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out) throws IOException {
-        PacketHelper.writeString(out, userName);
+        writeString(userName, out);
     }
 
     @Override

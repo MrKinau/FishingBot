@@ -12,6 +12,7 @@ import com.flowpowered.nbt.TagType;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.io.ByteArrayDataOutput;
 import javafx.util.Pair;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.fishing.ItemHandler;
@@ -19,7 +20,6 @@ import systems.kinau.fishingbot.io.Constants;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@NoArgsConstructor
 public class PacketInEntityMetadata extends Packet {
 
     private static final List<Integer> FISH_IDS = Arrays.asList(625, 626, 627, 628);
@@ -35,10 +36,10 @@ public class PacketInEntityMetadata extends Packet {
     public void write(ByteArrayDataOutput out) { }
 
     @Override
-    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
+    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) {
         if(!networkHandler.getFishingManager().isTrackingNextEntityMeta())
             return;
-        PacketHelper.readVarInt(in);
+        readVarInt(in);
         readWatchableObjects(in, networkHandler);
     }
 
@@ -63,7 +64,7 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     }
                     case 1: {
-                        PacketHelper.readVarInt(in);
+                        readVarInt(in);
                         break;
                     }
                     case 2: {
@@ -71,11 +72,11 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     }
                     case 3: {
-                        PacketHelper.readString(in);
+                        readString(in);
                         break;
                     }
                     case 4: {
-                        PacketHelper.readString(in);
+                        readString(in);
                         break;
                     }
                     case 5: {
@@ -89,7 +90,7 @@ public class PacketInEntityMetadata extends Packet {
                         if (!present)
                             break;
                         networkHandler.getFishingManager().setTrackingNextEntityMeta(false);
-                        int itemID = PacketHelper.readVarInt(in);
+                        int itemID = readVarInt(in);
                         byte count = in.readByte();
                         List<Pair<String, Short>> enchantments = readNBT(in);
 
@@ -108,6 +109,9 @@ public class PacketInEntityMetadata extends Packet {
                             networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + name + "\""));
                         else if(FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && itemID == 779)
                             networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + name + "\""));
+
+                        if(FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && itemID != 779)
+                            break;
 
                         Thread.sleep(200);
 
@@ -142,18 +146,18 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     }
                     case 11: {
-                        PacketHelper.readVarInt(in);
+                        readVarInt(in);
                         break;
                     }
                     case 12: {
                         boolean present = in.readBoolean();
                         if (present) {
-                            PacketHelper.readUUID(in);
+                            readUUID(in);
                         }
                         break;
                     }
                     case 13: {
-                        PacketHelper.readVarInt(in);
+                        readVarInt(in);
                         break;
                     }
                     case 14: {
@@ -161,11 +165,11 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     }
                     case 15: {
-                        int id = PacketHelper.readVarInt(in);
+                        int id = readVarInt(in);
                         switch (id) {
                             case 20:
                             case 3: {
-                                PacketHelper.readVarInt(in);
+                                readVarInt(in);
                                 break;
                             }
                             case 11: {
@@ -179,7 +183,7 @@ public class PacketInEntityMetadata extends Packet {
                                 boolean present = in.readBoolean();
                                 if (!present)
                                     break;
-                                PacketHelper.readVarInt(in);
+                                readVarInt(in);
                                 in.readByte();
                                 in.readFully(new byte[in.getAvailable()]);
                                 break;
@@ -188,17 +192,17 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     }
                     case 16: {
-                        PacketHelper.readVarInt(in);
-                        PacketHelper.readVarInt(in);
-                        PacketHelper.readVarInt(in);
+                        readVarInt(in);
+                        readVarInt(in);
+                        readVarInt(in);
                         break;
                     }
                     case 17: {
-                        PacketHelper.readVarInt(in);
+                        readVarInt(in);
                         break;
                     }
                     case 18: {
-                        PacketHelper.readVarInt(in);
+                        readVarInt(in);
                         break;
                     }
                 }

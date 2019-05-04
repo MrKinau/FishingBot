@@ -9,23 +9,20 @@ import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
-
-import java.io.IOException;
 
 public class PacketInJoinGame extends Packet {
 
     @Override
-    public void write(ByteArrayDataOutput out) throws IOException { }
+    public void write(ByteArrayDataOutput out) { }
 
     @Override
-    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
+    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) {
         in.readInt();   //Entity ID
         in.readByte();  //Gamemode
         in.readInt();   //Dimension
         in.readByte();  //MaxPlayer
-        PacketHelper.readString(in); //level type
-        PacketHelper.readVarInt(in); //viewDistance
+        readString(in); //level type
+        readVarInt(in); //viewDistance
         in.readByte(); //Reduced Debug info
 
         networkHandler.sendPacket(new PacketOutClientSettings());

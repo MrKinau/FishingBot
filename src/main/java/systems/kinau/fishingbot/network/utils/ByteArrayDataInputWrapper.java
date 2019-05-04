@@ -136,4 +136,7 @@ public class ByteArrayDataInputWrapper implements ByteArrayDataInput {
         return result;
     }
 
+    public void readBytes(byte[] b) {
+        readFully(b, 0, b.length);
+    }
 }

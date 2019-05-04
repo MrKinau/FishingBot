@@ -13,7 +13,6 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import java.io.IOException;
 
@@ -28,7 +27,7 @@ public class PacketInSetCompression extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
-        threshold = PacketHelper.readVarInt(in);
+        threshold = readVarInt(in);
         networkHandler.setThreshold(threshold);
         FishingBot.getLog().info("Changed current threshold to: " + threshold);
     }

@@ -13,7 +13,6 @@ import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import javax.crypto.SecretKey;
 import java.io.BufferedReader;
@@ -39,9 +38,9 @@ public class PacketInEncryptionRequest extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
         //reading public key & verify token
-        this.serverId = PacketHelper.readString(in);
-        this.publicKey = CryptManager.decodePublicKey(PacketHelper.readBytesFromStreamV(in));
-        this.verifyToken = PacketHelper.readBytesFromStreamV(in);
+        this.serverId = readString(in);
+        this.publicKey = CryptManager.decodePublicKey(readBytesFromStream(in));
+        this.verifyToken = readBytesFromStream(in);
 
         networkHandler.setPublicKey(publicKey);
 

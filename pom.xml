@@ -20,6 +20,13 @@
         <jar.finalName>Fishingbot</jar.finalName>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
@@ -55,6 +62,12 @@
             <groupId>com.flowpowered</groupId>
             <artifactId>flow-nbt</artifactId>
             <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MrPowerGamerBR</groupId>
+            <artifactId>TemmieWebhook</artifactId>
+            <version>-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

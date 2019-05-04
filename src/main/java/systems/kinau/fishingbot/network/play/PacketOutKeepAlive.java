@@ -8,7 +8,6 @@ package systems.kinau.fishingbot.network.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -16,7 +15,6 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 
 @AllArgsConstructor
-@NoArgsConstructor
 public class PacketOutKeepAlive extends Packet {
 
     @Getter private long id;

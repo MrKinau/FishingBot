@@ -65,7 +65,7 @@ public class CryptManager
     {
         try
         {
-            return digestOperation("SHA-1", new byte[][] {par0Str.getBytes("ISO_8859_1"), par2SecretKey.getEncoded(), par1PublicKey.getEncoded()});
+            return digestOperation("SHA-1", par0Str.getBytes("ISO_8859_1"), par2SecretKey.getEncoded(), par1PublicKey.getEncoded());
         }
         catch (UnsupportedEncodingException var4)
         {

@@ -9,20 +9,17 @@ import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
-
-import java.io.IOException;
 
 public class PacketOutClientSettings extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out) {
-        PacketHelper.writeString(out, "lol_aa"); //use speach "LOLCAT", lol
+        writeString("lol_aa", out); //use speach "LOLCAT", lol
         out.writeByte(1); //render-distance
-        PacketHelper.writeVarInt(out, 0); //chat enabled
+        writeVarInt(0, out); //chat enabled
         out.writeBoolean(true); //support colors
         out.writeByte(128); //skin bitmask
-        PacketHelper.writeVarInt(out, 1); //right = main hand
+        writeVarInt(1, out); //right = main hand
     }
 
     @Override

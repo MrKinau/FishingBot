@@ -11,7 +11,6 @@ import systems.kinau.fishingbot.io.Constants;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import java.io.IOException;
 
@@ -23,10 +22,10 @@ public class PacketHandshake extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out) throws IOException {
-        PacketHelper.writeVarInt(out, Constants.PROTOCOL_ID);
-        PacketHelper.writeString(out, serverName);
+        writeVarInt(Constants.PROTOCOL_ID, out);
+        writeString(serverName, out);
         out.writeShort(serverPort);
-        PacketHelper.writeVarInt(out, 2); //next State = 2 -> LOGIN
+        writeVarInt(2, out); //next State = 2 -> LOGIN
     }
 
     @Override

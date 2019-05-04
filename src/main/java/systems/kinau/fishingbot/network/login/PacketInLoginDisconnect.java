@@ -10,7 +10,6 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import java.io.IOException;
 
@@ -21,7 +20,7 @@ public class PacketInLoginDisconnect extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
-        FishingBot.getLog().severe("Login failed: " + PacketHelper.readString(in));
+        FishingBot.getLog().severe("Login failed: " + readString(in));
         System.exit(0);
     }
 }

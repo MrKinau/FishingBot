@@ -13,7 +13,6 @@ import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -34,9 +33,9 @@ public class PacketOutEncryptionResponse extends Packet {
         byte[] verifyToken = new byte[0];
         sharedSecret = CryptManager.encryptData(getPublicKey(), getSecretKey().getEncoded());
         verifyToken = CryptManager.encryptData(getPublicKey(), getVerifyToken());
-        PacketHelper.writeVarInt(out, sharedSecret.length);
+        writeVarInt(sharedSecret.length, out);
         out.write(sharedSecret);
-        PacketHelper.writeVarInt(out, verifyToken.length);
+        writeVarInt(verifyToken.length, out);
         out.write(verifyToken);
     }
 

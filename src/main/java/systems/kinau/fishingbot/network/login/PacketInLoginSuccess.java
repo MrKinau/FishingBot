@@ -14,7 +14,6 @@ import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.Packet;
 import systems.kinau.fishingbot.network.State;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.PacketHelper;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -32,9 +31,9 @@ public class PacketInLoginSuccess extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length) throws IOException {
-        String uuidStr = PacketHelper.readString(in).replace("-","");
+        String uuidStr = readString(in).replace("-","");
         this.uuid = new UUID(new BigInteger(uuidStr.substring(0, 16), 16).longValue(),new BigInteger(uuidStr.substring(16), 16).longValue());
-        this.userName = PacketHelper.readString(in);
+        this.userName = readString(in);
         FishingBot.getLog().info("Login successful!");
         FishingBot.getLog().info("Name: " + userName);
         FishingBot.getLog().info("UUID: " + uuid);

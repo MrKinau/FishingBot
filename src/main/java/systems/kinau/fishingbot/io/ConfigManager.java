@@ -33,6 +33,9 @@ public class ConfigManager {
 
     private int logCount = 15;
     private AnnounceType announceType = AnnounceType.ONLY_ENCHANTED;
+    private List<String> startText = Arrays.asList("%prefix%Starting fishing", "/trigger Bot");
+
+    private String webHook = "false";
 
     public ConfigManager(File file) {
         Validate.notNull(file);
@@ -59,6 +62,8 @@ public class ConfigManager {
                 this.password = properties.getProperty("account-password");
                 this.logCount = Integer.valueOf(properties.getProperty("log-count"));
                 this.announceType = AnnounceType.valueOf(properties.getProperty("announce-type").toUpperCase());
+                this.webHook = properties.getProperty("discord-webHook");
+                this.startText = Arrays.asList(properties.getProperty("start-text").split(";"));
             } catch (IOException ex) {
                 ex.printStackTrace();
             } catch (NumberFormatException ex) {
@@ -68,7 +73,7 @@ public class ConfigManager {
     }
 
     private boolean hasAllProperties(Properties props) {
-        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type");
+        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text");
         long included = expectedProps.stream().filter(props::containsKey).count();
         return included == expectedProps.size();
     }
@@ -82,6 +87,8 @@ public class ConfigManager {
         properties.setProperty("account-password", "CHANGEME");
         properties.setProperty("log-count", "15");
         properties.setProperty("announce-type", "ONLY_ENCHANTED");
+        properties.setProperty("discord-webHook", "false");
+        properties.setProperty("start-text", "%prefix%Starting fishing;/trigger Bot");
         String comments = "server-ip:\tServer IP the bot connects to\n" +
                 "#server-port:\tPort of the server the bot connects to\n" +
                 "#online-mode:\tToggles online-mode\n" +
@@ -92,6 +99,8 @@ public class ConfigManager {
                 "#\tONLY_ENCHANTED:\tAnnounces only enchanted stuff\n" +
                 "#\tONLY_BOOKS:\tAnnounces only enchanted books\n" +
                 "#\tNONE:\tAnnounces nothing\n" +
+                "#discord-webHook:\tUse this to send all chat messages from the bot to a Discord webhook\n" +
+                "#start-text:\tChat messages/commands separated with a semicolon\n" +
                 "#account-username:\tThe username / e-mail of the account\n" +
                 "#account-password:\tThe password of the account (ignored in offline-mode)\n";
         properties.store(new FileOutputStream(file), comments);

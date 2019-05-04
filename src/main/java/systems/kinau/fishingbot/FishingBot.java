@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.fishing.FishingManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.ConfigManager;
 import systems.kinau.fishingbot.io.LogFormatter;
+import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
 import systems.kinau.fishingbot.network.NetworkHandler;
 import systems.kinau.fishingbot.network.handshake.HandshakeModule;
 import systems.kinau.fishingbot.network.login.LoginModule;
@@ -29,6 +30,7 @@ public class FishingBot {
 
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static ConfigManager config;
+    @Getter static DiscordMessageDispatcher discord;
 
     private String[] args;
 
@@ -74,6 +76,10 @@ public class FishingBot {
         //Ping server
         ServerPinger sp = new ServerPinger(getConfig().getServerIP(), getConfig().getServerPort());
         sp.ping();
+
+        //Activate Discord webHook
+        if(!getConfig().getWebHook().equalsIgnoreCase("false"))
+            discord = new DiscordMessageDispatcher(getConfig().getWebHook());
     }
 
     public void start() {
