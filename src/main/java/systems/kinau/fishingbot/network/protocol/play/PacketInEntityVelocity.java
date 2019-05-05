@@ -23,11 +23,15 @@ public class PacketInEntityVelocity extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         int eid = readVarInt(in);
+        short x = in.readShort();
+        short y = in.readShort();
+        short z = in.readShort();
+
+        networkHandler.getFishingManager().addPossibleMotion(eid, x, y, z);
+
         if(networkHandler.getFishingManager().getCurrentBobber() != eid)
             return;
-        in.readShort();
-        short y = in.readShort();
-        in.readShort();
+
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_10:
             case ProtocolConstants.MINECRAFT_1_9_4:

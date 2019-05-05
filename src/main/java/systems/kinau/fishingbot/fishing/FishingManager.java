@@ -6,19 +6,32 @@
 package systems.kinau.fishingbot.fishing;
 
 import com.google.common.io.ByteArrayDataOutput;
+import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.io.Constants;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
+import systems.kinau.fishingbot.network.utils.Item;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class FishingManager implements Runnable {
+
+    private static final List<Integer> FISH_IDS_1_14 = Arrays.asList(625, 626, 627, 628);
+    private static final List<Integer> FISH_IDS_1_8 = Collections.singletonList(349);
 
     public FishingManager() {
         new Thread(this).start();
     }
 
     @Getter @Setter private NetworkHandler networkHandler;
+    @Getter private List<Item> possibleCaughtItems = new ArrayList<>();
 
     @Getter @Setter private int currentBobber = -1;
     @Getter @Setter private boolean trackingNextFishingId = false;
@@ -31,11 +44,13 @@ public class FishingManager implements Runnable {
         setLastFish(System.currentTimeMillis());
         setCurrentBobber(-1);
         setTrackingNextEntityMeta(true);
-        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
         networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
         new Thread(() -> {
             try {
-                Thread.sleep(400);
+                Thread.sleep(200);
+                setTrackingNextEntityMeta(false);
+                getCaughtItem();
+                Thread.sleep(200);
                 setTrackingNextFishingId(true);
                 try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
                 networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
@@ -43,6 +58,95 @@ public class FishingManager implements Runnable {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public boolean containsPossibleItem(int eid) {
+        return getPossibleCaughtItems().stream().anyMatch(item -> item.getEid() == eid);
+    }
+
+    public void addPossibleMotion(int eid, int motX, int motY, int motZ) {
+        getPossibleCaughtItems().forEach(item -> {
+            if(item.getEid() == eid) {
+                item.setMotX(motX);
+                item.setMotY(motY);
+                item.setMotZ(motZ);
+            }
+        });
+    }
+
+    private void getCaughtItem() {
+        if(getPossibleCaughtItems().size() < 1)
+            return;
+        Item currentMax = getPossibleCaughtItems().get(0);
+        int currentMaxMot = getMaxMot(currentMax);
+        for (Item possibleCaughtItem : getPossibleCaughtItems()) {
+            int mot = getMaxMot(possibleCaughtItem);
+            if(mot > currentMaxMot) {
+                currentMax = possibleCaughtItem;
+                currentMaxMot = mot;
+            }
+        }
+
+        getPossibleCaughtItems().clear();
+
+        FishingBot.getLog().info("Caught \"" + currentMax.getName() + "\"");
+        if (FishingBot.getConfig().getAnnounceType() == AnnounceType.NONE)
+            return;
+        else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL)
+            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+        else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(currentMax.getItemId()) && !FISH_IDS_1_8.contains(currentMax.getItemId()))
+            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+
+        if (currentMax.getEnchantments().isEmpty())
+            return;
+
+        if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_ENCHANTED)
+            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+        else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && currentMax.getItemId() == 779)
+            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+
+        if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && currentMax.getItemId() != 779)
+            return;
+
+        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+
+        if (!currentMax.getEnchantments().isEmpty()) {
+            for (Pair<String, Short> enchantment : currentMax.getEnchantments()) {
+                networkHandler.sendPacket(new PacketOutChat("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue())));
+                FishingBot.getLog().info("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue()));
+            }
+        }
+    }
+
+    private String getRomanLevel(int number) {
+        switch (number) {
+            case 1:
+                return "I";
+            case 2:
+                return "II";
+            case 3:
+                return "III";
+            case 4:
+                return "IV";
+            case 5:
+                return "V";
+            case 6:
+                return "VI";
+            case 7:
+                return "VII";
+            case 8:
+                return "VIII";
+            case 9:
+                return "IX";
+            case 10:
+                return "X";
+            default:
+                return "" + number;
+        }
+    }
+
+    private int getMaxMot(Item item) {
+        return Math.abs(item.getMotX()) + Math.abs(item.getMotY()) + Math.abs(item.getMotZ());
     }
 
     @Override
