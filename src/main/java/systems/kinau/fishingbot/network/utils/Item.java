@@ -5,7 +5,6 @@
 
 package systems.kinau.fishingbot.network.utils;
 
-import com.sun.istack.internal.Nullable;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +18,7 @@ public class Item {
     @Getter private int eid;
     @Getter private int itemId;
     @Getter private String name;
-    @Getter @Nullable private List<Pair<String, Short>> enchantments;
+    @Getter private List<Pair<String, Short>> enchantments;
     @Getter @Setter private int motX, motY, motZ;
 
     @Override

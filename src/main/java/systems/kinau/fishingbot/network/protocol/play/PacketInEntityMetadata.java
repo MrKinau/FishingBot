@@ -49,8 +49,6 @@ public class PacketInEntityMetadata extends Packet {
         }
     }
 
-    //TODO: Dont mess it so hard up
-
     private void defaultLoop(int protocolID, ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid) {
         while (true) {
             if (in.getAvailable() == 0)
