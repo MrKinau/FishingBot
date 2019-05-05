@@ -32,10 +32,6 @@ public class PacketInDifficultySet extends Packet {
                 e.printStackTrace();
             }
             FishingManager fishingManager = networkHandler.getFishingManager();
-            if(fishingManager.getSlotData() == null) {
-                PacketInSetSlot.noFishingRod(networkHandler);
-                return;
-            }
             fishingManager.setTrackingNextFishingId(true);
             synchronized (FishingBot.getLog()) {
                 FishingBot.getConfig().getStartText().forEach(s -> {

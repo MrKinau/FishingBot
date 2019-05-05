@@ -453,9 +453,7 @@ public enum Material_1_8 {
      *
      * @param id ID of the material to get
      * @return Material if found, or null
-     * @deprecated Magic value
      */
-    @Deprecated
     public static Material_1_8 getMaterial(final int id) {
         if (byId.length > id && id >= 0) {
             return byId[id];
