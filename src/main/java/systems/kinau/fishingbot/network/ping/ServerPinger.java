@@ -29,8 +29,8 @@ public class ServerPinger {
             //Somehow special calls
             //TODO: change this messed up Packetcalls
             PacketPingServer packet = new PacketPingServer(serverName, serverPort, out, in);
-            packet.write(null);
-            packet.read(null, null, 0);
+            packet.write(null, 0);
+            packet.read(null, null, 0, 0);
 
             out.close();
             in.close();

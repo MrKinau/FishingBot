@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 
 @AllArgsConstructor
 public abstract class Module {

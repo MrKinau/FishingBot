@@ -5,11 +5,12 @@
 
 package systems.kinau.fishingbot.fishing;
 
+import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.network.NetworkHandler;
-import systems.kinau.fishingbot.network.play.PacketOutUseItem;
+import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 
 public class FishingManager implements Runnable {
 
@@ -24,18 +25,20 @@ public class FishingManager implements Runnable {
     @Getter @Setter private boolean trackingNextEntityMeta = false;
     @Getter @Setter long lastFish = System.currentTimeMillis();
 
+    @Getter @Setter ByteArrayDataOutput slotData;
+
     public void fish() {
         setLastFish(System.currentTimeMillis());
         setCurrentBobber(-1);
         setTrackingNextEntityMeta(true);
         try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
-        networkHandler.sendPacket(new PacketOutUseItem());
+        networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
         new Thread(() -> {
             try {
                 Thread.sleep(400);
                 setTrackingNextFishingId(true);
                 try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
-                networkHandler.sendPacket(new PacketOutUseItem());
+                networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

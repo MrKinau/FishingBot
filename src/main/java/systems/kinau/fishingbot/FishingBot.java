@@ -6,6 +6,7 @@
 package systems.kinau.fishingbot;
 
 import lombok.Getter;
+import lombok.Setter;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.fishing.FishingManager;
@@ -13,10 +14,10 @@ import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.ConfigManager;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
-import systems.kinau.fishingbot.network.NetworkHandler;
-import systems.kinau.fishingbot.network.handshake.HandshakeModule;
-import systems.kinau.fishingbot.network.login.LoginModule;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
+import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.network.protocol.handshake.HandshakeModule;
+import systems.kinau.fishingbot.network.protocol.login.LoginModule;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class FishingBot {
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static ConfigManager config;
     @Getter static DiscordMessageDispatcher discord;
+    @Getter @Setter static int serverProtocol;
 
     private String[] args;
 
@@ -113,6 +115,14 @@ public class FishingBot {
             new HandshakeModule(serverName, port, getNet()).perform();
             new LoginModule(getAuthData().getUsername(), getNet()).perform();
             new ItemHandler();
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }));
 
             while (running) {
                 try {

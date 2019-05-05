@@ -61,7 +61,7 @@ public class Authenticator {
                     String clientToken = answer.get("clientToken").getAsString();
                     String profile = answer.getAsJsonObject("selectedProfile").get("id").getAsString();
                     String username = answer.getAsJsonObject("selectedProfile").get("name").getAsString();
-                    FishingBot.getLog().info("Authentication succeeded: " + answer.toString());
+                    FishingBot.getLog().info("Authentication successful!");
                     return new AuthData(accessToken, clientToken, profile, username);
                 } else {
                     String error = convertStreamToString(conn.getErrorStream());
