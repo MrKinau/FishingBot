@@ -32,6 +32,7 @@ public class FishingBot {
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static ConfigManager config;
     @Getter static DiscordMessageDispatcher discord;
+    @Getter static ChatHandler chatHandler;
     @Getter @Setter static int serverProtocol;
 
     private String[] args;
@@ -39,7 +40,7 @@ public class FishingBot {
     @Getter private boolean running;
     @Getter private Socket socket;
     @Getter private NetworkHandler net;
-
+    
     @Getter private AuthData authData;
 
     @Getter private FishingManager fishingManager;
@@ -82,6 +83,9 @@ public class FishingBot {
         //Activate Discord webHook
         if(!getConfig().getWebHook().equalsIgnoreCase("false"))
             discord = new DiscordMessageDispatcher(getConfig().getWebHook());
+        
+        // Initalize chat message
+        chatHandler = new ChatHandler(this);
     }
 
     public void start() {
