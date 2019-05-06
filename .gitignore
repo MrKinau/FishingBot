@@ -62,7 +62,7 @@ fabric.properties
 .idea/vcs.xml
 FishingBot.iml
 dependency-reduced-pom.xml
-logs/
 src/test/
 target/
 config.properties
+run*/

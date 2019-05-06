@@ -19,22 +19,34 @@ public class ItemHandler {
     public static Map<Integer, String> itemsMap_1_13_1 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_14 = new HashMap<>();
 
-    public ItemHandler() {
+    public ItemHandler(int protocolId) {
         JsonElement root = null;
-        root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_14.json")));
-        root = root.getAsJsonObject().get("minecraft:item").getAsJsonObject().get("entries").getAsJsonObject();
-        for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
-            itemsMap_1_14.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
-        }
-        root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13.json")));
-        root = root.getAsJsonObject();
-        for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
-            itemsMap_1_13.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
-        }
-        root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13_1.json")));
-        root = root.getAsJsonObject();
-        for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
-            itemsMap_1_13_1.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
+        switch(protocolId) {
+            case ProtocolConstants.MINECRAFT_1_13: {
+                root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13.json")));
+                root = root.getAsJsonObject();
+                for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
+                    itemsMap_1_13.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
+                }
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_14: {
+                root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_14.json")));
+                root = root.getAsJsonObject().get("minecraft:item").getAsJsonObject().get("entries").getAsJsonObject();
+                for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
+                    itemsMap_1_14.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
+                }
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_13_2:
+            case ProtocolConstants.MINECRAFT_1_13_1: {
+                root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13_1.json")));
+                root = root.getAsJsonObject();
+                for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
+                    itemsMap_1_13_1.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
+                }
+                break;
+            }
         }
     }
 

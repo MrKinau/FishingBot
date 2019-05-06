@@ -42,7 +42,6 @@ public class PacketInSetSlot extends Packet {
                 noFishingRod(networkHandler);
         } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_1) {
             short itemId = testFishRod.readShort();
-            System.out.println(itemId);
             if (itemId != 568)  //ID in 1.13.1
                 noFishingRod(networkHandler);
         } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_2) {

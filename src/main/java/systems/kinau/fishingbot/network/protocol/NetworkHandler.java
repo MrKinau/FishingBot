@@ -29,16 +29,16 @@ import java.util.zip.Inflater;
 public class NetworkHandler {
 
     @Getter private AuthData authData;
-    @Getter private  FishingManager fishingManager;
+    @Getter private FishingManager fishingManager;
 
     @Getter private Socket socket;
     @Getter private DataOutputStream out;
     @Getter private DataInputStream in;
 
     @Getter @Setter private State state;
-    @Getter private PacketRegistry handshakeRegistry;
+    @Getter private PacketRegistry handshakeRegistry, loginRegistry_IN, loginRegistry_OUT;
     //List of all PacketRegistries of all supported protocolIds
-    @Getter private HashMap<Integer, PacketRegistry> loginRegistry_IN, loginRegistry_OUT, playRegistry_IN, playRegistry_OUT;
+    @Getter private HashMap<Integer, PacketRegistry> playRegistry_IN, playRegistry_OUT;
 
     @Getter @Setter private int threshold = 0;
     @Getter @Setter PublicKey publicKey;
@@ -64,30 +64,29 @@ public class NetworkHandler {
 
     private void initPacketRegistries() {
         this.handshakeRegistry = new PacketRegistry();
-        this.loginRegistry_IN = new HashMap<>();
-        this.loginRegistry_OUT = new HashMap<>();
+        this.loginRegistry_IN = new PacketRegistry();
+        this.loginRegistry_OUT = new PacketRegistry();
         this.playRegistry_IN = new HashMap<>();
         this.playRegistry_OUT = new HashMap<>();
 
-        getHandshakeRegistry().registerPacket(0x00, PacketHandshake.class);
-
         ProtocolConstants.SUPPORTED_VERSION_IDS.forEach(protId -> {
-            loginRegistry_IN.put(protId, new PacketRegistry());
-            loginRegistry_OUT.put(protId, new PacketRegistry());
             playRegistry_IN.put(protId, new PacketRegistry());
             playRegistry_OUT.put(protId, new PacketRegistry());
         });
 
+        //All versions
+
+        getHandshakeRegistry().registerPacket(0x00, PacketHandshake.class);
+
+        getLoginRegistry_IN().registerPacket(0x00, PacketInLoginDisconnect.class);
+        getLoginRegistry_IN().registerPacket(0x01, PacketInEncryptionRequest.class);
+        getLoginRegistry_IN().registerPacket(0x02, PacketInLoginSuccess.class);
+        getLoginRegistry_IN().registerPacket(0x03, PacketInSetCompression.class);
+
+        getLoginRegistry_OUT().registerPacket(0x00, PacketOutLoginStart.class);
+        getLoginRegistry_OUT().registerPacket(0x01, PacketOutEncryptionResponse.class);
 
         //Minecraft 1.8.X
-
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutEncryptionResponse.class);
 
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x0E, PacketInSpawnObject.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x41, PacketInDifficultySet.class);
@@ -101,7 +100,7 @@ public class NetworkHandler {
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x08, PacketInPlayerPosLook.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x02, PacketInChat.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x1F, PacketInSetExperience.class);
-        
+
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutChat.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x15, PacketOutClientSettings.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x00, PacketOutKeepAlive.class);
@@ -110,14 +109,6 @@ public class NetworkHandler {
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x04, PacketOutPosition.class);
 
         //Minecraft 1.9.0
-
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x01, PacketOutEncryptionResponse.class);
 
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x00, PacketInSpawnObject.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x0D, PacketInDifficultySet.class);
@@ -138,175 +129,35 @@ public class NetworkHandler {
 
         //Minecraft 1.9.1
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x1A, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x1F, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x23, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x3B, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x39, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x37, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x16, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x0F, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x3D, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x0B, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_1).registerPacket(0x1D, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_1).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_1).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9));
 
         //Minecraft 1.9.2
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x1A, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x1F, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x23, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x3B, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x39, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x37, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x16, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x0F, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x3D, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x0B, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_2).registerPacket(0x1D, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_2).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_2).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9));
 
         //Minecraft 1.9.4
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x1A, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x1F, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x23, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x3B, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x39, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x37, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x16, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x0F, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x3D, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x0B, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_4).registerPacket(0x1D, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9_4).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9_4).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9));
 
         //Minecraft 1.10.X
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x1A, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x1F, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x23, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x3B, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x39, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x37, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x16, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x0F, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x3D, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x0B, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_10).registerPacket(0x1D, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_10).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_10).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9));
 
         //Minecraft 1.11.0
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x1A, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x1F, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x23, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x3B, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x39, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x37, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x16, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x0F, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x3D, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x0B, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11).registerPacket(0x1D, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9));
 
         //Minecraft 1.11.1
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x1A, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x1F, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x23, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x3B, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x39, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x37, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x16, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x0F, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x3D, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x0B, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11_1).registerPacket(0x1D, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_11_1).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_9));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_11_1).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_9));
 
         //Minecraft 1.12.0
-
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x01, PacketOutEncryptionResponse.class);
 
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x00, PacketInSpawnObject.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12).registerPacket(0x0D, PacketInDifficultySet.class);
@@ -327,14 +178,6 @@ public class NetworkHandler {
 
         //Minecraft 1.12.1
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x00, PacketInSpawnObject.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x0D, PacketInDifficultySet.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1).registerPacket(0x1A, PacketInDisconnect.class);
@@ -354,40 +197,10 @@ public class NetworkHandler {
 
         //Minecraft 1.12.2
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x1A, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x1F, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x23, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x3E, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x3C, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x3A, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x16, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x0F, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x3D, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x0B, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_2).registerPacket(0x20, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_2).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_12_1));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_2).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_12_1));
 
         //Minecraft 1.13.0
-
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x01, PacketOutEncryptionResponse.class);
 
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x00, PacketInSpawnObject.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13).registerPacket(0x0D, PacketInDifficultySet.class);
@@ -408,14 +221,6 @@ public class NetworkHandler {
 
         //Minecraft 1.13.1
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x00, PacketInSpawnObject.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x0D, PacketInDifficultySet.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x1B, PacketInDisconnect.class);
@@ -428,47 +233,14 @@ public class NetworkHandler {
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x0E, PacketInChat.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x43, PacketInSetExperience.class);
 
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x0E, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_1).registerPacket(0x2A, PacketOutUseItem.class);
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_1).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13));
 
         //Minecraft 1.13.2
 
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x01, PacketOutEncryptionResponse.class);
-
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x00, PacketInSpawnObject.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x0D, PacketInDifficultySet.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x1B, PacketInDisconnect.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x21, PacketInKeepAlive.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x25, PacketInJoinGame.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x41, PacketInEntityVelocity.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x3F, PacketInEntityMetadata.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x3D, PacketInHeldItemChange.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x17, PacketInSetSlot.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x0E, PacketInChat.class);
-        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x43, PacketInSetExperience.class);
-
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x02, PacketOutChat.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x04, PacketOutClientSettings.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x0E, PacketOutKeepAlive.class);
-        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_2).registerPacket(0x2A, PacketOutUseItem.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_2).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_13_1));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13_2).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_13));
 
         //Minecraft 1.14.0
-
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x00, PacketInLoginDisconnect.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x01, PacketInEncryptionRequest.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x02, PacketInLoginSuccess.class);
-        getLoginRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x03, PacketInSetCompression.class);
-
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x00, PacketOutLoginStart.class);
-        getLoginRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x01, PacketOutEncryptionResponse.class);
 
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x00, PacketInSpawnObject.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x0D, PacketInDifficultySet.class);
@@ -486,18 +258,19 @@ public class NetworkHandler {
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x05, PacketOutClientSettings.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x0F, PacketOutKeepAlive.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x2D, PacketOutUseItem.class);
+
     }
 
     public void sendPacket(Packet packet) {
         ByteArrayDataOutput buf = ByteStreams.newDataOutput();
 
-        //Add Packet ID from current PacketRegistry
+        //Add Packet ID from serverProtocol-specific PacketRegistry
         switch (getState()) {
             case HANDSHAKE:
                 Packet.writeVarInt(getHandshakeRegistry().getId(packet.getClass()), buf);
                 break;
             case LOGIN:
-                Packet.writeVarInt(getLoginRegistry_OUT().get(FishingBot.getServerProtocol()).getId(packet.getClass()), buf);
+                Packet.writeVarInt(getLoginRegistry_OUT().getId(packet.getClass()), buf);
                 break;
             case PLAY:
                 Packet.writeVarInt(getPlayRegistry_OUT().get(FishingBot.getServerProtocol()).getId(packet.getClass()), buf);
@@ -508,13 +281,13 @@ public class NetworkHandler {
         try {
             packet.write(buf, FishingBot.getServerProtocol());
         } catch (IOException e) {
-            FishingBot.getLog().severe("Error while trying to construct: " + packet.getClass().getSimpleName());
+            FishingBot.getLog().warning("Could not instantiate " + packet.getClass().getSimpleName());
         }
 
-        if(getThreshold() > 0) {
-            //Send packet (with 0 threshold)
+        if (getThreshold() > 0) {
+            //Send packet (with 0 threshold, no compression)
             ByteArrayDataOutput send1 = ByteStreams.newDataOutput();
-            Packet.writeVarInt(0, send1);//do not compress... lol
+            Packet.writeVarInt(0, send1);
             send1.write(buf.toByteArray());
             ByteArrayDataOutput send2 = ByteStreams.newDataOutput();
             Packet.writeVarInt(send1.toByteArray().length, send2);
@@ -537,7 +310,7 @@ public class NetworkHandler {
                 FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
             }
         }
-//        System.out.println(">>> " + packet.getClass().getSimpleName());
+//        FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C >>> S: " + packet.getClass().getSimpleName());
     }
 
     public void readData() throws IOException {
@@ -546,12 +319,12 @@ public class NetworkHandler {
             int[] dlens = Packet.readVarIntt(in);
             int dlen = dlens[0];
             int plen = plen1 - dlens[1];
-            if (dlen == 0) { //this packet isn't compressed
+            if (dlen == 0) {
                 readUncompressed(plen);
-            } else { //this packet is compressed
+            } else {
                 readCompressed(plen, dlen);
             }
-        } else { //We aren't currently compressing anything
+        } else {
             readUncompressed();
         }
 
@@ -606,28 +379,26 @@ public class NetworkHandler {
                 clazz = getHandshakeRegistry().getPacket(packetId);
                 break;
             case LOGIN:
-                clazz = getLoginRegistry_IN().get(FishingBot.getServerProtocol()).getPacket(packetId);
+                clazz = getLoginRegistry_IN().getPacket(packetId);
                 break;
             case PLAY:
                 clazz = getPlayRegistry_IN().get(FishingBot.getServerProtocol()).getPacket(packetId);
                 break;
         }
 
-        if(clazz == null) {
-//            System.out.println("<<< 0x" + Integer.toHexString(packetId).toUpperCase());
+        if (clazz == null) {
+//            FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: 0x" + Integer.toHexString(packetId));
             return;
-        } else {
-//            System.out.println("<<< 0x" + Integer.toHexString(packetId).toUpperCase() + " : " + clazz.getSimpleName());
         }
+//        FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: " + clazz.getSimpleName());
 
         try {
             Packet packet = clazz.newInstance();
             packet.read(buf, this, len, FishingBot.getServerProtocol());
         } catch (InstantiationException | IllegalAccessException e) {
+            FishingBot.getLog().warning("Could not create new instance of " + clazz.getSimpleName());
             e.printStackTrace();
         }
-//        FishingBot.getLog().info("RECEIVED PACKET: " + packetId);
-//        FishingBot.getLog().info("-> " + Arrays.toString(data) + "\n");
     }
 
     public void activateEncryption() {

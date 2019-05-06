@@ -5,12 +5,14 @@
 
 package systems.kinau.fishingbot.network.protocol;
 
+import lombok.Getter;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PacketRegistry {
 
-    private Map<Integer, Class<? extends Packet>> registeredPackets = new LinkedHashMap<>();
+    @Getter private Map<Integer, Class<? extends Packet>> registeredPackets = new LinkedHashMap<>();
 
     public void registerPacket(int id, Class<? extends Packet> clazz) {
         if(registeredPackets.containsKey(id))
@@ -29,5 +31,11 @@ public class PacketRegistry {
                 .findFirst()
                 .ifPresent(integer -> id[0] = integer);
         return id[0];
+    }
+
+    public void copyOf(PacketRegistry packetRegistryBase) {
+        packetRegistryBase.getRegisteredPackets().forEach((packetId, packetClass) -> {
+            this.registeredPackets.put(packetId, packetClass);
+        });
     }
 }

@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
+    public static final String PREFIX = "FishingBot v2.2 - ";
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static ConfigManager config;
     @Getter static DiscordMessageDispatcher discord;
@@ -52,23 +53,27 @@ public class FishingBot {
 
         //Initialize Logger
         log.setLevel(Level.ALL);
+        ConsoleHandler ch;
+        log.addHandler(ch = new ConsoleHandler());
+        log.setUseParentHandlers(false);
+        LogFormatter formatter = new LogFormatter();
+        ch.setFormatter(new LogFormatter());
+
+        //Generate/Load config
+        config = new ConfigManager(new File("config.properties"));
+
+        //Set logger file handler
         try {
             FileHandler fh;
-            ConsoleHandler ch;
             if(!logsFolder.exists() && !logsFolder.mkdir() && logsFolder.isDirectory())
                 throw new IOException("Could not create logs folder!");
-            log.addHandler(fh = new FileHandler("logs/log%g.log", 0, 15));
-            log.addHandler(ch = new ConsoleHandler());
-            log.setUseParentHandlers(false);
-            LogFormatter formatter = new LogFormatter();
-            fh.setFormatter(formatter);
-            ch.setFormatter(formatter);
+            log.addHandler(fh = new FileHandler("logs/log%g.log", 0 /* 0 = infinity */, getConfig().getLogCount()));
+            fh.setFormatter(new LogFormatter());
         } catch (IOException e) {
             System.err.println("Could not create log!");
             System.exit(1);
         }
 
-        config = new ConfigManager(new File("config.properties"));
 
         //Authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
@@ -118,7 +123,7 @@ public class FishingBot {
 
             new HandshakeModule(serverName, port, getNet()).perform();
             new LoginModule(getAuthData().getUsername(), getNet()).perform();
-            new ItemHandler();
+            new ItemHandler(getServerProtocol());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {

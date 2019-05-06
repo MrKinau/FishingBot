@@ -6,7 +6,6 @@
 package systems.kinau.fishingbot.io;
 
 import lombok.Getter;
-import org.apache.commons.lang3.Validate;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 
@@ -38,7 +37,6 @@ public class ConfigManager {
     private String webHook = "false";
 
     public ConfigManager(File file) {
-        Validate.notNull(file);
         this.file = file;
         if(!file.exists()) {
             try {

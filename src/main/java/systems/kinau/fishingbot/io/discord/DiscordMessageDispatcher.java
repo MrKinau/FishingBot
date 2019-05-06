@@ -8,7 +8,6 @@ package systems.kinau.fishingbot.io.discord;
 
 import com.mrpowergamerbr.temmiewebhook.DiscordMessage;
 import com.mrpowergamerbr.temmiewebhook.TemmieWebhook;
-import org.apache.commons.lang3.Validate;
 
 public class DiscordMessageDispatcher {
 
@@ -19,10 +18,6 @@ public class DiscordMessageDispatcher {
     }
 
     public void dispatchMessage(String content, DiscordDetails details) {
-        Validate.notNull(webHook, "Webhook cannot be null");
-        Validate.notBlank(details.getUserName(), "Username cannot be null or empty");
-        Validate.notBlank(content, "Content cannot be null or empty");
-
         DiscordMessage.DiscordMessageBuilder builder = DiscordMessage.builder()
                 .username(details.getUserName())
                 .content(content);

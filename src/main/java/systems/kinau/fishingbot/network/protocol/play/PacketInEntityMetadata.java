@@ -40,9 +40,9 @@ public class PacketInEntityMetadata extends Packet {
         if (!networkHandler.getFishingManager().isTrackingNextEntityMeta())
             return;
         int eid = readVarInt(in);
-        if(networkHandler.getFishingManager().containsPossibleItem(eid))
+        if (networkHandler.getFishingManager().containsPossibleItem(eid))
             return;
-        if(protocolId == ProtocolConstants.MINECRAFT_1_8) {
+        if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             readWatchableObjects_1_8(in, networkHandler, eid);
         } else {
             defaultLoop(protocolId, in, networkHandler, eid);

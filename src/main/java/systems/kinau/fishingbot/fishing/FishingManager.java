@@ -10,7 +10,6 @@ import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.io.Constants;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
@@ -74,6 +73,7 @@ public class FishingManager implements Runnable {
         });
     }
 
+    //TODO no for all types of announcement optimized (needs testin in all versions) book ids etc
     private void getCaughtItem() {
         if(getPossibleCaughtItems().size() < 1)
             return;
@@ -87,23 +87,33 @@ public class FishingManager implements Runnable {
             }
         }
 
+        //Clear mem
         getPossibleCaughtItems().clear();
 
+        //Print to console whats caugth
         FishingBot.getLog().info("Caught \"" + currentMax.getName() + "\"");
+        if (!currentMax.getEnchantments().isEmpty()) {
+            for (Pair<String, Short> enchantment : currentMax.getEnchantments()) {
+                FishingBot.getLog().info("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue()));
+            }
+        }
+
+        //Print in mc chat (based on announcetype)
+
         if (FishingBot.getConfig().getAnnounceType() == AnnounceType.NONE)
             return;
         else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL)
-            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
         else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(currentMax.getItemId()) && !FISH_IDS_1_8.contains(currentMax.getItemId()))
-            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
 
         if (currentMax.getEnchantments().isEmpty())
             return;
 
         if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_ENCHANTED)
-            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
         else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && currentMax.getItemId() == 779)
-            networkHandler.sendPacket(new PacketOutChat(Constants.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
 
         if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && currentMax.getItemId() != 779)
             return;
@@ -113,7 +123,6 @@ public class FishingManager implements Runnable {
         if (!currentMax.getEnchantments().isEmpty()) {
             for (Pair<String, Short> enchantment : currentMax.getEnchantments()) {
                 networkHandler.sendPacket(new PacketOutChat("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue())));
-                FishingBot.getLog().info("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue()));
             }
         }
     }
@@ -153,7 +162,11 @@ public class FishingManager implements Runnable {
     public void run() {
         while (true) {
             if(System.currentTimeMillis() - getLastFish() > 60000) {
-                fish();
+                setLastFish(System.currentTimeMillis());
+                setCurrentBobber(-1);
+                setTrackingNextEntityMeta(false);
+                setTrackingNextFishingId(true);
+                networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
                 FishingBot.getLog().warning("Bot is slow (Maybe stuck). Trying to restart!");
             }
             try {

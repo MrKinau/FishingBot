@@ -9,7 +9,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.FishingManager;
-import systems.kinau.fishingbot.io.Constants;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -35,7 +34,7 @@ public class PacketInDifficultySet extends Packet {
             fishingManager.setTrackingNextFishingId(true);
             synchronized (FishingBot.getLog()) {
                 FishingBot.getConfig().getStartText().forEach(s -> {
-                    networkHandler.sendPacket(new PacketOutChat(s.replace("%prefix%", Constants.PREFIX)));
+                    networkHandler.sendPacket(new PacketOutChat(s.replace("%prefix%", FishingBot.PREFIX)));
                 });
                 networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
                 FishingBot.getLog().info("Starting fishing!");
