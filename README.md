@@ -3,6 +3,10 @@ Minecraft 1.8 - 1.14 AFK Fishing bot
 
 This is a small Minecraft 1.8 - 1.14 Client which is able to automatically fish.
 
+### Download
+* a list with all releases can be found here(https://github.com/MrKinau/FishingBot/releases)
+* The latest release can be downloaded [here](https://github.com/MrKinau/FishingBot/releases/latest)
+
 ### How to use?
 1. Download a [release](https://github.com/MrKinau/FishingBot/releases) (or build it at you own)
 2. Start the Client (java -jar Fishingbot.jar)
