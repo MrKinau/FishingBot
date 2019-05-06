@@ -73,7 +73,6 @@ public class FishingManager implements Runnable {
         });
     }
 
-    //TODO no for all types of announcement optimized (needs testin in all versions) book ids etc
     private void getCaughtItem() {
         if(getPossibleCaughtItems().size() < 1)
             return;

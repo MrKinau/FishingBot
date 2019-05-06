@@ -10,8 +10,11 @@ This is a small Minecraft 1.8 - 1.14 Client which is able to automatically fish.
 ### How to use?
 1. Download a [release](https://github.com/MrKinau/FishingBot/releases) (or build it at you own)
 2. Start the Client (java -jar Fishingbot.jar)
-3. Fill in the configs, which generated on the first start
-4. Restart the bot (Remember to give the player a fishing rod)
+3. Fill in the config.properties, which generated on the first start
+4. Give a fishing rod to the account you used and place him in fron of water
+
+* You can check their level with writing "\<username\>, Level?" in the chat (replace <username> with the account username of your bot)
+* You can change announcements, Discord-Implementation and much more in the config.properties
 
 ### Supported Versions
 * 1.8

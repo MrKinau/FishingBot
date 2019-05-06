@@ -58,7 +58,7 @@ public class NetworkHandler {
             this.state = State.HANDSHAKE;
             initPacketRegistries();
         } catch (IOException e) {
-            FishingBot.getLog().severe("Could not start bot: IOException");
+            FishingBot.getLog().severe("Could not start bot: " + e.getMessage());
         }
     }
 

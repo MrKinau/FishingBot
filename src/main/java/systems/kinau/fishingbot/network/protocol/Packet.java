@@ -22,7 +22,7 @@ public abstract class Packet {
 
     public abstract void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException;
 
-    protected static void writeString(String s, ByteArrayDataOutput buf) {
+    public static void writeString(String s, ByteArrayDataOutput buf) {
         if (s.length() > Short.MAX_VALUE) {
             throw new OverflowPacketException(String.format("Cannot send string longer than Short.MAX_VALUE (got %s characters)", s.length()));
         }
@@ -226,7 +226,7 @@ public abstract class Packet {
         return result;
     }
 
-    protected String readString(DataInputStream in) {
+    public static String readString(DataInputStream in) {
         int length;
         String s = "";
         try {

@@ -16,6 +16,7 @@ import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.handshake.HandshakeModule;
 import systems.kinau.fishingbot.network.protocol.login.LoginModule;
 
@@ -34,11 +35,13 @@ public class FishingBot {
     @Getter static ConfigManager config;
     @Getter static DiscordMessageDispatcher discord;
     @Getter static ChatHandler chatHandler;
-    @Getter @Setter static int serverProtocol;
+    @Getter @Setter static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
+    @Getter @Setter private static String serverHost;
+    @Getter @Setter private static int serverPort;
 
     private String[] args;
 
-    @Getter private boolean running;
+    @Getter @Setter private boolean running;
     @Getter private Socket socket;
     @Getter private NetworkHandler net;
     
@@ -82,6 +85,7 @@ public class FishingBot {
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
 
         //Ping server
+        getLog().info("Pinging " + getConfig().getServerIP() + "...");
         ServerPinger sp = new ServerPinger(getConfig().getServerIP(), getConfig().getServerPort());
         sp.ping();
 
@@ -112,8 +116,8 @@ public class FishingBot {
     }
 
     private void connect() {
-        String serverName = getConfig().getServerIP();
-        int port = getConfig().getServerPort();
+        String serverName = getServerHost();
+        int port = getServerPort();
 
         try {
             this.socket = new Socket(serverName, port);
@@ -143,7 +147,7 @@ public class FishingBot {
                 }
             }
         } catch (IOException e) {
-            getLog().severe("Could not start bot: IOException");
+            getLog().severe("Could not start bot: " + e.getMessage());
         }
     }
 }
