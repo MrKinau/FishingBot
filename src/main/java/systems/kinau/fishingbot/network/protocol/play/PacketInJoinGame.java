@@ -30,7 +30,8 @@ public class PacketInJoinGame extends Packet {
                 in.readBoolean();   //Reduced Debug info
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_14: {
+            case ProtocolConstants.MINECRAFT_1_14:
+            case ProtocolConstants.MINECRAFT_1_14_1: {
                 in.readInt();       //Entity ID
                 in.readByte();      //Gamemode
                 in.readByte();      //Dimension

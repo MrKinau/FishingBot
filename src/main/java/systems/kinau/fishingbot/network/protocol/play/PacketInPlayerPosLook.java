@@ -36,7 +36,7 @@ public class PacketInPlayerPosLook extends Packet {
             PacketInPlayerPosLook.yaw = yaw;
             PacketInPlayerPosLook.pitch = pitch;
         }
-        if(protocolId == ProtocolConstants.MINECRAFT_1_14) {
+        if(protocolId >= ProtocolConstants.MINECRAFT_1_14) {
             int tId = readVarInt(in);
         }
     }

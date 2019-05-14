@@ -49,14 +49,14 @@ public class PacketInSetSlot extends Packet {
             if(!present)
                 noFishingRod(networkHandler);
             int itemId = readVarInt(testFishRod);
-            if (itemId != 568)
+            if (itemId != 568) //ID in 1.13.2
                 noFishingRod(networkHandler);
         } else {
             boolean present = testFishRod.readBoolean();
             if(!present)
                 noFishingRod(networkHandler);
             int itemId = readVarInt(testFishRod);
-            if (itemId != 622)
+            if (itemId != 622) //ID in 1.14
                 noFishingRod(networkHandler);
         }
     }

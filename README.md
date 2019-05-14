@@ -1,7 +1,7 @@
-Minecraft 1.8 - 1.14 AFK Fishing bot
+Minecraft 1.8 - 1.14.1 AFK Fishing bot
 ==============
 
-This is a small Minecraft 1.8 - 1.14 Client which is able to automatically fish.
+This is a small Minecraft 1.8 - 1.14.1 Client which is able to automatically fish.
 
 ### Download
 * a list with all releases can be found [here](https://github.com/MrKinau/FishingBot/releases)
@@ -32,6 +32,7 @@ This is a small Minecraft 1.8 - 1.14 Client which is able to automatically fish.
 * 1.13.1
 * 1.13.2
 * 1.14
+* 1.14.1
 
 ### Contribution
 You are free to create a fork or a pull request to participate. You also can open new issues (I will answer them as soon as possible)

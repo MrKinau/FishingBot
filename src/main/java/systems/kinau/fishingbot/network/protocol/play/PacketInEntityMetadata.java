@@ -82,7 +82,8 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_13_2:
-                case ProtocolConstants.MINECRAFT_1_14: {
+                case ProtocolConstants.MINECRAFT_1_14:
+                case ProtocolConstants.MINECRAFT_1_14_1: {
                     readWatchableObjects_1_14(in, networkHandler, eid, type);
                     break;
                 }
@@ -213,6 +214,7 @@ public class PacketInEntityMetadata extends Packet {
                 }
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
