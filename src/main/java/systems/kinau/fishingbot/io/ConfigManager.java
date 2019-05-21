@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.io;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +34,8 @@ public class ConfigManager {
     private int logCount = 15;
     private AnnounceType announceType = AnnounceType.ONLY_ENCHANTED;
     private List<String> startText = Arrays.asList("%prefix%Starting fishing", "/trigger Bot");
+
+    private int defaultProtocol = ProtocolConstants.MINECRAFT_1_8;
 
     private String webHook = "false";
 
@@ -62,6 +65,7 @@ public class ConfigManager {
                 this.announceType = AnnounceType.valueOf(properties.getProperty("announce-type").toUpperCase());
                 this.webHook = properties.getProperty("discord-webHook");
                 this.startText = Arrays.asList(properties.getProperty("start-text").split(";"));
+                this.defaultProtocol = ProtocolConstants.getProtocolId(properties.getProperty("default-protocol"));
             } catch (IOException ex) {
                 ex.printStackTrace();
             } catch (NumberFormatException ex) {
@@ -71,7 +75,7 @@ public class ConfigManager {
     }
 
     private boolean hasAllProperties(Properties props) {
-        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text");
+        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text", "default-protocol");
         long included = expectedProps.stream().filter(props::containsKey).count();
         return included == expectedProps.size();
     }
@@ -87,6 +91,7 @@ public class ConfigManager {
         properties.setProperty("announce-type", "ONLY_ENCHANTED");
         properties.setProperty("discord-webHook", "false");
         properties.setProperty("start-text", "%prefix%Starting fishing;/trigger Bot");
+        properties.setProperty("default-protocol", ProtocolConstants.getVersionString(ProtocolConstants.MINECRAFT_1_8));
         String comments = "server-ip:\tServer IP the bot connects to\n" +
                 "#server-port:\tPort of the server the bot connects to\n" +
                 "#online-mode:\tToggles online-mode\n" +
@@ -100,7 +105,8 @@ public class ConfigManager {
                 "#discord-webHook:\tUse this to send all chat messages from the bot to a Discord webhook\n" +
                 "#start-text:\tChat messages/commands separated with a semicolon\n" +
                 "#account-username:\tThe username / e-mail of the account\n" +
-                "#account-password:\tThe password of the account (ignored in offline-mode)\n";
+                "#account-password:\tThe password of the account (ignored in offline-mode)\n" +
+                "#default-protocol:\tOnly needed for Multi-Version servers. The Minecraft-Version for the ping request to the server. Possible values: (1.8, 1.9, 1.9.2, 1.9.2, 1.9.4, ...)\n";
         properties.store(new FileOutputStream(file), comments);
         FishingBot.getLog().info("Created new config.properties");
     }

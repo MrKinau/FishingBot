@@ -77,4 +77,25 @@ public class ProtocolConstants {
             default: return "Unknown version";
         }
     }
+
+    public static int getProtocolId(String versionString) {
+        switch (versionString) {
+            case "1.9": return MINECRAFT_1_9;
+            case "1.9.1": return MINECRAFT_1_9_1;
+            case "1.9.2": return MINECRAFT_1_9_2;
+            case "1.9.4": return MINECRAFT_1_9_4;
+            case "1.10": return MINECRAFT_1_10;
+            case "1.11": return MINECRAFT_1_11;
+            case "1.11.1": return MINECRAFT_1_11_1;
+            case "1.12": return MINECRAFT_1_12;
+            case "1.12.1": return MINECRAFT_1_12_1;
+            case "1.12.2": return MINECRAFT_1_12_2;
+            case "1.13": return MINECRAFT_1_13;
+            case "1.13.1": return MINECRAFT_1_13_1;
+            case "1.13.2": return MINECRAFT_1_13_2;
+            case "1.14": return MINECRAFT_1_14;
+            case "1.14.1": return MINECRAFT_1_14_1;
+            default: return MINECRAFT_1_8;
+        }
+    }
 }

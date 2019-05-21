@@ -15,10 +15,10 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.network.utils.Item;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FishingManager implements Runnable {
 
@@ -30,7 +30,7 @@ public class FishingManager implements Runnable {
     }
 
     @Getter @Setter private NetworkHandler networkHandler;
-    @Getter private List<Item> possibleCaughtItems = new ArrayList<>();
+    @Getter private List<Item> possibleCaughtItems = new CopyOnWriteArrayList<>();
 
     @Getter @Setter private int currentBobber = -1;
     @Getter @Setter private boolean trackingNextFishingId = false;
