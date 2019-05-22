@@ -35,7 +35,7 @@ This is a small Minecraft 1.8 - 1.14.1 Client which is able to automatically fis
 * 1.14.1
 
 ### Contribution
-You are free to create a fork or a pull request to participate. You also can open new issues (I will answer them as soon as possible)
+You are free to create a fork or a pull request to participate. You also can report bugs or request a new feature in the [issues](https://github.com/MrKinau/FishingBot/issues) tab (I will answer them as soon as possible)
 
 ### Credits
 Thanks to [Torchbot](https://github.com/woder/TorchBot) for a code base. I've just stolen the half project lol.
