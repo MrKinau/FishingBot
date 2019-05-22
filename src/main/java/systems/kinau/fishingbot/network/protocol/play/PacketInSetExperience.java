@@ -11,6 +11,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -18,7 +19,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 public class PacketInSetExperience extends Packet {
 	
 	@Getter private static int experience;
-	@Getter private static int levels;
+	@Getter private static int levels = -1;
 	
 	@Override
 	public void write(ByteArrayDataOutput out, int protocolId) { }
@@ -26,8 +27,16 @@ public class PacketInSetExperience extends Packet {
 	@Override
 	public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
 		in.readFloat();
-		
-		PacketInSetExperience.levels = readVarInt(in);
+		int newLevel = readVarInt(in);
+
+		if(getLevels() >= 0 && getLevels() < newLevel) {
+			FishingBot.getLog().info("Achieved level " + newLevel);
+			if(!FishingBot.getConfig().getAnnounceLvlUp().equalsIgnoreCase("false"))
+				networkHandler.sendPacket(new PacketOutChat(FishingBot.getConfig().getAnnounceLvlUp().replace("%lvl%", String.valueOf(newLevel))));
+		}
+
+		PacketInSetExperience.levels = newLevel;
 		PacketInSetExperience.experience = readVarInt(in);
+
 	}
 }

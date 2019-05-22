@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+//TODO: very messed up, use a better config API
+
 @Getter
 public class ConfigManager {
 
@@ -33,6 +35,7 @@ public class ConfigManager {
 
     private int logCount = 15;
     private AnnounceType announceType = AnnounceType.ONLY_ENCHANTED;
+    private String announceLvlUp = "I've got a new level: %lvl%";
     private List<String> startText = Arrays.asList("%prefix%Starting fishing", "/trigger Bot");
 
     private int defaultProtocol = ProtocolConstants.MINECRAFT_1_8;
@@ -51,21 +54,32 @@ public class ConfigManager {
             try {
                 Properties properties = new Properties();
                 properties.load(new FileInputStream(file));
+                if(properties.containsKey("server-ip"))
+                    this.serverIP = properties.getProperty("server-ip");
+                if(properties.containsKey("server-port"))
+                    this.serverPort = Integer.valueOf(properties.getProperty("server-port"));
+                if(properties.containsKey("online-mode"))
+                    this.onlineMode = Boolean.valueOf(properties.getProperty("online-mode"));
+                if(properties.containsKey("account-username"))
+                    this.userName = properties.getProperty("account-username");
+                if(properties.containsKey("account-password"))
+                    this.password = properties.getProperty("account-password");
+                if(properties.containsKey("log-count"))
+                    this.logCount = Integer.valueOf(properties.getProperty("log-count"));
+                if(properties.containsKey("announce-type"))
+                    this.announceType = AnnounceType.valueOf(properties.getProperty("announce-type").toUpperCase());
+                if(properties.containsKey("discord-webHook"))
+                    this.webHook = properties.getProperty("discord-webHook");
+                if(properties.containsKey("start-text"))
+                    this.startText = Arrays.asList(properties.getProperty("start-text").split(";"));
+                if(properties.containsKey("default-protocol"))
+                    this.defaultProtocol = ProtocolConstants.getProtocolId(properties.getProperty("default-protocol"));
+                if(properties.containsKey("announce-lvl-up"))
+                    this.announceLvlUp = properties.getProperty("announce-lvl-up");
                 if(!hasAllProperties(properties)) {
-                    FishingBot.getLog().warning("Wrong config! Restoring to default.");
+                    FishingBot.getLog().warning("Wrong config! Updating config.");
                     generateConfig();
-                    return;
                 }
-                this.serverIP = properties.getProperty("server-ip");
-                this.serverPort = Integer.valueOf(properties.getProperty("server-port"));
-                this.onlineMode = Boolean.valueOf(properties.getProperty("online-mode"));
-                this.userName = properties.getProperty("account-username");
-                this.password = properties.getProperty("account-password");
-                this.logCount = Integer.valueOf(properties.getProperty("log-count"));
-                this.announceType = AnnounceType.valueOf(properties.getProperty("announce-type").toUpperCase());
-                this.webHook = properties.getProperty("discord-webHook");
-                this.startText = Arrays.asList(properties.getProperty("start-text").split(";"));
-                this.defaultProtocol = ProtocolConstants.getProtocolId(properties.getProperty("default-protocol"));
             } catch (IOException ex) {
                 ex.printStackTrace();
             } catch (NumberFormatException ex) {
@@ -75,28 +89,30 @@ public class ConfigManager {
     }
 
     private boolean hasAllProperties(Properties props) {
-        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text", "default-protocol");
+        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text", "default-protocol", "announce-lvl-up");
         long included = expectedProps.stream().filter(props::containsKey).count();
         return included == expectedProps.size();
     }
 
     private void generateConfig() throws IOException {
         Properties properties = new Properties();
-        properties.setProperty("server-ip", "127.0.0.1");
-        properties.setProperty("server-port", "25565");
-        properties.setProperty("online-mode", "true");
-        properties.setProperty("account-username", "FishingBot");
-        properties.setProperty("account-password", "CHANGEME");
-        properties.setProperty("log-count", "15");
-        properties.setProperty("announce-type", "ONLY_ENCHANTED");
-        properties.setProperty("discord-webHook", "false");
-        properties.setProperty("start-text", "%prefix%Starting fishing;/trigger Bot");
-        properties.setProperty("default-protocol", ProtocolConstants.getVersionString(ProtocolConstants.MINECRAFT_1_8));
+        properties.setProperty("server-ip", getServerIP());
+        properties.setProperty("server-port", String.valueOf(getServerPort()));
+        properties.setProperty("online-mode", isOnlineMode() ? "true" : "false");
+        properties.setProperty("account-username", getUserName());
+        properties.setProperty("account-password", getPassword());
+        properties.setProperty("log-count", String.valueOf(getLogCount()));
+        properties.setProperty("announce-type", getAnnounceType().toString());
+        properties.setProperty("discord-webHook", getWebHook());
+        properties.setProperty("start-text", getStartText().toString().replace("[", "").replace("]", "").replace(", ",";"));   //Not clean
+        properties.setProperty("default-protocol", ProtocolConstants.getVersionString(getDefaultProtocol()));
+        properties.setProperty("announce-lvl-up", getAnnounceLvlUp());
         String comments = "server-ip:\tServer IP the bot connects to\n" +
                 "#server-port:\tPort of the server the bot connects to\n" +
                 "#online-mode:\tToggles online-mode\n" +
                 "#log-count:\tThe number of logs the bot generate\n" +
                 "#announce-type:\tThe type of chat announcement:\n" +
+                "#announce-lvl-up:\tText of the level-announcement in chat. %lvl% will be replaced with the gained level. Use false if you dont want to announce the achieved levels\n" +
                 "#\tALL:\tAnnounces everything caught\n" +
                 "#\tALL_BUT_FISH:\tAnnounces everything excepts fish\n" +
                 "#\tONLY_ENCHANTED:\tAnnounces only enchanted stuff\n" +
@@ -108,6 +124,6 @@ public class ConfigManager {
                 "#account-password:\tThe password of the account (ignored in offline-mode)\n" +
                 "#default-protocol:\tOnly needed for Multi-Version servers. The Minecraft-Version for the ping request to the server. Possible values: (1.8, 1.9, 1.9.2, 1.9.2, 1.9.4, ...)\n";
         properties.store(new FileOutputStream(file), comments);
-        FishingBot.getLog().info("Created new config.properties");
+        FishingBot.getLog().info("Created/Updated config.properties");
     }
 }

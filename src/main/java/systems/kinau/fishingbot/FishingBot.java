@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static final String PREFIX = "FishingBot v2.3.1 - ";
+    public static final String PREFIX = "FishingBot v2.3.2 - ";
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static ConfigManager config;
     @Getter static DiscordMessageDispatcher discord;
@@ -60,7 +60,7 @@ public class FishingBot {
         log.addHandler(ch = new ConsoleHandler());
         log.setUseParentHandlers(false);
         LogFormatter formatter = new LogFormatter();
-        ch.setFormatter(new LogFormatter());
+        ch.setFormatter(formatter);
 
         //Generate/Load config
         config = new ConfigManager(new File("config.properties"));
