@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static final String PREFIX = "FishingBot v2.3.2 - ";
+    public static final String PREFIX = "FishingBot v2.3.3 - ";
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static ConfigManager config;
     @Getter static DiscordMessageDispatcher discord;

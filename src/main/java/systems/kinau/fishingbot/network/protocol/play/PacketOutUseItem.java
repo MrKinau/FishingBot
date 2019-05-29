@@ -53,7 +53,8 @@ public class PacketOutUseItem extends Packet {
             case ProtocolConstants.MINECRAFT_1_9_1:
             case ProtocolConstants.MINECRAFT_1_9:
             case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1: {
+            case ProtocolConstants.MINECRAFT_1_14_1:
+            case ProtocolConstants.MINECRAFT_1_14_2: {
                 out.writeByte(0);       //main hand
                 break;
             }

@@ -38,7 +38,8 @@ public class PacketOutClientSettings extends Packet {
             case ProtocolConstants.MINECRAFT_1_9_1:
             case ProtocolConstants.MINECRAFT_1_9:
             case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1: {
+            case ProtocolConstants.MINECRAFT_1_14_1:
+            case ProtocolConstants.MINECRAFT_1_14_2: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
                 out.writeByte(1);           //render-distance
                 writeVarInt(0, out);        //chat enabled

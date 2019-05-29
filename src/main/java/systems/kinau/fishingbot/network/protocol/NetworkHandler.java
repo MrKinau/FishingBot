@@ -259,11 +259,15 @@ public class NetworkHandler {
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x0F, PacketOutKeepAlive.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14).registerPacket(0x2D, PacketOutUseItem.class);
 
-        //Minecraft 1.14.0
+        //Minecraft 1.14.1
 
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14_1).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14));
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14_1).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14));
 
+        //Minecraft 1.14.2
+
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14_2).copyOf(getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14));
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14_2).copyOf(getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14));
     }
 
     public void sendPacket(Packet packet) {
