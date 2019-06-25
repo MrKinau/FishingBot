@@ -52,7 +52,8 @@ public class PacketInEntityVelocity extends Packet {
             case ProtocolConstants.MINECRAFT_1_11:
             case ProtocolConstants.MINECRAFT_1_14:
             case ProtocolConstants.MINECRAFT_1_14_1:
-            case ProtocolConstants.MINECRAFT_1_14_2: {
+            case ProtocolConstants.MINECRAFT_1_14_2:
+            case ProtocolConstants.MINECRAFT_1_14_3: {
                 if(Math.abs(y) > 350) {
                     networkHandler.getFishingManager().fish();
                 } else if(lastY == 0 && y == 0) {               //Sometimes Minecraft does not push the bobber down, but this workaround works good
