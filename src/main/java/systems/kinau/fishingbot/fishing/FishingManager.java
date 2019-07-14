@@ -6,7 +6,6 @@
 package systems.kinau.fishingbot.fishing;
 
 import com.google.common.io.ByteArrayDataOutput;
-import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
@@ -18,6 +17,7 @@ import systems.kinau.fishingbot.network.utils.Item;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FishingManager implements Runnable {
@@ -92,8 +92,8 @@ public class FishingManager implements Runnable {
         //Print to console whats caugth
         FishingBot.getLog().info("Caught \"" + currentMax.getName() + "\"");
         if (!currentMax.getEnchantments().isEmpty()) {
-            for (Pair<String, Short> enchantment : currentMax.getEnchantments()) {
-                FishingBot.getLog().info("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue()));
+            for (Map<String, Short> enchantment : currentMax.getEnchantments()) {
+                enchantment.keySet().forEach(s -> FishingBot.getLog().info("-> " + s.replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.get(s))));
             }
         }
 
@@ -120,8 +120,8 @@ public class FishingManager implements Runnable {
         try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
 
         if (!currentMax.getEnchantments().isEmpty()) {
-            for (Pair<String, Short> enchantment : currentMax.getEnchantments()) {
-                networkHandler.sendPacket(new PacketOutChat("-> " + enchantment.getKey().replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.getValue())));
+            for (Map<String, Short> enchantment : currentMax.getEnchantments()) {
+                enchantment.keySet().forEach(s -> networkHandler.sendPacket(new PacketOutChat("-> " + s.replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.get(s)))));
             }
         }
     }

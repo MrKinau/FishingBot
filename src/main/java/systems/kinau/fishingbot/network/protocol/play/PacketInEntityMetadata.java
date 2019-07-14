@@ -11,7 +11,6 @@ import com.flowpowered.nbt.Tag;
 import com.flowpowered.nbt.TagType;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.io.ByteArrayDataOutput;
-import javafx.util.Pair;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.ItemHandler;
@@ -26,7 +25,9 @@ import systems.kinau.fishingbot.network.utils.Material_1_8;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 public class PacketInEntityMetadata extends Packet {
@@ -128,7 +129,7 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     int itemID = readVarInt(in);
                     byte count = in.readByte();
-                    List<Pair<String, Short>> enchantments = readNBT(in);
+                    List<Map<String, Short>> enchantments = readNBT(in);
                     String name = ItemHandler.getItemName(itemID, FishingBot.getServerProtocol()).replace("minecraft:", "");
                     networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
                     return;
@@ -252,7 +253,7 @@ public class PacketInEntityMetadata extends Packet {
                 case 6: {
                     int itemID = in.readShort();
                     byte count = in.readByte();
-                    List<Pair<String, Short>> enchantments = readNBT(in);
+                    List<Map<String, Short>> enchantments = readNBT(in);
 
                     String name = ItemHandler.getItemName(itemID, FishingBot.getServerProtocol()).replace("minecraft:", "");
 
@@ -342,8 +343,7 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
             }
-        } catch (Exception ex) {
-        }
+        } catch (Exception ignored) { }
     }
 
     private void readWatchableObjects_1_9(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
@@ -374,7 +374,7 @@ public class PacketInEntityMetadata extends Packet {
                     byte count = in.readByte();
                     short damage = in.readShort();
                     String name = Material_1_8.getMaterial(itemID).name();
-                    List<Pair<String, Short>> enchantments = readNBT_1_8(in);
+                    List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
                     networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
@@ -416,12 +416,9 @@ public class PacketInEntityMetadata extends Packet {
                     readVarInt(in);
                     break;
                 }
-                case 13: {
-                    return;
-                }
+                case 13: { }
             }
-        } catch (Exception ex) {
-        }
+        } catch (Exception ignored) { }
     }
 
     private void readWatchableObjects_1_8(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid) {
@@ -463,7 +460,7 @@ public class PacketInEntityMetadata extends Packet {
                         byte count = in.readByte();
                         short damage = in.readShort();
                         String name = Material_1_8.getMaterial(itemID).name();
-                        List<Pair<String, Short>> enchantments = readNBT_1_8(in);
+                        List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
                         networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
@@ -488,12 +485,12 @@ public class PacketInEntityMetadata extends Packet {
         }
     }
 
-    private List<Pair<String, Short>> readNBT(ByteArrayDataInputWrapper in) {
+    private List<Map<String, Short>> readNBT(ByteArrayDataInputWrapper in) {
 
         byte[] bytes = new byte[in.getAvailable()];
         in.readFully(bytes);
 
-        List<Pair<String, Short>> enchList = new ArrayList<>();
+        List<Map<String, Short>> enchList = new ArrayList<>();
 
         try {
             NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(bytes), false);
@@ -504,12 +501,12 @@ public class PacketInEntityMetadata extends Packet {
                     if (root.containsKey("StoredEnchantments")) {
                         List<CompoundTag> enchants = (List<CompoundTag>) root.get("StoredEnchantments").getValue();
                         for (CompoundTag enchant : enchants) {
-                            enchList.add(new Pair<>((String) enchant.getValue().get("id").getValue(), (Short) enchant.getValue().get("lvl").getValue()));
+                            enchList.add(Collections.singletonMap((String) enchant.getValue().get("id").getValue(), (Short) enchant.getValue().get("lvl").getValue()));
                         }
                     } else if (root.containsKey("Enchantments")) {
                         List<CompoundTag> enchants = (List<CompoundTag>) root.get("Enchantments").getValue();
                         for (CompoundTag enchant : enchants) {
-                            enchList.add(new Pair<>((String) enchant.getValue().get("id").getValue(), (Short) enchant.getValue().get("lvl").getValue()));
+                            enchList.add(Collections.singletonMap((String) enchant.getValue().get("id").getValue(), (Short) enchant.getValue().get("lvl").getValue()));
                         }
                     }
                 }
@@ -519,12 +516,12 @@ public class PacketInEntityMetadata extends Packet {
         return enchList;
     }
 
-    private List<Pair<String, Short>> readNBT_1_8(ByteArrayDataInputWrapper in) {
+    private List<Map<String, Short>> readNBT_1_8(ByteArrayDataInputWrapper in) {
 
         byte[] bytes = new byte[in.getAvailable()];
         in.readFully(bytes);
 
-        List<Pair<String, Short>> enchList = new ArrayList<>();
+        List<Map<String, Short>> enchList = new ArrayList<>();
 
         try {
             NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(bytes), false);
@@ -535,12 +532,12 @@ public class PacketInEntityMetadata extends Packet {
                     if (root.containsKey("StoredEnchantments")) {
                         List<CompoundTag> enchants = (List<CompoundTag>) root.get("StoredEnchantments").getValue();
                         for (CompoundTag enchant : enchants) {
-                            enchList.add(new Pair<>(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
+                            enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
                         }
                     } else if (root.containsKey("ench")) {
                         List<CompoundTag> enchants = (List<CompoundTag>) root.get("ench").getValue();
                         for (CompoundTag enchant : enchants) {
-                            enchList.add(new Pair<>(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
+                            enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
                         }
                     }
                 }
