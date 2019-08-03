@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static final String PREFIX = "FishingBot v2.3.4 - ";
+    public static final String PREFIX = "FishingBot v2.3.5 - ";
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static ConfigManager config;
     @Getter static DiscordMessageDispatcher discord;
@@ -86,7 +86,7 @@ public class FishingBot {
 
         //Ping server
         getLog().info("Pinging " + getConfig().getServerIP() + " with protocol of MC-" + ProtocolConstants.getVersionString(getConfig().getDefaultProtocol()));
-        ServerPinger sp = new ServerPinger(getConfig().getServerIP(), getConfig().getServerPort());
+        ServerPinger sp = new ServerPinger(getConfig().getServerIP(), getConfig().getServerPort(), this);
         sp.ping();
 
         //Activate Discord webHook

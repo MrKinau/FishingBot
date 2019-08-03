@@ -43,7 +43,9 @@ public class PacketOutKeepAlive extends Packet {
             case ProtocolConstants.MINECRAFT_1_14:
             case ProtocolConstants.MINECRAFT_1_14_1:
             case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3: {
+            case ProtocolConstants.MINECRAFT_1_14_3:
+            case ProtocolConstants.MINECRAFT_1_14_4:
+            default: {
                 out.writeLong(id);
                 break;
             }

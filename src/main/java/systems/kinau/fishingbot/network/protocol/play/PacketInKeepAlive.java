@@ -44,7 +44,9 @@ public class PacketInKeepAlive extends Packet {
             case ProtocolConstants.MINECRAFT_1_14:
             case ProtocolConstants.MINECRAFT_1_14_1:
             case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3: {
+            case ProtocolConstants.MINECRAFT_1_14_3:
+            case ProtocolConstants.MINECRAFT_1_14_4:
+            default: {
                 this.id = in.readLong();
                 break;
             }

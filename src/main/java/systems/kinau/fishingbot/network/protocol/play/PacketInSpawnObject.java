@@ -51,7 +51,9 @@ public class PacketInSpawnObject extends Packet {
             case ProtocolConstants.MINECRAFT_1_14:
             case ProtocolConstants.MINECRAFT_1_14_1:
             case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3: {
+            case ProtocolConstants.MINECRAFT_1_14_3:
+            case ProtocolConstants.MINECRAFT_1_14_4:
+            default: {
                 int id = readVarInt(in);    //EID
                 readUUID(in);               //E UUID
                 int type = in.readByte();  //Obj type

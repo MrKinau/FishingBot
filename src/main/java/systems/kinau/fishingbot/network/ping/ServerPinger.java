@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.TextComponent;
@@ -30,6 +31,7 @@ public class ServerPinger {
 
     private String serverName;
     private int serverPort;
+    private FishingBot fishingBot;
 
     public void ping() {
         if(serverName == null || serverName.trim().isEmpty()) {
@@ -83,9 +85,11 @@ public class ServerPinger {
                 int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
                 if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(protocolId)) {
                     FishingBot.getLog().severe("This server is not running a supported protocol version!");
-                    FishingBot.getLog().severe("You might connect to one of the following server versions:");
-                    FishingBot.getLog().severe(ProtocolConstants.SUPPORTED_VERSIONS.toString());
-                    System.exit(1);
+                    FishingBot.getLog().severe("It is possibe that it wont work correctly");
+
+                    //Register protocol of 1.14 for unknown versions
+                    fishingBot.getNet().getPlayRegistry_IN().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14));
+                    fishingBot.getNet().getPlayRegistry_OUT().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14));
                 }
                 FishingBot.setServerProtocol(protocolId);
                 String description = "Unknown";
