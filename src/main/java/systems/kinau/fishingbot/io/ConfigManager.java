@@ -37,6 +37,7 @@ public class ConfigManager {
     private AnnounceType announceType = AnnounceType.ONLY_ENCHANTED;
     private String announceLvlUp = "I've got a new level: %lvl%";
     private List<String> startText = Arrays.asList("%prefix%Starting fishing", "/trigger Bot");
+    private boolean proxyChat = false;
 
     private int defaultProtocol = ProtocolConstants.MINECRAFT_1_8;
 
@@ -76,6 +77,8 @@ public class ConfigManager {
                     this.defaultProtocol = ProtocolConstants.getProtocolId(properties.getProperty("default-protocol"));
                 if(properties.containsKey("announce-lvl-up"))
                     this.announceLvlUp = properties.getProperty("announce-lvl-up");
+                if(properties.containsKey("proxy-chat"))
+                    this.proxyChat = Boolean.valueOf(properties.getProperty("proxy-chat"));
                 if(!hasAllProperties(properties)) {
                     FishingBot.getLog().warning("Wrong config! Updating config.");
                     generateConfig();
@@ -89,7 +92,7 @@ public class ConfigManager {
     }
 
     private boolean hasAllProperties(Properties props) {
-        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text", "default-protocol", "announce-lvl-up");
+        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text", "default-protocol", "announce-lvl-up", "proxy-chat");
         long included = expectedProps.stream().filter(props::containsKey).count();
         return included == expectedProps.size();
     }
@@ -107,6 +110,7 @@ public class ConfigManager {
         properties.setProperty("start-text", getStartText().toString().replace("[", "").replace("]", "").replace(", ",";"));   //Not clean
         properties.setProperty("default-protocol", ProtocolConstants.getVersionString(getDefaultProtocol()));
         properties.setProperty("announce-lvl-up", getAnnounceLvlUp());
+        properties.setProperty("proxy-chat", Boolean.toString(proxyChat));
         String comments = "server-ip:\tServer IP the bot connects to\n" +
                 "#server-port:\tPort of the server the bot connects to\n" +
                 "#online-mode:\tToggles online-mode\n" +
@@ -122,7 +126,8 @@ public class ConfigManager {
                 "#start-text:\tChat messages/commands separated with a semicolon\n" +
                 "#account-username:\tThe username / e-mail of the account\n" +
                 "#account-password:\tThe password of the account (ignored in offline-mode)\n" +
-                "#default-protocol:\tOnly needed for Multi-Version servers. The Minecraft-Version for the ping request to the server. Possible values: (1.8, 1.9, 1.9.2, 1.9.2, 1.9.4, ...)\n";
+                "#default-protocol:\tOnly needed for Multi-Version servers. The Minecraft-Version for the ping request to the server. Possible values: (1.8, 1.9, 1.9.2, 1.9.2, 1.9.4, ...)\n" +
+                "#proxy-chat:\tWhether to function as a chat client (printing incoming chat messages to the console and sending input as chat)";
         properties.store(new FileOutputStream(file), comments);
         FishingBot.getLog().info("Created/Updated config.properties");
     }
