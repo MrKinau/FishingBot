@@ -13,6 +13,18 @@ public class TextComponent {
     public static String toPlainText(JsonObject object) {
         StringBuilder messageBuilder = new StringBuilder();
 
+        if(object.has("with"))  {
+            JsonArray array = object.getAsJsonArray("with");
+            for(int i = 0; i < array.size(); i++) {
+                messageBuilder = new StringBuilder(getText(array.get(i).getAsJsonObject(), messageBuilder) + " ");
+            }
+            return messageBuilder.toString();
+        } else {
+            return getText(object, messageBuilder);
+        }
+    }
+
+    private static String getText(JsonObject object, StringBuilder messageBuilder) {
         if (object.has("text")) {
             String text = object.get("text").getAsString();
             if (!text.isEmpty()) messageBuilder.append(text);
