@@ -14,11 +14,9 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.network.utils.Item;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 public class FishingManager implements Runnable {
 
@@ -89,39 +87,59 @@ public class FishingManager implements Runnable {
         //Clear mem
         getPossibleCaughtItems().clear();
 
-        //Print to console whats caugth
-        FishingBot.getLog().info("Caught \"" + currentMax.getName() + "\"");
-        if (!currentMax.getEnchantments().isEmpty()) {
-            for (Map<String, Short> enchantment : currentMax.getEnchantments()) {
-                enchantment.keySet().forEach(s -> FishingBot.getLog().info("-> " + s.replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.get(s))));
-            }
-        }
+        //Print to console (based on announcetype)
+        logItem(currentMax,
+                FishingBot.getConfig().getAnnounceTypeConsole(),
+                FishingBot.getLog()::info,
+                FishingBot.getLog()::info);
 
         //Print in mc chat (based on announcetype)
+        logItem(currentMax,
+                FishingBot.getConfig().getAnnounceTypeChat(),
+                (String str) -> networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + str)),
+                (String str) -> {
+                    // Delay the enchant messages to arrive after the item announcement
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    networkHandler.sendPacket(new PacketOutChat(str));
+                });
+    }
 
-        if (FishingBot.getConfig().getAnnounceType() == AnnounceType.NONE)
+
+    private String stringify(Item item) {
+        return "Caught \"" + item.getName() + "\"";
+    }
+
+    private void logItem(Item item, AnnounceType noisiness, Consumer<String> announce, Consumer<String> announceEnchants) {
+        if (noisiness == AnnounceType.NONE)
             return;
-        else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL)
-            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
-        else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(currentMax.getItemId()) && !FISH_IDS_1_8.contains(currentMax.getItemId()))
-            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
+        else if (noisiness == AnnounceType.ALL)
+            announce.accept(stringify(item));
+        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId()))
+            announce.accept(stringify(item));
 
-        if (currentMax.getEnchantments().isEmpty())
+        if (item.getEnchantments().isEmpty())
             return;
 
-        if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_ENCHANTED)
-            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
-        else if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && currentMax.getItemId() == 779)
-            networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + "Caught: \"" + currentMax.getName() + "\""));
-
-        if (FishingBot.getConfig().getAnnounceType() == AnnounceType.ONLY_BOOKS && currentMax.getItemId() != 779)
+        if (noisiness == AnnounceType.ONLY_ENCHANTED)
+            announce.accept(stringify(item));
+        else if (noisiness == AnnounceType.ONLY_BOOKS && item.getItemId() == 779)
+            announce.accept(stringify(item));
+        if (noisiness == AnnounceType.ONLY_BOOKS && item.getItemId() != 779)
             return;
 
-        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
-
-        if (!currentMax.getEnchantments().isEmpty()) {
-            for (Map<String, Short> enchantment : currentMax.getEnchantments()) {
-                enchantment.keySet().forEach(s -> networkHandler.sendPacket(new PacketOutChat("-> " + s.replace("minecraft:", "").toUpperCase() + " " + getRomanLevel(enchantment.get(s)))));
+        if (!item.getEnchantments().isEmpty()) {
+            for (Map<String, Short> enchantment : item.getEnchantments()) {
+                enchantment.keySet().forEach(s -> {
+                    String asText = "-> "
+                            + s.replace("minecraft:", "").toUpperCase()
+                            + " "
+                            + getRomanLevel(enchantment.get(s));
+                    announceEnchants.accept(asText);
+                });
             }
         }
     }

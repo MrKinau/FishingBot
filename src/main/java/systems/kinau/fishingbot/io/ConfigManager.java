@@ -34,7 +34,8 @@ public class ConfigManager {
     private String password = "CHANGEME";
 
     private int logCount = 15;
-    private AnnounceType announceType = AnnounceType.ONLY_ENCHANTED;
+    private AnnounceType announceTypeChat = AnnounceType.ONLY_ENCHANTED;
+    private AnnounceType announceTypeConsole = AnnounceType.ALL;
     private String announceLvlUp = "I've got a new level: %lvl%";
     private List<String> startText = Arrays.asList("%prefix%Starting fishing", "/trigger Bot");
     private boolean proxyChat = false;
@@ -68,7 +69,11 @@ public class ConfigManager {
                 if(properties.containsKey("log-count"))
                     this.logCount = Integer.valueOf(properties.getProperty("log-count"));
                 if(properties.containsKey("announce-type"))
-                    this.announceType = AnnounceType.valueOf(properties.getProperty("announce-type").toUpperCase());
+                    this.announceTypeChat = AnnounceType.valueOf(properties.getProperty("announce-type").toUpperCase());
+                if(properties.containsKey("announce-type-chat"))
+                    this.announceTypeChat = AnnounceType.valueOf(properties.getProperty("announce-type-chat").toUpperCase());
+                if(properties.containsKey("announce-type-console"))
+                    this.announceTypeConsole = AnnounceType.valueOf(properties.getProperty("announce-type-console").toUpperCase());
                 if(properties.containsKey("discord-webHook"))
                     this.webHook = properties.getProperty("discord-webHook");
                 if(properties.containsKey("start-text"))
@@ -92,7 +97,7 @@ public class ConfigManager {
     }
 
     private boolean hasAllProperties(Properties props) {
-        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type", "discord-webHook", "start-text", "default-protocol", "announce-lvl-up", "proxy-chat");
+        List<String> expectedProps = Arrays.asList("server-ip", "server-port", "online-mode", "account-username", "account-password", "log-count", "announce-type-chat", "announce-type-console", "discord-webHook", "start-text", "default-protocol", "announce-lvl-up", "proxy-chat");
         long included = expectedProps.stream().filter(props::containsKey).count();
         return included == expectedProps.size();
     }
@@ -105,7 +110,8 @@ public class ConfigManager {
         properties.setProperty("account-username", getUserName());
         properties.setProperty("account-password", getPassword());
         properties.setProperty("log-count", String.valueOf(getLogCount()));
-        properties.setProperty("announce-type", getAnnounceType().toString());
+        properties.setProperty("announce-type-chat", getAnnounceTypeChat().toString());
+        properties.setProperty("announce-type-console", getAnnounceTypeConsole().toString());
         properties.setProperty("discord-webHook", getWebHook());
         properties.setProperty("start-text", getStartText().toString().replace("[", "").replace("]", "").replace(", ",";"));   //Not clean
         properties.setProperty("default-protocol", ProtocolConstants.getVersionString(getDefaultProtocol()));
@@ -115,13 +121,16 @@ public class ConfigManager {
                 "#server-port:\tPort of the server the bot connects to\n" +
                 "#online-mode:\tToggles online-mode\n" +
                 "#log-count:\tThe number of logs the bot generate\n" +
-                "#announce-type:\tThe type of chat announcement:\n" +
-                "#announce-lvl-up:\tText of the level-announcement in chat. %lvl% will be replaced with the gained level. Use false if you dont want to announce the achieved levels\n" +
+                "#announce-type-chat:\tThe type of chat announcement:\n" +
+                "#announce-type-console:\tThe type of console log announcement:\n" +
+                "# Announcement levels:\n"+
                 "#\tALL:\tAnnounces everything caught\n" +
                 "#\tALL_BUT_FISH:\tAnnounces everything excepts fish\n" +
                 "#\tONLY_ENCHANTED:\tAnnounces only enchanted stuff\n" +
                 "#\tONLY_BOOKS:\tAnnounces only enchanted books\n" +
                 "#\tNONE:\tAnnounces nothing\n" +
+                "#announce-lvl-up:\tText of the level-announcement in chat. %lvl% will be replaced with the gained level.\n" +
+                "\tUse \"false\" if you dont want to announce the achieved levels\n" +
                 "#discord-webHook:\tUse this to send all chat messages from the bot to a Discord webhook\n" +
                 "#start-text:\tChat messages/commands separated with a semicolon\n" +
                 "#account-username:\tThe username / e-mail of the account\n" +
