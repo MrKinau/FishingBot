@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.github.MrPowerGamerBR</groupId>
             <artifactId>TemmieWebhook</artifactId>
-            <version>-SNAPSHOT</version>
+            <version>-59de40c3b6-1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

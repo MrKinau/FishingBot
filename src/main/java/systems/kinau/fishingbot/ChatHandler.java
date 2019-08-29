@@ -29,6 +29,7 @@ public class ChatHandler {
 					instance.getNet().sendPacket(new PacketOutChat(line));
 				}
 			});
+			chatThread.setDaemon(true);
 			chatThread.start();
 		}
 	}

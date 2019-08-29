@@ -14,6 +14,8 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+import java.util.Arrays;
+
 @NoArgsConstructor
 public class PacketInDifficultySet extends Packet {
 
@@ -33,7 +35,7 @@ public class PacketInDifficultySet extends Packet {
             FishingManager fishingManager = networkHandler.getFishingManager();
             fishingManager.setTrackingNextFishingId(true);
             synchronized (FishingBot.getLog()) {
-                FishingBot.getConfig().getStartText().forEach(s -> {
+                Arrays.asList(FishingBot.getConfig().getStartText().split(";")).forEach(s -> {
                     networkHandler.sendPacket(new PacketOutChat(s.replace("%prefix%", FishingBot.PREFIX)));
                 });
                 networkHandler.sendPacket(new PacketOutUseItem(networkHandler));

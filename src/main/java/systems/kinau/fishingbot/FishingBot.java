@@ -11,8 +11,8 @@ import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.fishing.FishingManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
-import systems.kinau.fishingbot.io.ConfigManager;
 import systems.kinau.fishingbot.io.LogFormatter;
+import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -32,7 +32,7 @@ public class FishingBot {
 
     public static final String PREFIX = "FishingBot v2.3.5 - ";
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
-    @Getter static ConfigManager config;
+    @Getter static SettingsConfig config;
     @Getter static DiscordMessageDispatcher discord;
     @Getter static ChatHandler chatHandler;
     @Getter @Setter static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
@@ -63,7 +63,7 @@ public class FishingBot {
         ch.setFormatter(formatter);
 
         //Generate/Load config
-        config = new ConfigManager(new File("config.properties"));
+        config = new SettingsConfig();
 
         //Set logger file handler
         try {
@@ -85,7 +85,7 @@ public class FishingBot {
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
 
         //Ping server
-        getLog().info("Pinging " + getConfig().getServerIP() + " with protocol of MC-" + ProtocolConstants.getVersionString(getConfig().getDefaultProtocol()));
+        getLog().info("Pinging " + getConfig().getServerIP() + " with protocol of MC-" + getConfig().getDefaultProtocol());
         ServerPinger sp = new ServerPinger(getConfig().getServerIP(), getConfig().getServerPort(), this);
         sp.ping();
 

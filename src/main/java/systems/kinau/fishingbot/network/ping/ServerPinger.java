@@ -11,7 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.TextComponent;
@@ -63,7 +62,7 @@ public class ServerPinger {
 
             ByteArrayDataOutput buf = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, buf);
-            Packet.writeVarInt(FishingBot.getConfig().getDefaultProtocol(), buf);
+            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getConfig().getDefaultProtocol()), buf);
             Packet.writeString(serverName, buf);
             buf.writeShort(serverPort);
             Packet.writeVarInt(1, buf);
