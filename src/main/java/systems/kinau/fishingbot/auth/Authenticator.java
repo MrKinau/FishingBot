@@ -18,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+//TODO: Change to use with HttpClient
 @AllArgsConstructor
 public class Authenticator {
 

@@ -33,8 +33,14 @@ public class PacketInChat extends Packet {
 
 			JsonObject object = PARSER.parse(minecraftJson).getAsJsonObject();
 
-			String text = TextComponent.toPlainText(object);
-
+			String text;
+			//Thrown only on vanilla servers
+			//TODO: Fix vanilla server json as text
+			try {
+				text = TextComponent.toPlainText(object);
+			} catch (IllegalStateException ex) {
+				text = minecraftJson;
+			}
 			FishingBot.getChatHandler().receiveMessage(text, ChatType.values()[in.readByte()], minecraftJson);
 		} catch (Exception ex) {
 			ex.printStackTrace();

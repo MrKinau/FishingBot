@@ -19,6 +19,7 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.handshake.HandshakeModule;
 import systems.kinau.fishingbot.network.protocol.login.LoginModule;
+import systems.kinau.fishingbot.realms.RealmsAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static final String PREFIX = "FishingBot v2.3.5 - ";
+    public static final String PREFIX = "FishingBot v2.4 - ";
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter static SettingsConfig config;
     @Getter static DiscordMessageDispatcher discord;
@@ -81,12 +82,53 @@ public class FishingBot {
         //Authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
             authenticate();
-        else
+        else {
+            getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
+        }
+
+        String ip = getConfig().getServerIP();
+        int port = getConfig().getServerPort();
+
+        //Check rather to connect to realm
+        if (getConfig().getRealmId() != -1) {
+            RealmsAPI realmsAPI = new RealmsAPI(getAuthData());
+            if (getConfig().getRealmId() == 0) {
+                realmsAPI.printPossibleWorlds();
+                FishingBot.getLog().info("Shutting down, because realm-id is not set...");
+                System.exit(0);
+            }
+            if (getConfig().isRealmAcceptTos())
+                realmsAPI.agreeTos();
+            else {
+                FishingBot.getLog().severe("*****************************************************************************");
+                FishingBot.getLog().severe("If you want to use realms you have to accept the tos in the config.properties");
+                FishingBot.getLog().severe("*****************************************************************************");
+                System.exit(0);
+            }
+
+            String ipAndPort = null;
+            for (int i = 0; i < 5; i++) {
+                ipAndPort = realmsAPI.getServerIP(getConfig().getRealmId());
+                if (ipAndPort == null) {
+                    FishingBot.getLog().info("Trying to receive IP (Try " + (i + 1) + ")...");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else
+                    break;
+            }
+            if (ipAndPort == null)
+                System.exit(0);
+            ip = ipAndPort.split(":")[0];
+            port = Integer.parseInt(ipAndPort.split(":")[1]);
+        }
 
         //Ping server
-        getLog().info("Pinging " + getConfig().getServerIP() + " with protocol of MC-" + getConfig().getDefaultProtocol());
-        ServerPinger sp = new ServerPinger(getConfig().getServerIP(), getConfig().getServerPort(), this);
+        getLog().info("Pinging " + ip + ":" + port + " with protocol of MC-" + getConfig().getDefaultProtocol());
+        ServerPinger sp = new ServerPinger(ip, port, this);
         sp.ping();
 
         //Activate Discord webHook

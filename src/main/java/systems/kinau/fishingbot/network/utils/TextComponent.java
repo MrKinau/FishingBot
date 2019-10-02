@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 
 public class TextComponent {
 
-    public static String toPlainText(JsonObject object) {
+    public static String toPlainText(JsonObject object) throws IllegalStateException {
         StringBuilder messageBuilder = new StringBuilder();
 
         if(object.has("with"))  {

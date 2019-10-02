@@ -13,8 +13,14 @@ This is a small Minecraft 1.8 - 1.14.4 Client which is able to automatically fis
 3. Fill in the config.properties, which generated on the first start
 4. Give a fishing rod to the account you used and place him in fron of water
 
-* You can check their level with writing "\<username\>, Level?" in the chat (replace <username> with the account username of your bot)
-* You can change announcements, Discord-Implementation and much more in the config.properties
+### Features
+* Auto-Fishing Bot
+* Announces Loot/Level (also in Discord if wanted)
+* check the bots level with "\<username\>, Level?" in the chat (replace <username> with the account username of your bot)
+* connect to every relevant minecraft version (realms included)
+* Offline and online mode
+* Use the bot console to chat
+* Want more? Feel free to request a feature [here](https://github.com/MrKinau/FishingBot/issues)
 
 ### Supported Versions
 * 1.8
