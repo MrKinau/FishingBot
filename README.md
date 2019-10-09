@@ -13,7 +13,7 @@ Minecraft 1.8 - 1.14.4 AFK Fishing bot
 1.	Download a [release](https://github.com/MrKinau/FishingBot/releases) (or build it at you own)
 2.	Start the Client (java -jar Fishingbot.jar)
 3.	Fill in the config.properties, which generated on the first start
-4.	Give a fishing rod to the account you used and place him in fron of water
+4.	Give a fishing rod to the account you used and place him in front of water
 
 ### Features
 -	Auto-Fishing Bot
