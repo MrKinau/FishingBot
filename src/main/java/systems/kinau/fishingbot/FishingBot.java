@@ -32,12 +32,12 @@ import java.util.logging.Logger;
 public class FishingBot {
 
     public static final String PREFIX = "FishingBot v2.4 - ";
-    @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
+    @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter @Setter public static boolean running;
-    @Getter static SettingsConfig config;
-    @Getter static DiscordMessageDispatcher discord;
-    @Getter static ChatHandler chatHandler;
-    @Getter @Setter static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
+    @Getter private static SettingsConfig config;
+    @Getter private static DiscordMessageDispatcher discord;
+    @Getter private static ChatHandler chatHandler;
+    @Getter @Setter private static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
     @Getter @Setter private static String serverHost;
     @Getter @Setter private static int serverPort;
     @Getter @Setter public static AuthData authData;
@@ -63,7 +63,7 @@ public class FishingBot {
         ch.setFormatter(formatter);
 
         //Generate/Load config
-        config = new SettingsConfig();
+        FishingBot.config = new SettingsConfig();
 
         //Set logger file handler
         try {
@@ -83,7 +83,7 @@ public class FishingBot {
             authenticate();
         else {
             getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
-            authData = new AuthData(null, null, null, getConfig().getUserName());
+            FishingBot.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
         String ip = getConfig().getServerIP();
@@ -132,10 +132,10 @@ public class FishingBot {
 
         //Activate Discord webHook
         if(!getConfig().getWebHook().equalsIgnoreCase("false"))
-            discord = new DiscordMessageDispatcher(getConfig().getWebHook());
+            FishingBot.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
 
         // Initalize chat message
-        chatHandler = new ChatHandler(this);
+        FishingBot.chatHandler = new ChatHandler(this);
     }
 
     public void start() {

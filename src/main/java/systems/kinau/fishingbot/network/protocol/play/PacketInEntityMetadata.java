@@ -34,6 +34,7 @@ public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
+        //Only incoming packet
     }
 
     @Override
@@ -44,7 +45,7 @@ public class PacketInEntityMetadata extends Packet {
         if (networkHandler.getFishingManager().containsPossibleItem(eid))
             return;
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
-            readWatchableObjects_1_8(in, networkHandler, eid);
+            readWatchableObjects18(in, networkHandler, eid);
         } else {
             defaultLoop(protocolId, in, networkHandler, eid);
         }
@@ -74,12 +75,12 @@ public class PacketInEntityMetadata extends Packet {
                 case ProtocolConstants.MINECRAFT_1_9_2:
                 case ProtocolConstants.MINECRAFT_1_9_1:
                 case ProtocolConstants.MINECRAFT_1_9: {
-                    readWatchableObjects_1_9(in, networkHandler, eid, type);
+                    readWatchableObjects19(in, networkHandler, eid, type);
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_13_1:
                 case ProtocolConstants.MINECRAFT_1_13: {
-                    readWatchableObjects_1_13(in, networkHandler, eid, type);
+                    readWatchableObjects113(in, networkHandler, eid, type);
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_13_2:
@@ -89,14 +90,14 @@ public class PacketInEntityMetadata extends Packet {
                 case ProtocolConstants.MINECRAFT_1_14_3:
                 case ProtocolConstants.MINECRAFT_1_14_4:
                 default: {
-                    readWatchableObjects_1_14(in, networkHandler, eid, type);
+                    readWatchableObjects114(in, networkHandler, eid, type);
                     break;
                 }
             }
         }
     }
 
-    private void readWatchableObjects_1_14(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+    private void readWatchableObjects114(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
         try {
             switch (type) {
                 case 0: {
@@ -120,9 +121,7 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 5: {
-                    if (in.readBoolean()) {
-                        //Chat is missing
-                    }
+                    in.readBoolean();
                     break;
                 }
                 case 6: {
@@ -223,7 +222,7 @@ public class PacketInEntityMetadata extends Packet {
         }
     }
 
-    private void readWatchableObjects_1_13(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+    private void readWatchableObjects113(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
         try {
             switch (type) {
                 case 0: {
@@ -247,9 +246,7 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 5: {
-                    if (in.readBoolean()) {
-                        //Chat is missing
-                    }
+                    in.readBoolean();
                     break;
                 }
                 case 6: {
@@ -348,7 +345,7 @@ public class PacketInEntityMetadata extends Packet {
         } catch (Exception ignored) { }
     }
 
-    private void readWatchableObjects_1_9(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+    private void readWatchableObjects19(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
         try {
             switch (type) {
                 case 0: {
@@ -418,12 +415,11 @@ public class PacketInEntityMetadata extends Packet {
                     readVarInt(in);
                     break;
                 }
-                case 13: { }
             }
         } catch (Exception ignored) { }
     }
 
-    private void readWatchableObjects_1_8(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid) {
+    private void readWatchableObjects18(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid) {
         while (true) {
             if (in.getAvailable() == 0)
                 break;
@@ -432,7 +428,6 @@ public class PacketInEntityMetadata extends Packet {
                 break;
 
             int i = (var2 & 224) >> 5;
-            int j = var2 & 31;
 
             try {
                 switch (i) {
@@ -459,8 +454,8 @@ public class PacketInEntityMetadata extends Packet {
 
                     case 5: {
                         int itemID = in.readShort();
-                        byte count = in.readByte();
-                        short damage = in.readShort();
+                        in.readByte(); //count
+                        in.readShort(); //damage
                         String name = Material_1_8.getMaterial(itemID).name();
                         List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
@@ -528,19 +523,17 @@ public class PacketInEntityMetadata extends Packet {
         try {
             NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(bytes), false);
             Tag tag = nbtInputStream.readTag();
-            if (tag.getType() == TagType.TAG_COMPOUND) {
-                if (tag.getValue() instanceof CompoundMap) {
-                    CompoundMap root = (CompoundMap) tag.getValue();
-                    if (root.containsKey("StoredEnchantments")) {
-                        List<CompoundTag> enchants = (List<CompoundTag>) root.get("StoredEnchantments").getValue();
-                        for (CompoundTag enchant : enchants) {
-                            enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
-                        }
-                    } else if (root.containsKey("ench")) {
-                        List<CompoundTag> enchants = (List<CompoundTag>) root.get("ench").getValue();
-                        for (CompoundTag enchant : enchants) {
-                            enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
-                        }
+            if (tag.getType() == TagType.TAG_COMPOUND && tag.getValue() instanceof CompoundMap) {
+                CompoundMap root = (CompoundMap) tag.getValue();
+                if (root.containsKey("StoredEnchantments")) {
+                    List<CompoundTag> enchants = (List<CompoundTag>) root.get("StoredEnchantments").getValue();
+                    for (CompoundTag enchant : enchants) {
+                        enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
+                    }
+                } else if (root.containsKey("ench")) {
+                    List<CompoundTag> enchants = (List<CompoundTag>) root.get("ench").getValue();
+                    for (CompoundTag enchant : enchants) {
+                        enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
                     }
                 }
             }

@@ -13,8 +13,12 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 public class PacketOutArmAnimation extends Packet {
 
     @Override
-    public void write(ByteArrayDataOutput out, int protocolId) { }
+    public void write(ByteArrayDataOutput out, int protocolId) {
+        //This packet needs no content
+    }
 
     @Override
-    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) { }
+    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+        //Only outgoing packet
+    }
 }

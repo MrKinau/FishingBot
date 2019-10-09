@@ -17,6 +17,7 @@
 
     <properties>
         <jar.finalName>Fishingbot</jar.finalName>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <repositories>

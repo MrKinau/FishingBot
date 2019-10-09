@@ -16,11 +16,16 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 @NoArgsConstructor
 public class PacketInPlayerPosLook extends Packet {
 
-    @Getter private static double x, y, z;
-    @Getter private static float yaw, pitch;
+    @Getter private static double x;
+    @Getter private static double y;
+    @Getter private static double z;
+    @Getter private static float yaw;
+    @Getter private static float pitch;
 
     @Override
-    public void write(ByteArrayDataOutput out, int protocolId) { }
+    public void write(ByteArrayDataOutput out, int protocolId) {
+        //Only incoming packet
+    }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
@@ -37,7 +42,7 @@ public class PacketInPlayerPosLook extends Packet {
             PacketInPlayerPosLook.pitch = pitch;
         }
         if(protocolId >= ProtocolConstants.MINECRAFT_1_14) {
-            int tId = readVarInt(in);
+            readVarInt(in); //tID
         }
     }
 }

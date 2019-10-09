@@ -11,5 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class AuthData {
 
-    @Getter private String accessToken, clientToken, profile, username;
+    @Getter private String accessToken;
+    @Getter private String clientToken;
+    @Getter private String profile;
+    @Getter private String username;
 }
