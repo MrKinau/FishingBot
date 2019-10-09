@@ -33,20 +33,19 @@ public class FishingBot {
 
     public static final String PREFIX = "FishingBot v2.4 - ";
     @Getter static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
+    @Getter @Setter public static boolean running;
     @Getter static SettingsConfig config;
     @Getter static DiscordMessageDispatcher discord;
     @Getter static ChatHandler chatHandler;
     @Getter @Setter static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
     @Getter @Setter private static String serverHost;
     @Getter @Setter private static int serverPort;
+    @Getter @Setter public static AuthData authData;
 
     private String[] args;
 
-    @Getter @Setter private boolean running;
     @Getter private Socket socket;
     @Getter private NetworkHandler net;
-    
-    @Getter private AuthData authData;
 
     @Getter private FishingManager fishingManager;
 
@@ -84,7 +83,7 @@ public class FishingBot {
             authenticate();
         else {
             getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
-            this.authData = new AuthData(null, null, null, getConfig().getUserName());
+            authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
         String ip = getConfig().getServerIP();
@@ -134,7 +133,7 @@ public class FishingBot {
         //Activate Discord webHook
         if(!getConfig().getWebHook().equalsIgnoreCase("false"))
             discord = new DiscordMessageDispatcher(getConfig().getWebHook());
-        
+
         // Initalize chat message
         chatHandler = new ChatHandler(this);
     }
@@ -142,7 +141,6 @@ public class FishingBot {
     public void start() {
         if(isRunning())
             return;
-        this.running = true;
         connect();
     }
 
@@ -150,10 +148,10 @@ public class FishingBot {
         Authenticator authenticator = new Authenticator(getConfig().getUserName(), getConfig().getPassword());
         AuthData authData = authenticator.authenticate();
         if(authData == null) {
-            this.authData = new AuthData(null, null, null, getConfig().getUserName());
+            setAuthData(new AuthData(null, null, null, getConfig().getUserName()));
             return false;
         }
-        this.authData = authData;
+        setAuthData(authData);
         return true;
     }
 
@@ -161,35 +159,64 @@ public class FishingBot {
         String serverName = getServerHost();
         int port = getServerPort();
 
-        try {
-            this.socket = new Socket(serverName, port);
+        do {
+            try {
+                setRunning(true);
+                this.socket = new Socket(serverName, port);
 
-            this.fishingManager = new FishingManager();
-            this.net = new NetworkHandler(socket, authData, fishingManager);
+                this.fishingManager = new FishingManager();
+                this.net = new NetworkHandler(socket, authData, fishingManager);
 
-            new HandshakeModule(serverName, port, getNet()).perform();
-            new LoginModule(getAuthData().getUsername(), getNet()).perform();
-            new ItemHandler(getServerProtocol());
+                new HandshakeModule(serverName, port, getNet()).perform();
+                new LoginModule(getAuthData().getUsername(), getNet()).perform();
+                new ItemHandler(getServerProtocol());
 
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }));
+
+                while (running) {
+                    try {
+                        net.readData();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        getLog().warning("Could not receive packet! Shutting down!");
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                getLog().severe("Could not start bot: " + e.getMessage());
+            } finally {
                 try {
-                    socket.close();
+                    if (socket != null)
+                        this.socket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }));
-
-            while (running) {
+                this.socket = null;
+                this.fishingManager = null;
+                this.net = null;
+            }
+            if (getConfig().isAutoReconnect()) {
+                getLog().info("FishingBot restarts in 3 seconds...");
                 try {
-                    net.readData();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    getLog().warning("Could not receive packet! Shutting down!");
-                    System.exit(1);
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (getAuthData() == null) {
+                    if (getConfig().isOnlineMode())
+                        authenticate();
+                    else {
+                        getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
+                        authData = new AuthData(null, null, null, getConfig().getUserName());
+                    }
                 }
             }
-        } catch (IOException e) {
-            getLog().severe("Could not start bot: " + e.getMessage());
-        }
+        } while (getConfig().isAutoReconnect());
     }
 }

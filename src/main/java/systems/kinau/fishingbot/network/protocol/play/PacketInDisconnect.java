@@ -22,6 +22,6 @@ public class PacketInDisconnect extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         String reason = readString(in);
         FishingBot.getLog().info("Disconnected: " + reason);
-        System.exit(0);
+        FishingBot.setRunning(false);
     }
 }

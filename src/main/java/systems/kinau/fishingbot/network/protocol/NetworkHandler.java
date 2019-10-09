@@ -327,6 +327,7 @@ public class NetworkHandler {
                 out.flush();
             } catch (IOException e) {
                 FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
+                e.printStackTrace();
             }
         }
 //        FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C >>> S: " + packet.getClass().getSimpleName());

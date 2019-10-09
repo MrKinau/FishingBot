@@ -13,10 +13,9 @@ public class SettingsConfig implements Config {
 
     @Property(key = "server-ip") private String serverIP = "127.0.0.1";
     @Property(key = "server-port") private int serverPort = 25565;
-    @Property(key = "realm-id")
-    private long realmId = -1;
-    @Property(key = "realm-accept-tos")
-    private boolean realmAcceptTos = false;
+    @Property(key = "realm-id") private long realmId = -1;
+    @Property(key = "realm-accept-tos") private boolean realmAcceptTos = false;
+    @Property(key = "auto-reconnect") private boolean autoReconnect = true;
 
     @Property(key = "online-mode") private boolean onlineMode = true;
 
@@ -38,8 +37,9 @@ public class SettingsConfig implements Config {
         String comments = "server-ip:\tServer IP the bot connects to\n" +
                 "#server-port:\tPort of the server the bot connects to\n" +
                 "#realm-id:\tID of the realm the bot should conmnect to (if this option is enabled the bot ignores the server-ip and server-port). To get the correct id start the bot in online-mode and set the realm-id to 0. At startup you will get a list of your connectable realms with the corresponding id.\n" +
+                "#auto-reconnect:\tAuto-Reconnect if bot get kicked/time out etc\n" +
                 "#online-mode:\tToggles online-mode\n" +
-                "#log-count:\tThe number of logs the bot generate\n" +
+                "#log-count:\t\t\t\tThe number of logs the bot generate\n" +
                 "#announce-type-chat:\tThe type of chat announcement:\n" +
                 "#announce-type-console:\tThe type of console log announcement:\n" +
                 "# Announcement levels:\n"+

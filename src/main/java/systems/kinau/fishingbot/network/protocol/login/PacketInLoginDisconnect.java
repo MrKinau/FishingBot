@@ -21,6 +21,7 @@ public class PacketInLoginDisconnect extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         FishingBot.getLog().severe("Login failed: " + readString(in));
-        System.exit(0);
+        FishingBot.setRunning(false);
+        FishingBot.setAuthData(null);
     }
 }
