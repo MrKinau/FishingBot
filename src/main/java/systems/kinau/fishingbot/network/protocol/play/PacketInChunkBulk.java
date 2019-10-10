@@ -1,7 +1,11 @@
+/*
+ * Created by David Luedtke (MrKinau)
+ * 2019/10/11
+ */
+
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
-import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.mining.Chunk;
 import systems.kinau.fishingbot.mining.MiningManager;
@@ -11,11 +15,11 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-@NoArgsConstructor
-public class PacketInChunk extends Packet {
-
+public class PacketInChunkBulk extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
         //Only incoming packet
@@ -25,22 +29,27 @@ public class PacketInChunk extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         if(!(MineBot.getInstance().getManager() instanceof MiningManager))
             return;
-        int chunkX = in.readInt();
-        int chunkZ = in.readInt();
-        boolean fullChunk = in.readBoolean();
-        int bitmask = in.readUnsignedShort();
-        readVarInt(in); //size (unimportant for us, I think)
+        boolean lightning = in.readBoolean();
+        int chunkCount = readVarInt(in);
 
         World world = MineBot.getInstance().getWorld();
-        Optional<Chunk> optChunk = world.getChunk(chunkX, chunkZ);
-        Chunk chunk;
-        if(!optChunk.isPresent()) {
-            chunk = new Chunk(chunkX, chunkZ, bitmask);
-            world.addChunk(chunk);
-        } else
-            chunk = optChunk.get();
+        List<Chunk> chunks = new ArrayList<>();
 
-        chunk.loadSections(in, world.getDimension() == 0, fullChunk);
+        for(int i = 0; i < chunkCount; i++) {
+            int chunkX = in.readInt();
+            int chunkZ = in.readInt();
+            int bitmask = in.readUnsignedShort();
+
+            Optional<Chunk> optChunk = world.getChunk(chunkX, chunkZ);
+            Chunk chunk;
+            if(!optChunk.isPresent()) {
+                chunk = new Chunk(chunkX, chunkZ, bitmask);
+                world.addChunk(chunk);
+            } else
+                chunk = optChunk.get();
+            chunks.add(chunk);
+        }
+
+        chunks.forEach(chunk -> chunk.loadSections(in, lightning, true));
     }
-
 }

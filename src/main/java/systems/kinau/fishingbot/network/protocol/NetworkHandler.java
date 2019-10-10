@@ -98,6 +98,7 @@ public class NetworkHandler {
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x02, PacketInChat.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x1F, PacketInSetExperience.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x21, PacketInChunk.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x26, PacketInChunkBulk.class);
 
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutChat.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x15, PacketOutClientSettings.class);

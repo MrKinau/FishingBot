@@ -15,6 +15,7 @@ import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
 import systems.kinau.fishingbot.mining.MiningManager;
+import systems.kinau.fishingbot.mining.World;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -43,6 +44,7 @@ public class MineBot {
     @Getter @Setter private static String serverHost;
     @Getter @Setter private static int serverPort;
     @Getter @Setter private AuthData authData;
+    @Getter @Setter private World world;
 
     private String[] args;
 
@@ -211,6 +213,7 @@ public class MineBot {
                 }
                 this.socket = null;
                 this.manager = null;
+                this.world = null;
                 this.net = null;
             }
             if (getConfig().isAutoReconnect()) {
