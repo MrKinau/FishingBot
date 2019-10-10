@@ -7,7 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -30,7 +30,7 @@ public class PacketInSetSlot extends Packet {
         in.readBytes(bytes);
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.write(bytes.clone());
-        networkHandler.getFishingManager().setSlotData(out);
+        networkHandler.getManager().setSlotData(out);
         ByteArrayDataInputWrapper testFishRod = new ByteArrayDataInputWrapper(bytes.clone());
         if(protocolId < ProtocolConstants.MINECRAFT_1_13) {
             short itemId = testFishRod.readShort();
@@ -63,7 +63,7 @@ public class PacketInSetSlot extends Packet {
 
     public static void noFishingRod(NetworkHandler networkHandler) {
         networkHandler.sendPacket(new PacketOutChat("Please equip my selected inventory slot with a fishing rod!"));
-        FishingBot.getLog().severe("No fishing rod equipped. Stopping bot!");
+        MineBot.getLog().severe("No fishing rod equipped. Stopping bot!");
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {

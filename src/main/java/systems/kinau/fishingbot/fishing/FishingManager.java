@@ -8,17 +8,21 @@ package systems.kinau.fishingbot.fishing;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.Setter;
-import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.Manager;
+import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.network.utils.Item;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-public class FishingManager implements Runnable {
+public class FishingManager extends Manager implements Runnable {
 
     private static final List<Integer> FISH_IDS_1_14 = Arrays.asList(625, 626, 627, 628);
     private static final List<Integer> FISH_IDS_1_8 = Collections.singletonList(349);
@@ -27,7 +31,6 @@ public class FishingManager implements Runnable {
         new Thread(this).start();
     }
 
-    @Getter @Setter private NetworkHandler networkHandler;
     @Getter private List<Item> possibleCaughtItems = new CopyOnWriteArrayList<>();
 
     @Getter @Setter private int currentBobber = -1;
@@ -89,14 +92,14 @@ public class FishingManager implements Runnable {
 
         //Print to console (based on announcetype)
         logItem(currentMax,
-                FishingBot.getConfig().getAnnounceTypeConsole(),
-                FishingBot.getLog()::info,
-                FishingBot.getLog()::info);
+                MineBot.getConfig().getAnnounceTypeConsole(),
+                MineBot.getLog()::info,
+                MineBot.getLog()::info);
 
         //Print in mc chat (based on announcetype)
         logItem(currentMax,
-                FishingBot.getConfig().getAnnounceTypeChat(),
-                (String str) -> networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + str)),
+                MineBot.getConfig().getAnnounceTypeChat(),
+                (String str) -> networkHandler.sendPacket(new PacketOutChat(MineBot.PREFIX + str)),
                 (String str) -> {
                     // Delay the enchant messages to arrive after the item announcement
                     try {
@@ -184,13 +187,27 @@ public class FishingManager implements Runnable {
                 setTrackingNextEntityMeta(false);
                 setTrackingNextFishingId(true);
                 networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
-                FishingBot.getLog().warning("Bot is slow (Maybe stuck). Trying to restart!");
+                MineBot.getLog().warning("Bot is slow (Maybe stuck). Trying to restart!");
             }
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void onConnected() {
+        setTrackingNextFishingId(true);
+        synchronized (MineBot.getLog()) {
+            Arrays.asList(MineBot.getConfig().getStartText().split(";")).forEach(s -> {
+                networkHandler.sendPacket(new PacketOutChat(s.replace("%prefix%", MineBot.PREFIX)));
+            });
+            networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+            MineBot.getLog().info("Starting fishing!");
+            if(MineBot.getServerProtocol() == ProtocolConstants.MINECRAFT_1_8)
+                startPositionUpdate(networkHandler);
         }
     }
 }

@@ -16,12 +16,12 @@ import java.util.Scanner;
 
 public class ChatHandler {
 	
-	private FishingBot instance;
+	private MineBot instance;
     private Thread chatThread;
 	
-	public ChatHandler(FishingBot instance) {
+	public ChatHandler(MineBot instance) {
 		this.instance = instance;
-		if(FishingBot.getConfig().isProxyChat()) {
+		if(MineBot.getConfig().isProxyChat()) {
 			chatThread = new Thread(() -> {
 				Scanner scanner = new Scanner(System.in);
 				while(true){
@@ -38,8 +38,8 @@ public class ChatHandler {
 		if (content.contains(instance.getAuthData().getUsername() + ", Level?")) {
 			instance.getNet().sendPacket(new PacketOutChat(PacketInSetExperience.getLevels() + " Level, Sir!"));
 		}
-		if (FishingBot.getConfig().isProxyChat() && !"".equals(content)) {
-			FishingBot.getLog().info(content);
+		if (MineBot.getConfig().isProxyChat() && !"".equals(content)) {
+			MineBot.getLog().info(content);
 		}
 	}
 	

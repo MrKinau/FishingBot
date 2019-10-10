@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import lombok.AllArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +48,7 @@ public class Authenticator {
             data.addProperty("username", username);
             data.addProperty("password", password);
 
-            FishingBot.getLog().info("Try to authenticate " + username + ":" + password.replaceAll(".", "*"));
+            MineBot.getLog().info("Try to authenticate " + username + ":" + password.replaceAll(".", "*"));
 
             wr.write(data.toString());
             wr.flush();
@@ -62,22 +62,22 @@ public class Authenticator {
                     String clientToken = answer.get("clientToken").getAsString();
                     String profile = answer.getAsJsonObject("selectedProfile").get("id").getAsString();
                     String username = answer.getAsJsonObject("selectedProfile").get("name").getAsString();
-                    FishingBot.getLog().info("Authentication successful!");
+                    MineBot.getLog().info("Authentication successful!");
                     return new AuthData(accessToken, clientToken, profile, username);
                 } else {
                     String error = convertStreamToString(conn.getErrorStream());
-                    FishingBot.getLog().warning("Authentication failed: " + error);
+                    MineBot.getLog().warning("Authentication failed: " + error);
                 }
 
             } catch (IOException e) {
-                FishingBot.getLog().severe("Could not open connection to: " + AUTH_SERVER);
+                MineBot.getLog().severe("Could not open connection to: " + AUTH_SERVER);
             } catch (JsonSyntaxException e) {
-                FishingBot.getLog().severe("Could not parse answer from: " + AUTH_SERVER);
+                MineBot.getLog().severe("Could not parse answer from: " + AUTH_SERVER);
             }
         } catch (MalformedURLException ex) {
-            FishingBot.getLog().severe(AUTH_SERVER + " is a malformed URL! Does not make any sense!");
+            MineBot.getLog().severe(AUTH_SERVER + " is a malformed URL! Does not make any sense!");
         } catch (IOException ex) {
-            FishingBot.getLog().severe("Could not open connection to: " + AUTH_SERVER);
+            MineBot.getLog().severe("Could not open connection to: " + AUTH_SERVER);
         }
         return null;
     }

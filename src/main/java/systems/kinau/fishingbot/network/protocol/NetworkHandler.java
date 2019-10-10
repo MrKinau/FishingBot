@@ -9,9 +9,9 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import lombok.Setter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.Manager;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.auth.AuthData;
-import systems.kinau.fishingbot.fishing.FishingManager;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketHandshake;
 import systems.kinau.fishingbot.network.protocol.login.*;
 import systems.kinau.fishingbot.network.protocol.play.*;
@@ -26,10 +26,10 @@ import java.util.HashMap;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class NetworkHandler {
+public class NetworkHandler<M extends Manager> {
 
     @Getter private AuthData authData;
-    @Getter private FishingManager fishingManager;
+    @Getter private M manager;
 
     @Getter private Socket socket;
     @Getter private DataOutputStream out;
@@ -46,11 +46,11 @@ public class NetworkHandler {
     @Getter @Setter private boolean outputEncrypted;
     @Getter @Setter private boolean inputBeingDecrypted;
 
-    public NetworkHandler(Socket socket, AuthData authData, FishingManager fishingManager) {
+    public NetworkHandler(Socket socket, AuthData authData, M manager) {
         this.socket = socket;
         this.authData = authData;
-        this.fishingManager = fishingManager;
-        fishingManager.setNetworkHandler(this);
+        this.manager = manager;
+        manager.setNetworkHandler(this);
         try {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.in = new DataInputStream(socket.getInputStream());
@@ -58,7 +58,7 @@ public class NetworkHandler {
             this.state = State.HANDSHAKE;
             initPacketRegistries();
         } catch (IOException e) {
-            FishingBot.getLog().severe("Could not start bot: " + e.getMessage());
+            MineBot.getLog().severe("Could not start bot: " + e.getMessage());
         }
     }
 
@@ -292,15 +292,15 @@ public class NetworkHandler {
                 Packet.writeVarInt(getLoginRegistry_OUT().getId(packet.getClass()), buf);
                 break;
             case PLAY:
-                Packet.writeVarInt(getPlayRegistry_OUT().get(FishingBot.getServerProtocol()).getId(packet.getClass()), buf);
+                Packet.writeVarInt(getPlayRegistry_OUT().get(MineBot.getServerProtocol()).getId(packet.getClass()), buf);
                 break;
         }
 
         //Add packet payload
         try {
-            packet.write(buf, FishingBot.getServerProtocol());
+            packet.write(buf, MineBot.getServerProtocol());
         } catch (IOException e) {
-            FishingBot.getLog().warning("Could not instantiate " + packet.getClass().getSimpleName());
+            MineBot.getLog().warning("Could not instantiate " + packet.getClass().getSimpleName());
         }
 
         if (getThreshold() > 0) {
@@ -315,7 +315,7 @@ public class NetworkHandler {
                 out.write(send2.toByteArray());
                 out.flush();
             } catch (IOException e) {
-                FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
+                MineBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
             }
         } else {
             //Send packet (without threshold)
@@ -326,7 +326,7 @@ public class NetworkHandler {
                 out.write(send.toByteArray());
                 out.flush();
             } catch (IOException e) {
-                FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
+                MineBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
                 e.printStackTrace();
             }
         }
@@ -402,7 +402,7 @@ public class NetworkHandler {
                 clazz = getLoginRegistry_IN().getPacket(packetId);
                 break;
             case PLAY:
-                clazz = getPlayRegistry_IN().get(FishingBot.getServerProtocol()).getPacket(packetId);
+                clazz = getPlayRegistry_IN().get(MineBot.getServerProtocol()).getPacket(packetId);
                 break;
         }
 
@@ -414,9 +414,9 @@ public class NetworkHandler {
 
         try {
             Packet packet = clazz.newInstance();
-            packet.read(buf, this, len, FishingBot.getServerProtocol());
+            packet.read(buf, this, len, MineBot.getServerProtocol());
         } catch (InstantiationException | IllegalAccessException e) {
-            FishingBot.getLog().warning("Could not create new instance of " + clazz.getSimpleName());
+            MineBot.getLog().warning("Could not create new instance of " + clazz.getSimpleName());
             e.printStackTrace();
         }
     }

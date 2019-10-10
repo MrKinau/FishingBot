@@ -11,7 +11,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -30,9 +30,9 @@ public class PacketInSetExperience extends Packet {
 		int newLevel = readVarInt(in);
 
 		if(getLevels() >= 0 && getLevels() < newLevel) {
-			FishingBot.getLog().info("Achieved level " + newLevel);
-			if(!FishingBot.getConfig().getAnnounceLvlUp().equalsIgnoreCase("false"))
-				networkHandler.sendPacket(new PacketOutChat(FishingBot.getConfig().getAnnounceLvlUp().replace("%lvl%", String.valueOf(newLevel))));
+			MineBot.getLog().info("Achieved level " + newLevel);
+			if(!MineBot.getConfig().getAnnounceLvlUp().equalsIgnoreCase("false"))
+				networkHandler.sendPacket(new PacketOutChat(MineBot.getConfig().getAnnounceLvlUp().replace("%lvl%", String.valueOf(newLevel))));
 		}
 
 		PacketInSetExperience.levels = newLevel;

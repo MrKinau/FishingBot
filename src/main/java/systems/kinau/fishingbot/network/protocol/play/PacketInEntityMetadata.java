@@ -12,7 +12,7 @@ import com.flowpowered.nbt.TagType;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -39,10 +39,10 @@ public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (!networkHandler.getFishingManager().isTrackingNextEntityMeta())
+        if (!networkHandler.getManager().isTrackingNextEntityMeta())
             return;
         int eid = readVarInt(in);
-        if (networkHandler.getFishingManager().containsPossibleItem(eid))
+        if (networkHandler.getManager().containsPossibleItem(eid))
             return;
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             readWatchableObjects18(in, networkHandler, eid);
@@ -131,8 +131,8 @@ public class PacketInEntityMetadata extends Packet {
                     int itemID = readVarInt(in);
                     byte count = in.readByte();
                     List<Map<String, Short>> enchantments = readNBT(in);
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getServerProtocol()).replace("minecraft:", "");
-                    networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    String name = ItemHandler.getItemName(itemID, MineBot.getServerProtocol()).replace("minecraft:", "");
+                    networkHandler.getManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
                     return;
                 }
                 case 7: {
@@ -254,9 +254,9 @@ public class PacketInEntityMetadata extends Packet {
                     byte count = in.readByte();
                     List<Map<String, Short>> enchantments = readNBT(in);
 
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getServerProtocol()).replace("minecraft:", "");
+                    String name = ItemHandler.getItemName(itemID, MineBot.getServerProtocol()).replace("minecraft:", "");
 
-                    networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    networkHandler.getManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -375,7 +375,7 @@ public class PacketInEntityMetadata extends Packet {
                     String name = Material_1_8.getMaterial(itemID).name();
                     List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
-                    networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    networkHandler.getManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -459,7 +459,7 @@ public class PacketInEntityMetadata extends Packet {
                         String name = Material_1_8.getMaterial(itemID).name();
                         List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
-                        networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                        networkHandler.getManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                         return;
                     }

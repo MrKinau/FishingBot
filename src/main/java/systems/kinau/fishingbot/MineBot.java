@@ -14,6 +14,7 @@ import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
+import systems.kinau.fishingbot.mining.MiningManager;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -29,10 +30,10 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FishingBot {
+public class MineBot {
 
-    public static final String PREFIX = "FishingBot v2.4 - ";
-    @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
+    public static final String PREFIX = "MineBot v2.4 - ";
+    @Getter public static Logger log = Logger.getLogger(MineBot.class.getSimpleName());
     @Getter @Setter public static boolean running;
     @Getter private static SettingsConfig config;
     @Getter private static DiscordMessageDispatcher discord;
@@ -48,11 +49,17 @@ public class FishingBot {
     @Getter private NetworkHandler net;
 
     @Getter private FishingManager fishingManager;
+    @Getter private MiningManager miningManager;
 
     private File logsFolder = new File("logs");
+    private BotMode botMode = BotMode.FISHING;
 
-    public FishingBot(String[] args) {
+    public MineBot(String[] args) {
         this.args = args;
+
+        //Load args
+        if(args.length >= 1 && args[0].equalsIgnoreCase("mining"))
+            this.botMode = BotMode.MINING;
 
         //Initialize Logger
         log.setLevel(Level.ALL);
@@ -63,7 +70,7 @@ public class FishingBot {
         ch.setFormatter(formatter);
 
         //Generate/Load config
-        FishingBot.config = new SettingsConfig();
+        MineBot.config = new SettingsConfig();
 
         //Set logger file handler
         try {
@@ -83,7 +90,7 @@ public class FishingBot {
             authenticate();
         else {
             getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
-            FishingBot.authData = new AuthData(null, null, null, getConfig().getUserName());
+            MineBot.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
         String ip = getConfig().getServerIP();
@@ -94,15 +101,15 @@ public class FishingBot {
             RealmsAPI realmsAPI = new RealmsAPI(getAuthData());
             if (getConfig().getRealmId() == 0) {
                 realmsAPI.printPossibleWorlds();
-                FishingBot.getLog().info("Shutting down, because realm-id is not set...");
+                MineBot.getLog().info("Shutting down, because realm-id is not set...");
                 System.exit(0);
             }
             if (getConfig().isRealmAcceptTos())
                 realmsAPI.agreeTos();
             else {
-                FishingBot.getLog().severe("*****************************************************************************");
-                FishingBot.getLog().severe("If you want to use realms you have to accept the tos in the config.properties");
-                FishingBot.getLog().severe("*****************************************************************************");
+                MineBot.getLog().severe("*****************************************************************************");
+                MineBot.getLog().severe("If you want to use realms you have to accept the tos in the config.properties");
+                MineBot.getLog().severe("*****************************************************************************");
                 System.exit(0);
             }
 
@@ -110,7 +117,7 @@ public class FishingBot {
             for (int i = 0; i < 5; i++) {
                 ipAndPort = realmsAPI.getServerIP(getConfig().getRealmId());
                 if (ipAndPort == null) {
-                    FishingBot.getLog().info("Trying to receive IP (Try " + (i + 1) + ")...");
+                    MineBot.getLog().info("Trying to receive IP (Try " + (i + 1) + ")...");
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -132,10 +139,10 @@ public class FishingBot {
 
         //Activate Discord webHook
         if(!getConfig().getWebHook().equalsIgnoreCase("false"))
-            FishingBot.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
+            MineBot.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
 
         // Initalize chat message
-        FishingBot.chatHandler = new ChatHandler(this);
+        MineBot.chatHandler = new ChatHandler(this);
     }
 
     public void start() {
@@ -164,8 +171,11 @@ public class FishingBot {
                 setRunning(true);
                 this.socket = new Socket(serverName, port);
 
-                this.fishingManager = new FishingManager();
-                this.net = new NetworkHandler(socket, authData, fishingManager);
+                switch (botMode) {
+                    case FISHING: this.fishingManager = new FishingManager(); break;
+                    case MINING: this.miningManager = new MiningManager(); break;
+                }
+                this.net = new NetworkHandler<>(socket, authData, fishingManager);
 
                 new HandshakeModule(serverName, port, getNet()).perform();
                 new LoginModule(getAuthData().getUsername(), getNet()).perform();

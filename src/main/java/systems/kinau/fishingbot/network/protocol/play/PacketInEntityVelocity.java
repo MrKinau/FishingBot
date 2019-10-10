@@ -27,9 +27,9 @@ public class PacketInEntityVelocity extends Packet {
         short y = in.readShort();
         short z = in.readShort();
 
-        networkHandler.getFishingManager().addPossibleMotion(eid, x, y, z);
+        networkHandler.getManager().addPossibleMotion(eid, x, y, z);
 
-        if(networkHandler.getFishingManager().getCurrentBobber() != eid)
+        if(networkHandler.getManager().getCurrentBobber() != eid)
             return;
 
         switch (protocolId) {
@@ -39,7 +39,7 @@ public class PacketInEntityVelocity extends Packet {
             case ProtocolConstants.MINECRAFT_1_9_1:
             case ProtocolConstants.MINECRAFT_1_9:
             case ProtocolConstants.MINECRAFT_1_8: {
-                networkHandler.getFishingManager().fish();
+                networkHandler.getManager().fish();
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -57,9 +57,9 @@ public class PacketInEntityVelocity extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_4:
             default: {
                 if(Math.abs(y) > 350) {
-                    networkHandler.getFishingManager().fish();
+                    networkHandler.getManager().fish();
                 } else if(lastY == 0 && y == 0) {               //Sometimes Minecraft does not push the bobber down, but this workaround works good
-                    networkHandler.getFishingManager().fish();
+                    networkHandler.getManager().fish();
                 }
                 break;
             }

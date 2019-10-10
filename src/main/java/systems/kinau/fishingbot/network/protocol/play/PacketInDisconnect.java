@@ -7,7 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -21,7 +21,7 @@ public class PacketInDisconnect extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         String reason = readString(in);
-        FishingBot.getLog().info("Disconnected: " + reason);
-        FishingBot.setRunning(false);
+        MineBot.getLog().info("Disconnected: " + reason);
+        MineBot.setRunning(false);
     }
 }

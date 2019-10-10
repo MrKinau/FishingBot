@@ -4,7 +4,7 @@
  */
 package systems.kinau.fishingbot.io;
 
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 
 public class ConvertUtils {
@@ -28,7 +28,7 @@ public class ConvertUtils {
             try {
                 return AnnounceType.valueOf(value);
             } catch (IllegalArgumentException ex) {
-                FishingBot.getLog().warning("Could not find Announce-Type: " + value);
+                MineBot.getLog().warning("Could not find Announce-Type: " + value);
                 ex.printStackTrace();
                 return AnnounceType.ALL;
             }

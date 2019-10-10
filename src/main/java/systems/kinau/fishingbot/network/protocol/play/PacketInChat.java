@@ -13,7 +13,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import systems.kinau.fishingbot.ChatHandler.ChatType;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -41,7 +41,7 @@ public class PacketInChat extends Packet {
 			} catch (IllegalStateException ex) {
 				text = minecraftJson;
 			}
-			FishingBot.getChatHandler().receiveMessage(text, ChatType.values()[in.readByte()], minecraftJson);
+			MineBot.getChatHandler().receiveMessage(text, ChatType.values()[in.readByte()], minecraftJson);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

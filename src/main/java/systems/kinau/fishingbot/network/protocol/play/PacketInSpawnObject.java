@@ -22,7 +22,7 @@ public class PacketInSpawnObject extends Packet {
             case ProtocolConstants.MINECRAFT_1_8: {
                 int id = readVarInt(in);    //EID
                 byte type = in.readByte();
-                if(type == 90 && networkHandler.getFishingManager().isTrackingNextFishingId()) {   //90 = bobber
+                if(type == 90 && networkHandler.getManager().isTrackingNextFishingId()) {   //90 = bobber
                     reFish(networkHandler, id);
                 }
                 break;
@@ -43,7 +43,7 @@ public class PacketInSpawnObject extends Packet {
                 int id = readVarInt(in);    //EID
                 readUUID(in);               //E UUID
                 int type = in.readByte();  //Obj type
-                if(type == 90 && networkHandler.getFishingManager().isTrackingNextFishingId()) {   //90 = bobber
+                if(type == 90 && networkHandler.getManager().isTrackingNextFishingId()) {   //90 = bobber
                     reFish(networkHandler, id);
                 }
                 break;
@@ -57,7 +57,7 @@ public class PacketInSpawnObject extends Packet {
                 int id = readVarInt(in);    //EID
                 readUUID(in);               //E UUID
                 int type = in.readByte();  //Obj type
-                if(type == 101 && networkHandler.getFishingManager().isTrackingNextFishingId()) {   //101 = bobber
+                if(type == 101 && networkHandler.getManager().isTrackingNextFishingId()) {   //101 = bobber
                     reFish(networkHandler, id);
                 }
                 break;
@@ -66,10 +66,10 @@ public class PacketInSpawnObject extends Packet {
     }
 
     private void reFish(NetworkHandler networkHandler, int id) {
-        networkHandler.getFishingManager().setTrackingNextFishingId(false);
+        networkHandler.getManager().setTrackingNextFishingId(false);
         new Thread(() -> {
             try { Thread.sleep(2500); } catch (InterruptedException e) { }     //Prevent Velocity grabbed from flying hook
-            networkHandler.getFishingManager().setCurrentBobber(id);
+            networkHandler.getManager().setCurrentBobber(id);
         }).start();
     }
 }
