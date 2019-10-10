@@ -4,7 +4,6 @@
  */
 package systems.kinau.fishingbot.io;
 
-import com.sun.corba.se.impl.io.TypeMismatchException;
 import systems.kinau.fishingbot.FishingBot;
 
 import java.io.File;
@@ -69,7 +68,7 @@ public class PropertyProcessor {
 
             Object typedValue = ConvertUtils.convert(value, field.getType());
             if(typedValue == null)
-                throw new TypeMismatchException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
+                throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
             ReflectionUtils.setField(field, object, typedValue);
         }
         for (String source : props.keySet()) {
