@@ -6,6 +6,8 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
+import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.fishing.FishingManager;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -18,12 +20,14 @@ public class PacketInSpawnObject extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+        if(!(MineBot.getInstance().getManager() instanceof FishingManager))
+            return;
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_8: {
                 int id = readVarInt(in);    //EID
                 byte type = in.readByte();
-                if(type == 90 && networkHandler.getManager().isTrackingNextFishingId()) {   //90 = bobber
-                    reFish(networkHandler, id);
+                if(type == 90 && ((FishingManager)MineBot.getInstance().getManager()).isTrackingNextFishingId()) {   //90 = bobber
+                    reFish(id);
                 }
                 break;
             }
@@ -43,8 +47,8 @@ public class PacketInSpawnObject extends Packet {
                 int id = readVarInt(in);    //EID
                 readUUID(in);               //E UUID
                 int type = in.readByte();  //Obj type
-                if(type == 90 && networkHandler.getManager().isTrackingNextFishingId()) {   //90 = bobber
-                    reFish(networkHandler, id);
+                if(type == 90 && ((FishingManager)MineBot.getInstance().getManager()).isTrackingNextFishingId()) {   //90 = bobber
+                    reFish(id);
                 }
                 break;
             }
@@ -57,19 +61,19 @@ public class PacketInSpawnObject extends Packet {
                 int id = readVarInt(in);    //EID
                 readUUID(in);               //E UUID
                 int type = in.readByte();  //Obj type
-                if(type == 101 && networkHandler.getManager().isTrackingNextFishingId()) {   //101 = bobber
-                    reFish(networkHandler, id);
+                if(type == 101 && ((FishingManager)MineBot.getInstance().getManager()).isTrackingNextFishingId()) {   //101 = bobber
+                    reFish(id);
                 }
                 break;
             }
         }
     }
 
-    private void reFish(NetworkHandler networkHandler, int id) {
-        networkHandler.getManager().setTrackingNextFishingId(false);
+    private void reFish(int id) {
+        ((FishingManager)MineBot.getInstance().getManager()).setTrackingNextFishingId(false);
         new Thread(() -> {
             try { Thread.sleep(2500); } catch (InterruptedException e) { }     //Prevent Velocity grabbed from flying hook
-            networkHandler.getManager().setCurrentBobber(id);
+            ((FishingManager)MineBot.getInstance().getManager()).setCurrentBobber(id);
         }).start();
     }
 }

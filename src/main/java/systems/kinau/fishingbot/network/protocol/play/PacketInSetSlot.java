@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.fishing.FishingManager;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -20,6 +21,8 @@ public class PacketInSetSlot extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+        if(!(MineBot.getInstance().getManager() instanceof FishingManager))
+            return;
         int window = in.readByte();
         if(window != 0)
             return;
@@ -30,7 +33,7 @@ public class PacketInSetSlot extends Packet {
         in.readBytes(bytes);
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.write(bytes.clone());
-        networkHandler.getManager().setSlotData(out);
+        ((FishingManager)MineBot.getInstance().getManager()).setSlotData(out);
         ByteArrayDataInputWrapper testFishRod = new ByteArrayDataInputWrapper(bytes.clone());
         if(protocolId < ProtocolConstants.MINECRAFT_1_13) {
             short itemId = testFishRod.readShort();

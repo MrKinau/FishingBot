@@ -9,7 +9,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import lombok.Setter;
-import systems.kinau.fishingbot.Manager;
 import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketHandshake;
@@ -26,10 +25,9 @@ import java.util.HashMap;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class NetworkHandler<M extends Manager> {
+public class NetworkHandler {
 
     @Getter private AuthData authData;
-    @Getter private M manager;
 
     @Getter private Socket socket;
     @Getter private DataOutputStream out;
@@ -46,11 +44,10 @@ public class NetworkHandler<M extends Manager> {
     @Getter @Setter private boolean outputEncrypted;
     @Getter @Setter private boolean inputBeingDecrypted;
 
-    public NetworkHandler(Socket socket, AuthData authData, M manager) {
+    public NetworkHandler(Socket socket) {
         this.socket = socket;
-        this.authData = authData;
-        this.manager = manager;
-        manager.setNetworkHandler(this);
+        this.authData = MineBot.getInstance().getAuthData();
+        MineBot.getInstance().getManager().setNetworkHandler(this);
         try {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.in = new DataInputStream(socket.getInputStream());
@@ -100,6 +97,7 @@ public class NetworkHandler<M extends Manager> {
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x08, PacketInPlayerPosLook.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x02, PacketInChat.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x1F, PacketInSetExperience.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x21, PacketInChunk.class);
 
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutChat.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x15, PacketOutClientSettings.class);

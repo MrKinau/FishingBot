@@ -1,4 +1,11 @@
 package systems.kinau.fishingbot.mining;
 
-public class MiningManager {
+import systems.kinau.fishingbot.Manager;
+
+public class MiningManager extends Manager {
+
+    @Override
+    public void onConnected() {
+
+    }
 }

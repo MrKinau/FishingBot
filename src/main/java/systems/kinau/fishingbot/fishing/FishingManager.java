@@ -44,7 +44,7 @@ public class FishingManager extends Manager implements Runnable {
         setLastFish(System.currentTimeMillis());
         setCurrentBobber(-1);
         setTrackingNextEntityMeta(true);
-        networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+        getNetworkHandler().sendPacket(new PacketOutUseItem(getNetworkHandler()));
         new Thread(() -> {
             try {
                 Thread.sleep(200);
@@ -53,7 +53,7 @@ public class FishingManager extends Manager implements Runnable {
                 Thread.sleep(200);
                 setTrackingNextFishingId(true);
                 try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
-                networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+                getNetworkHandler().sendPacket(new PacketOutUseItem(getNetworkHandler()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -99,7 +99,7 @@ public class FishingManager extends Manager implements Runnable {
         //Print in mc chat (based on announcetype)
         logItem(currentMax,
                 MineBot.getConfig().getAnnounceTypeChat(),
-                (String str) -> networkHandler.sendPacket(new PacketOutChat(MineBot.PREFIX + str)),
+                (String str) -> getNetworkHandler().sendPacket(new PacketOutChat(MineBot.PREFIX + str)),
                 (String str) -> {
                     // Delay the enchant messages to arrive after the item announcement
                     try {
@@ -107,7 +107,7 @@ public class FishingManager extends Manager implements Runnable {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    networkHandler.sendPacket(new PacketOutChat(str));
+                    getNetworkHandler().sendPacket(new PacketOutChat(str));
                 });
     }
 
@@ -186,7 +186,7 @@ public class FishingManager extends Manager implements Runnable {
                 setCurrentBobber(-1);
                 setTrackingNextEntityMeta(false);
                 setTrackingNextFishingId(true);
-                networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+                getNetworkHandler().sendPacket(new PacketOutUseItem(getNetworkHandler()));
                 MineBot.getLog().warning("Bot is slow (Maybe stuck). Trying to restart!");
             }
             try {
@@ -201,13 +201,10 @@ public class FishingManager extends Manager implements Runnable {
     public void onConnected() {
         setTrackingNextFishingId(true);
         synchronized (MineBot.getLog()) {
-            Arrays.asList(MineBot.getConfig().getStartText().split(";")).forEach(s -> {
-                networkHandler.sendPacket(new PacketOutChat(s.replace("%prefix%", MineBot.PREFIX)));
-            });
-            networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+            getNetworkHandler().sendPacket(new PacketOutUseItem(getNetworkHandler()));
             MineBot.getLog().info("Starting fishing!");
             if(MineBot.getServerProtocol() == ProtocolConstants.MINECRAFT_1_8)
-                startPositionUpdate(networkHandler);
+                startPositionUpdate(getNetworkHandler());
         }
     }
 }

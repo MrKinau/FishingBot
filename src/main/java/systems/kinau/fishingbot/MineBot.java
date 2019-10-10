@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 public class MineBot {
 
     public static final String PREFIX = "MineBot v2.4 - ";
+    @Getter public static MineBot instance;
     @Getter public static Logger log = Logger.getLogger(MineBot.class.getSimpleName());
     @Getter @Setter public static boolean running;
     @Getter private static SettingsConfig config;
@@ -41,20 +42,21 @@ public class MineBot {
     @Getter @Setter private static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
     @Getter @Setter private static String serverHost;
     @Getter @Setter private static int serverPort;
-    @Getter @Setter public static AuthData authData;
+    @Getter @Setter private AuthData authData;
 
     private String[] args;
 
     @Getter private Socket socket;
     @Getter private NetworkHandler net;
 
-    @Getter private FishingManager fishingManager;
-    @Getter private MiningManager miningManager;
+    @Getter private Manager manager;
 
     private File logsFolder = new File("logs");
     private BotMode botMode = BotMode.FISHING;
 
     public MineBot(String[] args) {
+        instance = this;
+
         this.args = args;
 
         //Load args
@@ -90,7 +92,7 @@ public class MineBot {
             authenticate();
         else {
             getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
-            MineBot.authData = new AuthData(null, null, null, getConfig().getUserName());
+            this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
         String ip = getConfig().getServerIP();
@@ -172,10 +174,10 @@ public class MineBot {
                 this.socket = new Socket(serverName, port);
 
                 switch (botMode) {
-                    case FISHING: this.fishingManager = new FishingManager(); break;
-                    case MINING: this.miningManager = new MiningManager(); break;
+                    case FISHING: this.manager = new FishingManager(); break;
+                    case MINING: this.manager = new MiningManager(); break;
                 }
-                this.net = new NetworkHandler<>(socket, authData, fishingManager);
+                this.net = new NetworkHandler(socket);
 
                 new HandshakeModule(serverName, port, getNet()).perform();
                 new LoginModule(getAuthData().getUsername(), getNet()).perform();
@@ -208,11 +210,11 @@ public class MineBot {
                     e.printStackTrace();
                 }
                 this.socket = null;
-                this.fishingManager = null;
+                this.manager = null;
                 this.net = null;
             }
             if (getConfig().isAutoReconnect()) {
-                getLog().info("FishingBot restarts in 3 seconds...");
+                getLog().info("MineBot restarts in 3 seconds...");
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {

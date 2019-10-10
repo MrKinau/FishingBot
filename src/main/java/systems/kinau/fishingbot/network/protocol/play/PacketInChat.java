@@ -12,6 +12,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.ChatHandler.ChatType;
 import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -19,12 +20,15 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.TextComponent;
 
+@NoArgsConstructor
 public class PacketInChat extends Packet {
 	
 	private static final JsonParser PARSER = new JsonParser();
 	
 	@Override
-	public void write(ByteArrayDataOutput out, int protocolId) { }
+	public void write(ByteArrayDataOutput out, int protocolId) {
+		//Only incoming packet
+	}
 	
 	@Override
 	public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {

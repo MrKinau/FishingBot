@@ -7,6 +7,8 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
+import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.fishing.FishingManager;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -22,14 +24,16 @@ public class PacketInEntityVelocity extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+        if(!(MineBot.getInstance().getManager() instanceof FishingManager))
+            return;
         int eid = readVarInt(in);
         short x = in.readShort();
         short y = in.readShort();
         short z = in.readShort();
 
-        networkHandler.getManager().addPossibleMotion(eid, x, y, z);
+        ((FishingManager)MineBot.getInstance().getManager()).addPossibleMotion(eid, x, y, z);
 
-        if(networkHandler.getManager().getCurrentBobber() != eid)
+        if(((FishingManager)MineBot.getInstance().getManager()).getCurrentBobber() != eid)
             return;
 
         switch (protocolId) {
@@ -39,7 +43,7 @@ public class PacketInEntityVelocity extends Packet {
             case ProtocolConstants.MINECRAFT_1_9_1:
             case ProtocolConstants.MINECRAFT_1_9:
             case ProtocolConstants.MINECRAFT_1_8: {
-                networkHandler.getManager().fish();
+                ((FishingManager)MineBot.getInstance().getManager()).fish();
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -57,9 +61,9 @@ public class PacketInEntityVelocity extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_4:
             default: {
                 if(Math.abs(y) > 350) {
-                    networkHandler.getManager().fish();
+                    ((FishingManager)MineBot.getInstance().getManager()).fish();
                 } else if(lastY == 0 && y == 0) {               //Sometimes Minecraft does not push the bobber down, but this workaround works good
-                    networkHandler.getManager().fish();
+                    ((FishingManager)MineBot.getInstance().getManager()).fish();
                 }
                 break;
             }

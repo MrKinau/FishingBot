@@ -22,6 +22,6 @@ public class PacketInLoginDisconnect extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         MineBot.getLog().severe("Login failed: " + readString(in));
         MineBot.setRunning(false);
-        MineBot.setAuthData(null);
+        MineBot.getInstance().setAuthData(null);
     }
 }
