@@ -35,24 +35,32 @@ public class Chunk {
 
     public BlockType getBlockAt(int relativeX, int relativeY, int relativeZ) {
         Optional<ChunkSection> optChunkSection = sections.stream()
-                .filter(section -> section.getYStart() >= relativeY)
+                .filter(section -> section.getYStart() <= relativeY)
                 .filter(section -> relativeY < (section.getYStart() + 16))
                 .findAny();
         if (optChunkSection.isPresent())
             return optChunkSection.get().getBlockAt(relativeX, relativeY - optChunkSection.get().getYStart(), relativeZ);
-        else
+        else {
+            MineBot.getLog().info("Could not find section at: " + relativeY);
             return BlockType.AIR;
+        }
     }
 
     public void loadSections(ByteArrayDataInputWrapper in, boolean skipLightning, boolean skipBiome) {
         for (int sectionY = 0; sectionY < 16; sectionY++) {
+            if(in.getAvailable() <= 256) {  //chunk unload
+                Optional<Chunk> chunk = MineBot.getInstance().getWorld().getChunk(chunkX, chunkZ);
+                chunk.ifPresent(value -> MineBot.getInstance().getWorld().unloadChunk(value));
+                in.skipBytes(in.getAvailable());
+                return;
+            }
             if (((bitmask & (1 << sectionY)) != 0)) {
                 ChunkSection chunkSection = new ChunkSection(in, sectionY);
                 addSection(chunkSection);
 //                MineBot.getLog().info("Loaded chunk section of " + (chunkX * 16) + "/" + (chunkZ * 16) + " from y:" + (sectionY * 16) + " to y:" + (sectionY * 16 + 15));
             }
         }
-        MineBot.getLog().info("Fully loaded Chunk (#" + getId() + ") at: " + (chunkX * 16) + "/" + (chunkZ * 16) + " with " + getSections().size() + " ChunkSections");
+//        MineBot.getLog().info("Fully loaded Chunk (#" + getId() + ") at: " + (chunkX * 16) + "/" + (chunkZ * 16) + " with " + getSections().size() + " ChunkSections");
 
         if(skipLightning)
             in.skipBytes(getSections().size() * 4096); //skip lightning

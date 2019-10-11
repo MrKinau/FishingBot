@@ -15,12 +15,12 @@ public class ChunkSection {
     private short[][][] blocks = new short[16][16][16];
 
     public ChunkSection(ByteArrayDataInputWrapper in, int chunkY) {
-        this.yStart = chunkY;
+        this.yStart = chunkY * 16;
         for(int currY = 0; currY < 16; currY++) {
             for(int currZ = 0; currZ < 16; currZ++) {
                 for(int currX = 0; currX < 16; currX++) {
-                    byte blockByte1 = in.readByte();
-                    byte blockByte2 = in.readByte();
+                    int blockByte1 = in.readUnsignedByte();
+                    int blockByte2 = in.readUnsignedByte();
                     short block = (short) ((blockByte2 << 8) | blockByte1);
                     blocks[currX][currY][currZ] = block;
                 }
@@ -33,9 +33,5 @@ public class ChunkSection {
         int id = (block & 0xfff0) >> 4;
         int data = block & 0xF;
         return new BlockType(id, data);
-    }
-
-    private int translateInChunk(int curr, int chunk) {
-        return curr + (16 * chunk);
     }
 }

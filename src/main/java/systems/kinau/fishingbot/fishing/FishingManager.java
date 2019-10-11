@@ -207,4 +207,9 @@ public class FishingManager extends Manager implements Runnable {
                 startPositionUpdate(getNetworkHandler());
         }
     }
+
+    @Override
+    public void tick() {
+
+    }
 }

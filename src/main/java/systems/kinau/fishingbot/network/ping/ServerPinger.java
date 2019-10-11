@@ -81,7 +81,6 @@ public class ServerPinger {
             if (id == 0) {
                 String pong = Packet.readString(in);
                 JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
-                MineBot.getLog().info(root.toString());
                 int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
                 if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(protocolId)) {
                     MineBot.getLog().severe("This server is not running a supported protocol version!");
