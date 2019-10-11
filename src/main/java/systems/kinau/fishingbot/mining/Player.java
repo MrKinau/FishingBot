@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.mining;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutDig;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosition;
 
 public class Player {
@@ -20,6 +21,7 @@ public class Player {
     @Getter @Setter private boolean onGround = true;
     @Getter @Setter private boolean resetY = false;
     @Getter private Vector velocity = new Vector(0, 0, 0);
+    @Getter private boolean dig = false;
 
     public void onGroundCheck() {
         World world = MineBot.getInstance().getWorld();
@@ -50,13 +52,29 @@ public class Player {
         }
     }
 
+    public void permaMove(double x, double y, double z) {
+        if (x != 0) getVelocity().setXV(x);
+        if (y != 0) getVelocity().setYV(y);
+        if (z != 0) getVelocity().setZV(z);
+    }
+
     public void addMotion(double x, double y, double z) {
         getVelocity().addX(x);
         getVelocity().addY(y);
         getVelocity().addZ(z);
     }
 
+    public void dig(byte digStatus, int x, int y, int z, byte blockFace) {
+        MineBot.getInstance().getNet().sendPacket(new PacketOutDig(digStatus, x, y, z, blockFace));
+    }
+
     public void tick() {
+        permaMove(0.1, 0, 0);
+        if(!dig) {
+            dig(DigStatus.STARTED_DIGGING, (int) x, (int) y - 1, (int) z, BlockFace.UP);
+            dig(DigStatus.FINISHED_DIGGING, (int) x, (int) y - 1, (int) z, BlockFace.UP);
+        }
+        dig = true;
         onGroundCheck();
         if(!isOnGround())
             applyGravity();

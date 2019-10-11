@@ -109,6 +109,7 @@ public class NetworkHandler {
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x04, PacketOutPosition.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x05, PacketOutLook.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x06, PacketOutPositionAndLook.class);
+        getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x07, PacketOutDig.class);
 
         //Minecraft 1.9.0
 
