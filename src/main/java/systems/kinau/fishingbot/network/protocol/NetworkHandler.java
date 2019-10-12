@@ -99,6 +99,8 @@ public class NetworkHandler {
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x1F, PacketInSetExperience.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x21, PacketInChunk.class);
         getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x26, PacketInChunkBulk.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x23, PacketInBlockChange.class);
+        getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x22, PacketInMultiBlockChange.class);
 
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutChat.class);
         getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x15, PacketOutClientSettings.class);
@@ -410,7 +412,7 @@ public class NetworkHandler {
         }
 
         if (clazz == null) {
-//            FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: 0x" + Integer.toHexString(packetId));
+//            MineBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: 0x" + Integer.toHexString(packetId));
             return;
         }
 //        FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: " + clazz.getSimpleName());

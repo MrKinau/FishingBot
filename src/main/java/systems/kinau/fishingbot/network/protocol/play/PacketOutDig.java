@@ -26,7 +26,7 @@ public class PacketOutDig extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
         out.writeByte(digStatus);
-        out.writeLong((((long)x & 0x3FFFFFF) << 38L) | (((long)z & 0x3FFFFFF) << 12L) | ((long)y & 0xFFF));
+        out.writeLong(((long)(x & 0x3FFFFFF) << 38) | ((long)(y & 0xFFF) << 26) | z & 0x3FFFFFF);
         out.writeByte(face);
     }
 

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
+import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.FishingManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.LogFormatter;
@@ -47,6 +48,7 @@ public class MineBot {
     @Getter @Setter private AuthData authData;
     @Getter @Setter private World world;
     @Getter @Setter private Player player;
+    @Getter         private EventManager eventManager;
 
     private String[] args;
 
@@ -90,6 +92,8 @@ public class MineBot {
             System.exit(1);
         }
 
+        //Load EventManager
+        this.eventManager = new EventManager();
 
         //Authenticate player if online-mode is set
         if(getConfig().isOnlineMode())

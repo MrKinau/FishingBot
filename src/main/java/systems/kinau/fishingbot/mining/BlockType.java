@@ -13,6 +13,15 @@ public class BlockType {
 
     public static final BlockType AIR = new BlockType(0, 0);
 
+    public BlockType(int block) {
+        id = (block & 0xfff0) >> 4;
+        data = block & 0xF;
+    }
+
     @Getter private int id;
     @Getter private int data;
+
+    public short getBlock() {
+        return (short) (id << 4 | (data & 15));
+    }
 }

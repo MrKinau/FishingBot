@@ -208,7 +208,7 @@ public abstract class Packet {
         return i;
     }
 
-    public static int[] readVarIntt(DataInputStream in) throws IOException{ //reads a varint from the stream, returning both the length and the value
+    public static int[] readVarIntt(DataInputStream in) throws IOException { //reads a varint from the stream, returning both the length and the value
         int i = 0;
         int j = 0;
         int b = 0;
@@ -246,6 +246,12 @@ public abstract class Packet {
             e.printStackTrace();
         }
         return s;
+    }
+
+    public static short readBlock(ByteArrayDataInputWrapper in) throws IOException {
+        int blockByte1 = in.readUnsignedByte();
+        int blockByte2 = in.readUnsignedByte();
+        return (short) ((blockByte2 << 8) | blockByte1);
     }
 
 }

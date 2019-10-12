@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.mining;
 
 public class BlockFace {
 
+    public static final byte NONE = -1;
     public static final byte DOWN = 0;
     public static final byte UP = 1;
     public static final byte Z_NEGATIVE = 2;

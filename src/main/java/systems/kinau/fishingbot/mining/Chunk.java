@@ -34,16 +34,30 @@ public class Chunk {
     }
 
     public BlockType getBlockAt(int relativeX, int relativeY, int relativeZ) {
-        Optional<ChunkSection> optChunkSection = sections.stream()
-                .filter(section -> section.getYStart() <= relativeY)
-                .filter(section -> relativeY < (section.getYStart() + 16))
-                .findAny();
+        Optional<ChunkSection> optChunkSection = getSection(relativeY);
         if (optChunkSection.isPresent())
             return optChunkSection.get().getBlockAt(relativeX, relativeY - optChunkSection.get().getYStart(), relativeZ);
         else {
             MineBot.getLog().info("Could not find section at: " + relativeY);
             return BlockType.AIR;
         }
+    }
+
+    public void setBlockAt(int relativeX, int relativeY, int relativeZ, short block) {
+        Optional<ChunkSection> optChunkSection = getSection(relativeY);
+        if (!optChunkSection.isPresent()) {
+            ChunkSection section = ChunkSection.newEmpty(Double.valueOf(Math.floor(relativeY / 16.0)).intValue() * 16);
+            sections.add(section);
+            optChunkSection = Optional.of(section);
+        }
+        optChunkSection.get().setBlockAt(relativeX, relativeY - optChunkSection.get().getYStart(), relativeZ, block);
+    }
+
+    public Optional<ChunkSection> getSection(int relativeY) {
+        return sections.stream()
+                .filter(section -> section.getYStart() <= relativeY)
+                .filter(section -> relativeY < (section.getYStart() + 16))
+                .findAny();
     }
 
     public void loadSections(ByteArrayDataInputWrapper in, boolean skipLightning, boolean skipBiome) {
@@ -68,6 +82,5 @@ public class Chunk {
             in.skipBytes(256); //skip biome
 //        MineBot.getLog().info("left: " + in.getAvailable() + " bytes!");
     }
-
 
 }
