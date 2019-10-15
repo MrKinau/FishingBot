@@ -27,4 +27,9 @@ public class Vector {
     public void addZ(double zAdd) {
         zV += zAdd;
     }
+
+    @Override
+    public String toString() {
+        return "x:" + xV + ", y:" + yV + ", z:" + zV;
+    }
 }

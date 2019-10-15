@@ -15,6 +15,7 @@ public class StripMining implements Listener {
 
     @Getter private byte currentDirection;
     @Getter private Position currBlock;
+    @Getter private boolean careful;
 
     public StripMining() {
         MineBot.getInstance().getEventManager().registerListener(this);
@@ -28,11 +29,11 @@ public class StripMining implements Listener {
         float angle = Math.abs(yaw % 360);
         System.out.println(angle);
         if (angle >= 45 && angle < 135)
-            return BlockFace.X_POSITIVE;
+            return BlockFace.X_NEGATIVE;
         else if (angle >= 135 && angle < 225)
             return BlockFace.Z_NEGATIVE;
         else if (angle >= 225 && angle < 315)
-            return BlockFace.X_NEGATIVE;
+            return BlockFace.X_POSITIVE;
         else
             return BlockFace.Z_POSITIVE;
     }
@@ -75,13 +76,20 @@ public class StripMining implements Listener {
             int x = Double.valueOf(Math.floor(player.getX())).intValue();
             int y = Double.valueOf(Math.floor(player.getY())).intValue();
             int z = Double.valueOf(Math.floor(player.getZ())).intValue();
-            BlockType type = world.getBlockAt(x, y, z, currentDirection);
+            BlockType typeDown = world.getBlockAt(x, y, z, currentDirection);
+            BlockType typeUp = world.getBlockAt(x, y + 1, z, currentDirection);
+            BlockType typeUpper = world.getBlockAt(x, y + 2, z, currentDirection);
 
-            if (type.getId() == 0)
+            BlockType curr = typeDown;
+            if (curr.getId() == 0) {
+                curr = typeUp;
                 y++;
+            }
 
-            type = world.getBlockAt(x, y, z, currentDirection);
-            if (type.getId() != 0) {
+            if (curr.getId() != 0) {
+                MineBot.getLog().info("down: " + typeDown.getId());
+                MineBot.getLog().info("up: " + typeUp.getId());
+                MineBot.getLog().info("up + 1: " + typeUpper.getId());
                 switch (currentDirection) {
                     case BlockFace.X_NEGATIVE: x--;break;
                     case BlockFace.X_POSITIVE: x++;break;
@@ -90,9 +98,19 @@ public class StripMining implements Listener {
                     case BlockFace.UP: y++;break;
                     case BlockFace.DOWN: y--;break;
                 }
+                if(curr.getId() == 12 || curr.getId() == 13)
+                    careful = true;
+                else if (typeUp.getId() == 12 || typeUp.getId() == 13)
+                    careful = true;
+                else if (typeUpper.getId() == 12 || typeUpper.getId() == 13)
+                    careful = true;
+                if(careful)
+                    MineBot.getLog().info("careful ---");
+                MineBot.getLog().info("+++++++++++++++++++++++++++++++++++++++++++");
                 player.dig(DigStatus.STARTED_DIGGING, x, y, z, currentDirection);
                 player.dig(DigStatus.FINISHED_DIGGING, x, y, z, currentDirection);
                 currBlock = new Position(x, y, z);
+                break;
             }
             try {
                 Thread.sleep(50);
@@ -108,20 +126,21 @@ public class StripMining implements Listener {
             return;
         if(event.getX() == currBlock.getX() && event.getY() == currBlock.getY() && event.getZ() == currBlock.getZ()) {
             currBlock = null;
-            new Thread(this::mineNextBlock).start();
+            if(!careful)
+                new Thread(this::mineNextBlock).start();
             new Thread(() -> {
-                if(!MineBot.getInstance().getPlayer().testWallCollision()) {
-                    int lastBlock= MineBot.getInstance().getWorld().getBlockAt(event.getX(), event.getY(), event.getZ()).getId();
-                    if (lastBlock == 12 || lastBlock == 13) {
-                        System.out.println("GRAVEL");
-                        try {
-                            Thread.sleep(1500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                if(careful) {
+                    MineBot.getLog().info("WAAAAAIIIIIIT");
+                    try {
+                        Thread.sleep(1300);
+                        careful = false;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    if(!MineBot.getInstance().getPlayer().testWallCollision())
-                        move();
+                    new Thread(this::mineNextBlock).start();
+                }
+                if(!MineBot.getInstance().getPlayer().testWallCollision(currentDirection)) {
+                    move();
                 }
             }).start();
         }

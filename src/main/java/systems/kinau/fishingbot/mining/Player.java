@@ -57,6 +57,41 @@ public class Player implements Listener {
         return false;
     }
 
+    public boolean testWallCollision(byte direction) {
+        float xMov = 0;
+        float zMov = 0;
+        switch (direction) {
+            case BlockFace.X_POSITIVE: xMov = 0.15F; break;
+            case BlockFace.Z_NEGATIVE: zMov = -0.15F; break;
+            case BlockFace.X_NEGATIVE: xMov = -0.15F; break;
+            case BlockFace.Z_POSITIVE: zMov = 0.15F; break;
+        }
+        World world = MineBot.getInstance().getWorld();
+        if (world != null) {
+            BlockType bt = world.getBlockAt(Double.valueOf(Math.floor(x + (4 * xMov))).intValue(), Double.valueOf(Math.floor(y)).intValue(), Double.valueOf(Math.floor(z)).intValue());
+            if(bt.getId() != 0) {
+                getVelocity().setXV(0);
+                return true;
+            }
+            bt = world.getBlockAt(Double.valueOf(Math.floor(x)).intValue(), Double.valueOf(Math.floor(y)).intValue(), Double.valueOf(Math.floor(z + (4 * zMov))).intValue());
+            if(bt.getId() != 0) {
+                getVelocity().setZV(0);
+                return true;
+            }
+            bt = world.getBlockAt(Double.valueOf(Math.floor(x + (4 * xMov))).intValue(), Double.valueOf(Math.floor(y)).intValue() + 1, Double.valueOf(Math.floor(z)).intValue());
+            if(bt.getId() != 0) {
+                getVelocity().setXV(0);
+                return true;
+            }
+            bt = world.getBlockAt(Double.valueOf(Math.floor(x)).intValue(), Double.valueOf(Math.floor(y)).intValue() + 1, Double.valueOf(Math.floor(z + (4 * zMov))).intValue());
+            if(bt.getId() != 0) {
+                getVelocity().setZV(0);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void applyGravity() {
         if(isOnGround())
             return;
@@ -113,14 +148,14 @@ public class Player implements Listener {
     public void tick() {
         addMotion(getOneTickVelocity().getYV(), getOneTickVelocity().getYV(), getOneTickVelocity().getZV());
         onGroundCheck();
-        boolean collide = testWallCollision();
-        if(collide) System.out.println("COLL");
         if(!isOnGround())
             applyGravity();
 
         x += getVelocity().getXV();
         y += getVelocity().getYV();
         z += getVelocity().getZV();
+
+        testWallCollision();
 
         addMotion(-getOneTickVelocity().getYV(), -getOneTickVelocity().getYV(), -getOneTickVelocity().getZV());
         oneTickVelocity = new Vector(0, 0, 0);
