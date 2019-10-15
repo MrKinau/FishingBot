@@ -19,7 +19,9 @@ public class PacketInKeepAlive extends Packet {
     @Getter private long id;
 
     @Override
-    public void write(ByteArrayDataOutput out, int protocolId) { }
+    public void write(ByteArrayDataOutput out, int protocolId) {
+        //Only incoming packet
+    }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {

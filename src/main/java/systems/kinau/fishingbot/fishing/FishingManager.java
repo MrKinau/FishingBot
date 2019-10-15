@@ -14,7 +14,10 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.network.utils.Item;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -184,7 +187,7 @@ public class FishingManager implements Runnable {
                 setTrackingNextEntityMeta(false);
                 setTrackingNextFishingId(true);
                 networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
-                FishingBot.getLog().warning("Bot is slow (Maybe stuck). Trying to restart!");
+                FishingBot.getLog().warning("Bot is slow (maybe stuck). Trying to restart!");
             }
             try {
                 Thread.sleep(5000);

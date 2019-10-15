@@ -6,6 +6,7 @@
 package systems.kinau.fishingbot.network.utils;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class TextComponent {
@@ -16,7 +17,7 @@ public class TextComponent {
         if(object.has("with"))  {
             JsonArray array = object.getAsJsonArray("with");
             for(int i = 0; i < array.size(); i++) {
-                messageBuilder = new StringBuilder(getText(array.get(i).getAsJsonObject(), messageBuilder) + " ");
+                messageBuilder = new StringBuilder(getText(array.get(i), messageBuilder) + " ");
             }
             return messageBuilder.toString();
         } else {
@@ -24,14 +25,21 @@ public class TextComponent {
         }
     }
 
-    private static String getText(JsonObject object, StringBuilder messageBuilder) {
-        if (object.has("text")) {
-            String text = object.get("text").getAsString();
+    private static String getText(JsonElement object, StringBuilder messageBuilder) {
+        if(object.isJsonPrimitive()) {
+            messageBuilder.append(object.getAsString());
+            return messageBuilder.toString();
+        }
+
+        JsonObject jObject = object.getAsJsonObject();
+
+        if (jObject.has("text")) {
+            String text = jObject.get("text").getAsString();
             if (!text.isEmpty()) messageBuilder.append(text);
         }
 
-        if (object.has("extra") && object.get("extra").isJsonArray()) {
-            JsonArray extras = object.getAsJsonArray("extra");
+        if (jObject.has("extra") && jObject.get("extra").isJsonArray()) {
+            JsonArray extras = jObject.getAsJsonArray("extra");
 
             for (int i = 0; i < extras.size(); i++) {
                 if(extras.get(i).isJsonObject()) {

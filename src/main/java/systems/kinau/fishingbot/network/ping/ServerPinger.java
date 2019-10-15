@@ -82,6 +82,7 @@ public class ServerPinger {
                 String pong = Packet.readString(in);
                 JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
                 int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
+                int currPlayers = root.getAsJsonObject("players").get("online").getAsInt();
                 if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(protocolId)) {
                     FishingBot.getLog().severe("This server is not running a supported protocol version!");
                     FishingBot.getLog().severe("It is possibe that it wont work correctly");
@@ -106,7 +107,11 @@ public class ServerPinger {
                     if(description.trim().isEmpty())
                         description = "Unknown";
                 }
-                FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId));
+                FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
+                if(currPlayers >= FishingBot.getConfig().getAutoDisconnectPlayersThreshold()) {
+                    FishingBot.getLog().warning("Max players threshold already reached. Stopping");
+                    FishingBot.setWontConnect(true);
+                }
             }
 
             out.close();

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static final String PREFIX = "FishingBot v2.4 - ";
+    public static final String PREFIX = "FishingBot v2.5 - ";
     @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
     @Getter @Setter public static boolean running;
     @Getter private static SettingsConfig config;
@@ -41,6 +41,7 @@ public class FishingBot {
     @Getter @Setter private static String serverHost;
     @Getter @Setter private static int serverPort;
     @Getter @Setter public static AuthData authData;
+    @Getter @Setter public static boolean wontConnect = false;
 
     private String[] args;
 
@@ -112,7 +113,7 @@ public class FishingBot {
                 if (ipAndPort == null) {
                     FishingBot.getLog().info("Trying to receive IP (Try " + (i + 1) + ")...");
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -162,6 +163,21 @@ public class FishingBot {
         do {
             try {
                 setRunning(true);
+                if(isWontConnect()) {
+                    setWontConnect(false);
+                    ServerPinger sp = new ServerPinger(getServerHost(), getServerPort(), this);
+                    sp.ping();
+                    if(isWontConnect()) {
+                        if(!getConfig().isAutoReconnect())
+                            return;
+                        try {
+                            Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        continue;
+                    }
+                }
                 this.socket = new Socket(serverName, port);
 
                 this.fishingManager = new FishingManager();
@@ -202,9 +218,9 @@ public class FishingBot {
                 this.net = null;
             }
             if (getConfig().isAutoReconnect()) {
-                getLog().info("FishingBot restarts in 3 seconds...");
+                getLog().info("FishingBot restarts in " + getConfig().getAutoReconnectTime() + " seconds...");
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
