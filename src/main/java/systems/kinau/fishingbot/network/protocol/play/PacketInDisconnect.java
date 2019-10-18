@@ -6,8 +6,10 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.DisconnectEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -15,13 +17,17 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 @NoArgsConstructor
 public class PacketInDisconnect extends Packet {
 
+    @Getter private String disconnectMessage;
+
     @Override
-    public void write(ByteArrayDataOutput out, int protocolId) { }
+    public void write(ByteArrayDataOutput out, int protocolId) {
+        //Only incoming packet
+    }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        String reason = readString(in);
-        FishingBot.getLog().info("Disconnected: " + reason);
-        FishingBot.setRunning(false);
+        this.disconnectMessage = readString(in);
+
+        FishingBot.getInstance().getEventManager().callEvent(new DisconnectEvent(getDisconnectMessage()));
     }
 }

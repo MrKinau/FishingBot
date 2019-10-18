@@ -22,33 +22,10 @@ public class PacketOutKeepAlive extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        switch (protocolId) {
-            case ProtocolConstants.MINECRAFT_1_12_1:
-            case ProtocolConstants.MINECRAFT_1_12:
-            case ProtocolConstants.MINECRAFT_1_11_1:
-            case ProtocolConstants.MINECRAFT_1_11:
-            case ProtocolConstants.MINECRAFT_1_10:
-            case ProtocolConstants.MINECRAFT_1_9_4:
-            case ProtocolConstants.MINECRAFT_1_9_2:
-            case ProtocolConstants.MINECRAFT_1_9_1:
-            case ProtocolConstants.MINECRAFT_1_9:
-            case ProtocolConstants.MINECRAFT_1_8: {
-                writeVarInt(Long.valueOf(getId()).intValue(), out);
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_13_2:
-            case ProtocolConstants.MINECRAFT_1_13_1:
-            case ProtocolConstants.MINECRAFT_1_13:
-            case ProtocolConstants.MINECRAFT_1_12_2:
-            case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1:
-            case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4:
-            default: {
-                out.writeLong(id);
-                break;
-            }
+        if(protocolId <= ProtocolConstants.MINECRAFT_1_12_1) {
+            writeVarInt(Long.valueOf(getId()).intValue(), out);
+        } else {
+            out.writeLong(id);
         }
     }
 

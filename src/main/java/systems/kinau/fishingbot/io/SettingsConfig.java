@@ -27,6 +27,7 @@ public class SettingsConfig implements Config {
     @Property(key = "announce-type-chat") private AnnounceType announceTypeChat = AnnounceType.ONLY_ENCHANTED;
     @Property(key = "announce-type-console") private AnnounceType announceTypeConsole = AnnounceType.ALL;
     @Property(key = "announce-lvl-up") private String announceLvlUp = "I've got a new level: %lvl%";
+    @Property(key = "start-text-enabled") private boolean startTextEnabled = true;
     @Property(key = "start-text") private String startText = "%prefix%Starting fishing;/trigger Bot";
     @Property(key = "proxy-chat") private boolean proxyChat = false;
 
@@ -56,6 +57,7 @@ public class SettingsConfig implements Config {
                 "#announce-lvl-up:\tText of the level-announcement in chat. %lvl% will be replaced with the gained level.\n" +
                 "\tUse \"false\" if you dont want to announce the achieved levels\n" +
                 "#discord-webHook:\tUse this to send all chat messages from the bot to a Discord webhook\n" +
+                "#start-text-enabled:\tIf disabled, the start-text will not be displayed\n" +
                 "#start-text:\tChat messages/commands separated with a semicolon\n" +
                 "#auto-disconnect:\tThe bot automatically disconnects (and cant connect) if a defined amount of players is reached\n" +
                 "#auto-disconnect-players-threshold:\tIf this amount of players is reached and auto-disconnect is activated the bot cant connect or will be kicked\n" +

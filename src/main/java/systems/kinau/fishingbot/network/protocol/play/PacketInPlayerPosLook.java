@@ -8,6 +8,8 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.PosLookChangeEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -16,11 +18,11 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 @NoArgsConstructor
 public class PacketInPlayerPosLook extends Packet {
 
-    @Getter private static double x;
-    @Getter private static double y;
-    @Getter private static double z;
-    @Getter private static float yaw;
-    @Getter private static float pitch;
+    @Getter private double x;
+    @Getter private double y;
+    @Getter private double z;
+    @Getter private float yaw;
+    @Getter private float pitch;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -35,14 +37,16 @@ public class PacketInPlayerPosLook extends Packet {
         float yaw = in.readFloat();
         float pitch = in.readFloat();
         if(in.readByte() == 0) {
-            PacketInPlayerPosLook.x = x;
-            PacketInPlayerPosLook.y = y;
-            PacketInPlayerPosLook.z = z;
-            PacketInPlayerPosLook.yaw = yaw;
-            PacketInPlayerPosLook.pitch = pitch;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.yaw = yaw;
+            this.pitch = pitch;
         }
         if(protocolId >= ProtocolConstants.MINECRAFT_1_14) {
             readVarInt(in); //tID
         }
+
+        FishingBot.getInstance().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch));
     }
 }

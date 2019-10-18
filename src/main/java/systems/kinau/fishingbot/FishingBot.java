@@ -9,16 +9,16 @@ import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
-import systems.kinau.fishingbot.fishing.FishingManager;
+import systems.kinau.fishingbot.bot.Player;
+import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
+import systems.kinau.fishingbot.modules.*;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.handshake.HandshakeModule;
-import systems.kinau.fishingbot.network.protocol.login.LoginModule;
 import systems.kinau.fishingbot.realms.RealmsAPI;
 
 import java.io.File;
@@ -32,28 +32,30 @@ import java.util.logging.Logger;
 public class FishingBot {
 
     public static final String PREFIX = "FishingBot v2.5 - ";
+    @Getter private static FishingBot instance;
     @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
-    @Getter @Setter public static boolean running;
-    @Getter private static SettingsConfig config;
-    @Getter private static DiscordMessageDispatcher discord;
-    @Getter private static ChatHandler chatHandler;
-    @Getter @Setter private static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
-    @Getter @Setter private static String serverHost;
-    @Getter @Setter private static int serverPort;
-    @Getter @Setter public static AuthData authData;
-    @Getter @Setter public static boolean wontConnect = false;
 
-    private String[] args;
+    @Getter @Setter private boolean running;
+    @Getter private SettingsConfig config;
+    @Getter private DiscordMessageDispatcher discord;
+    @Getter @Setter private int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
+    @Getter @Setter private String serverHost;
+    @Getter @Setter private int serverPort;
+    @Getter @Setter private AuthData authData;
+    @Getter @Setter private boolean wontConnect = false;
+    @Getter         private EventManager eventManager;
+    @Getter         private Player player;
+
 
     @Getter private Socket socket;
     @Getter private NetworkHandler net;
 
-    @Getter private FishingManager fishingManager;
+    @Getter private FishingModule fishingModule;
 
     private File logsFolder = new File("logs");
 
-    public FishingBot(String[] args) {
-        this.args = args;
+    public FishingBot() {
+        instance = this;
 
         //Initialize Logger
         log.setLevel(Level.ALL);
@@ -64,7 +66,7 @@ public class FishingBot {
         ch.setFormatter(formatter);
 
         //Generate/Load config
-        FishingBot.config = new SettingsConfig();
+        this.config = new SettingsConfig();
 
         //Set logger file handler
         try {
@@ -78,13 +80,15 @@ public class FishingBot {
             System.exit(1);
         }
 
+        //Load EventManager
+        this.eventManager = new EventManager();
 
         //Authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
             authenticate();
         else {
             getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
-            FishingBot.authData = new AuthData(null, null, null, getConfig().getUserName());
+            this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
         String ip = getConfig().getServerIP();
@@ -133,10 +137,7 @@ public class FishingBot {
 
         //Activate Discord webHook
         if(!getConfig().getWebHook().equalsIgnoreCase("false"))
-            FishingBot.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
-
-        // Initalize chat message
-        FishingBot.chatHandler = new ChatHandler(this);
+            this.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
     }
 
     public void start() {
@@ -180,12 +181,19 @@ public class FishingBot {
                 }
                 this.socket = new Socket(serverName, port);
 
-                this.fishingManager = new FishingManager();
-                this.net = new NetworkHandler(socket, authData, fishingManager);
+                this.fishingModule = new FishingModule();
+                getFishingModule().enable();
+                this.net = new NetworkHandler();
 
-                new HandshakeModule(serverName, port, getNet()).perform();
-                new LoginModule(getAuthData().getUsername(), getNet()).perform();
+                new HandshakeModule(serverName, port).enable();
+                new LoginModule(getAuthData().getUsername()).enable();
+                if (getConfig().isProxyChat())
+                    new ChatProxyModule().enable();
+                if(getConfig().isStartTextEnabled())
+                    new ChatCommandModule().enable();
+                new ClientDefaultsModule().enable();
                 new ItemHandler(getServerProtocol());
+                this.player = new Player();
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     try {
@@ -214,7 +222,7 @@ public class FishingBot {
                     e.printStackTrace();
                 }
                 this.socket = null;
-                this.fishingManager = null;
+                this.fishingModule = null;
                 this.net = null;
             }
             if (getConfig().isAutoReconnect()) {

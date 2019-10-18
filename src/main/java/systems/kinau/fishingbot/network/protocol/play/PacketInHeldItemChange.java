@@ -8,6 +8,8 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.SetHeldItemEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -15,7 +17,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 @NoArgsConstructor
 public class PacketInHeldItemChange extends Packet {
 
-    @Getter private static int heldItemSlot;
+    @Getter private int heldItemSlot;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -24,6 +26,8 @@ public class PacketInHeldItemChange extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        heldItemSlot = in.readByte() + 36;
+        this.heldItemSlot = in.readByte() + 36;
+
+        FishingBot.getInstance().getEventManager().callEvent(new SetHeldItemEvent(heldItemSlot));
     }
 }

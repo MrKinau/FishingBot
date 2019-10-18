@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.UpdatePlayerListEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 public class PacketInPlayerListItem extends Packet {
 
-    @Getter public static Set<UUID> currPlayers = new HashSet<>();
+    @Getter private static Set<UUID> currPlayers = new HashSet<>();
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
@@ -32,17 +33,13 @@ public class PacketInPlayerListItem extends Packet {
         int playerCount = readVarInt(in);
         for(int i = 0; i < playerCount; i++) {
             UUID uuid = readUUID(in);
-            if (action == 0)
+            if (action == 0)        //ADD
                 currPlayers.add(uuid);
-            else if (action == 4)
+            else if (action == 4)   //REMOVE
                 currPlayers.remove(uuid);
         }
         in.skipBytes(in.getAvailable());
 
-        if(FishingBot.getConfig().isAutoDisconnect() && currPlayers.size() > FishingBot.getConfig().getAutoDisconnectPlayersThreshold()) {
-            FishingBot.getLog().warning("Max players threshold reached. Stopping");
-            FishingBot.setWontConnect(true);
-            FishingBot.setRunning(false);
-        }
+        FishingBot.getInstance().getEventManager().callEvent(new UpdatePlayerListEvent(getCurrPlayers()));
     }
 }

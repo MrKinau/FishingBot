@@ -49,8 +49,8 @@ public class ServerPinger {
                 FishingBot.getLog().info("Changed port to: " + serverPort);
         }
 
-        FishingBot.setServerHost(serverName);
-        FishingBot.setServerPort(serverPort);
+        FishingBot.getInstance().setServerHost(serverName);
+        FishingBot.getInstance().setServerPort(serverPort);
 
         try {
 
@@ -62,7 +62,7 @@ public class ServerPinger {
 
             ByteArrayDataOutput buf = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, buf);
-            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getConfig().getDefaultProtocol()), buf);
+            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()), buf);
             Packet.writeString(serverName, buf);
             buf.writeShort(serverPort);
             Packet.writeVarInt(1, buf);
@@ -88,10 +88,10 @@ public class ServerPinger {
                     FishingBot.getLog().severe("It is possibe that it wont work correctly");
 
                     //Register protocol of 1.14 for unknown versions
-                    fishingBot.getNet().getPlayRegistry_IN().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14));
-                    fishingBot.getNet().getPlayRegistry_OUT().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14));
+                    fishingBot.getNet().getPlayRegistryIn().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_14));
+                    fishingBot.getNet().getPlayRegistryOut().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
                 }
-                FishingBot.setServerProtocol(protocolId);
+                FishingBot.getInstance().setServerProtocol(protocolId);
                 String description = "Unknown";
                 try {
                     try {
@@ -108,9 +108,9 @@ public class ServerPinger {
                         description = "Unknown";
                 }
                 FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
-                if(currPlayers >= FishingBot.getConfig().getAutoDisconnectPlayersThreshold()) {
+                if(currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold()) {
                     FishingBot.getLog().warning("Max players threshold already reached. Stopping");
-                    FishingBot.setWontConnect(true);
+                    FishingBot.getInstance().setWontConnect(true);
                 }
             }
 

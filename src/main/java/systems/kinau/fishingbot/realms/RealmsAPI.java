@@ -26,7 +26,7 @@ import java.io.IOException;
 
 public class RealmsAPI {
 
-    private static final String REALMS_ENDPOINT = "https://pc.realms.minecraft.net";
+    private final String REALMS_ENDPOINT = "https://pc.realms.minecraft.net";
 
     private AuthData authData;
     private BasicCookieStore cookies;
@@ -38,7 +38,7 @@ public class RealmsAPI {
 
         BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), authData.getProfile()));
         BasicClientCookie userCookie = new BasicClientCookie("user", authData.getUsername());
-        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getVersionString(FishingBot.getServerProtocol()));
+        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getVersionString(FishingBot.getInstance().getServerProtocol()));
 
         sidCookie.setDomain(".pc.realms.minecraft.net");
         userCookie.setDomain(".pc.realms.minecraft.net");

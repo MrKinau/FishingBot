@@ -29,10 +29,8 @@ public class PacketOutEncryptionResponse extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        byte[] sharedSecret = new byte[0];
-        byte[] verifyToken = new byte[0];
-        sharedSecret = CryptManager.encryptData(getPublicKey(), getSecretKey().getEncoded());
-        verifyToken = CryptManager.encryptData(getPublicKey(), getVerifyToken());
+        byte[] sharedSecret = CryptManager.encryptData(getPublicKey(), getSecretKey().getEncoded());
+        byte[] verifyToken = CryptManager.encryptData(getPublicKey(), getVerifyToken());
         writeVarInt(sharedSecret.length, out);
         out.write(sharedSecret);
         writeVarInt(verifyToken.length, out);

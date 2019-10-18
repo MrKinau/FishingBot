@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+//TODO: Add as event, yes this code is ugly...
 @NoArgsConstructor
 public class PacketInEntityMetadata extends Packet {
 
@@ -39,10 +40,10 @@ public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (!networkHandler.getFishingManager().isTrackingNextEntityMeta())
+        if (!FishingBot.getInstance().getFishingModule().isTrackingNextEntityMeta())
             return;
         int eid = readVarInt(in);
-        if (networkHandler.getFishingManager().containsPossibleItem(eid))
+        if (FishingBot.getInstance().getFishingModule().containsPossibleItem(eid))
             return;
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             readWatchableObjects18(in, networkHandler, eid);
@@ -131,8 +132,8 @@ public class PacketInEntityMetadata extends Packet {
                     int itemID = readVarInt(in);
                     byte count = in.readByte();
                     List<Map<String, Short>> enchantments = readNBT(in);
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getServerProtocol()).replace("minecraft:", "");
-                    networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    String name = ItemHandler.getItemName(itemID, FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
+                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
                     return;
                 }
                 case 7: {
@@ -254,9 +255,9 @@ public class PacketInEntityMetadata extends Packet {
                     byte count = in.readByte();
                     List<Map<String, Short>> enchantments = readNBT(in);
 
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getServerProtocol()).replace("minecraft:", "");
+                    String name = ItemHandler.getItemName(itemID, FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
 
-                    networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -375,7 +376,7 @@ public class PacketInEntityMetadata extends Packet {
                     String name = Material_1_8.getMaterial(itemID).name();
                     List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
-                    networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -459,7 +460,7 @@ public class PacketInEntityMetadata extends Packet {
                         String name = Material_1_8.getMaterial(itemID).name();
                         List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
-                        networkHandler.getFishingManager().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                        FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                         return;
                     }

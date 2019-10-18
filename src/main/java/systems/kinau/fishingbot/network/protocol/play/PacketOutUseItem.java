@@ -23,13 +23,9 @@ public class PacketOutUseItem extends Packet {
     public void write(ByteArrayDataOutput out, int protocolId) {
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_8: {
-                if(networkHandler.getFishingManager().getSlotData() == null) {
-                    FishingBot.getLog().severe("No fishing rod applied! exit!");
-                    System.exit(1);
-                }
                 out.writeLong(-1);      //Position
                 out.writeByte(255);     //Face
-                out.write(networkHandler.getFishingManager().getSlotData().toByteArray());  //Slot
+                out.write(FishingBot.getInstance().getPlayer().getSlotData().toByteArray());  //Slot
                 out.writeByte(0);       //Cursor X
                 out.writeByte(0);       //Cursor Y
                 out.writeByte(0);       //Cursor Z
