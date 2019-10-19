@@ -40,6 +40,10 @@ public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+        if (FishingBot.getInstance().getFishingModule() == null) {
+            in.skipBytes(in.getAvailable());
+            return;
+        }
         if (!FishingBot.getInstance().getFishingModule().isTrackingNextEntityMeta())
             return;
         int eid = readVarInt(in);

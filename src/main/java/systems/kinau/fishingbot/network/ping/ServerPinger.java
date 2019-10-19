@@ -108,7 +108,7 @@ public class ServerPinger {
                         description = "Unknown";
                 }
                 FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
-                if(currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold()) {
+                if(currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
                     FishingBot.getLog().warning("Max players threshold already reached. Stopping");
                     FishingBot.getInstance().setWontConnect(true);
                 }

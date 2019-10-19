@@ -5,7 +5,9 @@
 
 package systems.kinau.fishingbot.modules;
 
+import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.*;
@@ -19,7 +21,7 @@ import java.util.Arrays;
 
 public class ClientDefaultsModule extends Module implements Listener {
 
-    private Thread positionThread;
+    @Getter private Thread positionThread;
 
     @Override
     public void onEnable() {
@@ -33,6 +35,8 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onSetDifficulty(DifficultySetEvent event) {
+        if (FishingBot.getInstance().isCosmicSky())
+            return;
         new Thread(() -> {
             try {
                 Thread.sleep(1500);
@@ -82,8 +86,9 @@ public class ClientDefaultsModule extends Module implements Listener {
             positionThread.interrupt();
         positionThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
-                networkHandler.sendPacket(new PacketOutPosition());
-                try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+                Player player = FishingBot.getInstance().getPlayer();
+                networkHandler.sendPacket(new PacketOutPosition(player.getX(), player.getY(), player.getZ(), true));
+                try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }
         });
         positionThread.start();

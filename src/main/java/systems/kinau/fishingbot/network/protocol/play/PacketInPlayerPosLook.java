@@ -23,6 +23,7 @@ public class PacketInPlayerPosLook extends Packet {
     @Getter private double z;
     @Getter private float yaw;
     @Getter private float pitch;
+    @Getter private  int teleportId;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -42,11 +43,10 @@ public class PacketInPlayerPosLook extends Packet {
             this.z = z;
             this.yaw = yaw;
             this.pitch = pitch;
+            if(protocolId >= ProtocolConstants.MINECRAFT_1_9) {
+                this.teleportId = readVarInt(in); //tID
+            }
+            FishingBot.getInstance().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
         }
-        if(protocolId >= ProtocolConstants.MINECRAFT_1_14) {
-            readVarInt(in); //tID
-        }
-
-        FishingBot.getInstance().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch));
     }
 }

@@ -45,12 +45,13 @@ public class FishingBot {
     @Getter @Setter private boolean wontConnect = false;
     @Getter         private EventManager eventManager;
     @Getter         private Player player;
+    @Getter         private ClientDefaultsModule clientModule;
+    @Getter         private boolean cosmicSky = false;
 
+    @Getter         private Socket socket;
+    @Getter         private NetworkHandler net;
 
-    @Getter private Socket socket;
-    @Getter private NetworkHandler net;
-
-    @Getter private FishingModule fishingModule;
+    @Getter @Setter private FishingModule fishingModule;
 
     private File logsFolder = new File("logs");
 
@@ -79,9 +80,6 @@ public class FishingBot {
             System.err.println("Could not create log!");
             System.exit(1);
         }
-
-        //Load EventManager
-        this.eventManager = new EventManager();
 
         //Authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
@@ -181,8 +179,16 @@ public class FishingBot {
                 }
                 this.socket = new Socket(serverName, port);
 
-                this.fishingModule = new FishingModule();
-                getFishingModule().enable();
+                //Load EventManager
+                this.eventManager = new EventManager();
+
+                if (!getServerHost().equalsIgnoreCase("cosmic.sky.login.cox.sh.")) {
+                    getLog().info(getServerHost());
+                    this.fishingModule = new FishingModule();
+                    getFishingModule().enable();
+                } else
+                    cosmicSky = true;
+
                 this.net = new NetworkHandler();
 
                 new HandshakeModule(serverName, port).enable();
@@ -191,9 +197,13 @@ public class FishingBot {
                     new ChatProxyModule().enable();
                 if(getConfig().isStartTextEnabled())
                     new ChatCommandModule().enable();
-                new ClientDefaultsModule().enable();
+                this.clientModule = new ClientDefaultsModule();
+                getClientModule().enable();
                 new ItemHandler(getServerProtocol());
                 this.player = new Player();
+
+                if(isCosmicSky())
+                    new CosmicSkyModule().enable();
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     try {

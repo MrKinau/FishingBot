@@ -15,7 +15,6 @@ import systems.kinau.fishingbot.event.play.EntityVelocityEvent;
 import systems.kinau.fishingbot.event.play.SpawnObjectEvent;
 import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
 import systems.kinau.fishingbot.fishing.AnnounceType;
-import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
@@ -35,7 +34,6 @@ public class FishingModule extends Module implements Runnable, Listener {
     private static final List<Integer> FISH_IDS_1_14 = Arrays.asList(625, 626, 627, 628);
     private static final List<Integer> FISH_IDS_1_8 = Collections.singletonList(349);
 
-    @Getter @Setter private NetworkHandler networkHandler;
     @Getter private List<Item> possibleCaughtItems = new CopyOnWriteArrayList<>();
 
     @Getter @Setter private int currentBobber = -1;
@@ -61,7 +59,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         setLastFish(System.currentTimeMillis());
         setCurrentBobber(-1);
         setTrackingNextEntityMeta(true);
-        networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+        FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
         new Thread(() -> {
             try {
                 Thread.sleep(200);
@@ -70,7 +68,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 Thread.sleep(200);
                 setTrackingNextFishingId(true);
                 try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
-                networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+                FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -116,7 +114,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         //Print in mc chat (based on announcetype)
         logItem(currentMax,
                 FishingBot.getInstance().getConfig().getAnnounceTypeChat(),
-                (String str) -> networkHandler.sendPacket(new PacketOutChat(FishingBot.PREFIX + str)),
+                (String str) -> FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(FishingBot.PREFIX + str)),
                 (String str) -> {
                     // Delay the enchant messages to arrive after the item announcement
                     try {
@@ -124,7 +122,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    networkHandler.sendPacket(new PacketOutChat(str));
+                    FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(str));
                 });
     }
 
@@ -222,7 +220,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 e.printStackTrace();
             }
             setTrackingNextFishingId(true);
-            networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+            FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
             FishingBot.getLog().info("Starting fishing!");
         }).start();
     }
@@ -353,7 +351,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 setCurrentBobber(-1);
                 setTrackingNextEntityMeta(false);
                 setTrackingNextFishingId(true);
-                networkHandler.sendPacket(new PacketOutUseItem(networkHandler));
+                FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
                 FishingBot.getLog().warning("Bot is slow (maybe stuck). Trying to restart!");
             }
             try {
