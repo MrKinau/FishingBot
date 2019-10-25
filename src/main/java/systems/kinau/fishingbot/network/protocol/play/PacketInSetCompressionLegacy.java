@@ -1,9 +1,9 @@
 /*
  * Created by David Luedtke (MrKinau)
- * 2019/5/5
+ * 2019/10/25
  */
 
-package systems.kinau.fishingbot.network.protocol.login;
+package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
@@ -19,9 +19,10 @@ import java.io.IOException;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class PacketInSetCompression extends Packet {
+public class PacketInSetCompressionLegacy extends Packet {
 
-    @Getter private int threshold;
+    @Getter
+    private int threshold;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException { }

@@ -33,7 +33,7 @@ public class NetworkHandler {
     //List of all PacketRegistries of all supported protocolIds
     @Getter private HashMap<Integer, PacketRegistry> playRegistryIn, playRegistryOut;
 
-    @Getter @Setter private int threshold = 0;
+    @Getter @Setter private int threshold = -1;
     @Getter @Setter PublicKey publicKey;
     @Getter @Setter SecretKey secretKey;
     @Getter @Setter private boolean outputEncrypted;
@@ -90,6 +90,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x02, PacketInChat.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x1F, PacketInSetExperience.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x38, PacketInPlayerListItem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x46, PacketInSetCompressionLegacy.class);
 
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutChat.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x15, PacketOutClientSettings.class);
@@ -329,7 +330,7 @@ public class NetworkHandler {
             FishingBot.getLog().warning("Could not instantiate " + packet.getClass().getSimpleName());
         }
 
-        if (getThreshold() > 0) {
+        if (getThreshold() >= 0) {
             //Send packet (with 0 threshold, no compression)
             ByteArrayDataOutput send1 = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, send1);
@@ -361,7 +362,7 @@ public class NetworkHandler {
     }
 
     public void readData() throws IOException {
-        if (getThreshold() > 0) {
+        if (getThreshold() >= 0) {
             int plen1 = Packet.readVarInt(in);
             int[] dlens = Packet.readVarIntt(in);
             int dlen = dlens[0];
