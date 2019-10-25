@@ -356,7 +356,8 @@ public class NetworkHandler {
                 e.printStackTrace();
             }
         }
-//        FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C >>> S: " + packet.getClass().getSimpleName());
+        if (FishingBot.getInstance().getConfig().isLogPackets())
+            FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C >>> S: " + packet.getClass().getSimpleName());
     }
 
     public void readData() throws IOException {
@@ -433,10 +434,11 @@ public class NetworkHandler {
         }
 
         if (clazz == null) {
-//            FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: 0x" + Integer.toHexString(packetId));
+            if (FishingBot.getInstance().getConfig().isLogPackets())
+                FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: 0x" + Integer.toHexString(packetId));
             return;
-        }
-//        FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: " + clazz.getSimpleName());
+        } else if (FishingBot.getInstance().getConfig().isLogPackets())
+            FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] C <<< S: " + clazz.getSimpleName());
 
         try {
             Packet packet = clazz.newInstance();

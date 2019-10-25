@@ -24,6 +24,7 @@ public class SettingsConfig implements Config {
     @Property(key = "account-password") private String password = "CHANGEME";
 
     @Property(key = "log-count") private int logCount = 15;
+    @Property(key = "log-packets") private boolean logPackets = false;
     @Property(key = "announce-type-chat") private AnnounceType announceTypeChat = AnnounceType.ONLY_ENCHANTED;
     @Property(key = "announce-type-console") private AnnounceType announceTypeConsole = AnnounceType.ALL;
     @Property(key = "announce-lvl-up") private String announceLvlUp = "I've got a new level: %lvl%";

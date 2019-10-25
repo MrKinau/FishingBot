@@ -194,13 +194,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     private void noFishingRod() {
-        FishingBot.getLog().severe("No fishing rod equipped. Stopping bot!");
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.exit(1);
+        FishingBot.getLog().severe("No fishing rod equipped. Retrying later!");
     }
 
     private void reFish(int id) {
