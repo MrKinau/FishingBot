@@ -6,8 +6,9 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
-import systems.kinau.fishingbot.MineBot;
-import systems.kinau.fishingbot.fishing.FishingManager;
+import lombok.Getter;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.SpawnObjectEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -15,20 +16,18 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 public class PacketInSpawnObject extends Packet {
 
+    @Getter private int id;
+    @Getter private byte type;
+
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) { }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if(!(MineBot.getInstance().getManager() instanceof FishingManager))
-            return;
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_8: {
-                int id = readVarInt(in);    //EID
-                byte type = in.readByte();
-                if(type == 90 && ((FishingManager)MineBot.getInstance().getManager()).isTrackingNextFishingId()) {   //90 = bobber
-                    reFish(id);
-                }
+                this.id = readVarInt(in);    //EID
+                this.type = in.readByte();
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -44,12 +43,9 @@ public class PacketInSpawnObject extends Packet {
             case ProtocolConstants.MINECRAFT_1_9_2:
             case ProtocolConstants.MINECRAFT_1_9_1:
             case ProtocolConstants.MINECRAFT_1_9: {
-                int id = readVarInt(in);    //EID
+                this.id = readVarInt(in);    //EID
                 readUUID(in);               //E UUID
-                int type = in.readByte();  //Obj type
-                if(type == 90 && ((FishingManager)MineBot.getInstance().getManager()).isTrackingNextFishingId()) {   //90 = bobber
-                    reFish(id);
-                }
+                this.type = in.readByte();   //Obj type
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_14:
@@ -58,22 +54,13 @@ public class PacketInSpawnObject extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_3:
             case ProtocolConstants.MINECRAFT_1_14_4:
             default: {
-                int id = readVarInt(in);    //EID
-                readUUID(in);               //E UUID
-                int type = in.readByte();  //Obj type
-                if(type == 101 && ((FishingManager)MineBot.getInstance().getManager()).isTrackingNextFishingId()) {   //101 = bobber
-                    reFish(id);
-                }
+                this.id = readVarInt(in);    //EID
+                readUUID(in);                //E UUID
+                this.type = in.readByte();   //Obj type
                 break;
             }
         }
-    }
 
-    private void reFish(int id) {
-        ((FishingManager)MineBot.getInstance().getManager()).setTrackingNextFishingId(false);
-        new Thread(() -> {
-            try { Thread.sleep(2500); } catch (InterruptedException e) { }     //Prevent Velocity grabbed from flying hook
-            ((FishingManager)MineBot.getInstance().getManager()).setCurrentBobber(id);
-        }).start();
+        FishingBot.getInstance().getEventManager().callEvent(new SpawnObjectEvent(getId(), getType()));
     }
 }

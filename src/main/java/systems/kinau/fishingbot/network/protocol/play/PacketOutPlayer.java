@@ -1,6 +1,6 @@
 /*
  * Created by David Luedtke (MrKinau)
- * 2019/10/11
+ * 2019/10/19
  */
 
 package systems.kinau.fishingbot.network.protocol.play;
@@ -25,7 +25,5 @@ public class PacketOutPlayer extends Packet {
     }
 
     @Override
-    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-
-    }
+    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException { }
 }

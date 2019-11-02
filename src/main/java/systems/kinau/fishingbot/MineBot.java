@@ -10,19 +10,19 @@ import lombok.Setter;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.event.EventManager;
-import systems.kinau.fishingbot.fishing.FishingManager;
+import systems.kinau.fishingbot.bot.Player;
+import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
+import systems.kinau.fishingbot.modules.*;
 import systems.kinau.fishingbot.mining.MiningManager;
 import systems.kinau.fishingbot.mining.Player;
 import systems.kinau.fishingbot.mining.World;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.handshake.HandshakeModule;
-import systems.kinau.fishingbot.network.protocol.login.LoginModule;
 import systems.kinau.fishingbot.realms.RealmsAPI;
 
 import java.io.File;
@@ -49,25 +49,31 @@ public class MineBot {
     @Getter @Setter private World world;
     @Getter @Setter private Player player;
     @Getter         private EventManager eventManager;
+    public static final String PREFIX = "FishingBot v2.5 - ";
+    @Getter private static FishingBot instance;
+    @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
 
-    private String[] args;
+    @Getter @Setter private boolean running;
+    @Getter private SettingsConfig config;
+    @Getter private DiscordMessageDispatcher discord;
+    @Getter @Setter private int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
+    @Getter @Setter private String serverHost;
+    @Getter @Setter private int serverPort;
+    @Getter @Setter private AuthData authData;
+    @Getter @Setter private boolean wontConnect = false;
+    @Getter         private EventManager eventManager;
+    @Getter         private Player player;
+    @Getter         private ClientDefaultsModule clientModule;
 
-    @Getter private Socket socket;
-    @Getter private NetworkHandler net;
+    @Getter         private Socket socket;
+    @Getter         private NetworkHandler net;
 
-    @Getter private Manager manager;
+    @Getter @Setter private FishingModule fishingModule;
 
     private File logsFolder = new File("logs");
-    private BotMode botMode = BotMode.FISHING;
 
-    public MineBot(String[] args) {
+    public FishingBot() {
         instance = this;
-
-        this.args = args;
-
-        //Load args
-        if(args.length >= 1 && args[0].equalsIgnoreCase("mining"))
-            this.botMode = BotMode.MINING;
 
         //Initialize Logger
         log.setLevel(Level.ALL);
@@ -78,7 +84,7 @@ public class MineBot {
         ch.setFormatter(formatter);
 
         //Generate/Load config
-        MineBot.config = new SettingsConfig();
+        this.config = new SettingsConfig();
 
         //Set logger file handler
         try {
@@ -91,9 +97,6 @@ public class MineBot {
             System.err.println("Could not create log!");
             System.exit(1);
         }
-
-        //Load EventManager
-        this.eventManager = new EventManager();
 
         //Authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
@@ -129,7 +132,7 @@ public class MineBot {
                 if (ipAndPort == null) {
                     MineBot.getLog().info("Trying to receive IP (Try " + (i + 1) + ")...");
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -149,10 +152,7 @@ public class MineBot {
 
         //Activate Discord webHook
         if(!getConfig().getWebHook().equalsIgnoreCase("false"))
-            MineBot.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
-
-        // Initalize chat message
-        MineBot.chatHandler = new ChatHandler(this);
+            this.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
     }
 
     public void start() {
@@ -179,17 +179,38 @@ public class MineBot {
         do {
             try {
                 setRunning(true);
+                if(isWontConnect()) {
+                    setWontConnect(false);
+                    ServerPinger sp = new ServerPinger(getServerHost(), getServerPort(), this);
+                    sp.ping();
+                    if(isWontConnect()) {
+                        if(!getConfig().isAutoReconnect())
+                            return;
+                        try {
+                            Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        continue;
+                    }
+                }
                 this.socket = new Socket(serverName, port);
 
-                switch (botMode) {
-                    case FISHING: this.manager = new FishingManager(); break;
-                    case MINING: this.manager = new MiningManager(); break;
-                }
-                this.net = new NetworkHandler(socket);
+                //Load EventManager
+                this.eventManager = new EventManager();
 
-                new HandshakeModule(serverName, port, getNet()).perform();
-                new LoginModule(getAuthData().getUsername(), getNet()).perform();
+                this.net = new NetworkHandler();
+
+                new HandshakeModule(serverName, port).enable();
+                new LoginModule(getAuthData().getUsername()).enable();
+                if (getConfig().isProxyChat())
+                    new ChatProxyModule().enable();
+                if(getConfig().isStartTextEnabled())
+                    new ChatCommandModule().enable();
+                this.clientModule = new ClientDefaultsModule();
+                getClientModule().enable();
                 new ItemHandler(getServerProtocol());
+                this.player = new Player();
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     try {
@@ -218,16 +239,13 @@ public class MineBot {
                     e.printStackTrace();
                 }
                 this.socket = null;
-                if(getManager() != null)
-                    getManager().shutdown();
-                this.manager = null;
-                this.world = null;
+                this.fishingModule = null;
                 this.net = null;
             }
             if (getConfig().isAutoReconnect()) {
-                getLog().info("MineBot restarts in 3 seconds...");
+                getLog().info("FishingBot restarts in " + getConfig().getAutoReconnectTime() + " seconds...");
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

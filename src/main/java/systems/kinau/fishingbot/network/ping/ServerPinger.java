@@ -10,7 +10,7 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
-import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.TextComponent;
@@ -30,27 +30,15 @@ public class ServerPinger {
 
     private String serverName;
     private int serverPort;
-    private MineBot mineBot;
+    private FishingBot fishingBot;
 
     public void ping() {
         if(serverName == null || serverName.trim().isEmpty()) {
-            MineBot.getLog().severe("Invalid server host given. Please change the server-ip in your config.properties");
+            FishingBot.getLog().severe("Invalid server host given. Please change the server-ip in your config.properties");
             System.exit(1);
         }
 
-        //Getting SRV Record - changing data to correct ones
-        if(serverPort == 25565 || serverPort < 1) {
-            String[] serverData = getServerAddress(serverName);
-            if(!serverData[0].equalsIgnoreCase(serverName))
-                MineBot.getLog().info("Changed server host to: " + serverData[0]);
-            this.serverName = serverData[0];
-            this.serverPort = Integer.valueOf(serverData[1]);
-            if(serverPort != 25565)
-                MineBot.getLog().info("Changed port to: " + serverPort);
-        }
-
-        MineBot.setServerHost(serverName);
-        MineBot.setServerPort(serverPort);
+        updateWithSRV();
 
         try {
 
@@ -62,7 +50,7 @@ public class ServerPinger {
 
             ByteArrayDataOutput buf = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, buf);
-            Packet.writeVarInt(ProtocolConstants.getProtocolId(MineBot.getConfig().getDefaultProtocol()), buf);
+            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()), buf);
             Packet.writeString(serverName, buf);
             buf.writeShort(serverPort);
             Packet.writeVarInt(1, buf);
@@ -82,15 +70,16 @@ public class ServerPinger {
                 String pong = Packet.readString(in);
                 JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
                 int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
+                int currPlayers = root.getAsJsonObject("players").get("online").getAsInt();
                 if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(protocolId)) {
-                    MineBot.getLog().severe("This server is not running a supported protocol version!");
-                    MineBot.getLog().severe("It is possibe that it wont work correctly");
+                    FishingBot.getLog().severe("This server is not running a supported protocol version!");
+                    FishingBot.getLog().severe("It is possibe that it wont work correctly");
 
                     //Register protocol of 1.14 for unknown versions
-                    mineBot.getNet().getPlayRegistry_IN().get(protocolId).copyOf(mineBot.getNet().getPlayRegistry_IN().get(ProtocolConstants.MINECRAFT_1_14));
-                    mineBot.getNet().getPlayRegistry_OUT().get(protocolId).copyOf(mineBot.getNet().getPlayRegistry_OUT().get(ProtocolConstants.MINECRAFT_1_14));
+                    fishingBot.getNet().getPlayRegistryIn().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_14));
+                    fishingBot.getNet().getPlayRegistryOut().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
                 }
-                MineBot.setServerProtocol(protocolId);
+                FishingBot.getInstance().setServerProtocol(protocolId);
                 String description = "Unknown";
                 try {
                     try {
@@ -106,7 +95,11 @@ public class ServerPinger {
                     if(description.trim().isEmpty())
                         description = "Unknown";
                 }
-                MineBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId));
+                FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
+                if(currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
+                    FishingBot.getLog().warning("Max players threshold already reached. Stopping");
+                    FishingBot.getInstance().setWontConnect(true);
+                }
             }
 
             out.close();
@@ -114,10 +107,26 @@ public class ServerPinger {
             socket.close();
 
         } catch (UnknownHostException e) {
-            MineBot.getLog().severe("Unknown host: " + serverName);
+            FishingBot.getLog().severe("Unknown host: " + serverName);
         } catch (IOException e) {
-            MineBot.getLog().severe("Could not ping: " + serverName);
+            FishingBot.getLog().severe("Could not ping: " + serverName);
         }
+    }
+
+    public void updateWithSRV() {
+        //Getting SRV Record - changing data to correct ones
+        if(serverPort == 25565 || serverPort < 1) {
+            String[] serverData = getServerAddress(serverName);
+            if(!serverData[0].equalsIgnoreCase(serverName))
+                FishingBot.getLog().info("Changed server host to: " + serverData[0]);
+            this.serverName = serverData[0];
+            this.serverPort = Integer.valueOf(serverData[1]);
+            if(serverPort != 25565)
+                FishingBot.getLog().info("Changed port to: " + serverPort);
+        }
+
+        FishingBot.getInstance().setServerHost(serverName);
+        FishingBot.getInstance().setServerPort(serverPort);
     }
 
     /**
@@ -126,9 +135,8 @@ public class ServerPinger {
      */
     private static String[] getServerAddress(String serverHost) {
         try {
-            String s = "com.sun.jndi.dns.DnsContextFactory";
             Class.forName("com.sun.jndi.dns.DnsContextFactory");
-            Hashtable<String, String> hashtable = new Hashtable<String, String>();
+            Hashtable<String, String> hashtable = new Hashtable<>();
             hashtable.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
             hashtable.put("java.naming.provider.url", "dns:");
             hashtable.put("com.sun.jndi.dns.timeout.retries", "1");

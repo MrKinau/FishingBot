@@ -7,71 +7,33 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import systems.kinau.fishingbot.MineBot;
-import systems.kinau.fishingbot.fishing.FishingManager;
+import lombok.Getter;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
-import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 public class PacketInSetSlot extends Packet {
+
+    @Getter private int windowId;
+    @Getter private short slotId;
+    @Getter private ByteArrayDataOutput slotData;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) { }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if(!(MineBot.getInstance().getManager() instanceof FishingManager))
-            return;
-        int window = in.readByte();
-        if(window != 0)
-            return;
-        int slotId = in.readShort();
-        if(slotId != PacketInHeldItemChange.getHeldItemSlot())
-            return;
+        this.windowId = in.readByte();
+        this.slotId = in.readShort();
+
         byte[] bytes = new byte[in.getAvailable()];
         in.readBytes(bytes);
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.write(bytes.clone());
-        ((FishingManager)MineBot.getInstance().getManager()).setSlotData(out);
-        ByteArrayDataInputWrapper testFishRod = new ByteArrayDataInputWrapper(bytes.clone());
-        if(protocolId < ProtocolConstants.MINECRAFT_1_13) {
-            short itemId = testFishRod.readShort();
-            if (itemId != 346)  //Normal ID
-                noFishingRod(networkHandler);
-        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13) {
-            short itemId = testFishRod.readShort();
-            if (itemId != 563)  //ID in 1.13.0
-                noFishingRod(networkHandler);
-        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_1) {
-            short itemId = testFishRod.readShort();
-            if (itemId != 568)  //ID in 1.13.1
-                noFishingRod(networkHandler);
-        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_2) {
-            boolean present = testFishRod.readBoolean();
-            if(!present)
-                noFishingRod(networkHandler);
-            int itemId = readVarInt(testFishRod);
-            if (itemId != 568) //ID in 1.13.2
-                noFishingRod(networkHandler);
-        } else {
-            boolean present = testFishRod.readBoolean();
-            if(!present)
-                noFishingRod(networkHandler);
-            int itemId = readVarInt(testFishRod);
-            if (itemId != 622) //ID in 1.14
-                noFishingRod(networkHandler);
-        }
-    }
+        this.slotData = out;
 
-    public static void noFishingRod(NetworkHandler networkHandler) {
-        networkHandler.sendPacket(new PacketOutChat("Please equip my selected inventory slot with a fishing rod!"));
-        MineBot.getLog().severe("No fishing rod equipped. Stopping bot!");
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.exit(1);
+        FishingBot.getInstance().getEventManager().callEvent(new UpdateSlotEvent(windowId, slotId, slotData));
     }
 }

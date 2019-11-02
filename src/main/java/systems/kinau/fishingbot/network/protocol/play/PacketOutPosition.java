@@ -22,10 +22,10 @@ public class PacketOutPosition extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        out.writeDouble(x);
-        out.writeDouble(y);
-        out.writeDouble(z);
-        out.writeBoolean(onGround);
+        out.writeDouble(getX());
+        out.writeDouble(getY());
+        out.writeDouble(getZ());
+        out.writeBoolean(isOnGround());
     }
 
     @Override

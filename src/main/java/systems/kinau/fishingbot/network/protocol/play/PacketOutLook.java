@@ -1,30 +1,31 @@
 /*
  * Created by David Luedtke (MrKinau)
- * 2019/10/11
+ * 2019/10/19
  */
 
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
-import systems.kinau.fishingbot.MineBot;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
-import java.util.Random;
 
+@AllArgsConstructor
 public class PacketOutLook extends Packet {
 
-    private Random random = new Random();
+    @Getter private float yaw;
+    @Getter private float pitch;
+    @Getter private boolean onGround;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        if(MineBot.getInstance().getPlayer() == null)
-            return;
-        out.writeFloat(random.nextInt(180));
-        out.writeFloat(random.nextInt(180));
-        out.writeBoolean(true);
+        out.writeFloat(getYaw());
+        out.writeFloat(getPitch());
+        out.writeBoolean(isOnGround());
     }
 
     @Override

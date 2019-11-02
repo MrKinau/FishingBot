@@ -4,8 +4,7 @@
  */
 package systems.kinau.fishingbot.io;
 
-import com.sun.corba.se.impl.io.TypeMismatchException;
-import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.FishingBot;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,7 +53,7 @@ public class PropertyProcessor {
                     List<Map<String, Field>> kvPairList = new ArrayList<>();
                     kvPairList.add(kvPair);
                     undefinedKeys.put(source, kvPairList);
-                    MineBot.getLog().warning("Undefined config option in " + source + " -> " + key);
+                    FishingBot.getLog().warning("Undefined config option in " + source + " -> " + key);
                     continue;
                 } else {
                     List<Map<String, Field>> undKeys = undefinedKeys.get(source);
@@ -62,14 +61,14 @@ public class PropertyProcessor {
                     kvPair.put(key, field);
                     undKeys.add(kvPair);
                     undefinedKeys.put(source, undKeys);
-                    MineBot.getLog().warning("Undefined config option in " + source + " -> " + key);
+                    FishingBot.getLog().warning("Undefined config option in " + source + " -> " + key);
                     continue;
                 }
             }
 
             Object typedValue = ConvertUtils.convert(value, field.getType());
             if(typedValue == null)
-                throw new TypeMismatchException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
+                throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
             ReflectionUtils.setField(field, object, typedValue);
         }
         for (String source : props.keySet()) {

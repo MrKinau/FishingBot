@@ -12,19 +12,19 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.ChatHandler.ChatType;
-import systems.kinau.fishingbot.MineBot;
+import lombok.Getter;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.TextComponent;
 
-@NoArgsConstructor
 public class PacketInChat extends Packet {
-	
-	private static final JsonParser PARSER = new JsonParser();
-	
+
+	@Getter private String text;
+	private final JsonParser PARSER = new JsonParser();
+
 	@Override
 	public void write(ByteArrayDataOutput out, int protocolId) {
 		//Only incoming packet
@@ -32,20 +32,17 @@ public class PacketInChat extends Packet {
 	
 	@Override
 	public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+		this.text = readString(in);
 		try {
-			String minecraftJson = readString(in);
+			JsonObject object = PARSER.parse(text).getAsJsonObject();
 
-			JsonObject object = PARSER.parse(minecraftJson).getAsJsonObject();
-
-			String text;
-			//Thrown only on vanilla servers
-			//TODO: Fix vanilla server json as text
 			try {
-				text = TextComponent.toPlainText(object);
-			} catch (IllegalStateException ex) {
-				text = minecraftJson;
+				this.text = TextComponent.toPlainText(object);
+			} catch (IllegalStateException ignored) {
+				//Ignored
 			}
-			MineBot.getChatHandler().receiveMessage(text, ChatType.values()[in.readByte()], minecraftJson);
+
+			FishingBot.getInstance().getEventManager().callEvent(new ChatEvent(getText()));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

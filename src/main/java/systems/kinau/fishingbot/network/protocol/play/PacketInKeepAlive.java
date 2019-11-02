@@ -8,6 +8,8 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.KeepAliveEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -19,7 +21,9 @@ public class PacketInKeepAlive extends Packet {
     @Getter private long id;
 
     @Override
-    public void write(ByteArrayDataOutput out, int protocolId) { }
+    public void write(ByteArrayDataOutput out, int protocolId) {
+        //Only incoming packet
+    }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
@@ -51,6 +55,6 @@ public class PacketInKeepAlive extends Packet {
                 break;
             }
         }
-        networkHandler.sendPacket(new PacketOutKeepAlive(getId()));
+        FishingBot.getInstance().getEventManager().callEvent(new KeepAliveEvent(getId()));
     }
 }

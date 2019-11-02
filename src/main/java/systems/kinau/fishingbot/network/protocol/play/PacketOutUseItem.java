@@ -8,8 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import systems.kinau.fishingbot.MineBot;
-import systems.kinau.fishingbot.fishing.FishingManager;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -22,17 +21,11 @@ public class PacketOutUseItem extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if(!(MineBot.getInstance().getManager() instanceof FishingManager))
-            return;
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_8: {
-                if(((FishingManager)MineBot.getInstance().getManager()).getSlotData() == null) {
-                    MineBot.getLog().severe("No fishing rod applied! exit!");
-                    System.exit(1);
-                }
                 out.writeLong(-1);      //Position
                 out.writeByte(255);     //Face
-                out.write(((FishingManager)MineBot.getInstance().getManager()).getSlotData().toByteArray());  //Slot
+                out.write(FishingBot.getInstance().getPlayer().getSlotData().toByteArray());  //Slot
                 out.writeByte(0);       //Cursor X
                 out.writeByte(0);       //Cursor Y
                 out.writeByte(0);       //Cursor Z

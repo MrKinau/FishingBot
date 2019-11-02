@@ -7,10 +7,10 @@ Minecraft 1.8 - 1.14.4 AFK Fishing bot
 
 ## Download
 -  a list with all releases can be found [here](https://github.com/MrKinau/FishingBot/releases)
--	 The latest release can be downloaded [here](https://github.com/MrKinau/FishingBot/releases/latest)
+-  The latest release can be downloaded [here](https://github.com/MrKinau/FishingBot/releases/latest)
 
 ## How to use
-1. Dwnload a [release](https://github.com/MrKinau/FishingBot/releases) (or build it at you own)
+1. Download a [release](https://github.com/MrKinau/FishingBot/releases) (or build it at you own)
 2. Start the Client (java -jar Fishingbot.jar)
 3. Fill in the config.properties, which generated on the first start
 4. Give a fishing rod to the account you used and place him in front of water
