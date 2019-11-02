@@ -17,7 +17,9 @@ import java.io.IOException;
 public class PacketInLoginDisconnect extends Packet {
 
     @Override
-    public void write(ByteArrayDataOutput out, int protocolId) throws IOException { }
+    public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
+        //Only incoming packet
+    }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {

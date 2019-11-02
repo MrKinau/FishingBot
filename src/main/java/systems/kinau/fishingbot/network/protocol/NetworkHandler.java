@@ -29,13 +29,16 @@ public class NetworkHandler {
     @Getter private DataInputStream in;
 
     @Getter @Setter private State state;
-    @Getter private PacketRegistry handshakeRegistry, loginRegistryIn, loginRegistryOut;
+    @Getter private PacketRegistry handshakeRegistry;
+    @Getter private PacketRegistry loginRegistryIn;
+    @Getter private PacketRegistry loginRegistryOut;
     //List of all PacketRegistries of all supported protocolIds
-    @Getter private HashMap<Integer, PacketRegistry> playRegistryIn, playRegistryOut;
+    @Getter private HashMap<Integer, PacketRegistry> playRegistryIn;
+    @Getter private HashMap<Integer, PacketRegistry> playRegistryOut;
 
     @Getter @Setter private int threshold = -1;
-    @Getter @Setter PublicKey publicKey;
-    @Getter @Setter SecretKey secretKey;
+    @Getter @Setter private PublicKey publicKey;
+    @Getter @Setter private SecretKey secretKey;
     @Getter @Setter private boolean outputEncrypted;
     @Getter @Setter private boolean inputBeingDecrypted;
 
@@ -321,6 +324,8 @@ public class NetworkHandler {
             case PLAY:
                 Packet.writeVarInt(getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).getId(packet.getClass()), buf);
                 break;
+            default:
+                return;
         }
 
         //Add packet payload
@@ -432,6 +437,8 @@ public class NetworkHandler {
             case PLAY:
                 clazz = getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).getPacket(packetId);
                 break;
+            default:
+                return;
         }
 
         if (clazz == null) {

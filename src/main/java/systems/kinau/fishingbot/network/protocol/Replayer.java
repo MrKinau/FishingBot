@@ -54,7 +54,6 @@ public class Replayer {
         getPath().forEach(bytes -> {
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             int id = buffer.getInt();
-            System.out.println(id);
             switch (id) {
                 case 15: {
                     float yaw = buffer.getFloat();

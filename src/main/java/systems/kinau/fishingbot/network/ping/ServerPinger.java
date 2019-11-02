@@ -38,19 +38,7 @@ public class ServerPinger {
             System.exit(1);
         }
 
-        //Getting SRV Record - changing data to correct ones
-        if(serverPort == 25565 || serverPort < 1) {
-            String[] serverData = getServerAddress(serverName);
-            if(!serverData[0].equalsIgnoreCase(serverName))
-                FishingBot.getLog().info("Changed server host to: " + serverData[0]);
-            this.serverName = serverData[0];
-            this.serverPort = Integer.valueOf(serverData[1]);
-            if(serverPort != 25565)
-                FishingBot.getLog().info("Changed port to: " + serverPort);
-        }
-
-        FishingBot.getInstance().setServerHost(serverName);
-        FishingBot.getInstance().setServerPort(serverPort);
+        updateWithSRV();
 
         try {
 
@@ -125,15 +113,30 @@ public class ServerPinger {
         }
     }
 
+    public void updateWithSRV() {
+        //Getting SRV Record - changing data to correct ones
+        if(serverPort == 25565 || serverPort < 1) {
+            String[] serverData = getServerAddress(serverName);
+            if(!serverData[0].equalsIgnoreCase(serverName))
+                FishingBot.getLog().info("Changed server host to: " + serverData[0]);
+            this.serverName = serverData[0];
+            this.serverPort = Integer.valueOf(serverData[1]);
+            if(serverPort != 25565)
+                FishingBot.getLog().info("Changed port to: " + serverPort);
+        }
+
+        FishingBot.getInstance().setServerHost(serverName);
+        FishingBot.getInstance().setServerPort(serverPort);
+    }
+
     /**
      * Returns a server's address and port for the specified hostname, looking up the SRV record if possible
      * Copied from Minecraft src
      */
     private static String[] getServerAddress(String serverHost) {
         try {
-            String s = "com.sun.jndi.dns.DnsContextFactory";
             Class.forName("com.sun.jndi.dns.DnsContextFactory");
-            Hashtable<String, String> hashtable = new Hashtable<String, String>();
+            Hashtable<String, String> hashtable = new Hashtable<>();
             hashtable.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
             hashtable.put("java.naming.provider.url", "dns:");
             hashtable.put("com.sun.jndi.dns.timeout.retries", "1");

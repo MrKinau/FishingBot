@@ -46,7 +46,6 @@ public class FishingBot {
     @Getter         private EventManager eventManager;
     @Getter         private Player player;
     @Getter         private ClientDefaultsModule clientModule;
-    @Getter         private boolean cosmicSky = false;
 
     @Getter         private Socket socket;
     @Getter         private NetworkHandler net;
@@ -182,13 +181,6 @@ public class FishingBot {
                 //Load EventManager
                 this.eventManager = new EventManager();
 
-                if (!getServerHost().equalsIgnoreCase("cosmic.sky.login.cox.sh.")) {
-                    getLog().info(getServerHost());
-                    this.fishingModule = new FishingModule();
-                    getFishingModule().enable();
-                } else
-                    cosmicSky = true;
-
                 this.net = new NetworkHandler();
 
                 new HandshakeModule(serverName, port).enable();
@@ -201,9 +193,6 @@ public class FishingBot {
                 getClientModule().enable();
                 new ItemHandler(getServerProtocol());
                 this.player = new Player();
-
-                if(isCosmicSky())
-                    new CosmicSkyModule().enable();
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     try {

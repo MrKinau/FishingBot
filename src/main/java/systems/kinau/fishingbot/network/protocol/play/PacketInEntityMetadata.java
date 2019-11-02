@@ -20,7 +20,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.Enchantments_1_8;
 import systems.kinau.fishingbot.network.utils.Item;
-import systems.kinau.fishingbot.network.utils.Material_1_8;
+import systems.kinau.fishingbot.network.utils.MaterialMc18;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -377,7 +377,7 @@ public class PacketInEntityMetadata extends Packet {
                     int itemID = in.readShort();
                     byte count = in.readByte();
                     short damage = in.readShort();
-                    String name = Material_1_8.getMaterial(itemID).name();
+                    String name = MaterialMc18.getMaterial(itemID).name();
                     List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
                     FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
@@ -461,7 +461,7 @@ public class PacketInEntityMetadata extends Packet {
                         int itemID = in.readShort();
                         in.readByte(); //count
                         in.readShort(); //damage
-                        String name = Material_1_8.getMaterial(itemID).name();
+                        String name = MaterialMc18.getMaterial(itemID).name();
                         List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
                         FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));

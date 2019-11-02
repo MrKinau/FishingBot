@@ -35,8 +35,6 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onSetDifficulty(DifficultySetEvent event) {
-        if (FishingBot.getInstance().isCosmicSky())
-            return;
         new Thread(() -> {
             try {
                 Thread.sleep(1500);

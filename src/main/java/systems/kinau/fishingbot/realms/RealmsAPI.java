@@ -28,13 +28,10 @@ public class RealmsAPI {
 
     private final String REALMS_ENDPOINT = "https://pc.realms.minecraft.net";
 
-    private AuthData authData;
-    private BasicCookieStore cookies;
     private HttpClient client;
 
     public RealmsAPI(AuthData authData) {
-        this.authData = authData;
-        this.cookies = new BasicCookieStore();
+        BasicCookieStore cookies = new BasicCookieStore();
 
         BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), authData.getProfile()));
         BasicClientCookie userCookie = new BasicClientCookie("user", authData.getUsername());
