@@ -6,7 +6,7 @@
 package systems.kinau.fishingbot.modules;
 
 import lombok.Getter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
@@ -25,7 +25,7 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getEventManager().registerListener(this);
+        MineBot.getInstance().getEventManager().registerListener(this);
     }
 
     @Override
@@ -43,39 +43,39 @@ public class ClientDefaultsModule extends Module implements Listener {
             }
 
             //Send start texts
-            if(FishingBot.getInstance().getConfig().isStartTextEnabled()) {
-                Arrays.asList(FishingBot.getInstance().getConfig().getStartText().split(";")).forEach(s -> {
-                    FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(s.replace("%prefix%", FishingBot.PREFIX)));
+            if(MineBot.getInstance().getConfig().isStartTextEnabled()) {
+                Arrays.asList(MineBot.getInstance().getConfig().getStartText().split(";")).forEach(s -> {
+                    MineBot.getInstance().getNet().sendPacket(new PacketOutChat(s.replace("%prefix%", MineBot.PREFIX)));
                 });
             }
 
             //Start position updates
-            startPositionUpdate(FishingBot.getInstance().getNet());
+            startPositionUpdate(MineBot.getInstance().getNet());
         }).start();
     }
 
     @EventHandler
     public void onDisconnect(DisconnectEvent event) {
-        FishingBot.getLog().info("Disconnected: " + event.getDisconnectMessage());
-        FishingBot.getInstance().setRunning(false);
+        MineBot.getLog().info("Disconnected: " + event.getDisconnectMessage());
+        MineBot.getInstance().setRunning(false);
     }
 
     @EventHandler
     public void onJoinGame(JoinGameEvent event) {
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutClientSettings());
+        MineBot.getInstance().getNet().sendPacket(new PacketOutClientSettings());
     }
 
     @EventHandler
     public void onKeepAlive(KeepAliveEvent event) {
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutKeepAlive(event.getId()));
+        MineBot.getInstance().getNet().sendPacket(new PacketOutKeepAlive(event.getId()));
     }
 
     @EventHandler
     public void onUpdatePlayerList(UpdatePlayerListEvent event) {
-        if(FishingBot.getInstance().getConfig().isAutoDisconnect() && event.getPlayers().size() > FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold()) {
-            FishingBot.getLog().warning("Max players threshold reached. Stopping");
-            FishingBot.getInstance().setWontConnect(true);
-            FishingBot.getInstance().setRunning(false);
+        if(MineBot.getInstance().getConfig().isAutoDisconnect() && event.getPlayers().size() > MineBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold()) {
+            MineBot.getLog().warning("Max players threshold reached. Stopping");
+            MineBot.getInstance().setWontConnect(true);
+            MineBot.getInstance().setRunning(false);
         }
     }
 
@@ -84,7 +84,7 @@ public class ClientDefaultsModule extends Module implements Listener {
             positionThread.interrupt();
         positionThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
-                Player player = FishingBot.getInstance().getPlayer();
+                Player player = MineBot.getInstance().getPlayer();
                 networkHandler.sendPacket(new PacketOutPosition(player.getX(), player.getY(), player.getZ(), true));
                 try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }

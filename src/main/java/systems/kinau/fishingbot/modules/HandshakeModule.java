@@ -6,7 +6,7 @@
 package systems.kinau.fishingbot.modules;
 
 import lombok.Getter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.protocol.State;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketOutHandshake;
 
@@ -22,12 +22,12 @@ public class HandshakeModule extends Module {
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutHandshake(serverName, serverPort));
-        FishingBot.getInstance().getNet().setState(State.LOGIN);
+        MineBot.getInstance().getNet().sendPacket(new PacketOutHandshake(serverName, serverPort));
+        MineBot.getInstance().getNet().setState(State.LOGIN);
     }
 
     @Override
     public void onDisable() {
-        FishingBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
+        MineBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
     }
 }

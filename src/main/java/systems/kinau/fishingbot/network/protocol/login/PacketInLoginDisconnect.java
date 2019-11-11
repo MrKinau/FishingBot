@@ -6,7 +6,7 @@
 package systems.kinau.fishingbot.network.protocol.login;
 
 import com.google.common.io.ByteArrayDataOutput;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.login.LoginDisconnectEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -24,6 +24,6 @@ public class PacketInLoginDisconnect extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         String errorMessage = readString(in);
-        FishingBot.getInstance().getEventManager().callEvent(new LoginDisconnectEvent(errorMessage));
+        MineBot.getInstance().getEventManager().callEvent(new LoginDisconnectEvent(errorMessage));
     }
 }

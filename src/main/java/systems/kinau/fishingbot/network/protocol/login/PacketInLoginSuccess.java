@@ -9,7 +9,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.login.LoginSuccessEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -35,6 +35,6 @@ public class PacketInLoginSuccess extends Packet {
         this.uuid = new UUID(new BigInteger(uuidStr.substring(0, 16), 16).longValue(), new BigInteger(uuidStr.substring(16), 16).longValue());
         this.userName = readString(in);
 
-        FishingBot.getInstance().getEventManager().callEvent(new LoginSuccessEvent(uuid, userName));
+        MineBot.getInstance().getEventManager().callEvent(new LoginSuccessEvent(uuid, userName));
     }
 }

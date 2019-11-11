@@ -866,4 +866,22 @@ public enum MaterialMc18 {
                 return false;
         }
     }
+
+    /**
+     * @return True if this material is fluid.
+     */
+    public boolean isFluid() {
+        if (!isBlock()) {
+            return false;
+        }
+        switch (this) {
+            case WATER:
+            case STATIONARY_WATER:
+            case LAVA:
+            case STATIONARY_LAVA:
+                return true;
+            default:
+                return false;
+        }
+    }
 }

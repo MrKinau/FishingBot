@@ -7,7 +7,7 @@ package systems.kinau.fishingbot.modules;
 
 import lombok.Getter;
 import lombok.Setter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.DifficultySetEvent;
@@ -17,8 +17,8 @@ import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlacement;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.Item;
 
@@ -46,20 +46,20 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getEventManager().registerListener(this);
+        MineBot.getInstance().getEventManager().registerListener(this);
         new Thread(this).start();
     }
 
     @Override
     public void onDisable() {
-        FishingBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
+        MineBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
     }
 
     public void fish() {
         setLastFish(System.currentTimeMillis());
         setCurrentBobber(-1);
         setTrackingNextEntityMeta(true);
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
+        MineBot.getInstance().getNet().sendPacket(PacketOutBlockPlacement.useItem());
         new Thread(() -> {
             try {
                 Thread.sleep(200);
@@ -68,7 +68,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 Thread.sleep(200);
                 setTrackingNextFishingId(true);
                 try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
-                FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
+                MineBot.getInstance().getNet().sendPacket(PacketOutBlockPlacement.useItem());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -107,14 +107,14 @@ public class FishingModule extends Module implements Runnable, Listener {
 
         //Print to console (based on announcetype)
         logItem(currentMax,
-                FishingBot.getInstance().getConfig().getAnnounceTypeConsole(),
-                FishingBot.getLog()::info,
-                FishingBot.getLog()::info);
+                MineBot.getInstance().getConfig().getAnnounceTypeConsole(),
+                MineBot.getLog()::info,
+                MineBot.getLog()::info);
 
         //Print in mc chat (based on announcetype)
         logItem(currentMax,
-                FishingBot.getInstance().getConfig().getAnnounceTypeChat(),
-                (String str) -> FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(FishingBot.PREFIX + str)),
+                MineBot.getInstance().getConfig().getAnnounceTypeChat(),
+                (String str) -> MineBot.getInstance().getNet().sendPacket(new PacketOutChat(MineBot.PREFIX + str)),
                 (String str) -> {
                     // Delay the enchant messages to arrive after the item announcement
                     try {
@@ -122,7 +122,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(str));
+                    MineBot.getInstance().getNet().sendPacket(new PacketOutChat(str));
                 });
     }
 
@@ -194,7 +194,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     private void noFishingRod() {
-        FishingBot.getLog().severe("No fishing rod equipped. Retrying later!");
+        MineBot.getLog().severe("No fishing rod equipped. Retrying later!");
     }
 
     private void reFish(int id) {
@@ -214,8 +214,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                 e.printStackTrace();
             }
             setTrackingNextFishingId(true);
-            FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
-            FishingBot.getLog().info("Starting fishing!");
+            MineBot.getInstance().getNet().sendPacket(PacketOutBlockPlacement.useItem());
+            MineBot.getLog().info("Starting fishing!");
         }).start();
     }
 
@@ -226,14 +226,14 @@ public class FishingModule extends Module implements Runnable, Listener {
         if(getCurrentBobber() != event.getEid())
             return;
 
-        switch (FishingBot.getInstance().getServerProtocol()) {
+        switch (MineBot.getInstance().getServerProtocol()) {
             case ProtocolConstants.MINECRAFT_1_10:
             case ProtocolConstants.MINECRAFT_1_9_4:
             case ProtocolConstants.MINECRAFT_1_9_2:
             case ProtocolConstants.MINECRAFT_1_9_1:
             case ProtocolConstants.MINECRAFT_1_9:
             case ProtocolConstants.MINECRAFT_1_8: {
-                FishingBot.getInstance().getFishingModule().fish();
+                MineBot.getInstance().getFishingModule().fish();
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -251,9 +251,9 @@ public class FishingModule extends Module implements Runnable, Listener {
             case ProtocolConstants.MINECRAFT_1_14_4:
             default: {
                 if(Math.abs(event.getY()) > 350) {
-                    FishingBot.getInstance().getFishingModule().fish();
+                    MineBot.getInstance().getFishingModule().fish();
                 } else if(lastY == 0 && event.getY() == 0) {    //Sometimes Minecraft does not push the bobber down, but this workaround works good
-                    FishingBot.getInstance().getFishingModule().fish();
+                    MineBot.getInstance().getFishingModule().fish();
                 }
                 break;
             }
@@ -266,10 +266,10 @@ public class FishingModule extends Module implements Runnable, Listener {
     public void onUpdateSlot(UpdateSlotEvent event) {
         if(event.getWindowId() != 0)
             return;
-        if(event.getSlotId() != FishingBot.getInstance().getPlayer().getHeldSlot())
+        if(event.getSlotId() != MineBot.getInstance().getPlayer().getHeldSlot())
             return;
         ByteArrayDataInputWrapper testFishRod = new ByteArrayDataInputWrapper(event.getSlotData().toByteArray().clone());
-        int protocolId = FishingBot.getInstance().getServerProtocol();
+        int protocolId = MineBot.getInstance().getServerProtocol();
         if(protocolId < ProtocolConstants.MINECRAFT_1_13) {
             short itemId = testFishRod.readShort();
             if (itemId != 346)  //Normal ID
@@ -301,9 +301,9 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @EventHandler
     public void onSpawnObject(SpawnObjectEvent event) {
-        if(!FishingBot.getInstance().getFishingModule().isTrackingNextFishingId())
+        if(!MineBot.getInstance().getFishingModule().isTrackingNextFishingId())
             return;
-        switch (FishingBot.getInstance().getServerProtocol()) {
+        switch (MineBot.getInstance().getServerProtocol()) {
             case ProtocolConstants.MINECRAFT_1_8:
             case ProtocolConstants.MINECRAFT_1_13_2:
             case ProtocolConstants.MINECRAFT_1_13_1:
@@ -345,8 +345,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                 setCurrentBobber(-1);
                 setTrackingNextEntityMeta(false);
                 setTrackingNextFishingId(true);
-                FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
-                FishingBot.getLog().warning("Bot is slow (maybe stuck). Trying to restart!");
+                MineBot.getInstance().getNet().sendPacket(PacketOutBlockPlacement.useItem());
+                MineBot.getLog().warning("Bot is slow (maybe stuck). Trying to restart!");
             }
             try {
                 Thread.sleep(5000);

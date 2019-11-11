@@ -7,7 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.UpdatePlayerListEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -40,6 +40,6 @@ public class PacketInPlayerListItem extends Packet {
         }
         in.skipBytes(in.getAvailable());
 
-        FishingBot.getInstance().getEventManager().callEvent(new UpdatePlayerListEvent(getCurrPlayers()));
+        MineBot.getInstance().getEventManager().callEvent(new UpdatePlayerListEvent(getCurrPlayers()));
     }
 }

@@ -8,7 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.EntityVelocityEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -34,6 +34,6 @@ public class PacketInEntityVelocity extends Packet {
         y = in.readShort();
         z = in.readShort();
 
-        FishingBot.getInstance().getEventManager().callEvent(new EntityVelocityEvent(x, y, z, eid));
+        MineBot.getInstance().getEventManager().callEvent(new EntityVelocityEvent(x, y, z, eid));
     }
 }

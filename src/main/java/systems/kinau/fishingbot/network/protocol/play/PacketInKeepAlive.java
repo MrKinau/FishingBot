@@ -8,7 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.KeepAliveEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -55,6 +55,6 @@ public class PacketInKeepAlive extends Packet {
                 break;
             }
         }
-        FishingBot.getInstance().getEventManager().callEvent(new KeepAliveEvent(getId()));
+        MineBot.getInstance().getEventManager().callEvent(new KeepAliveEvent(getId()));
     }
 }

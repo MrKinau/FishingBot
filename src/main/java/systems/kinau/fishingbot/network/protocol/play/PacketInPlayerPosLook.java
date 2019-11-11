@@ -8,7 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.PosLookChangeEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -46,7 +46,7 @@ public class PacketInPlayerPosLook extends Packet {
             if(protocolId >= ProtocolConstants.MINECRAFT_1_9) {
                 this.teleportId = readVarInt(in); //tID
             }
-            FishingBot.getInstance().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
+            MineBot.getInstance().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
         }
     }
 }

@@ -8,7 +8,7 @@ package systems.kinau.fishingbot;
 public class Main {
 
     public static void main(String[] args) {
-        MineBot bot = new MineBot(args);
+        MineBot bot = new MineBot();
         bot.start();
     }
 }

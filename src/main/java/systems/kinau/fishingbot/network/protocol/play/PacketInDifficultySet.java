@@ -8,7 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.DifficultySetEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -28,6 +28,6 @@ public class PacketInDifficultySet extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.difficulty = in.readUnsignedByte();
 
-        FishingBot.getInstance().getEventManager().callEvent(new DifficultySetEvent(getDifficulty()));
+        MineBot.getInstance().getEventManager().callEvent(new DifficultySetEvent(getDifficulty()));
     }
 }

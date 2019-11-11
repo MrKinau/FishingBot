@@ -20,7 +20,7 @@ public class SettingsConfig implements Config {
 
     @Property(key = "online-mode") private boolean onlineMode = true;
 
-    @Property(key = "account-username") private String userName = "FishingBot";
+    @Property(key = "account-username") private String userName = "MineBot";
     @Property(key = "account-password") private String password = "CHANGEME";
 
     @Property(key = "log-count") private int logCount = 15;

@@ -12,7 +12,7 @@ import com.flowpowered.nbt.TagType;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -40,14 +40,14 @@ public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (FishingBot.getInstance().getFishingModule() == null) {
+        if (MineBot.getInstance().getFishingModule() == null) {
             in.skipBytes(in.getAvailable());
             return;
         }
-        if (!FishingBot.getInstance().getFishingModule().isTrackingNextEntityMeta())
+        if (!MineBot.getInstance().getFishingModule().isTrackingNextEntityMeta())
             return;
         int eid = readVarInt(in);
-        if (FishingBot.getInstance().getFishingModule().containsPossibleItem(eid))
+        if (MineBot.getInstance().getFishingModule().containsPossibleItem(eid))
             return;
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             readWatchableObjects18(in, networkHandler, eid);
@@ -136,8 +136,8 @@ public class PacketInEntityMetadata extends Packet {
                     int itemID = readVarInt(in);
                     byte count = in.readByte();
                     List<Map<String, Short>> enchantments = readNBT(in);
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    String name = ItemHandler.getItemName(itemID, MineBot.getInstance().getServerProtocol()).replace("minecraft:", "");
+                    MineBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
                     return;
                 }
                 case 7: {
@@ -259,9 +259,9 @@ public class PacketInEntityMetadata extends Packet {
                     byte count = in.readByte();
                     List<Map<String, Short>> enchantments = readNBT(in);
 
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
+                    String name = ItemHandler.getItemName(itemID, MineBot.getInstance().getServerProtocol()).replace("minecraft:", "");
 
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    MineBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -380,7 +380,7 @@ public class PacketInEntityMetadata extends Packet {
                     String name = MaterialMc18.getMaterial(itemID).name();
                     List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    MineBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -464,7 +464,7 @@ public class PacketInEntityMetadata extends Packet {
                         String name = MaterialMc18.getMaterial(itemID).name();
                         List<Map<String, Short>> enchantments = readNBT_1_8(in);
 
-                        FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                        MineBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
 
                         return;
                     }

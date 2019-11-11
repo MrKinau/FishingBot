@@ -5,7 +5,7 @@
 
 package systems.kinau.fishingbot.modules;
 
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.ChatEvent;
@@ -15,18 +15,18 @@ public class ChatCommandModule extends Module implements Listener {
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getEventManager().registerListener(this);
+        MineBot.getInstance().getEventManager().registerListener(this);
     }
 
     @Override
     public void onDisable() {
-        FishingBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
+        MineBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
     }
 
     @EventHandler
     public void onChat(ChatEvent event) {
-        if (isEnabled() && event.getText().contains(FishingBot.getInstance().getAuthData().getUsername() + ", Level?")) {
-            FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(FishingBot.getInstance().getPlayer().getLevels() + " Level, Sir!"));
+        if (isEnabled() && event.getText().contains(MineBot.getInstance().getAuthData().getUsername() + ", Level?")) {
+            MineBot.getInstance().getNet().sendPacket(new PacketOutChat(MineBot.getInstance().getPlayer().getLevels() + " Level, Sir!"));
         }
     }
 }

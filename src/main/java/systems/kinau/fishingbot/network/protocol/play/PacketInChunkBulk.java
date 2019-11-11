@@ -8,7 +8,6 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.mining.Chunk;
-import systems.kinau.fishingbot.mining.MiningManager;
 import systems.kinau.fishingbot.mining.World;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -27,8 +26,6 @@ public class PacketInChunkBulk extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        if(!(MineBot.getInstance().getManager() instanceof MiningManager))
-            return;
         boolean lightning = in.readBoolean();
         int chunkCount = readVarInt(in);
 

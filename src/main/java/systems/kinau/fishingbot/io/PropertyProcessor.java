@@ -4,7 +4,7 @@
  */
 package systems.kinau.fishingbot.io;
 
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +53,7 @@ public class PropertyProcessor {
                     List<Map<String, Field>> kvPairList = new ArrayList<>();
                     kvPairList.add(kvPair);
                     undefinedKeys.put(source, kvPairList);
-                    FishingBot.getLog().warning("Undefined config option in " + source + " -> " + key);
+                    MineBot.getLog().warning("Undefined config option in " + source + " -> " + key);
                     continue;
                 } else {
                     List<Map<String, Field>> undKeys = undefinedKeys.get(source);
@@ -61,7 +61,7 @@ public class PropertyProcessor {
                     kvPair.put(key, field);
                     undKeys.add(kvPair);
                     undefinedKeys.put(source, undKeys);
-                    FishingBot.getLog().warning("Undefined config option in " + source + " -> " + key);
+                    MineBot.getLog().warning("Undefined config option in " + source + " -> " + key);
                     continue;
                 }
             }

@@ -9,7 +9,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.login.EncryptionRequestEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -36,6 +36,6 @@ public class PacketInEncryptionRequest extends Packet {
         this.publicKey = CryptManager.decodePublicKey(readBytesFromStream(in));
         this.verifyToken = readBytesFromStream(in);
 
-        FishingBot.getInstance().getEventManager().callEvent(new EncryptionRequestEvent(serverId, publicKey, verifyToken));
+        MineBot.getInstance().getEventManager().callEvent(new EncryptionRequestEvent(serverId, publicKey, verifyToken));
     }
 }

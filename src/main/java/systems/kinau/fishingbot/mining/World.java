@@ -5,6 +5,7 @@ import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.block.BlockChangeEvent;
+import systems.kinau.fishingbot.network.utils.MaterialMc18;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +34,7 @@ public class World implements Listener {
                 .findAny();
     }
 
-    public BlockType getBlockAt(int x, int y, int z) {
-        return getBlockAt(x, y, z, BlockFace.NONE);
-    }
-
-    public BlockType getBlockAt(int x, int y, int z, byte blockFace) {
+    public Position getRelativePosition(int x, int y, int z, byte blockFace) {
         switch (blockFace) {
             case BlockFace.X_NEGATIVE: x--; break;
             case BlockFace.X_POSITIVE: x++; break;
@@ -46,6 +43,23 @@ public class World implements Listener {
             case BlockFace.UP: y++; break;
             case BlockFace.DOWN: y--; break;
         }
+        return new Position(x, y, z);
+    }
+
+    public BlockType getBlockAt(Position pos) {
+        return getBlockAt(pos.getX(), pos.getY(), pos.getZ(), BlockFace.NONE);
+    }
+
+    public BlockType getBlockAt(int x, int y, int z) {
+        return getBlockAt(x, y, z, BlockFace.NONE);
+    }
+
+    public BlockType getBlockAt(int x, int y, int z, byte blockFace) {
+        Position pos = getRelativePosition(x, y, z, blockFace);
+
+        x = pos.getX();
+        y = pos.getY();
+        z = pos.getZ();
 
         int finalX = x;
         int finalZ = z;
@@ -65,6 +79,43 @@ public class World implements Listener {
         return c.getBlockAt(x - (c.getChunkX() * 16), y, z - (c.getChunkZ() * 16));
     }
 
+    public byte getAdjacentDirection(Position from, Position to) {
+        if (from.getY() > to.getY()) {
+            return BlockFace.UP;
+        } else if (from.getY() < to.getY()) {
+            return BlockFace.DOWN;
+        } else if (from.getX() > to.getX()) {
+            return BlockFace.X_POSITIVE;
+        } else if (from.getX() < to.getX()) {
+            return BlockFace.X_NEGATIVE;
+        } else if (from.getZ() > to.getZ()) {
+            return BlockFace.Z_NEGATIVE;
+        } else if (from.getZ() < to.getZ()) {
+            return BlockFace.Z_POSITIVE;
+        } else {
+            return BlockFace.NONE;
+        }
+    }
+
+    public Position getAdjacentBlock(Position pos) {
+        BlockType block;
+        if (!(block = getBlockAt(pos.getX(), pos.getY() + 1, pos.getZ())).getMaterial().isFluid() && block.getMaterial() != MaterialMc18.AIR) {
+            return new Position(pos.getX(), pos.getY() + 1, pos.getZ());
+        } else if (!(block = getBlockAt(pos.getX(), pos.getY() - 1, pos.getZ())).getMaterial().isFluid() && block.getMaterial() != MaterialMc18.AIR) {
+            return new Position(pos.getX(), pos.getY() - 1, pos.getZ());
+        } else if (!(block = getBlockAt(pos.getX() + 1, pos.getY(), pos.getZ())).getMaterial().isFluid() && block.getMaterial() != MaterialMc18.AIR) {
+            return new Position(pos.getX() + 1, pos.getY(), pos.getZ());
+        } else if (!(block = getBlockAt(pos.getX() - 1, pos.getY(), pos.getZ())).getMaterial().isFluid() && block.getMaterial() != MaterialMc18.AIR) {
+            return new Position(pos.getX() - 1, pos.getY(), pos.getZ());
+        } else if (!(block = getBlockAt(pos.getX(), pos.getY(), pos.getZ() + 1)).getMaterial().isFluid() && block.getMaterial() != MaterialMc18.AIR) {
+            return new Position(pos.getX(), pos.getY(), pos.getZ() + 1);
+        } else if (!(block = getBlockAt(pos.getX(), pos.getY(), pos.getZ() - 1)).getMaterial().isFluid() && block.getMaterial() != MaterialMc18.AIR) {
+            return new Position(pos.getX(), pos.getY(), pos.getZ() - 1);
+        } else {
+            return null;
+        }
+    }
+
     public void setBlockAt(int x, int y, int z, short block) {
         Optional<Chunk> optChunk = getChunkAt(x, z);
 
@@ -74,6 +125,7 @@ public class World implements Listener {
         }
 
         Chunk c = optChunk.get();
+        MineBot.getLog().info("SET BLOCK: " + new BlockType(block).getMaterial().name() + "  " + x + " " + y + " " + z);
         c.setBlockAt(x - (c.getChunkX() * 16), y, z - (c.getChunkZ() * 16), block);
     }
 

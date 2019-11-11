@@ -10,7 +10,7 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.TextComponent;
@@ -30,11 +30,11 @@ public class ServerPinger {
 
     private String serverName;
     private int serverPort;
-    private FishingBot fishingBot;
+    private MineBot fishingBot;
 
     public void ping() {
         if(serverName == null || serverName.trim().isEmpty()) {
-            FishingBot.getLog().severe("Invalid server host given. Please change the server-ip in your config.properties");
+            MineBot.getLog().severe("Invalid server host given. Please change the server-ip in your config.properties");
             System.exit(1);
         }
 
@@ -50,7 +50,7 @@ public class ServerPinger {
 
             ByteArrayDataOutput buf = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, buf);
-            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()), buf);
+            Packet.writeVarInt(ProtocolConstants.getProtocolId(MineBot.getInstance().getConfig().getDefaultProtocol()), buf);
             Packet.writeString(serverName, buf);
             buf.writeShort(serverPort);
             Packet.writeVarInt(1, buf);
@@ -72,14 +72,14 @@ public class ServerPinger {
                 int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
                 int currPlayers = root.getAsJsonObject("players").get("online").getAsInt();
                 if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(protocolId)) {
-                    FishingBot.getLog().severe("This server is not running a supported protocol version!");
-                    FishingBot.getLog().severe("It is possibe that it wont work correctly");
+                    MineBot.getLog().severe("This server is not running a supported protocol version!");
+                    MineBot.getLog().severe("It is possibe that it wont work correctly");
 
                     //Register protocol of 1.14 for unknown versions
                     fishingBot.getNet().getPlayRegistryIn().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_14));
                     fishingBot.getNet().getPlayRegistryOut().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
                 }
-                FishingBot.getInstance().setServerProtocol(protocolId);
+                MineBot.getInstance().setServerProtocol(protocolId);
                 String description = "Unknown";
                 try {
                     try {
@@ -95,10 +95,10 @@ public class ServerPinger {
                     if(description.trim().isEmpty())
                         description = "Unknown";
                 }
-                FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
-                if(currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
-                    FishingBot.getLog().warning("Max players threshold already reached. Stopping");
-                    FishingBot.getInstance().setWontConnect(true);
+                MineBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
+                if(currPlayers >= MineBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && MineBot.getInstance().getConfig().isAutoDisconnect()) {
+                    MineBot.getLog().warning("Max players threshold already reached. Stopping");
+                    MineBot.getInstance().setWontConnect(true);
                 }
             }
 
@@ -107,9 +107,9 @@ public class ServerPinger {
             socket.close();
 
         } catch (UnknownHostException e) {
-            FishingBot.getLog().severe("Unknown host: " + serverName);
+            MineBot.getLog().severe("Unknown host: " + serverName);
         } catch (IOException e) {
-            FishingBot.getLog().severe("Could not ping: " + serverName);
+            MineBot.getLog().severe("Could not ping: " + serverName);
         }
     }
 
@@ -118,15 +118,15 @@ public class ServerPinger {
         if(serverPort == 25565 || serverPort < 1) {
             String[] serverData = getServerAddress(serverName);
             if(!serverData[0].equalsIgnoreCase(serverName))
-                FishingBot.getLog().info("Changed server host to: " + serverData[0]);
+                MineBot.getLog().info("Changed server host to: " + serverData[0]);
             this.serverName = serverData[0];
             this.serverPort = Integer.valueOf(serverData[1]);
             if(serverPort != 25565)
-                FishingBot.getLog().info("Changed port to: " + serverPort);
+                MineBot.getLog().info("Changed port to: " + serverPort);
         }
 
-        FishingBot.getInstance().setServerHost(serverName);
-        FishingBot.getInstance().setServerPort(serverPort);
+        MineBot.getInstance().setServerHost(serverName);
+        MineBot.getInstance().setServerPort(serverPort);
     }
 
     /**

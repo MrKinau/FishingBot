@@ -7,7 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.SpawnObjectEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -61,6 +61,6 @@ public class PacketInSpawnObject extends Packet {
             }
         }
 
-        FishingBot.getInstance().getEventManager().callEvent(new SpawnObjectEvent(getId(), getType()));
+        MineBot.getInstance().getEventManager().callEvent(new SpawnObjectEvent(getId(), getType()));
     }
 }

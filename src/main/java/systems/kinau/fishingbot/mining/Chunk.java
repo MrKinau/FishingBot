@@ -10,6 +10,7 @@ import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,6 +70,13 @@ public class Chunk {
                 return;
             }
             if (((bitmask & (1 << sectionY)) != 0)) {
+                if(in.getAvailable() == 4096) {
+                    byte[] bytes = new byte[in.getAvailable()];
+                    in.readFully(bytes);
+                    System.out.println(Arrays.toString(bytes));
+                    in.skipBytes(in.getAvailable());
+                    return;
+                }
                 ChunkSection chunkSection = new ChunkSection(in, sectionY);
                 addSection(chunkSection);
 //                MineBot.getLog().info("Loaded chunk section of " + (chunkX * 16) + "/" + (chunkZ * 16) + " from y:" + (sectionY * 16) + " to y:" + (sectionY * 16 + 15));
@@ -83,4 +91,8 @@ public class Chunk {
 //        MineBot.getLog().info("left: " + in.getAvailable() + " bytes!");
     }
 
+    @Override
+    public String toString() {
+        return "Chunk {\"chunkX\":" + (getChunkX()*16) + ",\"chunkZ\":" + (getChunkZ()*16) + ",\"chunkId\":" + getId() + "}";
+    }
 }

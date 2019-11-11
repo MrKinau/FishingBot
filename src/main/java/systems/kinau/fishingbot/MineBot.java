@@ -9,17 +9,14 @@ import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
-import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
-import systems.kinau.fishingbot.modules.*;
-import systems.kinau.fishingbot.mining.MiningManager;
-import systems.kinau.fishingbot.mining.Player;
 import systems.kinau.fishingbot.mining.World;
+import systems.kinau.fishingbot.modules.*;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -35,34 +32,27 @@ import java.util.logging.Logger;
 
 public class MineBot {
 
-    public static final String PREFIX = "MineBot v2.4 - ";
     @Getter public static MineBot instance;
     @Getter public static Logger log = Logger.getLogger(MineBot.class.getSimpleName());
-    @Getter @Setter public static boolean running;
-    @Getter private static SettingsConfig config;
-    @Getter private static DiscordMessageDispatcher discord;
-    @Getter private static ChatHandler chatHandler;
-    @Getter @Setter private static int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
-    @Getter @Setter private static String serverHost;
-    @Getter @Setter private static int serverPort;
-    @Getter @Setter private AuthData authData;
-    @Getter @Setter private World world;
-    @Getter @Setter private Player player;
-    @Getter         private EventManager eventManager;
-    public static final String PREFIX = "FishingBot v2.5 - ";
-    @Getter private static FishingBot instance;
-    @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
+    public static final String PREFIX = "MineBot v2.5 - ";
 
     @Getter @Setter private boolean running;
+
     @Getter private SettingsConfig config;
+
     @Getter private DiscordMessageDispatcher discord;
+
     @Getter @Setter private int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
     @Getter @Setter private String serverHost;
     @Getter @Setter private int serverPort;
     @Getter @Setter private AuthData authData;
+
     @Getter @Setter private boolean wontConnect = false;
+
     @Getter         private EventManager eventManager;
-    @Getter         private Player player;
+    @Getter @Setter private World world;
+    @Getter @Setter private Player player;
+
     @Getter         private ClientDefaultsModule clientModule;
 
     @Getter         private Socket socket;
@@ -72,7 +62,7 @@ public class MineBot {
 
     private File logsFolder = new File("logs");
 
-    public FishingBot() {
+    public MineBot() {
         instance = this;
 
         //Initialize Logger
@@ -201,6 +191,7 @@ public class MineBot {
 
                 this.net = new NetworkHandler();
 
+                //Activate modules
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();
                 if (getConfig().isProxyChat())
@@ -210,6 +201,7 @@ public class MineBot {
                 this.clientModule = new ClientDefaultsModule();
                 getClientModule().enable();
                 new ItemHandler(getServerProtocol());
+                new MiningModule().enable();
                 this.player = new Player();
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -243,7 +235,7 @@ public class MineBot {
                 this.net = null;
             }
             if (getConfig().isAutoReconnect()) {
-                getLog().info("FishingBot restarts in " + getConfig().getAutoReconnectTime() + " seconds...");
+                getLog().info("MineBot restarts in " + getConfig().getAutoReconnectTime() + " seconds...");
                 try {
                     Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
                 } catch (InterruptedException e) {

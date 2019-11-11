@@ -11,7 +11,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -33,6 +33,6 @@ public class PacketInSetExperience extends Packet {
 		level = readVarInt(in);
 		experience = readVarInt(in);
 
-		FishingBot.getInstance().getEventManager().callEvent(new UpdateExperienceEvent(experience, level));
+		MineBot.getInstance().getEventManager().callEvent(new UpdateExperienceEvent(experience, level));
 	}
 }

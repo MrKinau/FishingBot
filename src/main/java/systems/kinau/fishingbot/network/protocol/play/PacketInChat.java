@@ -13,7 +13,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Getter;
-import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -42,7 +42,7 @@ public class PacketInChat extends Packet {
 				//Ignored
 			}
 
-			FishingBot.getInstance().getEventManager().callEvent(new ChatEvent(getText()));
+			MineBot.getInstance().getEventManager().callEvent(new ChatEvent(getText()));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

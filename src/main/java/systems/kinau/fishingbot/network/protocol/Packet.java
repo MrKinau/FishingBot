@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network.protocol;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataOutput;
+import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
@@ -158,9 +159,14 @@ public abstract class Packet {
     }
 
     public static short readBlock(ByteArrayDataInputWrapper in) throws IOException {
-        int blockByte1 = in.readUnsignedByte();
-        int blockByte2 = in.readUnsignedByte();
-        return (short) ((blockByte2 << 8) | blockByte1);
+        try {
+            int blockByte1 = in.readUnsignedByte();
+            int blockByte2 = in.readUnsignedByte();
+            return (short) ((blockByte2 << 8) | blockByte1);
+        } catch (Exception ex) {
+            MineBot.getLog().severe("Error reading Block!");
+        }
+        return 0;
     }
 
 }
