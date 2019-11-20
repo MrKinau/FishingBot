@@ -38,13 +38,13 @@ public class PacketInChat extends Packet {
 
 			try {
 				this.text = TextComponent.toPlainText(object);
-			} catch (IllegalStateException ignored) {
+			} catch (Exception ignored) {
 				//Ignored
 			}
 
 			FishingBot.getInstance().getEventManager().callEvent(new ChatEvent(getText()));
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception ignored) {
+			//Ignored
 		}
 	}
 }
