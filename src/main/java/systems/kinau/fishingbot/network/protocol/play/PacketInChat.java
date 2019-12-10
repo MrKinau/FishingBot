@@ -38,7 +38,7 @@ public class PacketInChat extends Packet {
 
 			try {
 				this.text = TextComponent.toPlainText(object);
-			} catch (IllegalStateException ignored) {
+			} catch (Exception ignored) {
 				//Ignored
 			}
 
