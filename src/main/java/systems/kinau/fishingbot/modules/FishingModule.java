@@ -332,7 +332,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 }
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_15_PRE_7:
+            case ProtocolConstants.MINECRAFT_1_15:
             default: {
                 if(event.getType() == 102) {   //102 = bobber
                     reFish(event.getId());

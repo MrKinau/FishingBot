@@ -81,7 +81,7 @@ public class PacketInJoinGame extends Packet {
                 reducedDebugInfo = in.readBoolean();    //Reduced Debug info
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_15_PRE_7:
+            case ProtocolConstants.MINECRAFT_1_15:
             default: {
                 eid = in.readInt();                     //Entity ID
                 gamemode = in.readUnsignedByte();       //Gamemode

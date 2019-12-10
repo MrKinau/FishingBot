@@ -52,7 +52,7 @@ public class ItemHandler {
                 }
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_15_PRE_7:
+            case ProtocolConstants.MINECRAFT_1_15:
             default: {
                 root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_15.json")));
                 root = root.getAsJsonObject().get("minecraft:item").getAsJsonObject().get("entries").getAsJsonObject();

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static final String PREFIX = "FishingBot v2.5 - ";
+    public static final String PREFIX = "FishingBot v2.6 - ";
     @Getter private static FishingBot instance;
     @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
 
