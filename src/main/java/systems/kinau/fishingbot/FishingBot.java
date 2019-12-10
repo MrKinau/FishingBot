@@ -183,6 +183,9 @@ public class FishingBot {
                 //Load EventManager
                 this.eventManager = new EventManager();
 
+                this.fishingModule = new FishingModule();
+                getFishingModule().enable();
+
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();
                 if (getConfig().isProxyChat())

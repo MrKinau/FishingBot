@@ -222,7 +222,6 @@ public class FishingModule extends Module implements Runnable, Listener {
     @EventHandler
     public void onEntityVelocity(EntityVelocityEvent event) {
         addPossibleMotion(event.getEid(), event.getX(), event.getY(), event.getZ());
-
         if(getCurrentBobber() != event.getEid())
             return;
 
@@ -327,9 +326,15 @@ public class FishingModule extends Module implements Runnable, Listener {
             case ProtocolConstants.MINECRAFT_1_14_1:
             case ProtocolConstants.MINECRAFT_1_14_2:
             case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4:
-            default: {
+            case ProtocolConstants.MINECRAFT_1_14_4: {
                 if(event.getType() == 101) {   //101 = bobber
+                    reFish(event.getId());
+                }
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_15_PRE_7:
+            default: {
+                if(event.getType() == 102) {   //102 = bobber
                     reFish(event.getId());
                 }
                 break;
