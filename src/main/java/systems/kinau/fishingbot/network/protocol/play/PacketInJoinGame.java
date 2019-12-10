@@ -19,11 +19,13 @@ public class PacketInJoinGame extends Packet {
     @Getter private int eid;
     @Getter private int gamemode;
     @Getter private int dimension;
+    @Getter private long hashedSeed;
     @Getter private int difficulty;
     @Getter private int maxPlayers;
     @Getter private int viewDistance;
     @Getter private String levelType;
     @Getter private boolean reducedDebugInfo;
+    @Getter private boolean enableRespawnScreen;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -42,21 +44,6 @@ public class PacketInJoinGame extends Packet {
                 maxPlayers = in.readUnsignedByte();      //MaxPlayer
                 levelType = readString(in);              //level type
                 reducedDebugInfo = in.readBoolean();     //Reduced Debug info
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1:
-            case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4:
-            default: {
-                eid = in.readInt();                     //Entity ID
-                gamemode = in.readUnsignedByte();       //Gamemode
-                dimension = in.readInt();               //Dimension
-                maxPlayers = in.readUnsignedByte();     //MaxPlayer
-                levelType = readString(in);             //level type
-                viewDistance = readVarInt(in);          //View distance
-                reducedDebugInfo = in.readBoolean();    //Reduced Debug info
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -78,6 +65,33 @@ public class PacketInJoinGame extends Packet {
                 maxPlayers = in.readUnsignedByte();     //MaxPlayer
                 levelType = readString(in);             //level type
                 reducedDebugInfo = in.readBoolean();    //Reduced Debug info
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_14:
+            case ProtocolConstants.MINECRAFT_1_14_1:
+            case ProtocolConstants.MINECRAFT_1_14_2:
+            case ProtocolConstants.MINECRAFT_1_14_3:
+            case ProtocolConstants.MINECRAFT_1_14_4:{
+                eid = in.readInt();                     //Entity ID
+                gamemode = in.readUnsignedByte();       //Gamemode
+                dimension = in.readInt();               //Dimension
+                maxPlayers = in.readUnsignedByte();     //MaxPlayer
+                levelType = readString(in);             //level type
+                viewDistance = readVarInt(in);          //View distance
+                reducedDebugInfo = in.readBoolean();    //Reduced Debug info
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_15_PRE_7:
+            default: {
+                eid = in.readInt();                     //Entity ID
+                gamemode = in.readUnsignedByte();       //Gamemode
+                dimension = in.readInt();               //Dimension
+                hashedSeed = in.readLong();             //First 8 bytes of the SHA-256 hash of the world's seed
+                maxPlayers = in.readUnsignedByte();     //MaxPlayer
+                levelType = readString(in);             //level type
+                viewDistance = readVarInt(in);          //View distance
+                reducedDebugInfo = in.readBoolean();    //Reduced Debug info
+                enableRespawnScreen = in.readBoolean(); //Set to false when the doImmediateRespawn gamerule is true
                 break;
             }
         }

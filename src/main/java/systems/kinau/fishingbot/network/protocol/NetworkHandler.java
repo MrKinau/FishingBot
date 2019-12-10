@@ -308,6 +308,35 @@ public class NetworkHandler {
 
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_14_4).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_14));
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14_4).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
+
+        //Minecraft 1.15 - pre7
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x00, PacketInSpawnObject.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x0E, PacketInDifficultySet.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x1B, PacketInDisconnect.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x21, PacketInKeepAlive.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x26, PacketInJoinGame.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x46, PacketInEntityVelocity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x44, PacketInEntityMetadata.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x40, PacketInHeldItemChange.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x17, PacketInSetSlot.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x0F, PacketInChat.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x48, PacketInSetExperience.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x34, PacketInPlayerListItem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).registerPacket(0x36, PacketInPlayerPosLook.class);
+
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_15_PRE_7).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
+
+
+        //Register protocol of 1.14 for unknown versions
+        if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
+            FishingBot.getLog().severe("This server is not running a supported protocol version: ProtocolVersion " + FishingBot.getInstance().getServerProtocol());
+            FishingBot.getLog().severe("It is possibe that it wont work correctly");
+
+            getPlayRegistryIn().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
+            getPlayRegistryOut().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
+            getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_14));
+            getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
+        }
     }
 
     public void sendPacket(Packet packet) {

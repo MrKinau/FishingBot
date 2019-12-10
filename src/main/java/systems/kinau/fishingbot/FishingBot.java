@@ -178,10 +178,10 @@ public class FishingBot {
                 }
                 this.socket = new Socket(serverName, port);
 
+                this.net = new NetworkHandler();
+
                 //Load EventManager
                 this.eventManager = new EventManager();
-
-                this.net = new NetworkHandler();
 
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();

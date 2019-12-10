@@ -71,14 +71,7 @@ public class ServerPinger {
                 JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
                 int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
                 int currPlayers = root.getAsJsonObject("players").get("online").getAsInt();
-                if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(protocolId)) {
-                    FishingBot.getLog().severe("This server is not running a supported protocol version!");
-                    FishingBot.getLog().severe("It is possibe that it wont work correctly");
 
-                    //Register protocol of 1.14 for unknown versions
-                    fishingBot.getNet().getPlayRegistryIn().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_14));
-                    fishingBot.getNet().getPlayRegistryOut().get(protocolId).copyOf(fishingBot.getNet().getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
-                }
                 FishingBot.getInstance().setServerProtocol(protocolId);
                 String description = "Unknown";
                 try {

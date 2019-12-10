@@ -43,8 +43,8 @@ public class PacketInChat extends Packet {
 			}
 
 			FishingBot.getInstance().getEventManager().callEvent(new ChatEvent(getText()));
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (Exception ignored) {
+			//Ignored
 		}
 	}
 }
