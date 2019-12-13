@@ -18,7 +18,7 @@ public class PacketOutLoginPluginResponse extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeVarInt(msgId, out);
-        out.writeByte(hasResponse ? 1 : 0);
+        out.writeBoolean(hasResponse);
         if (hasResponse)
             out.write(data);
     }
