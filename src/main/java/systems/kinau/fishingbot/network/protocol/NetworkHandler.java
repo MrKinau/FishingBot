@@ -74,9 +74,11 @@ public class NetworkHandler {
         getLoginRegistryIn().registerPacket(0x01, PacketInEncryptionRequest.class);
         getLoginRegistryIn().registerPacket(0x02, PacketInLoginSuccess.class);
         getLoginRegistryIn().registerPacket(0x03, PacketInSetCompression.class);
+        getLoginRegistryIn().registerPacket(0x04, PacketInLoginPluginRequest.class);
 
         getLoginRegistryOut().registerPacket(0x00, PacketOutLoginStart.class);
         getLoginRegistryOut().registerPacket(0x01, PacketOutEncryptionResponse.class);
+        getLoginRegistryOut().registerPacket(0x02, PacketOutLoginPluginResponse.class);
 
         //Minecraft 1.8.X
 
