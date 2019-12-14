@@ -13,10 +13,12 @@ import systems.kinau.fishingbot.event.login.EncryptionRequestEvent;
 import systems.kinau.fishingbot.event.login.LoginDisconnectEvent;
 import systems.kinau.fishingbot.event.login.LoginSuccessEvent;
 import systems.kinau.fishingbot.event.login.SetCompressionEvent;
+import systems.kinau.fishingbot.event.login.LoginPluginRequestEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.State;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutEncryptionResponse;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginStart;
+import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginPluginResponse;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
 import javax.crypto.SecretKey;
@@ -82,6 +84,11 @@ public class LoginModule extends Module implements Listener {
     @EventHandler
     public void onSetCompression(SetCompressionEvent event) {
         FishingBot.getInstance().getNet().setThreshold(event.getThreshold());
+    }
+
+    @EventHandler
+    public void onLoginPluginRequest(LoginPluginRequestEvent event) {
+        FishingBot.getInstance().getNet().sendPacket(new PacketOutLoginPluginResponse(event.getMsgId(), false, null));
     }
 
     @EventHandler
