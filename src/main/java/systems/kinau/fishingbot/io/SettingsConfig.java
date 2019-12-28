@@ -39,6 +39,8 @@ public class SettingsConfig implements Config {
     @Property(key = "auto-disconnect") private boolean autoDisconnect = false;
     @Property(key = "auto-disconnect-players-threshold") private int autoDisconnectPlayersThreshold = 5;
 
+    @Property(key = "stucking-fix-enabled") private boolean stuckingFixEnabled = true;
+
     public SettingsConfig() {
         String comments = "server-ip:\tServer IP the bot connects to\n" +
                 "#server-port:\tPort of the server the bot connects to\n" +
@@ -65,6 +67,7 @@ public class SettingsConfig implements Config {
                 "#account-username:\tThe username / e-mail of the account\n" +
                 "#account-password:\tThe password of the account (ignored in offline-mode)\n" +
                 "#default-protocol:\tOnly needed for Multi-Version servers. The Minecraft-Version for the ping request to the server. Possible values: (1.8, 1.9, 1.9.2, 1.9.2, 1.9.4, ...)\n" +
+                "#stucking-fix-enabled:\tIf you dont want the bot to re-throw if no fish is caught after 60 seconds (Disabling may cause the bot stuck)" +
                 "#proxy-chat:\tWhether to function as a chat client (printing incoming chat messages to the console and sending input as chat)";
 
         init("config.properties", comments);

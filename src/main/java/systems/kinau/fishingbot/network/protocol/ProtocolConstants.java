@@ -30,6 +30,7 @@ public class ProtocolConstants {
     public static final int MINECRAFT_1_14_3 = 490;
     public static final int MINECRAFT_1_14_4 = 498;
     public static final int MINECRAFT_1_15 = 573;
+    public static final int MINECRAFT_1_15_1 = 575;
 
     public static final List<String> SUPPORTED_VERSIONS = Arrays.asList(
             "1.8.x",
@@ -62,7 +63,8 @@ public class ProtocolConstants {
             ProtocolConstants.MINECRAFT_1_14_2,
             ProtocolConstants.MINECRAFT_1_14_3,
             ProtocolConstants.MINECRAFT_1_14_4,
-            ProtocolConstants.MINECRAFT_1_15
+            ProtocolConstants.MINECRAFT_1_15,
+            ProtocolConstants.MINECRAFT_1_15_1
     );
 
     public static String getVersionString(int protocolId) {
@@ -87,6 +89,7 @@ public class ProtocolConstants {
             case MINECRAFT_1_14_3: return "1.14.3";
             case MINECRAFT_1_14_4: return "1.14.4";
             case MINECRAFT_1_15: return "1.15";
+            case MINECRAFT_1_15_1: return "1.15.1";
             default: return "Unknown version";
         }
     }
@@ -112,6 +115,7 @@ public class ProtocolConstants {
             case "1.14.3": return MINECRAFT_1_14_3;
             case "1.14.4": return MINECRAFT_1_14_4;
             case "1.15": return MINECRAFT_1_15;
+            case "1.15.1": return MINECRAFT_1_15_1;
             default: return MINECRAFT_1_8;
         }
     }

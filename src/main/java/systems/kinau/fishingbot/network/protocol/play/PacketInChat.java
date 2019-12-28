@@ -13,6 +13,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -20,6 +21,7 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.TextComponent;
 
+@NoArgsConstructor
 public class PacketInChat extends Packet {
 
 	@Getter private String text;

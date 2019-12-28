@@ -47,7 +47,8 @@ public class FishingModule extends Module implements Runnable, Listener {
     @Override
     public void onEnable() {
         FishingBot.getInstance().getEventManager().registerListener(this);
-        new Thread(this).start();
+        if (FishingBot.getInstance().getConfig().isStuckingFixEnabled())
+            new Thread(this).start();
     }
 
     @Override
