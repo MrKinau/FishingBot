@@ -30,7 +30,9 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @Override
     public void onDisable() {
-        positionThread.interrupt();
+        if(getPositionThread() != null)
+            getPositionThread().interrupt();
+        FishingBot.getInstance().getEventManager().unregisterListener(this);
     }
 
     @EventHandler

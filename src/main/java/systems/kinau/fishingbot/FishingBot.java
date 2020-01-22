@@ -223,6 +223,11 @@ public class FishingBot {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                if (getClientModule() != null)
+                    this.getClientModule().disable();
+                if (getFishingModule() != null)
+                    this.getFishingModule().disable();
                 this.socket = null;
                 this.fishingModule = null;
                 this.net = null;

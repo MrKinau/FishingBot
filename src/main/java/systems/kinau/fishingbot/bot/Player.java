@@ -11,10 +11,7 @@ import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
-import systems.kinau.fishingbot.event.play.PosLookChangeEvent;
-import systems.kinau.fishingbot.event.play.SetHeldItemEvent;
-import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
-import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
+import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
@@ -33,6 +30,8 @@ public class Player implements Listener {
 
     @Getter @Setter private int heldSlot;
     @Getter @Setter private ByteArrayDataOutput slotData;
+
+    @Getter @Setter private int entityID = -1;
 
     public Player() {
         FishingBot.getInstance().getEventManager().registerListener(this);
@@ -75,5 +74,10 @@ public class Player implements Listener {
         if(event.getSlotId() != getHeldSlot())
             return;
         this.slotData = event.getSlotData();
+    }
+
+    @EventHandler
+    public void onJoinGame(JoinGameEvent event) {
+        setEntityID(event.getEid());
     }
 }

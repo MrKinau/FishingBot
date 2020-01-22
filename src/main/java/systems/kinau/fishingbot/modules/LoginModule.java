@@ -9,16 +9,12 @@ import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
-import systems.kinau.fishingbot.event.login.EncryptionRequestEvent;
-import systems.kinau.fishingbot.event.login.LoginDisconnectEvent;
-import systems.kinau.fishingbot.event.login.LoginSuccessEvent;
-import systems.kinau.fishingbot.event.login.SetCompressionEvent;
-import systems.kinau.fishingbot.event.login.LoginPluginRequestEvent;
+import systems.kinau.fishingbot.event.login.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.State;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutEncryptionResponse;
-import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginStart;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginPluginResponse;
+import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginStart;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
 import javax.crypto.SecretKey;
@@ -45,7 +41,7 @@ public class LoginModule extends Module implements Listener {
 
     @Override
     public void onDisable() {
-        FishingBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
+        FishingBot.getInstance().getEventManager().unregisterListener(this);
     }
 
     @EventHandler

@@ -44,16 +44,22 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @Getter @Setter private int heldSlot;
 
+    @Getter private Thread stuckingFix;
+
     @Override
     public void onEnable() {
         FishingBot.getInstance().getEventManager().registerListener(this);
-        if (FishingBot.getInstance().getConfig().isStuckingFixEnabled())
-            new Thread(this).start();
+        if (FishingBot.getInstance().getConfig().isStuckingFixEnabled()) {
+            stuckingFix = new Thread(this);
+            stuckingFix.start();
+        }
     }
 
     @Override
     public void onDisable() {
-        FishingBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
+        if (stuckingFix != null)
+            stuckingFix.interrupt();
+        FishingBot.getInstance().getEventManager().unregisterListener(this);
     }
 
     public void fish() {
@@ -303,6 +309,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     public void onSpawnObject(SpawnObjectEvent event) {
         if(!FishingBot.getInstance().getFishingModule().isTrackingNextFishingId())
             return;
+
         switch (FishingBot.getInstance().getServerProtocol()) {
             case ProtocolConstants.MINECRAFT_1_8:
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -319,7 +326,8 @@ public class FishingModule extends Module implements Runnable, Listener {
             case ProtocolConstants.MINECRAFT_1_9_1:
             case ProtocolConstants.MINECRAFT_1_9: {
                 if(event.getType() == 90) {   //90 = bobber
-                    reFish(event.getId());
+                    if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())
+                        reFish(event.getId());
                 }
                 break;
             }
@@ -329,14 +337,17 @@ public class FishingModule extends Module implements Runnable, Listener {
             case ProtocolConstants.MINECRAFT_1_14_3:
             case ProtocolConstants.MINECRAFT_1_14_4: {
                 if(event.getType() == 101) {   //101 = bobber
-                    reFish(event.getId());
+                    if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())
+                        reFish(event.getId());
                 }
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_15:
+            case ProtocolConstants.MINECRAFT_1_15_1:
             default: {
                 if(event.getType() == 102) {   //102 = bobber
-                    reFish(event.getId());
+                    if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())
+                        reFish(event.getId());
                 }
                 break;
             }
@@ -345,7 +356,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @Override
     public void run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             if(System.currentTimeMillis() - getLastFish() > 60000) {
                 setLastFish(System.currentTimeMillis());
                 setCurrentBobber(-1);

@@ -50,6 +50,25 @@ public class EventManager {
         classToInstanceMapping.put(listener.getClass(), listener);
     }
 
+    public void unregisterListener(Listener listener) {
+        List<Method> usedMethods = new ArrayList<>();
+        getRegisteredListener().values().forEach(methods -> {
+            methods.stream().filter(method -> method.getDeclaringClass().getName().equals(listener.getClass().getName())).forEach(usedMethods::add);
+        });
+
+        List<Class<? extends Event>> toRemove = new ArrayList<>();
+        for (Class<? extends Event> eventClass : registeredListener.keySet()) {
+            List<Method> methods = registeredListener.get(eventClass);
+            methods.removeAll(usedMethods);
+            registeredListener.put(eventClass, methods);
+            if(registeredListener.get(eventClass).isEmpty())
+                toRemove.add(eventClass);
+        }
+
+        toRemove.forEach(registeredListener::remove);
+        classToInstanceMapping.remove(registeredListener.getClass());
+    }
+
     public void callEvent(Event event) {
         if(!registeredListener.containsKey(event.getClass()))
             return;

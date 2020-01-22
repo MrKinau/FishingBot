@@ -14,4 +14,13 @@ public class SpawnObjectEvent extends Event {
 
     @Getter private int id;
     @Getter private byte type;
+    @Getter private int x;
+    @Getter private int y;
+    @Getter private int z;
+    @Getter private byte yaw;
+    @Getter private byte pitch;
+    @Getter private int objectData;
+    @Getter private short xVelocity;
+    @Getter private short yVelocity;
+    @Getter private short zVelocity;
 }

@@ -18,6 +18,15 @@ public class PacketInSpawnObject extends Packet {
 
     @Getter private int id;
     @Getter private byte type;
+    @Getter private int x;
+    @Getter private int y;
+    @Getter private int z;
+    @Getter private byte yaw;
+    @Getter private byte pitch;
+    @Getter private int objectData;
+    @Getter private short xVelocity;
+    @Getter private short yVelocity;
+    @Getter private short zVelocity;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) { }
@@ -26,8 +35,19 @@ public class PacketInSpawnObject extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_8: {
-                this.id = readVarInt(in);    //EID
-                this.type = in.readByte();
+                this.id = readVarInt(in);       // EID
+                this.type = in.readByte();      // Type of the object
+                this.x = in.readInt();          // X POS
+                this.y = in.readInt();          // Y POS
+                this.z = in.readInt();          // Z POS
+                this.pitch = in.readByte();     // Pitch
+                this.yaw = in.readByte();       // Yaw
+                this.objectData = in.readInt(); // Data of object: https://wiki.vg/Object_Data
+                if(getObjectData() != 0) {
+                    this.xVelocity = in.readShort();    // Velocity only present if data nonzero
+                    this.yVelocity = in.readShort();
+                    this.zVelocity = in.readShort();
+                }
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -42,25 +62,34 @@ public class PacketInSpawnObject extends Packet {
             case ProtocolConstants.MINECRAFT_1_9_4:
             case ProtocolConstants.MINECRAFT_1_9_2:
             case ProtocolConstants.MINECRAFT_1_9_1:
-            case ProtocolConstants.MINECRAFT_1_9: {
-                this.id = readVarInt(in);    //EID
-                readUUID(in);               //E UUID
-                this.type = in.readByte();   //Obj type
-                break;
-            }
+            case ProtocolConstants.MINECRAFT_1_9:
             case ProtocolConstants.MINECRAFT_1_14:
             case ProtocolConstants.MINECRAFT_1_14_1:
             case ProtocolConstants.MINECRAFT_1_14_2:
             case ProtocolConstants.MINECRAFT_1_14_3:
             case ProtocolConstants.MINECRAFT_1_14_4:
+            case ProtocolConstants.MINECRAFT_1_15:
+            case ProtocolConstants.MINECRAFT_1_15_1:
             default: {
-                this.id = readVarInt(in);    //EID
-                readUUID(in);                //E UUID
-                this.type = in.readByte();   //Obj type
+                this.id = readVarInt(in);       // EID
+                readUUID(in);                   // E UUID
+                this.type = in.readByte();      // Obj type
+                this.x = (int)in.readDouble();  // X POS (casts are incorrect, but if nobody sees it, nobody can blame it)
+                this.y = (int)in.readDouble();  // Y POS
+                this.z = (int)in.readDouble();  // Z POS
+                this.pitch = in.readByte();     // Pitch
+                this.yaw = in.readByte();       // Yaw
+                this.objectData = in.readInt(); // Data of object: https://wiki.vg/Object_Data
+                if(getObjectData() != 0) {
+                    this.xVelocity = in.readShort();    // Velocity only present if data nonzero
+                    this.yVelocity = in.readShort();
+                    this.zVelocity = in.readShort();
+                }
                 break;
             }
         }
 
-        FishingBot.getInstance().getEventManager().callEvent(new SpawnObjectEvent(getId(), getType()));
+        FishingBot.getInstance().getEventManager().callEvent(
+                new SpawnObjectEvent(getId(), getType(), getX(), getY(), getZ(), getYaw(), getPitch(), getObjectData(), getXVelocity(), getYVelocity(), getZVelocity()));
     }
 }

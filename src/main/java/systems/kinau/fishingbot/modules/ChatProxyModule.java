@@ -32,7 +32,7 @@ public class ChatProxyModule extends Module implements Listener {
 
     @Override
     public void onDisable() {
-        chatThread.interrupt();
+        FishingBot.getInstance().getEventManager().unregisterListener(this);
     }
 
     @EventHandler

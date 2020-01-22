@@ -20,7 +20,7 @@ public class ChatCommandModule extends Module implements Listener {
 
     @Override
     public void onDisable() {
-        FishingBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
+        FishingBot.getInstance().getEventManager().unregisterListener(this);
     }
 
     @EventHandler
