@@ -70,6 +70,7 @@ public class PacketInSpawnObject extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_4:
             case ProtocolConstants.MINECRAFT_1_15:
             case ProtocolConstants.MINECRAFT_1_15_1:
+            case ProtocolConstants.MINECRAFT_1_15_2:
             default: {
                 this.id = readVarInt(in);       // EID
                 readUUID(in);                   // E UUID

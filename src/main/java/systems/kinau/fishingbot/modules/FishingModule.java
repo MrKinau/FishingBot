@@ -344,6 +344,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             }
             case ProtocolConstants.MINECRAFT_1_15:
             case ProtocolConstants.MINECRAFT_1_15_1:
+            case ProtocolConstants.MINECRAFT_1_15_2:
             default: {
                 if(event.getType() == 102) {   //102 = bobber
                     if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())

@@ -332,6 +332,10 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_1).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15));
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_15_1).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
 
+        //Minecraft 1.15.2
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_2).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15));
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_15_2).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
+
         //Register protocol of 1.15.1 for unknown versions
         if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
             FishingBot.getLog().severe("This server is not running a supported protocol version: ProtocolVersion " + FishingBot.getInstance().getServerProtocol());
@@ -339,8 +343,8 @@ public class NetworkHandler {
 
             getPlayRegistryIn().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
             getPlayRegistryOut().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
-            getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_1));
-            getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_15_1));
+            getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_2));
+            getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_15_2));
         }
     }
 

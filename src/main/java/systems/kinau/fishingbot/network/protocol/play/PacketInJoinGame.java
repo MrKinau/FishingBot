@@ -83,6 +83,7 @@ public class PacketInJoinGame extends Packet {
             }
             case ProtocolConstants.MINECRAFT_1_15:
             case ProtocolConstants.MINECRAFT_1_15_1:
+            case ProtocolConstants.MINECRAFT_1_15_2:
             default: {
                 eid = in.readInt();                     //Entity ID
                 gamemode = in.readUnsignedByte();       //Gamemode
