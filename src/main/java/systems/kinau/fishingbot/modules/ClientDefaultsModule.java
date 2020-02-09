@@ -12,16 +12,14 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutClientSettings;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutKeepAlive;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutPosition;
+import systems.kinau.fishingbot.network.protocol.play.*;
 
 import java.util.Arrays;
 
 public class ClientDefaultsModule extends Module implements Listener {
 
-    @Getter private Thread positionThread;
+    @Getter
+    private Thread positionThread;
 
     @Override
     public void onEnable() {
@@ -43,7 +41,7 @@ public class ClientDefaultsModule extends Module implements Listener {
             }
 
             //Send start texts
-            if(MineBot.getInstance().getConfig().isStartTextEnabled()) {
+            if (MineBot.getInstance().getConfig().isStartTextEnabled()) {
                 Arrays.asList(MineBot.getInstance().getConfig().getStartText().split(";")).forEach(s -> {
                     MineBot.getInstance().getNet().sendPacket(new PacketOutChat(s.replace("%prefix%", MineBot.PREFIX)));
                 });
@@ -71,8 +69,15 @@ public class ClientDefaultsModule extends Module implements Listener {
     }
 
     @EventHandler
+    public void onUpdateHealth(UpdateHealthEvent event) {
+        if (event.getHealth() <= 0) {
+            MineBot.getInstance().getNet().sendPacket(new PacketOutClientStatus(0));
+        }
+    }
+
+    @EventHandler
     public void onUpdatePlayerList(UpdatePlayerListEvent event) {
-        if(MineBot.getInstance().getConfig().isAutoDisconnect() && event.getPlayers().size() > MineBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold()) {
+        if (MineBot.getInstance().getConfig().isAutoDisconnect() && event.getPlayers().size() > MineBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold()) {
             MineBot.getLog().warning("Max players threshold reached. Stopping");
             MineBot.getInstance().setWontConnect(true);
             MineBot.getInstance().setRunning(false);
@@ -80,13 +85,17 @@ public class ClientDefaultsModule extends Module implements Listener {
     }
 
     private void startPositionUpdate(NetworkHandler networkHandler) {
-        if(positionThread != null)
+        if (positionThread != null)
             positionThread.interrupt();
         positionThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 Player player = MineBot.getInstance().getPlayer();
                 networkHandler.sendPacket(new PacketOutPosition(player.getX(), player.getY(), player.getZ(), true));
-                try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
         });
         positionThread.start();

@@ -98,9 +98,12 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x23, PacketInBlockChange.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x22, PacketInMultiBlockChange.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x46, PacketInSetCompressionLegacy.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x30, PacketInWindowItems.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x06, PacketInUpdateHealth.class);
 
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutChat.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x15, PacketOutClientSettings.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x16, PacketOutClientStatus.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x00, PacketOutKeepAlive.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x0A, PacketOutArmAnimation.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x03, PacketOutPlayer.class);

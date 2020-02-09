@@ -11,46 +11,34 @@ import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.block.BlockChangeEvent;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutHeldItemChange;
 import systems.kinau.fishingbot.network.utils.MaterialMc18;
 
 public class StripMining implements Listener {
 
+    private final int BIG_LENGTH = 30;
+    private final int SMALL_LENGTH = 3;
+
     @Getter private byte currentDirection;
     @Getter private Position currBlock;
     @Getter private boolean careful;
+    @Getter private boolean curve;
+    @Getter private boolean left;
+
+    @Getter private Position startPos;
+
+    @Getter private int stepsLeft = BIG_LENGTH;
+    @Getter private boolean paused;
 
     public StripMining() {
         MineBot.getInstance().getEventManager().registerListener(this);
-        this.currentDirection = getStartDirection();
-        fixDirection();
+        this.currentDirection = MineBot.getInstance().getPlayer().getDirection();
         start();
     }
 
-    private byte getStartDirection() {
-        float yaw = MineBot.getInstance().getPlayer().getYaw();
-        float angle = Math.abs(yaw % 360);
-        if (angle >= 45 && angle < 135)
-            return BlockFace.X_POSITIVE;
-        else if (angle >= 135 && angle < 225)
-            return BlockFace.Z_NEGATIVE;
-        else if (angle >= 225 && angle < 315)
-            return BlockFace.X_NEGATIVE;
-        else
-            return BlockFace.Z_POSITIVE;
-    }
-
-    private void fixDirection() {
-        Player player = MineBot.getInstance().getPlayer();
-        switch (currentDirection) {
-            case BlockFace.X_POSITIVE: player.setYaw(-90); break;
-            case BlockFace.Z_NEGATIVE: player.setYaw(180); break;
-            case BlockFace.X_NEGATIVE: player.setYaw(90); break;
-            case BlockFace.Z_POSITIVE: player.setYaw(0); break;
-        }
-        player.addOneTickMotion((Math.floor(player.getX()) + 0.5) - player.getX(), 0, (Math.floor(player.getZ()) + 0.5) - player.getZ());
-    }
-
     private void start() {
+        this.startPos = MineBot.getInstance().getPlayer().getPosition();
+        MineBot.getInstance().getNet().sendPacket(new PacketOutHeldItemChange((short)0));
         move();
         new Thread(() -> {
             while (currBlock == null) {
@@ -73,6 +61,8 @@ public class StripMining implements Listener {
         Player player = MineBot.getInstance().getPlayer();
         World world = MineBot.getInstance().getWorld();
         while (currBlock == null) {
+            if (isPaused())
+                break;
             int x = Double.valueOf(Math.floor(player.getX())).intValue();
             int y = Double.valueOf(Math.floor(player.getY())).intValue();
             int z = Double.valueOf(Math.floor(player.getZ())).intValue();
@@ -140,54 +130,43 @@ public class StripMining implements Listener {
 
     @EventHandler
     public void onBlockUpdate(BlockChangeEvent event) {
-        if(currBlock == null)
+        if (currBlock == null)
             return;
         if(event.getX() == currBlock.getX() && event.getY() == currBlock.getY() && event.getZ() == currBlock.getZ() && event.getBlock().getMaterial() == MaterialMc18.AIR) {
             new Thread(() -> {
-                byte interruptingFluid = isFluidInterrupting();
-                while (interruptingFluid != BlockFace.NONE) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    MineBot.getLog().warning("Interrupting Fluid at: " + isFluidInterrupting() + " " + currBlock.getY());
-                    World world = MineBot.getInstance().getWorld();
-                    Position fluidPos = world.getRelativePosition(currBlock.getX(), currBlock.getY(), currBlock.getZ(), interruptingFluid);
-                    Position blockClickPos = world.getAdjacentBlock(fluidPos);
-                    System.out.println("FLUID BLOCK POS: " + fluidPos.getX() + " " + fluidPos.getY() + " " + fluidPos.getZ());
-                    if (blockClickPos == null) {
-                        //TODO: Change this behaviour
-                        MineBot.getLog().severe("PENIS STUCK IN TOASTER! QUIT!");
-                        System.exit(1);
-                    }
-                    System.out.println("CLICK BLOCK POS: " + blockClickPos.getX() + " " + blockClickPos.getY() + " " + blockClickPos.getZ() + ", " + world.getAdjacentDirection(fluidPos, blockClickPos));
-                    MineBot.getInstance().getPlayer().place(1, blockClickPos.getX(), blockClickPos.getY(), blockClickPos.getZ(), world.getAdjacentDirection(fluidPos, blockClickPos));
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    interruptingFluid = isFluidInterrupting();
-                }
                 currBlock = null;
-                if(!careful) {
-                    new Thread(this::mineNextBlock).start();
-                    if (!MineBot.getInstance().getPlayer().testWallCollision(currentDirection)) {
-                        move();
+                if (careful) {
+                    try {
+                        Thread.sleep(1300);
+                        careful = false;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } else {
-                    new Thread(() -> {
-                        if (careful) {
-                            try {
-                                Thread.sleep(1300);
-                                careful = false;
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            new Thread(this::mineNextBlock).start();
+                }
+                new Thread(this::mineNextBlock).start();
+                if (!MineBot.getInstance().getPlayer().testWallCollision(currentDirection)) {
+                    stepsLeft--;
+                    if (getStepsLeft() > 0)
+                        move();
+                    else {
+                        paused = true;
+                        move();
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    }).start();
+                        MineBot.getInstance().getPlayer().turn(aBoolean -> {
+                            paused = false;
+                            new Thread(this::mineNextBlock).start();
+                            if(curve)
+                                left = !left;
+                            currentDirection = MineBot.getInstance().getPlayer().getDirection();
+                            stepsLeft = curve ? BIG_LENGTH : SMALL_LENGTH;
+                            curve = !curve;
+                            move();
+                        }, left);
+                    }
                 }
             }).start();
         }

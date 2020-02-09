@@ -884,4 +884,23 @@ public enum MaterialMc18 {
                 return false;
         }
     }
+
+    /**
+     * @return True if this material is fluid.
+     */
+    public boolean isPickaxe() {
+        if (isBlock()) {
+            return false;
+        }
+        switch (this) {
+            case WOOD_PICKAXE:
+            case STONE_PICKAXE:
+            case IRON_PICKAXE:
+            case GOLD_PICKAXE:
+            case DIAMOND_PICKAXE:
+                return true;
+            default:
+                return false;
+        }
+    }
 }

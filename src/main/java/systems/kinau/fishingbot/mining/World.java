@@ -7,8 +7,10 @@ import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.block.BlockChangeEvent;
 import systems.kinau.fishingbot.network.utils.MaterialMc18;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class World implements Listener {
@@ -116,6 +118,17 @@ public class World implements Listener {
         }
     }
 
+    public Set<Position> getNeighbouringBlocks(Position pos) {
+        Set<Position> blocks = new HashSet<>();
+        blocks.add(getRelativePosition(pos.getX(), pos.getY(), pos.getZ(), BlockFace.UP));
+        blocks.add(getRelativePosition(pos.getX(), pos.getY(), pos.getZ(), BlockFace.DOWN));
+        blocks.add(getRelativePosition(pos.getX(), pos.getY(), pos.getZ(), BlockFace.X_NEGATIVE));
+        blocks.add(getRelativePosition(pos.getX(), pos.getY(), pos.getZ(), BlockFace.X_POSITIVE));
+        blocks.add(getRelativePosition(pos.getX(), pos.getY(), pos.getZ(), BlockFace.Z_NEGATIVE));
+        blocks.add(getRelativePosition(pos.getX(), pos.getY(), pos.getZ(), BlockFace.Z_POSITIVE));
+        return blocks;
+    }
+
     public void setBlockAt(int x, int y, int z, short block) {
         Optional<Chunk> optChunk = getChunkAt(x, z);
 
@@ -125,7 +138,7 @@ public class World implements Listener {
         }
 
         Chunk c = optChunk.get();
-        MineBot.getLog().info("SET BLOCK: " + new BlockType(block).getMaterial().name() + "  " + x + " " + y + " " + z);
+//        MineBot.getLog().info("SET BLOCK: " + new BlockType(block).getMaterial().name() + "  " + x + " " + y + " " + z);
         c.setBlockAt(x - (c.getChunkX() * 16), y, z - (c.getChunkZ() * 16), block);
     }
 

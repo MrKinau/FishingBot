@@ -8,8 +8,10 @@ package systems.kinau.fishingbot.network.protocol;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.MineBot;
+import systems.kinau.fishingbot.bot.ItemStack;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
+import systems.kinau.fishingbot.network.utils.NBTUtils;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
 
 import java.io.DataInputStream;
@@ -167,6 +169,20 @@ public abstract class Packet {
             MineBot.getLog().severe("Error reading Block!");
         }
         return 0;
+    }
+
+    public static ItemStack readItemstack(ByteArrayDataInputWrapper in) {
+        short itemId = in.readShort();
+        if (itemId != -1) {
+            byte itemCount = in.readByte();
+            short itemDamage = in.readShort();
+
+            int bytes = NBTUtils.readNBT(in.clone());
+            byte[] data = new byte[bytes];
+            in.readBytes(data);
+            return new ItemStack(itemId, itemCount, itemDamage, data);
+        }
+        return null;
     }
 
 }

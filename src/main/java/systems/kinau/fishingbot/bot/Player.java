@@ -11,21 +11,20 @@ import lombok.Setter;
 import systems.kinau.fishingbot.MineBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
-import systems.kinau.fishingbot.event.play.PosLookChangeEvent;
-import systems.kinau.fishingbot.event.play.SetHeldItemEvent;
-import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
-import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
+import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.mining.*;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
+
+import java.util.function.Consumer;
 
 public class Player implements Listener {
 
     @Getter @Setter private double x;
     @Getter @Setter private double y;
     @Getter @Setter private double z;
-    @Getter @Setter private float yaw;
+    @Getter private float yaw;
     @Getter @Setter private float pitch;
     @Getter @Setter private boolean onGround = true;
 
@@ -36,12 +35,27 @@ public class Player implements Listener {
     @Getter @Setter private int levels;
 
     @Getter @Setter private int heldSlot;
+    @Getter @Setter private Inventory inventory;
     @Getter @Setter private ByteArrayDataOutput slotData;
 
     @Getter @Setter private boolean resetY = false;
 
     public Player() {
         MineBot.getInstance().getEventManager().registerListener(this);
+        this.inventory = new Inventory();
+    }
+
+    public void setYaw(float yaw) {
+        if (yaw <= -360)
+            setYaw(yaw + 360);
+        else if (yaw >= 360)
+            setYaw(yaw - 360);
+        else
+            this.yaw = yaw;
+    }
+
+    public Position getPosition() {
+        return new Position((int)Math.round(x), (int)Math.round(y), (int)Math.round(z));
     }
 
     @EventHandler
@@ -78,9 +92,39 @@ public class Player implements Listener {
     public void onUpdateSlot(UpdateSlotEvent event) {
         if(event.getWindowId() != 0)
             return;
+        getInventory().setItem(event.getSlotId(), event.getItemStack());
         if(event.getSlotId() != getHeldSlot())
             return;
         this.slotData = event.getSlotData();
+    }
+
+    @EventHandler
+    public void onWindowItems(WindowItemsEvent event) {
+        if(event.getWindowId() != 0)
+            return;
+        event.getSlotData().forEach((slotId, itemStack) -> getInventory().setItem(slotId, itemStack));
+    }
+
+    public byte getDirection() {
+        if (yaw > 0) {
+            if (yaw >= 316 || yaw <= 45)
+                return BlockFace.Z_POSITIVE;
+            else if (yaw >= 226)
+                return BlockFace.X_POSITIVE;
+            else if (yaw >= 136)
+                return BlockFace.Z_NEGATIVE;
+            else
+                return BlockFace.X_NEGATIVE;
+        } else {
+            if (yaw <= -316 || yaw >= -45)
+                return BlockFace.Z_POSITIVE;
+            else if (yaw <= -226)
+                return BlockFace.X_NEGATIVE;
+            else if (yaw <= -136)
+                return BlockFace.Z_NEGATIVE;
+            else
+                return BlockFace.X_POSITIVE;
+        }
     }
 
     public void onGroundCheck() {
@@ -205,14 +249,21 @@ public class Player implements Listener {
         MineBot.getInstance().getNet().sendPacket(new PacketOutHeldItemChange((short)0));
     }
 
-    public void startMining() {
+    public void turn(Consumer<Boolean> callback, boolean left) {
+        int direction = left ? -5 : 5;
         new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            int counter = 18;
+            while (counter > 0) {
+                MineBot.getInstance().getNet().sendPacket(new PacketOutLook(getYaw() + direction, getPitch(), isOnGround()));
+                setYaw(getYaw() + direction);
+                counter--;
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-            StripMining stripMining = new StripMining();
+            callback.accept(true);
         }).start();
     }
 
