@@ -13,6 +13,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.login.LoginSuccessEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -31,9 +32,15 @@ public class PacketInLoginSuccess extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        String uuidStr = readString(in).replace("-","");
-        this.uuid = new UUID(new BigInteger(uuidStr.substring(0, 16), 16).longValue(), new BigInteger(uuidStr.substring(16), 16).longValue());
-        this.userName = readString(in);
+
+        if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16_PRE_2) {
+            String uuidStr = readString(in).replace("-", "");
+            this.uuid = new UUID(new BigInteger(uuidStr.substring(0, 16), 16).longValue(), new BigInteger(uuidStr.substring(16), 16).longValue());
+            this.userName = readString(in);
+        } else {
+            this.uuid = readUUID(in);
+            this.userName = readString(in);
+        }
 
         FishingBot.getInstance().getEventManager().callEvent(new LoginSuccessEvent(uuid, userName));
     }

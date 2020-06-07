@@ -11,7 +11,7 @@
 
     <groupId>systems.kinau</groupId>
     <artifactId>FishingBot</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>2.7</version>
     <name>FishingBot</name>
     <description>An AFK fishing bot for minecraft</description>
 
@@ -67,7 +67,6 @@
             <groupId>com.github.MrPowerGamerBR</groupId>
             <artifactId>TemmieWebhook</artifactId>
             <version>-59de40c3b6-1</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

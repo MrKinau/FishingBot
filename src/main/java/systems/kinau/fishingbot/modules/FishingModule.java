@@ -15,11 +15,9 @@ import systems.kinau.fishingbot.event.play.EntityVelocityEvent;
 import systems.kinau.fishingbot.event.play.SpawnObjectEvent;
 import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
 import systems.kinau.fishingbot.fishing.AnnounceType;
-import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
-import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.Item;
 
 import java.util.Arrays;
@@ -226,6 +224,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
+    //TODO: Caught detection may be much easier with the Is Caught field in EntityMetadataPacket (since MC-1.16)
     @EventHandler
     public void onEntityVelocity(EntityVelocityEvent event) {
         addPossibleMotion(event.getEid(), event.getX(), event.getY(), event.getZ());
@@ -268,41 +267,42 @@ public class FishingModule extends Module implements Runnable, Listener {
         lastY = event.getY();
     }
 
+    //TODO: Rewrite or delete including packets
     @EventHandler
     public void onUpdateSlot(UpdateSlotEvent event) {
-        if(event.getWindowId() != 0)
-            return;
-        if(event.getSlotId() != FishingBot.getInstance().getPlayer().getHeldSlot())
-            return;
-        ByteArrayDataInputWrapper testFishRod = new ByteArrayDataInputWrapper(event.getSlotData().toByteArray().clone());
-        int protocolId = FishingBot.getInstance().getServerProtocol();
-        if(protocolId < ProtocolConstants.MINECRAFT_1_13) {
-            short itemId = testFishRod.readShort();
-            if (itemId != 346)  //Normal ID
-                noFishingRod();
-        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13) {
-            short itemId = testFishRod.readShort();
-            if (itemId != 563)  //ID in 1.13.0
-                noFishingRod();
-        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_1) {
-            short itemId = testFishRod.readShort();
-            if (itemId != 568)  //ID in 1.13.1
-                noFishingRod();
-        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_2) {
-            boolean present = testFishRod.readBoolean();
-            if(!present)
-                noFishingRod();
-            int itemId = Packet.readVarInt(testFishRod);
-            if (itemId != 568) //ID in 1.13.2
-                noFishingRod();
-        } else {
-            boolean present = testFishRod.readBoolean();
-            if(!present)
-                noFishingRod();
-            int itemId = Packet.readVarInt(testFishRod);
-            if (itemId != 622) //ID in 1.14
-                noFishingRod();
-        }
+//        if(event.getWindowId() != 0)
+//            return;
+//        if(event.getSlotId() != FishingBot.getInstance().getPlayer().getHeldSlot())
+//            return;
+//        ByteArrayDataInputWrapper testFishRod = new ByteArrayDataInputWrapper(event.getSlotData().toByteArray().clone());
+//        int protocolId = FishingBot.getInstance().getServerProtocol();
+//        if(protocolId < ProtocolConstants.MINECRAFT_1_13) {
+//            short itemId = testFishRod.readShort();
+//            if (itemId != 346)  //Normal ID
+//                noFishingRod();
+//        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13) {
+//            short itemId = testFishRod.readShort();
+//            if (itemId != 563)  //ID in 1.13.0
+//                noFishingRod();
+//        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_1) {
+//            short itemId = testFishRod.readShort();
+//            if (itemId != 568)  //ID in 1.13.1
+//                noFishingRod();
+//        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_2) {
+//            boolean present = testFishRod.readBoolean();
+//            if(!present)
+//                noFishingRod();
+//            int itemId = Packet.readVarInt(testFishRod);
+//            if (itemId != 568) //ID in 1.13.2
+//                noFishingRod();
+//        } else {
+//            boolean present = testFishRod.readBoolean();
+//            if(!present)
+//                noFishingRod();
+//            int itemId = Packet.readVarInt(testFishRod);
+//            if (itemId != 622) //ID in 1.14
+//                noFishingRod();
+//        }
     }
 
     @EventHandler
@@ -344,9 +344,16 @@ public class FishingModule extends Module implements Runnable, Listener {
             }
             case ProtocolConstants.MINECRAFT_1_15:
             case ProtocolConstants.MINECRAFT_1_15_1:
-            case ProtocolConstants.MINECRAFT_1_15_2:
-            default: {
+            case ProtocolConstants.MINECRAFT_1_15_2: {
                 if(event.getType() == 102) {   //102 = bobber
+                    if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())
+                        reFish(event.getId());
+                }
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_16_PRE_2:
+            default: {
+                if(event.getType() == 106) {   //106 = bobber
                     if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())
                         reFish(event.getId());
                 }

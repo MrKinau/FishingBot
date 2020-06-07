@@ -336,15 +336,37 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_2).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15));
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_15_2).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_14));
 
-        //Register protocol of 1.15.1 for unknown versions
+        //Minecraft 1.16-pre2
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x00, PacketInSpawnObject.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x0D, PacketInDifficultySet.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x1A, PacketInDisconnect.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x20, PacketInKeepAlive.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x25, PacketInJoinGame.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x46, PacketInEntityVelocity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x44, PacketInEntityMetadata.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x3F, PacketInHeldItemChange.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x16, PacketInSetSlot.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x0E, PacketInChat.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x49, PacketInSetExperience.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x33, PacketInPlayerListItem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x35, PacketInPlayerPosLook.class);
+
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x00, PacketOutTeleportConfirm.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x03, PacketOutChat.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x05, PacketOutClientSettings.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x10, PacketOutKeepAlive.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x2E, PacketOutUseItem.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_PRE_2).registerPacket(0x12, PacketOutPosition.class);
+
+        //Register protocol of 1.16 for unknown versions
         if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
             FishingBot.getLog().severe("This server is not running a supported protocol version: ProtocolVersion " + FishingBot.getInstance().getServerProtocol());
-            FishingBot.getLog().severe("It is possibe that it wont work correctly");
+            FishingBot.getLog().severe("It is possible that it wont work correctly");
 
             getPlayRegistryIn().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
             getPlayRegistryOut().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
-            getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_15_2));
-            getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_15_2));
+            getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_PRE_2));
+            getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_PRE_2));
         }
     }
 

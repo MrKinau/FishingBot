@@ -9,8 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 public class ChatEvent extends Event {
 
     @Getter private String text;
+    @Getter private UUID sender;
 }

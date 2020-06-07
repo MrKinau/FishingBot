@@ -19,6 +19,7 @@ public class ItemHandler {
     public static Map<Integer, String> itemsMap_1_13_1 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_14 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_15 = new HashMap<>();
+    public static Map<Integer, String> itemsMap_1_16 = new HashMap<>();
 
     public ItemHandler(int protocolId) {
         JsonElement root = null;
@@ -53,11 +54,21 @@ public class ItemHandler {
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_15:
-            default: {
+            case ProtocolConstants.MINECRAFT_1_15_1:
+            case ProtocolConstants.MINECRAFT_1_15_2:{
                 root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_15.json")));
                 root = root.getAsJsonObject().get("minecraft:item").getAsJsonObject().get("entries").getAsJsonObject();
                 for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
                     itemsMap_1_15.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
+                }
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_16_PRE_2:
+            default: {
+                root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_16.json")));
+                root = root.getAsJsonObject().get("minecraft:item").getAsJsonObject().get("entries").getAsJsonObject();
+                for (Map.Entry<String, JsonElement> stringJsonElementEntry : root.getAsJsonObject().entrySet()) {
+                    itemsMap_1_16.put(stringJsonElementEntry.getValue().getAsJsonObject().get("protocol_id").getAsInt(), stringJsonElementEntry.getKey());
                 }
                 break;
             }
@@ -71,7 +82,9 @@ public class ItemHandler {
             return itemsMap_1_13_1.get(id);
         else if(protocol >= ProtocolConstants.MINECRAFT_1_14 && protocol <= ProtocolConstants.MINECRAFT_1_14_4)
             return itemsMap_1_14.get(id);
-        else
+        else if(protocol >= ProtocolConstants.MINECRAFT_1_15 && protocol <= ProtocolConstants.MINECRAFT_1_15_2)
             return itemsMap_1_15.get(id);
+        else
+            return itemsMap_1_16.get(id);
     }
 }

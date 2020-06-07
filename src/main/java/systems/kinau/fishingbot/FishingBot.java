@@ -24,6 +24,7 @@ import systems.kinau.fishingbot.realms.RealmsAPI;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static final String PREFIX = "FishingBot v2.6 - ";
+    public static String PREFIX;
     @Getter private static FishingBot instance;
     @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
 
@@ -56,6 +57,15 @@ public class FishingBot {
 
     public FishingBot() {
         instance = this;
+
+        try {
+            final Properties properties = new Properties();
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("fishingbot.properties"));
+            PREFIX = properties.getProperty("name") + " v" + properties.getProperty("version") + " - ";
+        } catch (Exception ex) {
+            PREFIX = "FishingBot vUnknown - ";
+            ex.printStackTrace();
+        }
 
         //Initialize Logger
         log.setLevel(Level.ALL);
