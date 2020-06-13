@@ -15,6 +15,7 @@ import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClientStatus;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutTeleportConfirm;
 
 public class Player implements Listener {
@@ -79,5 +80,16 @@ public class Player implements Listener {
     @EventHandler
     public void onJoinGame(JoinGameEvent event) {
         setEntityID(event.getEid());
+        respawn();
+    }
+
+    @EventHandler
+    public void onUpdateHealth(UpdateHealthEvent event) {
+        if (event.getHealth() <= 0)
+            respawn();
+    }
+
+    public void respawn() {
+        FishingBot.getInstance().getNet().sendPacket(new PacketOutClientStatus(PacketOutClientStatus.Action.PERFORM_RESPAWN));
     }
 }

@@ -21,7 +21,7 @@ public class PacketOutHandshake extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeVarInt(FishingBot.getInstance().getServerProtocol(), out);
-        writeString(serverName, out);
+        writeString(serverName + "\0FML\0", out);
         out.writeShort(serverPort);
         writeVarInt(2, out); //next State = 2 -> LOGIN
     }

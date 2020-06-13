@@ -22,6 +22,7 @@ import java.util.Arrays;
 public class ClientDefaultsModule extends Module implements Listener {
 
     @Getter private Thread positionThread;
+    @Getter private boolean joined;
 
     @Override
     public void onEnable() {
@@ -37,6 +38,9 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onSetDifficulty(DifficultySetEvent event) {
+        if (isJoined())
+            return;
+        this.joined = true;
         new Thread(() -> {
             try {
                 Thread.sleep(1500);

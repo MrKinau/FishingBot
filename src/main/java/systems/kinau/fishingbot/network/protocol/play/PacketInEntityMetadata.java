@@ -13,6 +13,7 @@ import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -40,14 +41,12 @@ public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (FishingBot.getInstance().getFishingModule() == null) {
-            in.skipBytes(in.getAvailable());
-            return;
-        }
-        if (!FishingBot.getInstance().getFishingModule().isTrackingNextEntityMeta())
+        if (FishingBot.getInstance().getFishingModule() == null)
             return;
         int eid = readVarInt(in);
-        if (FishingBot.getInstance().getFishingModule().containsPossibleItem(eid))
+        if (!FishingBot.getInstance().getFishingModule().isTrackingNextEntityMeta() && FishingBot.getInstance().getPlayer().getEntityID() != eid)
+            return;
+        if (FishingBot.getInstance().getFishingModule().containsPossibleItem(eid) && FishingBot.getInstance().getPlayer().getEntityID() != eid)
             return;
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             readWatchableObjects18(in, networkHandler, eid);
@@ -114,8 +113,9 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 2: {
-                    in.readFloat();
-                    break;
+                    float health = in.readFloat();
+                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                    return;
                 }
                 case 3: {
                     readString(in);
@@ -239,8 +239,9 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 2: {
-                    in.readFloat();
-                    break;
+                    float health = in.readFloat();
+                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                    return;
                 }
                 case 3: {
                     readString(in);
@@ -362,8 +363,9 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 2: {
-                    in.readFloat();
-                    break;
+                    float health = in.readFloat();
+                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                    return;
                 }
                 case 3: {
                     readString(in);
@@ -449,8 +451,9 @@ public class PacketInEntityMetadata extends Packet {
                         break;
                     }
                     case 3: {
-                        in.readFloat();
-                        break;
+                        float health = in.readFloat();
+                        FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                        return;
                     }
                     case 4: {
                         readString(in);
