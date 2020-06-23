@@ -15,7 +15,7 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutClientSettings;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutKeepAlive;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutPosition;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 
 import java.util.Arrays;
 
@@ -91,7 +91,7 @@ public class ClientDefaultsModule extends Module implements Listener {
         positionThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 Player player = FishingBot.getInstance().getPlayer();
-                networkHandler.sendPacket(new PacketOutPosition(player.getX(), player.getY(), player.getZ(), true));
+                networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true));
                 try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }
         });

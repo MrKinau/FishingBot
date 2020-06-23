@@ -100,11 +100,11 @@ public class PacketInJoinGame extends Packet {
                 enableRespawnScreen = in.readBoolean();     //Set to false when the doImmediateRespawn gamerule is true
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_16_PRE_2:
-            case ProtocolConstants.MINECRAFT_1_16_PRE_5:
+            case ProtocolConstants.MINECRAFT_1_16:
             default: {
                 eid = in.readInt();                         //Entity ID
                 gamemode = in.readUnsignedByte();           //Gamemode
+                in.readUnsignedByte();                      //previous gamemode
                 int worldCount = readVarInt(in);            //count of worlds
                 worldIdentifier = new String[worldCount];   //identifier for all worlds
                 for (int i = 0; i < worldCount; i++)

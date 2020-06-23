@@ -33,7 +33,7 @@ public class PacketInLoginSuccess extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
 
-        if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16_PRE_2) {
+        if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16) {
             String uuidStr = readString(in).replace("-", "");
             this.uuid = new UUID(new BigInteger(uuidStr.substring(0, 16), 16).longValue(), new BigInteger(uuidStr.substring(16), 16).longValue());
             this.userName = readString(in);
