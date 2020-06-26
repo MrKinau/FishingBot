@@ -376,6 +376,10 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16).registerPacket(0x13, PacketOutPosLook.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16).registerPacket(0x2E, PacketOutUseItem.class);
 
+        //Minecraft 1.16.1
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_1).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16));
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_1).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16));
+
         //Register protocol of latest for unknown versions
         if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
             FishingBot.getLog().severe("This server is not running a supported protocol version: ProtocolVersion " + FishingBot.getInstance().getServerProtocol());

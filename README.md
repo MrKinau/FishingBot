@@ -1,4 +1,4 @@
-Minecraft 1.8 - 1.16 AFK Fishing bot
+Minecraft 1.8 - 1.16.1 AFK Fishing bot
 =============
 ![Codacy grade](https://img.shields.io/codacy/grade/05f0f6a5d76444a1b710f911b661bf1d)
 [![GitHub issues](https://img.shields.io/github/issues/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/issues)
@@ -47,6 +47,7 @@ Minecraft 1.8 - 1.16 AFK Fishing bot
 - 1.15.1
 - 1.15.2
 - 1.16
+- 1.16.1
 
 ## Contribution
 You are free to create a fork or a pull request to participate. You also can report bugs or request a new feature in the [issues](https://github.com/MrKinau/FishingBot/issues) tab (I will answer them as soon as possible)

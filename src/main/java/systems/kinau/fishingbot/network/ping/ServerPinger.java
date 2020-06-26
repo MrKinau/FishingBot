@@ -33,6 +33,7 @@ public class ServerPinger {
     private FishingBot fishingBot;
 
     public void ping() {
+        FishingBot.getInstance().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()));
         if(serverName == null || serverName.trim().isEmpty()) {
             FishingBot.getLog().severe("Invalid server host given. Please change the server-ip in your config.properties");
             System.exit(1);
@@ -63,7 +64,8 @@ public class ServerPinger {
 
             //read Handshake 0x00 Response - Ping
 
-            Packet.readVarInt(in); //ignore
+            //Packet.readVarInt(in); //ignore
+            in.readInt(); //ignore
             int id = Packet.readVarInt(in);
 
             if (id == 0) {
