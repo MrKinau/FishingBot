@@ -57,8 +57,7 @@ public class SettingsConfig implements Config {
                 "#\tONLY_ENCHANTED:\tAnnounces only enchanted stuff\n" +
                 "#\tONLY_BOOKS:\tAnnounces only enchanted books\n" +
                 "#\tNONE:\tAnnounces nothing\n" +
-                "#announce-lvl-up:\tText of the level-announcement in chat. %lvl% will be replaced with the gained level.\n" +
-                "\tUse \"false\" if you dont want to announce the achieved levels\n" +
+                "#announce-lvl-up:\tText of the level-announcement in chat. %lvl% will be replaced with the gained level. Use \"false\" if you don't want to announce the achieved levels\n" +
                 "#discord-webHook:\tUse this to send all chat messages from the bot to a Discord webhook\n" +
                 "#start-text-enabled:\tIf disabled, the start-text will not be displayed\n" +
                 "#start-text:\tChat messages/commands separated with a semicolon\n" +
