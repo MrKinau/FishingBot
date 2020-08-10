@@ -84,7 +84,6 @@ public class LoginModule extends Module implements Listener {
 
     @EventHandler
     public void onLoginPluginRequest(LoginPluginRequestEvent event) {
-        System.out.println(event.getMsgId() + " >> " + event.getChannel());
         FishingBot.getInstance().getNet().sendPacket(new PacketOutLoginPluginResponse(event.getMsgId(), false, null));
     }
 

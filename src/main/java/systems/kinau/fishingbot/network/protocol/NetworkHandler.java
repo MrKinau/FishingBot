@@ -101,6 +101,7 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x00, PacketOutKeepAlive.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x01, PacketOutChat.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x04, PacketOutPosition.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x06, PacketOutPosLook.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x08, PacketOutUseItem.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x0A, PacketOutArmAnimation.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_8).registerPacket(0x15, PacketOutClientSettings.class);
@@ -129,6 +130,7 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x04, PacketOutClientSettings.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x0B, PacketOutKeepAlive.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x0C, PacketOutPosition.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x0D, PacketOutPosLook.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_9).registerPacket(0x1D, PacketOutUseItem.class);
 
         //Minecraft 1.9.1
