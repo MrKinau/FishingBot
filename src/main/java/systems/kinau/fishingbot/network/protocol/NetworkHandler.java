@@ -382,6 +382,31 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_1).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16));
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_1).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16));
 
+        //Minecraft 1.16.2
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x00, PacketInSpawnObject.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x0D, PacketInDifficultySet.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x0E, PacketInChat.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x15, PacketInSetSlot.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x19, PacketInDisconnect.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x1F, PacketInKeepAlive.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x24, PacketInJoinGame.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x32, PacketInPlayerListItem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x34, PacketInPlayerPosLook.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x3F, PacketInHeldItemChange.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x44, PacketInEntityMetadata.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x46, PacketInEntityVelocity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x48, PacketInSetExperience.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x49, PacketInUpdateHealth.class);
+
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x00, PacketOutTeleportConfirm.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x03, PacketOutChat.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x04, PacketOutClientStatus.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x05, PacketOutClientSettings.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x10, PacketOutKeepAlive.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x12, PacketOutPosition.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x13, PacketOutPosLook.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x2F, PacketOutUseItem.class);
+
         //Register protocol of latest for unknown versions
         if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
             FishingBot.getLog().severe("This server is not running a supported protocol version: ProtocolVersion " + FishingBot.getInstance().getServerProtocol());
@@ -509,7 +534,7 @@ public class NetworkHandler {
     }
 
     private void readPacket(int len, int packetId, ByteArrayDataInputWrapper buf) throws IOException {
-        Class<? extends Packet> clazz = null;
+        Class<? extends Packet> clazz;
 
         switch (state) {
             case HANDSHAKE:

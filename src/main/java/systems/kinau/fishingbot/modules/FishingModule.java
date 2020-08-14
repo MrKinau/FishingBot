@@ -310,6 +310,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         if(!FishingBot.getInstance().getFishingModule().isTrackingNextFishingId())
             return;
 
+        //TODO: Refactor just make the objecttype with ifs
         switch (FishingBot.getInstance().getServerProtocol()) {
             case ProtocolConstants.MINECRAFT_1_8:
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -352,9 +353,16 @@ public class FishingModule extends Module implements Runnable, Listener {
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_16:
-            case ProtocolConstants.MINECRAFT_1_16_1:
-            default: {
+            case ProtocolConstants.MINECRAFT_1_16_1: {
                 if(event.getType() == 106) {   //106 = bobber
+                    if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())
+                        reFish(event.getId());
+                }
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_16_2:
+            default: {
+                if(event.getType() == 107) {   //107 = bobber
                     if(FishingBot.getInstance().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getPlayer().getEntityID())
                         reFish(event.getId());
                 }

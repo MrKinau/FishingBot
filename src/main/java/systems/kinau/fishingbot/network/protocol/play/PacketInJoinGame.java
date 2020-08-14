@@ -102,15 +102,17 @@ public class PacketInJoinGame extends Packet {
             }
             case ProtocolConstants.MINECRAFT_1_16:
             case ProtocolConstants.MINECRAFT_1_16_1:
+            case ProtocolConstants.MINECRAFT_1_16_2:
             default: {
                 eid = in.readInt();                         //Entity ID
                 gamemode = in.readUnsignedByte();           //Gamemode
                 in.readUnsignedByte();                      //previous gamemode
-                int worldCount = readVarInt(in);            //count of worlds
+                in.readByte();                              //TODO: just a hotfix, wiki.vg has not described it atm (part of worldCount, but varint fails)
+                int worldCount = in.readByte();             //count of worlds
                 worldIdentifier = new String[worldCount];   //identifier for all worlds
                 for (int i = 0; i < worldCount; i++)
                     worldIdentifier[i] = readString(in);
-                NBTUtils.readNBT(in);                       //Dimension codec (dont use, just skip it)
+                NBTUtils.readNBT(in);                       //Dimension codec (don't use, just skip it)
                 dimension = readString(in);                 //Dimension
                 spawnWorld = readString(in);                //spawn world name
                 hashedSeed = in.readLong();                 //First 8 bytes of the SHA-256 hash of the world's seed

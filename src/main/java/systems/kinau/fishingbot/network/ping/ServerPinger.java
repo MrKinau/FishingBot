@@ -64,11 +64,12 @@ public class ServerPinger {
 
             //read Handshake 0x00 Response - Ping
 
-            //Packet.readVarInt(in); //ignore
-            in.readInt(); //ignore
+            //TODO: Sometimes it's an int sometimes a varint? investigate how to fix the auto-version detection (e.g. based on getAvailable())
+            Packet.readVarInt(in); //ignore
+            //in.readInt(); //ignore
             int id = Packet.readVarInt(in);
 
-            if (id == 0) {
+            if (id != 2) {
                 String pong = Packet.readString(in);
                 JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
                 int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
