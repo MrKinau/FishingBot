@@ -34,7 +34,7 @@ public class ServerPinger {
 
     public void ping() {
         FishingBot.getInstance().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()));
-        if(serverName == null || serverName.trim().isEmpty()) {
+        if (serverName == null || serverName.trim().isEmpty()) {
             FishingBot.getLog().severe("Invalid server host given. Please change the server-ip in your config.properties");
             System.exit(1);
         }
@@ -67,36 +67,36 @@ public class ServerPinger {
             //TODO: Sometimes it's an int sometimes a varint? investigate how to fix the auto-version detection (e.g. based on getAvailable())
             Packet.readVarInt(in); //ignore
             //in.readInt(); //ignore
-            int id = Packet.readVarInt(in);
+            Packet.readVarInt(in); //id
 
-            if (id != 2) {
-                String pong = Packet.readString(in);
-                JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
-                int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
-                int currPlayers = root.getAsJsonObject("players").get("online").getAsInt();
+//            if (id != 2) {
+            String pong = Packet.readString(in);
+            JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
+            int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
+            int currPlayers = root.getAsJsonObject("players").get("online").getAsInt();
 
-                FishingBot.getInstance().setServerProtocol(protocolId);
-                String description = "Unknown";
+            FishingBot.getInstance().setServerProtocol(protocolId);
+            String description = "Unknown";
+            try {
                 try {
-                    try {
-                        if (protocolId > ProtocolConstants.MINECRAFT_1_8)
-                            description = root.getAsJsonObject("description").get("text").getAsString();
-                        else
-                            description = root.get("description").getAsString();
-                    } catch (UnsupportedOperationException ex) {
-                        description = TextComponent.toPlainText(root.getAsJsonObject("description"));
-                    }
+                    if (protocolId > ProtocolConstants.MINECRAFT_1_8)
+                        description = root.getAsJsonObject("description").get("text").getAsString();
+                    else
+                        description = root.get("description").getAsString();
                 } catch (UnsupportedOperationException ex) {
-                } finally {
-                    if(description.trim().isEmpty())
-                        description = "Unknown";
+                    description = TextComponent.toPlainText(root.getAsJsonObject("description"));
                 }
-                FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
-                if(currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
-                    FishingBot.getLog().warning("Max players threshold already reached. Stopping");
-                    FishingBot.getInstance().setWontConnect(true);
-                }
+            } catch (UnsupportedOperationException ex) {
+            } finally {
+                if (description.trim().isEmpty())
+                    description = "Unknown";
             }
+            FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
+            if (currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
+                FishingBot.getLog().warning("Max players threshold already reached. Stopping");
+                FishingBot.getInstance().setWontConnect(true);
+            }
+//            }
 
             out.close();
             in.close();
@@ -104,20 +104,21 @@ public class ServerPinger {
 
         } catch (UnknownHostException e) {
             FishingBot.getLog().severe("Unknown host: " + serverName);
-        } catch (IOException e) {
+        } catch (Exception e) {
             FishingBot.getLog().severe("Could not ping: " + serverName);
+            FishingBot.getLog().severe("Automatic version detection may not work");
         }
     }
 
     public void updateWithSRV() {
         //Getting SRV Record - changing data to correct ones
-        if(serverPort == 25565 || serverPort < 1) {
+        if (serverPort == 25565 || serverPort < 1) {
             String[] serverData = getServerAddress(serverName);
-            if(!serverData[0].equalsIgnoreCase(serverName))
+            if (!serverData[0].equalsIgnoreCase(serverName))
                 FishingBot.getLog().info("Changed server host to: " + serverData[0]);
             this.serverName = serverData[0];
             this.serverPort = Integer.valueOf(serverData[1]);
-            if(serverPort != 25565)
+            if (serverPort != 25565)
                 FishingBot.getLog().info("Changed port to: " + serverPort);
         }
 
@@ -137,11 +138,11 @@ public class ServerPinger {
             hashtable.put("java.naming.provider.url", "dns:");
             hashtable.put("com.sun.jndi.dns.timeout.retries", "1");
             DirContext dircontext = new InitialDirContext(hashtable);
-            Attributes attributes = dircontext.getAttributes("_minecraft._tcp." + serverHost, new String[] {"SRV"});
+            Attributes attributes = dircontext.getAttributes("_minecraft._tcp." + serverHost, new String[]{"SRV"});
             String[] astring = attributes.get("srv").get().toString().split(" ", 4);
-            return new String[] {astring[3], astring[2]};
+            return new String[]{astring[3], astring[2]};
         } catch (Throwable var6) {
-            return new String[] {serverHost, Integer.toString(25565)};
+            return new String[]{serverHost, Integer.toString(25565)};
         }
     }
 
