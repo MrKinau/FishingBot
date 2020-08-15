@@ -30,7 +30,6 @@ public class ServerPinger {
 
     private String serverName;
     private int serverPort;
-    private FishingBot fishingBot;
 
     public void ping() {
         FishingBot.getInstance().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()));

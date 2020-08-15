@@ -139,7 +139,7 @@ public class FishingBot {
 
         //Ping server
         getLog().info("Pinging " + ip + ":" + port + " with protocol of MC-" + getConfig().getDefaultProtocol());
-        ServerPinger sp = new ServerPinger(ip, port, this);
+        ServerPinger sp = new ServerPinger(ip, port);
         sp.ping();
 
         //Activate Discord webHook
@@ -173,7 +173,7 @@ public class FishingBot {
                 setRunning(true);
                 if(isWontConnect()) {
                     setWontConnect(false);
-                    ServerPinger sp = new ServerPinger(getServerHost(), getServerPort(), this);
+                    ServerPinger sp = new ServerPinger(getServerHost(), getServerPort());
                     sp.ping();
                     if(isWontConnect()) {
                         if(!getConfig().isAutoReconnect())
