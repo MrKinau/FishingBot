@@ -18,6 +18,7 @@ Minecraft 1.8 - 1.16.2 AFK Fishing bot
 - Auto-Fishing Bot
 - Announces Loot/Level (also in Discord if wanted)
 - Check the bots level with "\<username\>, Level?" in the chat (replace <username> with the account username of your bot)
+- Empty the bots inventory with "\<username\>, empty inventory!" in the chat (replace <username> with the account username of your bot)
 - Connect to every relevant minecraft version (realms included)
 - Offline and online mode
 - Use the bot console to chat
