@@ -6,23 +6,25 @@
 
 package systems.kinau.fishingbot.io.discord;
 
-import com.mrpowergamerbr.temmiewebhook.DiscordMessage;
-import com.mrpowergamerbr.temmiewebhook.TemmieWebhook;
+
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 
 public class DiscordMessageDispatcher {
 
-    private TemmieWebhook webHook;
+    private WebhookClient webHook;
 
     public DiscordMessageDispatcher(String webHook) {
-        this.webHook = new TemmieWebhook(webHook);
+        this.webHook = WebhookClient.withUrl(webHook);
     }
 
     public void dispatchMessage(String content, DiscordDetails details) {
-        DiscordMessage.DiscordMessageBuilder builder = DiscordMessage.builder()
-                .username(details.getUserName())
-                .content(content);
-        if (details.getAvatar() != null && !details.getAvatar().isEmpty()) builder.avatarUrl(details.getAvatar());
+        WebhookMessageBuilder builder = new WebhookMessageBuilder()
+                .setUsername(details.getUserName())
+                .setContent(content);
+        if (details.getAvatar() != null && !details.getAvatar().isEmpty())
+            builder.setAvatarUrl(details.getAvatar());
 
-        webHook.sendMessage(builder.build());
+        webHook.send(builder.build());
     }
 }

@@ -5,8 +5,6 @@
 
 package systems.kinau.fishingbot.auth;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpHeaders;
@@ -16,6 +14,9 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.FishingBot;
 
 import java.io.IOException;
@@ -29,13 +30,13 @@ public class Authenticator {
     private String password;
 
     public AuthData authenticate() {
-        JsonObject data = new JsonObject();
-        JsonObject agent = new JsonObject();
-        agent.addProperty("name", "minecraft");
-        agent.addProperty("version", "1");
-        data.add("agent", agent);
-        data.addProperty("username", username);
-        data.addProperty("password", password);
+        JSONObject data = new JSONObject();
+        JSONObject agent = new JSONObject();
+        agent.put("name", "minecraft");
+        agent.put("version", "1");
+        data.put("agent", agent);
+        data.put("username", username);
+        data.put("password", password);
 
         try {
             HttpUriRequest request = RequestBuilder.post()
@@ -53,14 +54,14 @@ public class Authenticator {
                 return null;
             }
 
-            JsonObject responseJson = (JsonObject) new JsonParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
-            String accessToken = responseJson.get("accessToken").getAsString();
-            String clientToken = responseJson.get("clientToken").getAsString();
-            String profile = responseJson.getAsJsonObject("selectedProfile").get("id").getAsString();
-            String username = responseJson.getAsJsonObject("selectedProfile").get("name").getAsString();
+            JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
+            String accessToken = (String) responseJson.get("accessToken");
+            String clientToken = (String) responseJson.get("clientToken");
+            String profile = (String) ((JSONObject)responseJson.get("selectedProfile")).get("id");
+            String username = (String) ((JSONObject)responseJson.get("selectedProfile")).get("name");
             FishingBot.getLog().info("Authentication successful!");
             return new AuthData(accessToken, clientToken, profile, username);
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             FishingBot.getLog().severe("Error while connecting to: " + AUTH_SERVER);
         }
         return null;

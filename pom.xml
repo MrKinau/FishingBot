@@ -22,8 +22,9 @@
 
     <repositories>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <name>jcenter</name>
+            <id>bintray-jcenter</id>
+            <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
 
@@ -35,12 +36,11 @@
             <version>1.18.6</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-        <!-- TODO: Replace with json-simple -->
+        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.5</version>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava-io -->
         <dependency>
@@ -65,9 +65,9 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.MrPowerGamerBR</groupId>
-            <artifactId>TemmieWebhook</artifactId>
-            <version>-59de40c3b6-1</version>
+            <groupId>club.minnced</groupId>
+            <artifactId>discord-webhooks</artifactId>
+            <version>LATEST</version>
         </dependency>
     </dependencies>
 

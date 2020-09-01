@@ -5,9 +5,6 @@
 
 package systems.kinau.fishingbot.realms;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -18,6 +15,10 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -66,25 +67,25 @@ public class RealmsAPI {
                 FishingBot.getLog().severe("Could not connect to " + REALMS_ENDPOINT + ": " + answer.getStatusLine());
                 return;
             }
-            JsonObject responseJson = (JsonObject) new JsonParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
-            JsonArray servers = responseJson.getAsJsonArray("servers");
+            JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
+            JSONArray servers = (JSONArray) responseJson.get("servers");
             if (servers.size() == 0) {
                 FishingBot.getLog().warning("There are no possible realms this account can join");
                 return;
             }
             FishingBot.getLog().info("Possible realms to join:");
             servers.forEach(server -> {
-                long id = server.getAsJsonObject().get("id").getAsLong();
-                String owner = server.getAsJsonObject().get("owner").getAsString();
-                String name = server.getAsJsonObject().get("name").getAsString();
-                String motd = server.getAsJsonObject().get("motd").getAsString();
+                long id = (long) ((JSONObject)server).get("id");
+                String owner = (String) ((JSONObject)server).get("owner");
+                String name = (String) ((JSONObject)server).get("name");
+                String motd = (String) ((JSONObject)server).get("motd");
                 FishingBot.getLog().info("ID: " + id);
                 FishingBot.getLog().info("name: " + name);
                 FishingBot.getLog().info("motd: " + motd);
                 FishingBot.getLog().info("owner: " + owner);
                 FishingBot.getLog().info("");
             });
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             FishingBot.getLog().severe("Could not connect to " + REALMS_ENDPOINT);
         }
     }
@@ -119,10 +120,10 @@ public class RealmsAPI {
                 FishingBot.getLog().severe("Could not retrieve IP from " + REALMS_ENDPOINT + ": " + answer.getStatusLine());
                 return null;
             }
-            JsonObject responseJson = (JsonObject) new JsonParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
+            JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
             FishingBot.getLog().info("Connecting to: " + responseJson.toString());
-            return responseJson.get("address").getAsString();
-        } catch (IOException e) {
+            return (String) responseJson.get("address");
+        } catch (IOException | ParseException e) {
             FishingBot.getLog().severe("Could not connect to " + REALMS_ENDPOINT);
         }
         return null;

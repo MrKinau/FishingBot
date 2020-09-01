@@ -7,9 +7,9 @@ package systems.kinau.fishingbot.network.ping;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -70,20 +70,20 @@ public class ServerPinger {
 
 //            if (id != 2) {
             String pong = Packet.readString(in);
-            JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
-            int protocolId = root.getAsJsonObject("version").get("protocol").getAsInt();
-            int currPlayers = root.getAsJsonObject("players").get("online").getAsInt();
+            JSONObject root = (JSONObject) new JSONParser().parse(pong);
+            int protocolId = (int) ((JSONObject)root.get("version")).get("protocol");
+            int currPlayers = (int) ((JSONObject)root.get("players")).get("online");
 
             FishingBot.getInstance().setServerProtocol(protocolId);
             String description = "Unknown";
             try {
                 try {
                     if (protocolId > ProtocolConstants.MINECRAFT_1_8)
-                        description = root.getAsJsonObject("description").get("text").getAsString();
+                        description = (String) ((JSONObject)root.get("description")).get("text");
                     else
-                        description = root.get("description").getAsString();
+                        description = (String) root.get("description");
                 } catch (UnsupportedOperationException ex) {
-                    description = TextComponent.toPlainText(root.getAsJsonObject("description"));
+                    description = TextComponent.toPlainText(((JSONObject)root.get("description")));
                 }
             } catch (UnsupportedOperationException ex) {
             } finally {

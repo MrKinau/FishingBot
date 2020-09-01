@@ -32,13 +32,13 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
-    public static String PREFIX;
-    @Getter private static FishingBot instance;
-    @Getter public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
+                    public static String PREFIX;
+    @Getter         private static FishingBot instance;
+    @Getter         public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
 
     @Getter @Setter private boolean running;
-    @Getter private SettingsConfig config;
-    @Getter private DiscordMessageDispatcher discord;
+    @Getter         private SettingsConfig config;
+    @Getter         private DiscordMessageDispatcher discord;
     @Getter @Setter private int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
     @Getter @Setter private String serverHost;
     @Getter @Setter private int serverPort;

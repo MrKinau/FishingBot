@@ -31,10 +31,11 @@ public class PacketInJoinGame extends Packet {
     @Getter private boolean enableRespawnScreen;
     @Getter private boolean debug;
     @Getter private boolean flat;
+    @Getter private boolean hardcore;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //Only incoming packet
+        // only incoming packet
     }
 
     @Override
@@ -42,13 +43,13 @@ public class PacketInJoinGame extends Packet {
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_9:
             case ProtocolConstants.MINECRAFT_1_8: {
-                eid = in.readInt();                         //Entity ID
-                gamemode = in.readUnsignedByte();           //Gamemode
-                dimension = String.valueOf(in.readByte());  //Dimension
-                difficulty = in.readUnsignedByte();         //Difficulty
-                maxPlayers = in.readUnsignedByte();         //MaxPlayer
-                levelType = readString(in);                 //level type
-                reducedDebugInfo = in.readBoolean();        //Reduced Debug info
+                eid = in.readInt();                         // entity ID
+                gamemode = in.readUnsignedByte();           // gamemode
+                dimension = String.valueOf(in.readByte());  // dimension
+                difficulty = in.readUnsignedByte();         // difficulty
+                maxPlayers = in.readUnsignedByte();         // maxPlayer
+                levelType = readString(in);                 // level type
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -63,13 +64,13 @@ public class PacketInJoinGame extends Packet {
             case ProtocolConstants.MINECRAFT_1_9_4:
             case ProtocolConstants.MINECRAFT_1_9_2:
             case ProtocolConstants.MINECRAFT_1_9_1: {
-                eid = in.readInt();                         //Entity ID
-                gamemode = in.readUnsignedByte();           //Gamemode
-                dimension = String.valueOf(in.readInt());   //Dimension
-                difficulty = in.readUnsignedByte();         //Difficulty
-                maxPlayers = in.readUnsignedByte();         //MaxPlayer
-                levelType = readString(in);                 //level type
-                reducedDebugInfo = in.readBoolean();        //Reduced Debug info
+                eid = in.readInt();                         // entity ID
+                gamemode = in.readUnsignedByte();           // gamemode
+                dimension = String.valueOf(in.readInt());   // dimension
+                difficulty = in.readUnsignedByte();         // difficulty
+                maxPlayers = in.readUnsignedByte();         // maxPlayer
+                levelType = readString(in);                 // level type
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_14:
@@ -77,51 +78,70 @@ public class PacketInJoinGame extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_2:
             case ProtocolConstants.MINECRAFT_1_14_3:
             case ProtocolConstants.MINECRAFT_1_14_4:{
-                eid = in.readInt();                         //Entity ID
-                gamemode = in.readUnsignedByte();           //Gamemode
-                dimension = String.valueOf(in.readInt());   //Dimension
-                maxPlayers = in.readUnsignedByte();         //MaxPlayer
-                levelType = readString(in);                 //level type
-                viewDistance = readVarInt(in);              //View distance
-                reducedDebugInfo = in.readBoolean();        //Reduced Debug info
+                eid = in.readInt();                         // entity ID
+                gamemode = in.readUnsignedByte();           // gamemode
+                dimension = String.valueOf(in.readInt());   // dimension
+                maxPlayers = in.readUnsignedByte();         // maxPlayer
+                levelType = readString(in);                 // level type
+                viewDistance = readVarInt(in);              // view distance
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_15:
             case ProtocolConstants.MINECRAFT_1_15_1:
             case ProtocolConstants.MINECRAFT_1_15_2: {
-                eid = in.readInt();                         //Entity ID
-                gamemode = in.readUnsignedByte();           //Gamemode
-                dimension = String.valueOf(in.readInt());   //Dimension
-                hashedSeed = in.readLong();                 //First 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = in.readUnsignedByte();         //MaxPlayer
-                levelType = readString(in);                 //level type
-                viewDistance = readVarInt(in);              //View distance
-                reducedDebugInfo = in.readBoolean();        //Reduced Debug info
-                enableRespawnScreen = in.readBoolean();     //Set to false when the doImmediateRespawn gamerule is true
+                eid = in.readInt();                         // entity ID
+                gamemode = in.readUnsignedByte();           // gamemode
+                dimension = String.valueOf(in.readInt());   // dimension
+                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+                maxPlayers = in.readUnsignedByte();         // maxPlayer
+                levelType = readString(in);                 // level type
+                viewDistance = readVarInt(in);              // view distance
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
+                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_16:
-            case ProtocolConstants.MINECRAFT_1_16_1:
-            case ProtocolConstants.MINECRAFT_1_16_2:
-            default: {
-                eid = in.readInt();                         //Entity ID
-                gamemode = in.readUnsignedByte();           //Gamemode
-                in.readUnsignedByte();                      //previous gamemode
-                in.readByte();                              //TODO: just a hotfix, wiki.vg has not described it atm (part of worldCount, but varint fails)
-                int worldCount = in.readByte();             //count of worlds
-                worldIdentifier = new String[worldCount];   //identifier for all worlds
+            case ProtocolConstants.MINECRAFT_1_16_1: {
+                eid = in.readInt();                         // entity ID
+                gamemode = in.readUnsignedByte();           // gamemode
+                in.readUnsignedByte();                      // previous gamemode
+                int worldCount = readVarInt(in);            // count of worlds
+                worldIdentifier = new String[worldCount];   // identifier for all worlds
                 for (int i = 0; i < worldCount; i++)
                     worldIdentifier[i] = readString(in);
-                NBTUtils.readNBT(in);                       //Dimension codec (don't use, just skip it)
-                dimension = readString(in);                 //Dimension
-                spawnWorld = readString(in);                //spawn world name
-                hashedSeed = in.readLong();                 //First 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = in.readUnsignedByte();         //MaxPlayer
-                viewDistance = readVarInt(in);              //View distance
-                reducedDebugInfo = in.readBoolean();        //Reduced Debug info
-                enableRespawnScreen = in.readBoolean();     //Set to false when the doImmediateRespawn gamerule is true
-                debug = in.readBoolean();                   //debug world
-                flat = in.readBoolean();                    //flat world
+                NBTUtils.readNBT(in);                       // dimension codec (dont use, just skip it)
+                dimension = readString(in);                 // dimension
+                spawnWorld = readString(in);                // spawn world name
+                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+                maxPlayers = in.readUnsignedByte();         // maxPlayer
+                viewDistance = readVarInt(in);              // view distance
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
+                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+                debug = in.readBoolean();                   // debug world
+                flat = in.readBoolean();                    // flat world
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_16_2:
+            default: {
+                eid = in.readInt();                         // entity ID
+                hardcore = in.readBoolean();                // is hardcore
+                gamemode = in.readUnsignedByte();           // current gamemode
+                in.readUnsignedByte();                      // previous gamemode
+                int worldCount = readVarInt(in);            // count of worlds
+                worldIdentifier = new String[worldCount];   // identifier for all worlds
+                for (int i = 0; i < worldCount; i++)
+                    worldIdentifier[i] = readString(in);
+                NBTUtils.readNBT(in);                       // dimension codec (don't use, just skip it)
+                NBTUtils.readNBT(in);                       // spawn dimension
+                spawnWorld = readString(in);                // spawn world name
+                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+                maxPlayers = in.readUnsignedByte();         // maxPlayer
+                viewDistance = readVarInt(in);              // view distance
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
+                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+                debug = in.readBoolean();                   // debug world
+                flat = in.readBoolean();                    // flat world
                 break;
             }
         }

@@ -7,6 +7,8 @@ package systems.kinau.fishingbot.network.protocol;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataOutput;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
@@ -101,7 +103,7 @@ public abstract class Packet {
         }
     }
 
-    public static int readVarInt(DataInputStream in) throws IOException{ //reads a varint from the stream
+    public static int readVarInt(DataInputStream in) throws IOException { //reads a varint from the stream
         int i = 0;
         int j = 0;
         while (true){
@@ -117,7 +119,7 @@ public abstract class Packet {
         return i;
     }
 
-    public static int[] readVarIntt(DataInputStream in) throws IOException{ //reads a varint from the stream, returning both the length and the value
+    public static int[] readVarIntt(DataInputStream in) throws IOException { //reads a varint from the stream, returning both the length and the value
         int i = 0;
         int j = 0;
         int b = 0;
@@ -155,6 +157,65 @@ public abstract class Packet {
             e.printStackTrace();
         }
         return s;
+    }
+
+    public static void writeSlot(Slot slot, ByteArrayDataOutput output) {
+        if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
+            output.writeBoolean(slot.isPresent());
+            if (slot.isPresent()) {
+                writeVarInt(slot.getItemId(), output);
+                output.writeByte(slot.getItemCount());
+                output.write(slot.getNbtData());
+            }
+        } else if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+            if (!slot.isPresent()) {
+                output.writeShort(-1);
+                return;
+            }
+            output.writeShort(slot.getItemId());
+            output.writeByte(slot.getItemCount());
+            output.write(slot.getNbtData());
+        } else {
+            if (!slot.isPresent()) {
+                output.writeShort(-1);
+                return;
+            }
+            output.writeShort(slot.getItemId());
+            output.writeByte(slot.getItemCount());
+            output.writeShort(slot.getItemDamage());
+            output.write(slot.getNbtData());
+        }
+    }
+
+    public static Slot readSlot(ByteArrayDataInputWrapper input) {
+        if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
+            boolean present = input.readBoolean();
+            if (present) {
+                int itemId = readVarInt(input);
+                byte itemCount = input.readByte();
+                byte[] nbtData = new byte[input.getAvailable()];
+                input.readFully(nbtData);
+                return new Slot(true, itemId, itemCount, (short)-1, nbtData);
+            } else
+                return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
+        } else if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+            int itemId = input.readShort();
+            if (itemId == -1)
+                return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
+            byte itemCount = input.readByte();
+            byte[] nbtData = new byte[input.getAvailable()];
+            input.readFully(nbtData);
+            return new Slot(true, itemId, itemCount, (short)-1, nbtData);
+        } else {
+            int itemId = input.readShort();
+            if (itemId == -1)
+                return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
+            byte itemCount = input.readByte();
+            short itemDamage = input.readShort();
+            byte[] nbtData = new byte[input.getAvailable()];
+            input.readFully(nbtData);
+            return new Slot(true, itemId, itemCount, itemDamage, nbtData);
+        }
     }
 
 }
