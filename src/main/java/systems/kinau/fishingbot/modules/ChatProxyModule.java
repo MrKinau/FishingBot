@@ -6,6 +6,7 @@
 package systems.kinau.fishingbot.modules;
 
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.command.CommandExecutor;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.ChatEvent;
@@ -24,7 +25,12 @@ public class ChatProxyModule extends Module implements Listener {
             Scanner scanner = new Scanner(System.in);
             while(!chatThread.isInterrupted()){
                 String line = scanner.nextLine();
-                FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(line));
+                if (line.startsWith("/")) {
+                    boolean executed = FishingBot.getInstance().getCommandRegistry().dispatchCommand(line, CommandExecutor.CONSOLE);
+                    if (!executed)
+                        FishingBot.getLog().info("This command does not exist. Try /help for a list of commands.");
+                } else
+                    FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(line));
             }
         });
         chatThread.start();

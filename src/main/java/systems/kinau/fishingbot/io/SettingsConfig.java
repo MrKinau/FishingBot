@@ -30,7 +30,6 @@ public class SettingsConfig implements Config {
     @Property(key = "announce-lvl-up") private String announceLvlUp = "I've got a new level: %lvl%";
     @Property(key = "start-text-enabled") private boolean startTextEnabled = true;
     @Property(key = "start-text") private String startText = "%prefix%Starting fishing;/trigger Bot";
-    @Property(key = "proxy-chat") private boolean proxyChat = false;
 
     @Property(key = "default-protocol") private String defaultProtocol = ProtocolConstants.getVersionString(ProtocolConstants.MINECRAFT_1_8);
 
@@ -66,8 +65,7 @@ public class SettingsConfig implements Config {
                 "#account-username:\tThe username / e-mail of the account\n" +
                 "#account-password:\tThe password of the account (ignored in offline-mode)\n" +
                 "#default-protocol:\tOnly needed for Multi-Version servers. The Minecraft-Version for the ping request to the server. Possible values: (1.8, 1.9, 1.9.2, 1.9.2, 1.9.4, ...)\n" +
-                "#stucking-fix-enabled:\tIf you dont want the bot to re-throw if no fish is caught after 60 seconds (Disabling may cause the bot stuck)" +
-                "#proxy-chat:\tWhether to function as a chat client (printing incoming chat messages to the console and sending input as chat)";
+                "#stucking-fix-enabled:\tIf you dont want the bot to re-throw if no fish is caught after 60 seconds (Disabling may cause the bot stuck)";
 
         init("config.properties", comments);
     }

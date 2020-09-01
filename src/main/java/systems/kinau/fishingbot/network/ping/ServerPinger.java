@@ -105,7 +105,7 @@ public class ServerPinger {
             FishingBot.getLog().severe("Unknown host: " + serverName);
         } catch (Exception e) {
             FishingBot.getLog().severe("Could not ping: " + serverName);
-            FishingBot.getLog().severe("Automatic version detection may not work");
+            FishingBot.getLog().severe("Automatic version detection may not work. Please set default-protocol in config.properties");
         }
     }
 

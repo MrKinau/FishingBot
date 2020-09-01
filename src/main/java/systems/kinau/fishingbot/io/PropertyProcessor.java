@@ -46,33 +46,31 @@ public class PropertyProcessor {
             }
 
             String value = props.get(source).getProperty(key);
-            if(value == null) {
-                if(undefinedKeys.get(source) == null) {
+            if (value == null) {
+                if (undefinedKeys.get(source) == null) {
                     Map<String, Field> kvPair = new HashMap<>();
                     kvPair.put(key, field);
                     List<Map<String, Field>> kvPairList = new ArrayList<>();
                     kvPairList.add(kvPair);
                     undefinedKeys.put(source, kvPairList);
-                    FishingBot.getLog().warning("Undefined config option in " + source + " -> " + key);
-                    continue;
                 } else {
                     List<Map<String, Field>> undKeys = undefinedKeys.get(source);
                     Map<String, Field> kvPair = new HashMap<>();
                     kvPair.put(key, field);
                     undKeys.add(kvPair);
                     undefinedKeys.put(source, undKeys);
-                    FishingBot.getLog().warning("Undefined config option in " + source + " -> " + key);
-                    continue;
                 }
+                FishingBot.getLog().warning("Undefined config option in " + source + " -> " + key);
+                continue;
             }
 
             Object typedValue = ConvertUtils.convert(value, field.getType());
-            if(typedValue == null)
+            if (typedValue == null)
                 throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
             ReflectionUtils.setField(field, object, typedValue);
         }
         for (String source : props.keySet()) {
-            if(undefinedKeys.containsKey(source)) {
+            if (undefinedKeys.containsKey(source)) {
                 for (Map<String, Field> configEntry : undefinedKeys.get(source)) {
                     configEntry.forEach((key, value) -> {
                         props.get(source).setProperty(key, Objects.requireNonNull(ReflectionUtils.getField(value, object)).toString());

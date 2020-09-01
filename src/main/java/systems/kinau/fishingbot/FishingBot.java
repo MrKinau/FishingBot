@@ -10,6 +10,8 @@ import lombok.Setter;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.bot.Player;
+import systems.kinau.fishingbot.command.CommandRegistry;
+import systems.kinau.fishingbot.command.commands.*;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.LogFormatter;
@@ -44,7 +46,10 @@ public class FishingBot {
     @Getter @Setter private int serverPort;
     @Getter @Setter private AuthData authData;
     @Getter @Setter private boolean wontConnect = false;
+
     @Getter         private EventManager eventManager;
+    @Getter         private CommandRegistry commandRegistry;
+
     @Getter         private Player player;
     @Getter         private ClientDefaultsModule clientModule;
 
@@ -164,6 +169,15 @@ public class FishingBot {
         return true;
     }
 
+    private void registerCommands() {
+        this.commandRegistry = new CommandRegistry();
+        getCommandRegistry().registerCommand(new HelpCommand());
+        getCommandRegistry().registerCommand(new LevelCommand());
+        getCommandRegistry().registerCommand(new EmptyCommand());
+        getCommandRegistry().registerCommand(new ByeCommand());
+        getCommandRegistry().registerCommand(new StuckCommand());
+    }
+
     private void connect() {
         String serverName = getServerHost();
         int port = getServerPort();
@@ -192,14 +206,14 @@ public class FishingBot {
 
                 //Load EventManager
                 this.eventManager = new EventManager();
+                registerCommands();
 
                 this.fishingModule = new FishingModule();
                 getFishingModule().enable();
 
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();
-                if (getConfig().isProxyChat())
-                    new ChatProxyModule().enable();
+                new ChatProxyModule().enable();
                 if(getConfig().isStartTextEnabled())
                     new ChatCommandModule().enable();
                 this.clientModule = new ClientDefaultsModule();

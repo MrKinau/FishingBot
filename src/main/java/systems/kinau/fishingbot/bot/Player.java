@@ -15,6 +15,7 @@ import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClickWindow;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutClientStatus;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutTeleportConfirm;
 
@@ -91,5 +92,22 @@ public class Player implements Listener {
 
     public void respawn() {
         FishingBot.getInstance().getNet().sendPacket(new PacketOutClientStatus(PacketOutClientStatus.Action.PERFORM_RESPAWN));
+    }
+
+    public void sendMessage(String message) {
+        FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(message));
+    }
+
+    public void dropStack(short slot, short actionNumber) {
+        FishingBot.getInstance().getNet().sendPacket(
+                new PacketOutClickWindow(
+                        /* player inventory */ 0,
+                        slot,
+                        /* drop entire stack */ (byte) 1,
+                        /* action count starting at 1 */ actionNumber,
+                        /* drop entire stack */ 4,
+                        /* empty slot */ new Slot(false, -1, (byte) -1, (short) -1, new byte[]{0})
+                )
+        );
     }
 }
