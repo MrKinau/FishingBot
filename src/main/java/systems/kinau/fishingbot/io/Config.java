@@ -16,5 +16,6 @@ public interface Config {
             e.printStackTrace();
         }
     }
+
 }
 

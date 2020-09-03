@@ -40,7 +40,9 @@ public class SettingsConfig implements Config {
 
     @Property(key = "stucking-fix-enabled") private boolean stuckingFixEnabled = true;
 
-    public SettingsConfig() {
+    @Getter private String path;
+
+    public SettingsConfig(String path) {
         String comments = "server-ip:\tServer IP the bot connects to\n" +
                 "#server-port:\tPort of the server the bot connects to\n" +
                 "#realm-id:\tID of the realm the bot should conmnect to (if this option is enabled the bot ignores the server-ip and server-port). To get the correct id start the bot in online-mode and set the realm-id to 0. At startup you will get a list of your connectable realms with the corresponding id.\n" +
@@ -67,6 +69,7 @@ public class SettingsConfig implements Config {
                 "#default-protocol:\tOnly needed for Multi-Version servers. The Minecraft-Version for the ping request to the server. Possible values: (1.8, 1.9, 1.9.2, 1.9.2, 1.9.4, ...)\n" +
                 "#stucking-fix-enabled:\tIf you dont want the bot to re-throw if no fish is caught after 60 seconds (Disabling may cause the bot stuck)";
 
-        init("config.properties", comments);
+        this.path = path;
+        init(path, comments);
     }
 }

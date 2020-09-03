@@ -24,7 +24,7 @@ public class PacketOutChat extends Packet {
         writeString(getMessage(), out);
         if(!FishingBot.getInstance().getConfig().getWebHook().equalsIgnoreCase("false"))
             FishingBot.getInstance().getDiscord().dispatchMessage("`" + getMessage() + "`",
-                    new DiscordDetails("FishingBot", "https://vignette.wikia.nocookie.net/mcmmo/images/2/2f/FishingRod.png/revision/latest?cb=20110822134546"));
+                    new DiscordDetails("FishingBot", "https://vignette.wikia.nocookie.net/mcmmo/images/2/2f/FishingRod.png"));
 
     }
 

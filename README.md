@@ -4,14 +4,15 @@ Minecraft 1.8 - 1.16.2 AFK Fishing bot
 [![GitHub issues](https://img.shields.io/github/issues/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/issues)
 [![GitHub](https://img.shields.io/github/license/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/blob/master/LICENSE)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/releases/latest)
-![Discord](https://img.shields.io/discord/550764567282712583?logo=discord)
+[![Discord](https://img.shields.io/discord/550764567282712583?logo=discord)](https://discord.gg/xHpCDYf)
 
+![img](https://screens.kinau.systems/69e90c5d-e366-4434-aefb-7150b851847a.png)
 ## Download
 - A list with all past releases can be found [here](https://github.com/MrKinau/FishingBot/releases)
 
 ## How to use
 1. Download a [release](https://github.com/MrKinau/FishingBot/releases) (or build it yourself)
-2. Start the Client (java -jar Fishingbot.jar)
+2. Start the Client (java -jar FishingBot-\<VERSION\>.jar)
 3. Fill in the config.properties, which generated on the first start
 4. Give a fishing rod to the account you used and place it in front of water (remember you can only fish treasure in open water)
 
@@ -29,6 +30,8 @@ The Command "/help" or "\<bot username\>, help" displays an overview of all comm
 - Use the bot console to chat
 - Setup Auto-Disconnect to reduce server-load
 - Automatically execute commands after connecting
+- GUI
+- Use Command-Line-Arguments (java -jar FishingBot-\<VERSION\>.jar -help)
 - Want more? Feel free to request a feature [here](https://github.com/MrKinau/FishingBot/issues) or on [Discord](https://discord.gg/xHpCDYf)
 
 ## Supported Versions

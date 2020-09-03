@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.kinau.fishingbot.gui.GUIController">
+  <MenuBar BorderPane.alignment="CENTER">
+    <menus>
+      <Menu mnemonicParsing="false" text="File">
+        <items>
+          <MenuItem mnemonicParsing="false" onAction="#exit" text="Close" />
+        </items>
+      </Menu>
+      <Menu mnemonicParsing="false" text="Edit">
+        <items>
+          <MenuItem mnemonicParsing="false" onAction="#deleteAllData" text="Delete all data" />
+          <MenuItem mnemonicParsing="false" onAction="#openConfig" text="Open config..." />
+          <MenuItem mnemonicParsing="false" onAction="#openLog" text="Open current log..." />
+          <MenuItem mnemonicParsing="false" onAction="#openLogsDir" text="Open logs folder..." />
+        </items>
+      </Menu>
+      <Menu mnemonicParsing="false" text="Help">
+        <items>
+          <MenuItem mnemonicParsing="false" onAction="#github" text="GitHub..." />
+          <MenuItem mnemonicParsing="false" onAction="#issues" text="Issues..." />
+          <MenuItem mnemonicParsing="false" onAction="#discord" text="Discord..." />
+        </items>
+      </Menu>
+    </menus>
+  </MenuBar>
+  <TabPane prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+    <tabs>
+      <Tab text="Loot">
+        <content>
+          <TableView fx:id="lootTable" prefWidth="600.0">
+            <columns>
+              <TableColumn fx:id="lootItemColumn" prefWidth="530.0" text="Item" />
+              <TableColumn fx:id="lootCountColumn" prefWidth="60.0" text="Count" />
+            </columns>
+            <opaqueInsets>
+              <Insets />
+            </opaqueInsets>
+          </TableView>
+        </content>
+      </Tab>
+      <Tab text="Enchantments">
+        <content>
+          <VBox>
+            <VBox>
+              <Label text="Books" />
+              <TableView fx:id="booksTable">
+                <columns>
+                  <TableColumn prefWidth="445.0" text="Enchantment" />
+                  <TableColumn prefWidth="60.0" text="Level" />
+                  <TableColumn prefWidth="60.0" text="Count" />
+                </columns>
+                <VBox.margin>
+                  <Insets bottom="10.0" />
+                </VBox.margin>
+              </TableView>
+            </VBox>
+            <VBox>
+              <Label text="Fishing rods" />
+              <TableView fx:id="rodsTable">
+                <columns>
+                  <TableColumn prefWidth="445.0" text="Enchantment" />
+                  <TableColumn prefWidth="60.0" text="Level" />
+                  <TableColumn prefWidth="60.0" text="Count" />
+                </columns>
+                <VBox.margin>
+                  <Insets bottom="10.0" />
+                </VBox.margin>
+              </TableView>
+            </VBox>
+            <VBox>
+              <Label text="Bows" />
+              <TableView fx:id="bowsTable">
+                <columns>
+                  <TableColumn prefWidth="445.0" text="Enchantment" />
+                  <TableColumn prefWidth="60.0" text="Level" />
+                  <TableColumn prefWidth="60.0" text="Count" />
+                </columns>
+                <VBox.margin>
+                  <Insets bottom="10.0" />
+                </VBox.margin>
+              </TableView>
+            </VBox>
+            <opaqueInsets>
+              <Insets />
+            </opaqueInsets>
+            <padding>
+              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+          </VBox>
+        </content>
+      </Tab>
+    </tabs>
+  </TabPane>
+</VBox>

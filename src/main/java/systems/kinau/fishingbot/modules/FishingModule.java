@@ -10,6 +10,7 @@ import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.event.play.DifficultySetEvent;
 import systems.kinau.fishingbot.event.play.EntityVelocityEvent;
 import systems.kinau.fishingbot.event.play.SpawnObjectEvent;
@@ -129,6 +130,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                     }
                     FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(str));
                 });
+
+        FishingBot.getInstance().getEventManager().callEvent(new FishCaughtEvent(currentMax));
     }
 
 

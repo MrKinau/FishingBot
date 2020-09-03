@@ -7,6 +7,7 @@ package systems.kinau.fishingbot;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.cli.CommandLine;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.bot.Player;
@@ -58,9 +59,9 @@ public class FishingBot {
 
     @Getter @Setter private FishingModule fishingModule;
 
-    private File logsFolder = new File("logs");
+    @Getter         private File logsFolder = new File("logs");
 
-    public FishingBot() {
+    public FishingBot(CommandLine cmdLine) {
         instance = this;
 
         try {
@@ -71,6 +72,24 @@ public class FishingBot {
             PREFIX = "FishingBot vUnknown - ";
             ex.printStackTrace();
         }
+        this.eventManager = new EventManager();
+
+        // use command line arguments
+        if (cmdLine.hasOption("logsdir")) {
+            this.logsFolder = new File(cmdLine.getOptionValue("logsdir"));
+            if (!logsFolder.exists()) {
+                boolean success = logsFolder.mkdirs();
+                if (!success) {
+                    System.err.println("Could not create logs-folder. Exiting.");
+                    System.exit(1);
+                }
+            }
+        }
+
+        if (cmdLine.hasOption("config"))
+            this.config = new SettingsConfig(cmdLine.getOptionValue("config"));
+        else
+            this.config = new SettingsConfig("config.properties");
 
         //Initialize Logger
         log.setLevel(Level.ALL);
@@ -80,15 +99,13 @@ public class FishingBot {
         LogFormatter formatter = new LogFormatter();
         ch.setFormatter(formatter);
 
-        //Generate/Load config
-        this.config = new SettingsConfig();
 
         //Set logger file handler
         try {
             FileHandler fh;
             if(!logsFolder.exists() && !logsFolder.mkdir() && logsFolder.isDirectory())
                 throw new IOException("Could not create logs folder!");
-            log.addHandler(fh = new FileHandler("logs/log%g.log", 0 /* 0 = infinity */, getConfig().getLogCount()));
+            log.addHandler(fh = new FileHandler(logsFolder.getPath() + "/log%g.log", 0 /* 0 = infinity */, getConfig().getLogCount()));
             fh.setFormatter(new LogFormatter());
         } catch (IOException e) {
             System.err.println("Could not create log!");
@@ -204,8 +221,6 @@ public class FishingBot {
 
                 this.net = new NetworkHandler();
 
-                //Load EventManager
-                this.eventManager = new EventManager();
                 registerCommands();
 
                 this.fishingModule = new FishingModule();
