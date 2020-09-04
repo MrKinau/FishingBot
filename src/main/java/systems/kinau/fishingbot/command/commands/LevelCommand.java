@@ -9,7 +9,7 @@ public class LevelCommand extends Command {
     private final String LEVEL_MSG = "I have %d levels";
 
     public LevelCommand() {
-        super("level", "Displays my current level");
+        super("level", "Displays my current level", "level?");
     }
 
     @Override

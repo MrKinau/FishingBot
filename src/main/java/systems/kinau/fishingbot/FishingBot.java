@@ -24,9 +24,11 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.realms.RealmsAPI;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
@@ -91,7 +93,7 @@ public class FishingBot {
         else
             this.config = new SettingsConfig("config.properties");
 
-        //Initialize Logger
+        // initialize Logger
         log.setLevel(Level.ALL);
         ConsoleHandler ch;
         log.addHandler(ch = new ConsoleHandler());
@@ -100,7 +102,7 @@ public class FishingBot {
         ch.setFormatter(formatter);
 
 
-        //Set logger file handler
+        // set logger file handler
         try {
             FileHandler fh;
             if(!logsFolder.exists() && !logsFolder.mkdir() && logsFolder.isDirectory())
@@ -112,7 +114,10 @@ public class FishingBot {
             System.exit(1);
         }
 
-        //Authenticate player if online-mode is set
+        // log config location
+        FishingBot.getLog().info("Loaded config from: " + new File(getConfig().getPath()).getAbsolutePath());
+
+        // authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
             authenticate();
         else {
@@ -127,8 +132,11 @@ public class FishingBot {
         if (getConfig().getRealmId() != -1) {
             RealmsAPI realmsAPI = new RealmsAPI(getAuthData());
             if (getConfig().getRealmId() == 0) {
-                realmsAPI.printPossibleWorlds();
+                List<String> possibleWorldsText = realmsAPI.getPossibleWorlds();
+                possibleWorldsText.forEach(getLog()::info);
                 FishingBot.getLog().info("Shutting down, because realm-id is not set...");
+                if (!cmdLine.hasOption("nogui"))
+                    JOptionPane.showConfirmDialog(new JFrame(), String.join("\n", possibleWorldsText), "FishingBot", JOptionPane.DEFAULT_OPTION);
                 System.exit(0);
             }
             if (getConfig().isRealmAcceptTos())
@@ -137,6 +145,8 @@ public class FishingBot {
                 FishingBot.getLog().severe("*****************************************************************************");
                 FishingBot.getLog().severe("If you want to use realms you have to accept the tos in the config.properties");
                 FishingBot.getLog().severe("*****************************************************************************");
+                if (!cmdLine.hasOption("nogui"))
+                    JOptionPane.showConfirmDialog(new JFrame(), "If you want to use realms you have to accept the tos in the config.properties", "FishingBot", JOptionPane.DEFAULT_OPTION);
                 System.exit(0);
             }
 

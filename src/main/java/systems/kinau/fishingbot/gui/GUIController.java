@@ -5,12 +5,15 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.command.CommandExecutor;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 
 import java.awt.*;
 import java.io.File;
@@ -29,6 +32,7 @@ public class GUIController implements Listener {
     @FXML private TableView<Enchantment> rodsTable;
     @FXML private TableColumn lootItemColumn;
     @FXML private TableColumn lootCountColumn;
+    @FXML private TextField commandlineTextField;
 
     @Getter private LootHistory lootHistory;
 
@@ -71,6 +75,20 @@ public class GUIController implements Listener {
 
     public void openLog(Event e) {
         openFile(FishingBot.getInstance().getLogsFolder().getPath() + "/log0.log");
+    }
+
+    public void commandlineSend(Event e) {
+        runCommand(commandlineTextField.getText());
+        commandlineTextField.setText("");
+    }
+
+    private void runCommand(String text) {
+        if (text.startsWith("/")) {
+            boolean executed = FishingBot.getInstance().getCommandRegistry().dispatchCommand(text, CommandExecutor.CONSOLE);
+            if (!executed)
+                FishingBot.getLog().info("This command does not exist. Try /help for a list of commands.");
+        } else
+            FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(text));
     }
 
     private void openFile(String fileUrl) {

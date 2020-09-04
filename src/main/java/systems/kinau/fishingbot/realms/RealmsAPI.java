@@ -24,6 +24,8 @@ import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RealmsAPI {
 
@@ -55,7 +57,8 @@ public class RealmsAPI {
                 .build();
     }
 
-    public void printPossibleWorlds() {
+    public List<String> getPossibleWorlds() {
+        List<String> response = new ArrayList<>();
         HttpUriRequest request = RequestBuilder.get()
                 .setUri(REALMS_ENDPOINT + "/worlds")
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -64,30 +67,31 @@ public class RealmsAPI {
         try {
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() != 200) {
-                FishingBot.getLog().severe("Could not connect to " + REALMS_ENDPOINT + ": " + answer.getStatusLine());
-                return;
+                response.add("Could not connect to " + REALMS_ENDPOINT + ": " + answer.getStatusLine());
+                return response;
             }
             JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
             JSONArray servers = (JSONArray) responseJson.get("servers");
             if (servers.size() == 0) {
-                FishingBot.getLog().warning("There are no possible realms this account can join");
-                return;
+                response.add("There are no possible realms this account can join");
+                return response;
             }
-            FishingBot.getLog().info("Possible realms to join:");
+            response.add("Possible realms to join:");
             servers.forEach(server -> {
                 long id = (long) ((JSONObject)server).get("id");
                 String owner = (String) ((JSONObject)server).get("owner");
                 String name = (String) ((JSONObject)server).get("name");
                 String motd = (String) ((JSONObject)server).get("motd");
-                FishingBot.getLog().info("ID: " + id);
-                FishingBot.getLog().info("name: " + name);
-                FishingBot.getLog().info("motd: " + motd);
-                FishingBot.getLog().info("owner: " + owner);
-                FishingBot.getLog().info("");
+                response.add("ID: " + id);
+                response.add("name: " + name);
+                response.add("motd: " + motd);
+                response.add("owner: " + owner);
+                response.add("");
             });
         } catch (IOException | ParseException e) {
-            FishingBot.getLog().severe("Could not connect to " + REALMS_ENDPOINT);
+            response.add("Could not connect to " + REALMS_ENDPOINT);
         }
+        return response;
     }
 
     public void agreeTos() {

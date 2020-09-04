@@ -6,6 +6,7 @@
 package systems.kinau.fishingbot;
 
 import org.apache.commons.cli.*;
+import systems.kinau.fishingbot.gui.JavaFXNotWorkingGUI;
 import systems.kinau.fishingbot.gui.MainGUI;
 
 public class Main {
@@ -28,8 +29,13 @@ public class Main {
 
             if (!cmd.hasOption("nogui")) {
                 new Thread(() -> {
-                    new MainGUI(args);
-                    System.exit(0);
+                    try {
+                        try { Thread.sleep(200); } catch (InterruptedException ignore) { }
+                        new MainGUI(args);
+                        System.exit(0);
+                    } catch (NoClassDefFoundError ex) {
+                        new JavaFXNotWorkingGUI().show();
+                    }
                 }, "GUIThread").start();
             }
             FishingBot bot = new FishingBot(cmd);
