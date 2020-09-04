@@ -37,13 +37,14 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @Getter @Setter private int currentBobber = -1;
     @Getter @Setter private short lastY = -1;
-    @Getter @Setter private boolean trackingNextFishingId = false;
+    @Getter @Setter private boolean trackingNextBobberId = false;
     @Getter @Setter private boolean trackingNextEntityMeta = false;
     @Getter @Setter long lastFish = System.currentTimeMillis();
 
     @Getter @Setter private int heldSlot;
 
     @Getter private Thread stuckingFix;
+    @Getter private boolean joined;
 
     @Override
     public void onEnable() {
@@ -61,6 +62,16 @@ public class FishingModule extends Module implements Runnable, Listener {
         FishingBot.getInstance().getEventManager().unregisterListener(this);
     }
 
+    public void stuck() {
+        setTrackingNextBobberId(true);
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
+    }
+
     public void fish() {
         setLastFish(System.currentTimeMillis());
         setCurrentBobber(-1);
@@ -72,7 +83,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 setTrackingNextEntityMeta(false);
                 getCaughtItem();
                 Thread.sleep(200);
-                setTrackingNextFishingId(true);
+                setTrackingNextBobberId(true);
                 try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
                 FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
             } catch (InterruptedException e) {
@@ -206,7 +217,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     private void reFish(int id) {
-        setTrackingNextFishingId(false);
+        setTrackingNextBobberId(false);
         new Thread(() -> {
             try { Thread.sleep(2500); } catch (InterruptedException e) { }     //Prevent Velocity grabbed from flying hook
             setCurrentBobber(id);
@@ -215,13 +226,16 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @EventHandler
     public void onSetDifficulty(DifficultySetEvent event) {
+        if (isJoined())
+            return;
+        this.joined = true;
         new Thread(() -> {
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            setTrackingNextFishingId(true);
+            setTrackingNextBobberId(true);
             FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
             FishingBot.getLog().info("Starting fishing!");
         }).start();
@@ -310,7 +324,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @EventHandler
     public void onSpawnObject(SpawnObjectEvent event) {
-        if(!FishingBot.getInstance().getFishingModule().isTrackingNextFishingId())
+        if(!FishingBot.getInstance().getFishingModule().isTrackingNextBobberId())
             return;
 
         //TODO: Refactor just make the objecttype with ifs
@@ -381,7 +395,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 setLastFish(System.currentTimeMillis());
                 setCurrentBobber(-1);
                 setTrackingNextEntityMeta(false);
-                setTrackingNextFishingId(true);
+                setTrackingNextBobberId(true);
                 FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
                 FishingBot.getLog().warning("Bot is slow (maybe stuck). Trying to restart!");
             }

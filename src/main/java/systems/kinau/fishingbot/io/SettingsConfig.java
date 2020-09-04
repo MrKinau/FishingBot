@@ -40,7 +40,7 @@ public class SettingsConfig implements Config {
 
     @Property(key = "stucking-fix-enabled") private boolean stuckingFixEnabled = true;
 
-    @Getter private String path;
+    @Getter private final String path;
 
     public SettingsConfig(String path) {
         String comments = "server-ip:\tServer IP the bot connects to\n" +
