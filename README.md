@@ -6,7 +6,7 @@ Minecraft 1.8 - 1.16.2 AFK Fishing bot
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/releases/latest)
 [![Discord](https://img.shields.io/discord/550764567282712583?logo=discord)](https://discord.gg/xHpCDYf)
 
-![img](https://screens.kinau.systems/69e90c5d-e366-4434-aefb-7150b851847a.png)
+![img](https://screens.kinau.systems/928b8dda-e300-4dc4-b04b-d1798ca833d6.png)
 ## Download
 - A list with all past releases can be found [here](https://github.com/MrKinau/FishingBot/releases)
 
