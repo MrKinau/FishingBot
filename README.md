@@ -16,7 +16,7 @@ Visit the Wiki to see detailed instructions ([here](https://github.com/MrKinau/F
 ## Commands
 You can use commands in the console with /\<command\> or as another player on the server writing "\<bot username\>, \<command\>" (replace \<bot username\> with the account username of your bot).
 The Command "/help" or "\<bot username\>, help" displays an overview of all commands.
-A list of all commands can be found in the wiki ([here](https://github.com/MrKinau/FishingBot/wiki#commands))
+A list of all commands can be found in the wiki ([here](https://github.com/MrKinau/FishingBot/wiki/commands))
 
 ## Features
 - Auto-Fishing Bot
@@ -29,7 +29,7 @@ A list of all commands can be found in the wiki ([here](https://github.com/MrKin
 - Setup Auto-Disconnect to reduce server-load
 - Automatically execute commands after connecting
 - GUI
-- Use Command-Line-Arguments (java -jar FishingBot-\<VERSION\>.jar -help)
+- Use Command-Line-Arguments (all options [here](https://github.com/MrKinau/FishingBot/wiki/command-line-options))
 - Want more? Feel free to request a feature [here](https://github.com/MrKinau/FishingBot/issues) or on [Discord](https://discord.gg/xHpCDYf)
 
 ## Supported Versions
