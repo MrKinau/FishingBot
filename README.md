@@ -11,14 +11,12 @@ Minecraft 1.8 - 1.16.2 AFK Fishing bot
 - A list with all past releases can be found [here](https://github.com/MrKinau/FishingBot/releases)
 
 ## How to use
-1. Download a [release](https://github.com/MrKinau/FishingBot/releases) (or build it yourself)
-2. Start the Client (java -jar FishingBot-\<VERSION\>.jar)
-3. Fill in the config.properties, which generated on the first start
-4. Give a fishing rod to the account you used and place it in front of water (remember you can only fish treasure in open water)
+Visit the Wiki to see detailed instructions ([here](https://github.com/MrKinau/FishingBot/wiki#how-do-i-use-the-bot)).
 
 ## Commands
 You can use commands in the console with /\<command\> or as another player on the server writing "\<bot username\>, \<command\>" (replace \<bot username\> with the account username of your bot).
 The Command "/help" or "\<bot username\>, help" displays an overview of all commands.
+A list of all commands can be found in the wiki ([here](https://github.com/MrKinau/FishingBot/wiki#commands))
 
 ## Features
 - Auto-Fishing Bot
