@@ -6,8 +6,11 @@
 package systems.kinau.fishingbot;
 
 import org.apache.commons.cli.*;
-import systems.kinau.fishingbot.gui.JavaFXNotWorkingGUI;
+import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.gui.MainGUI;
+
+import java.awt.*;
+import java.util.Arrays;
 
 public class Main {
 
@@ -17,6 +20,12 @@ public class Main {
         options.addOption("help", false, "shows help message");
         options.addOption("logsdir", true, "specifies where to save the logs");
         options.addOption("config", true, "specifies the path to the config");
+
+        // add nogui option if Desktop is not supported
+        if (!Desktop.isDesktopSupported()) {
+            args = Arrays.copyOfRange(args, 0, args.length + 1);
+            args[args.length - 1] = "nogui";
+        }
 
         CommandLineParser optionsParser = new DefaultParser();
         try {
@@ -28,13 +37,14 @@ public class Main {
             }
 
             if (!cmd.hasOption("nogui")) {
+                String[] finalArgs = args;
                 new Thread(() -> {
                     try {
                         try { Thread.sleep(200); } catch (InterruptedException ignore) { }
-                        new MainGUI(args);
+                        new MainGUI(finalArgs);
                         System.exit(0);
                     } catch (NoClassDefFoundError ex) {
-                        new JavaFXNotWorkingGUI().show();
+                        Dialogs.showJavaFXNotWorking();
                     }
                 }, "GUIThread").start();
             }

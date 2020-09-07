@@ -56,8 +56,8 @@ public class Player implements Listener {
         if(getLevels() >= 0 && getLevels() < event.getLevel()) {
             if(FishingBot.getInstance().getConfig().getAnnounceTypeConsole() != AnnounceType.NONE)
                 FishingBot.getLog().info("Achieved level " + event.getLevel());
-            if(!FishingBot.getInstance().getConfig().getAnnounceLvlUp().equalsIgnoreCase("false"))
-                FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(FishingBot.getInstance().getConfig().getAnnounceLvlUp().replace("%lvl%", String.valueOf(event.getLevel()))));
+            if(FishingBot.getInstance().getConfig().isAnnounceLvlUp() && !FishingBot.getInstance().getConfig().getAnnounceLvlUpText().equalsIgnoreCase("false"))
+                FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(FishingBot.getInstance().getConfig().getAnnounceLvlUpText().replace("%lvl%", String.valueOf(event.getLevel()))));
         }
 
         this.levels = event.getLevel();

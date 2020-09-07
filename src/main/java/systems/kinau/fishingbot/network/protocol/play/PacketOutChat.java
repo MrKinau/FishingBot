@@ -22,9 +22,12 @@ public class PacketOutChat extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(getMessage(), out);
-        if(!FishingBot.getInstance().getConfig().getWebHook().equalsIgnoreCase("false"))
+        if (FishingBot.getInstance().getConfig().isWebHookEnabled()
+                && !FishingBot.getInstance().getConfig().getWebHook().equalsIgnoreCase("false")
+                && !FishingBot.getInstance().getConfig().getWebHook().equals("YOURWEBHOOK")) {
             FishingBot.getInstance().getDiscord().dispatchMessage("`" + getMessage() + "`",
                     new DiscordDetails("FishingBot", "https://vignette.wikia.nocookie.net/mcmmo/images/2/2f/FishingRod.png"));
+        }
 
     }
 

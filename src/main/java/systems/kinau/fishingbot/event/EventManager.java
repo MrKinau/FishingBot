@@ -22,7 +22,7 @@ public class EventManager {
 
     public void registerListener(Listener listener) {
         List<Method> annotatedMethods = new ArrayList<>();
-        List<Class<? extends Event>> paramters = new ArrayList<>();
+        List<Class<? extends Event>> parameters = new ArrayList<>();
         Method[] methods = listener.getClass().getDeclaredMethods();
         for (Method method : methods) {
             if (method.isAnnotationPresent(EventHandler.class)) {
@@ -31,23 +31,26 @@ public class EventManager {
                 if(!Event.class.isAssignableFrom(method.getParameterTypes()[0]))
                     throw new EventException("An @EventHandler annotated method should have an Event as parameter");
                 annotatedMethods.add(method);
-                paramters.add((Class<? extends Event>) method.getParameterTypes()[0]);
+                parameters.add((Class<? extends Event>) method.getParameterTypes()[0]);
             }
         }
 
         for(int i = 0; i < annotatedMethods.size(); i++) {
-            if(registeredListener.containsKey(paramters.get(i))) {
-                List<Method> oldMethods = registeredListener.get(paramters.get(i));
-                oldMethods.add(annotatedMethods.get(i));
-                registeredListener.put(paramters.get(i), oldMethods);
+            if(registeredListener.containsKey(parameters.get(i))) {
+                List<Method> oldMethods = registeredListener.get(parameters.get(i));
+                if (!oldMethods.contains(annotatedMethods.get(i))) {
+                    oldMethods.add(annotatedMethods.get(i));
+                    registeredListener.put(parameters.get(i), oldMethods);
+                }
             } else {
                 List<Method> methodList = new ArrayList<>();
                 methodList.add(annotatedMethods.get(i));
-                registeredListener.put(paramters.get(i), methodList);
+                registeredListener.put(parameters.get(i), methodList);
             }
         }
 
-        classToInstanceMapping.put(listener.getClass(), listener);
+        if (!classToInstanceMapping.containsKey(listener.getClass()))
+            classToInstanceMapping.put(listener.getClass(), listener);
     }
 
     public void unregisterListener(Listener listener) {

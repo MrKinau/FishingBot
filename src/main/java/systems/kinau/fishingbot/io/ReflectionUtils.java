@@ -66,7 +66,6 @@ public class ReflectionUtils {
     public static Object getField(Field field, Object obj) {
         try {
             field.setAccessible(true);
-
             return field.get(obj);
         } catch (IllegalAccessException e) {
             e.printStackTrace();

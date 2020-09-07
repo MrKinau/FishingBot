@@ -15,6 +15,7 @@ import systems.kinau.fishingbot.command.CommandRegistry;
 import systems.kinau.fishingbot.command.commands.*;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
+import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
@@ -24,7 +25,6 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.realms.RealmsAPI;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
@@ -88,11 +88,6 @@ public class FishingBot {
             }
         }
 
-        if (cmdLine.hasOption("config"))
-            this.config = new SettingsConfig(cmdLine.getOptionValue("config"));
-        else
-            this.config = new SettingsConfig("config.properties");
-
         // initialize Logger
         log.setLevel(Level.ALL);
         ConsoleHandler ch;
@@ -100,6 +95,13 @@ public class FishingBot {
         log.setUseParentHandlers(false);
         LogFormatter formatter = new LogFormatter();
         ch.setFormatter(formatter);
+
+        // read config
+
+        if (cmdLine.hasOption("config"))
+            this.config = new SettingsConfig(cmdLine.getOptionValue("config"));
+        else
+            this.config = new SettingsConfig("config.json");
 
 
         // set logger file handler
@@ -116,6 +118,14 @@ public class FishingBot {
 
         // log config location
         FishingBot.getLog().info("Loaded config from: " + new File(getConfig().getPath()).getAbsolutePath());
+
+        // error if credentials are default credentials
+        if (FishingBot.getInstance().getConfig().getUserName().equals("my-minecraft@login.com")) {
+            FishingBot.getLog().warning("Credentials not set. Please set your credentials in the config.json.");
+            if (!cmdLine.hasOption("nogui"))
+                Dialogs.showCredentialsNotSet();
+            System.exit(0);
+        }
 
         // authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
@@ -136,7 +146,7 @@ public class FishingBot {
                 possibleWorldsText.forEach(getLog()::info);
                 FishingBot.getLog().info("Shutting down, because realm-id is not set...");
                 if (!cmdLine.hasOption("nogui"))
-                    JOptionPane.showConfirmDialog(new JFrame(), String.join("\n", possibleWorldsText), "FishingBot", JOptionPane.DEFAULT_OPTION);
+                    Dialogs.showRealmsWorlds(possibleWorldsText);
                 System.exit(0);
             }
             if (getConfig().isRealmAcceptTos())
@@ -146,7 +156,7 @@ public class FishingBot {
                 FishingBot.getLog().severe("If you want to use realms you have to accept the tos in the config.properties");
                 FishingBot.getLog().severe("*****************************************************************************");
                 if (!cmdLine.hasOption("nogui"))
-                    JOptionPane.showConfirmDialog(new JFrame(), "If you want to use realms you have to accept the tos in the config.properties", "FishingBot", JOptionPane.DEFAULT_OPTION);
+                    Dialogs.showRealmsAcceptToS();
                 System.exit(0);
             }
 
@@ -174,8 +184,8 @@ public class FishingBot {
         ServerPinger sp = new ServerPinger(ip, port);
         sp.ping();
 
-        //Activate Discord webHook
-        if(!getConfig().getWebHook().equalsIgnoreCase("false"))
+        //Activate Discord web hook
+        if(getConfig().isWebHookEnabled() && !getConfig().getWebHook().equalsIgnoreCase("false") && !getConfig().getWebHook().equals("YOURWEBHOOK"))
             this.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
     }
 

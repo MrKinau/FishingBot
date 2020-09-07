@@ -67,3 +67,4 @@ target/
 config.properties
 run*/
 logs/
+config.json
