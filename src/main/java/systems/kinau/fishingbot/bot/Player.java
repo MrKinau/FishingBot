@@ -19,6 +19,8 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutClickWindow;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutClientStatus;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutTeleportConfirm;
 
+import java.util.UUID;
+
 public class Player implements Listener {
 
     @Getter @Setter private double x;
@@ -33,7 +35,10 @@ public class Player implements Listener {
     @Getter @Setter private int heldSlot;
     @Getter @Setter private ByteArrayDataOutput slotData;
 
+    @Getter @Setter private UUID uuid;
+
     @Getter @Setter private int entityID = -1;
+    @Getter @Setter private int lastPing = 500;
 
     public Player() {
         FishingBot.getInstance().getEventManager().registerListener(this);
@@ -88,6 +93,11 @@ public class Player implements Listener {
     public void onUpdateHealth(UpdateHealthEvent event) {
         if (event.getHealth() <= 0)
             respawn();
+    }
+
+    @EventHandler
+    public void onPingUpdate(PingChangeEvent event) {
+        setLastPing(event.getPing());
     }
 
     public void respawn() {

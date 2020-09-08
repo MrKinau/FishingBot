@@ -28,23 +28,30 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+// TODO: Change fishing ids based on current version
 public class FishingModule extends Module implements Runnable, Listener {
 
+    private static final List<Integer> FISH_IDS_1_16 = Arrays.asList(687, 688, 689, 690);
     private static final List<Integer> FISH_IDS_1_14 = Arrays.asList(625, 626, 627, 628);
     private static final List<Integer> FISH_IDS_1_8 = Collections.singletonList(349);
+    private static final List<Integer> ENCHANTED_BOOKS_IDS = Arrays.asList(779, 780, 847, 848);
 
     @Getter private List<Item> possibleCaughtItems = new CopyOnWriteArrayList<>();
 
     @Getter @Setter private int currentBobber = -1;
     @Getter @Setter private short lastY = -1;
     @Getter @Setter private boolean trackingNextBobberId = false;
-    @Getter @Setter private boolean trackingNextEntityMeta = false;
+    @Getter private boolean trackingNextEntityMeta = false;
     @Getter @Setter long lastFish = System.currentTimeMillis();
 
     @Getter @Setter private int heldSlot;
 
     @Getter private Thread stuckingFix;
     @Getter private boolean joined;
+
+    public void setTrackingNextEntityMeta(boolean trackingNextEntityMeta) {
+        this.trackingNextEntityMeta = trackingNextEntityMeta;
+    }
 
     @Override
     public void onEnable() {
@@ -79,7 +86,8 @@ public class FishingModule extends Module implements Runnable, Listener {
         FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
         new Thread(() -> {
             try {
-                Thread.sleep(200);
+                int timeToWait = FishingBot.getInstance().getPlayer().getLastPing() + 200;
+                Thread.sleep(timeToWait);
                 setTrackingNextEntityMeta(false);
                 getCaughtItem();
                 Thread.sleep(200);
@@ -155,7 +163,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
         else if (noisiness == AnnounceType.ALL)
             announce.accept(stringify(item));
-        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId()))
+        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId())&& !FISH_IDS_1_16.contains(item.getItemId()))
             announce.accept(stringify(item));
 
         if (item.getEnchantments().isEmpty())
@@ -163,9 +171,9 @@ public class FishingModule extends Module implements Runnable, Listener {
 
         if (noisiness == AnnounceType.ONLY_ENCHANTED)
             announce.accept(stringify(item));
-        else if (noisiness == AnnounceType.ONLY_BOOKS && item.getItemId() == 779)
+        else if (noisiness == AnnounceType.ONLY_BOOKS && ENCHANTED_BOOKS_IDS.contains(item.getItemId()))
             announce.accept(stringify(item));
-        if (noisiness == AnnounceType.ONLY_BOOKS && item.getItemId() != 779)
+        if (noisiness == AnnounceType.ONLY_BOOKS && !ENCHANTED_BOOKS_IDS.contains(item.getItemId()))
             return;
 
         if (!item.getEnchantments().isEmpty()) {
@@ -245,7 +253,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     @EventHandler
     public void onEntityVelocity(EntityVelocityEvent event) {
         addPossibleMotion(event.getEid(), event.getX(), event.getY(), event.getZ());
-        if(getCurrentBobber() != event.getEid())
+        if (getCurrentBobber() != event.getEid())
             return;
 
         switch (FishingBot.getInstance().getServerProtocol()) {
@@ -272,9 +280,9 @@ public class FishingModule extends Module implements Runnable, Listener {
             case ProtocolConstants.MINECRAFT_1_14_3:
             case ProtocolConstants.MINECRAFT_1_14_4:
             default: {
-                if(Math.abs(event.getY()) > 350) {
+                if (Math.abs(event.getY()) > 350) {
                     FishingBot.getInstance().getFishingModule().fish();
-                } else if(lastY == 0 && event.getY() == 0) {    //Sometimes Minecraft does not push the bobber down, but this workaround works good
+                } else if (lastY == 0 && event.getY() == 0) {    //Sometimes Minecraft does not push the bobber down, but this workaround works good
                     FishingBot.getInstance().getFishingModule().fish();
                 }
                 break;
@@ -391,7 +399,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
-            if(System.currentTimeMillis() - getLastFish() > 60000) {
+            if (System.currentTimeMillis() - getLastFish() > 60000) {
                 setLastFish(System.currentTimeMillis());
                 setCurrentBobber(-1);
                 setTrackingNextEntityMeta(false);

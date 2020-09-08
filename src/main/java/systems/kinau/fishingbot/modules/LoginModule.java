@@ -93,6 +93,7 @@ public class LoginModule extends Module implements Listener {
         FishingBot.getLog().info("Name: " + event.getUserName());
         FishingBot.getLog().info("UUID: " + event.getUuid());
         FishingBot.getInstance().getNet().setState(State.PLAY);
+        FishingBot.getInstance().getPlayer().setUuid(event.getUuid());
     }
 
     private String sendSessionRequest(String user, String session, String serverid) {

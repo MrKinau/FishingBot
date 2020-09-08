@@ -24,7 +24,7 @@ public class Main {
         // add nogui option if Desktop is not supported
         if (!Desktop.isDesktopSupported()) {
             args = Arrays.copyOfRange(args, 0, args.length + 1);
-            args[args.length - 1] = "nogui";
+            args[args.length - 1] = "-nogui";
         }
 
         CommandLineParser optionsParser = new DefaultParser();
