@@ -11,7 +11,7 @@
 
     <groupId>systems.kinau</groupId>
     <artifactId>FishingBot</artifactId>
-    <version>2.7.6</version>
+    <version>2.7.7</version>
     <name>FishingBot</name>
     <description>An AFK fishing bot for minecraft</description>
 
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>club.minnced</groupId>
             <artifactId>discord-webhooks</artifactId>
-            <version>LATEST</version>
+            <version>0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>

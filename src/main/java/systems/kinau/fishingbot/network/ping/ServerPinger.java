@@ -34,7 +34,7 @@ public class ServerPinger {
     public void ping() {
         FishingBot.getInstance().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()));
         if (serverName == null || serverName.trim().isEmpty()) {
-            FishingBot.getLog().severe("Invalid server host given. Please change the server-ip in your config.properties");
+            FishingBot.getLog().severe("Invalid server host given. Please change the server.ip in your config.json");
             System.exit(1);
         }
 
@@ -71,10 +71,10 @@ public class ServerPinger {
 //            if (id != 2) {
             String pong = Packet.readString(in);
             JSONObject root = (JSONObject) new JSONParser().parse(pong);
-            int protocolId = (int) ((JSONObject)root.get("version")).get("protocol");
-            int currPlayers = (int) ((JSONObject)root.get("players")).get("online");
+            long protocolId = (long) ((JSONObject)root.get("version")).get("protocol");
+            long currPlayers = (long) ((JSONObject)root.get("players")).get("online");
 
-            FishingBot.getInstance().setServerProtocol(protocolId);
+            FishingBot.getInstance().setServerProtocol(Long.valueOf(protocolId).intValue());
             String description = "Unknown";
             try {
                 try {
@@ -90,7 +90,7 @@ public class ServerPinger {
                 if (description.trim().isEmpty())
                     description = "Unknown";
             }
-            FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(protocolId) + ", online: " + currPlayers);
+            FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()) + " (" + protocolId + "), online: " + currPlayers);
             if (currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
                 FishingBot.getLog().warning("Max players threshold already reached. Stopping");
                 FishingBot.getInstance().setWontConnect(true);
@@ -104,6 +104,7 @@ public class ServerPinger {
         } catch (UnknownHostException e) {
             FishingBot.getLog().severe("Unknown host: " + serverName);
         } catch (Exception e) {
+            e.printStackTrace();
             FishingBot.getLog().severe("Could not ping: " + serverName);
             FishingBot.getLog().severe("Automatic version detection may not work. Please set default-protocol in config.properties");
         }
