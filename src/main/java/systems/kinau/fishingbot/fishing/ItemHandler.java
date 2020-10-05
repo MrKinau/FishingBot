@@ -9,9 +9,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.utils.MaterialMc18;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,7 +82,13 @@ public class ItemHandler {
     }
 
     public static Map<Integer, String> getItemsMap(int protocol) {
-        if(protocol == ProtocolConstants.MINECRAFT_1_13)
+        if (protocol < ProtocolConstants.MINECRAFT_1_13) {
+            Map<Integer, String> itemsMap = new HashMap<>();
+            Arrays.stream(MaterialMc18.values()).forEach(materialMc18 -> {
+                itemsMap.put(materialMc18.getId(), materialMc18.name());
+            });
+            return itemsMap;
+        } else if (protocol == ProtocolConstants.MINECRAFT_1_13)
             return itemsMap_1_13;
         else if(protocol >= ProtocolConstants.MINECRAFT_1_13_1 && protocol <= ProtocolConstants.MINECRAFT_1_13_2)
             return itemsMap_1_13_1;

@@ -5,7 +5,6 @@
 
 package systems.kinau.fishingbot.bot;
 
-import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
@@ -14,10 +13,7 @@ import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutClickWindow;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutClientStatus;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutTeleportConfirm;
+import systems.kinau.fishingbot.network.protocol.play.*;
 
 import java.util.UUID;
 
@@ -33,7 +29,8 @@ public class Player implements Listener {
     @Getter @Setter private int levels;
 
     @Getter @Setter private int heldSlot;
-    @Getter @Setter private ByteArrayDataOutput slotData;
+    @Getter @Setter private Slot heldItem;
+    @Getter @Setter private Inventory inventory;
 
     @Getter @Setter private UUID uuid;
 
@@ -51,6 +48,7 @@ public class Player implements Listener {
         this.z = event.getZ();
         this.yaw = event.getYaw();
         this.pitch = event.getPitch();
+        this.inventory = new Inventory();
         if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9)
             FishingBot.getInstance().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
 
@@ -78,9 +76,12 @@ public class Player implements Listener {
     public void onUpdateSlot(UpdateSlotEvent event) {
         if(event.getWindowId() != 0)
             return;
-        if(event.getSlotId() != getHeldSlot())
-            return;
-        this.slotData = event.getSlotData();
+
+        Slot slot = event.getSlot();
+        getInventory().setItem(event.getSlotId(), slot);
+
+        if(event.getSlotId() == getHeldSlot())
+            this.heldItem = slot;
     }
 
     @EventHandler
@@ -119,5 +120,20 @@ public class Player implements Listener {
                         /* empty slot */ new Slot(false, -1, (byte) -1, (short) -1, new byte[]{0})
                 )
         );
+    }
+
+    public void swapToHotBar(int slotId, int hotBarButton) {
+        FishingBot.getInstance().getNet().sendPacket(
+                new PacketOutClickWindow(
+                        /* player inventory */ 0,
+                        /* the clicked slot */ (short) slotId,
+                        /* use hotBar Button */ (byte) hotBarButton,
+                        /* action count starting at 1 */ (short) 1,
+                        /* hotBar button mode */ 2,
+                        /* slot */ getInventory().getContent().get(slotId)
+                )
+        );
+        try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
+        FishingBot.getInstance().getNet().sendPacket(new PacketOutCloseInventory(0));
     }
 }

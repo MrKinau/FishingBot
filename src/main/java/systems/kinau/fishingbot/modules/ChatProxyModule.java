@@ -27,10 +27,10 @@ public class ChatProxyModule extends Module implements Listener {
                 String line = scanner.nextLine();
                 if (line.startsWith("/")) {
                     boolean executed = FishingBot.getInstance().getCommandRegistry().dispatchCommand(line, CommandExecutor.CONSOLE);
-                    if (!executed)
-                        FishingBot.getLog().info("This command does not exist. Try /help for a list of commands.");
-                } else
-                    FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(line));
+                    if (executed)
+                        continue;
+                }
+                FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(line));
             }
         });
         chatThread.start();

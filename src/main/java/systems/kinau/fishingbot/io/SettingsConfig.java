@@ -19,6 +19,7 @@ public class SettingsConfig implements Config {
     @Property(key = "server.realm-accept-tos") private boolean realmAcceptTos = false;
     @Property(key = "server.online-mode") private boolean onlineMode = true;
     @Property(key = "server.default-protocol") private String defaultProtocol = ProtocolConstants.getVersionString(ProtocolConstants.MINECRAFT_1_8);
+    @Property(key = "server.spoof-forge") private boolean spoofForge = false;
 
     @Property(key = "auto.auto-reconnect") private boolean autoReconnect = true;
     @Property(key = "auto.auto-reconnect-time") private int autoReconnectTime = 5;
@@ -43,6 +44,7 @@ public class SettingsConfig implements Config {
     @Property(key = "discord.web-hook") private String webHook = "YOURWEBHOOK";
 
     @Property(key = "misc.stucking-fix-enabled") private boolean stuckingFixEnabled = true;
+    @Property(key = "misc.prevent-rod-breaking") private boolean preventRodBreaking = true;
     @Property(key = "misc.wiki") private String readme = "https://github.com/MrKinau/FishingBot/wiki/config";
 
     @Getter private final String path;

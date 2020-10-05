@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.modules;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
@@ -19,12 +20,13 @@ import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
+import systems.kinau.fishingbot.network.utils.Enchantment;
 import systems.kinau.fishingbot.network.utils.Item;
+import systems.kinau.fishingbot.network.utils.ItemUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
@@ -41,10 +43,11 @@ public class FishingModule extends Module implements Runnable, Listener {
     @Getter @Setter private int currentBobber = -1;
     @Getter @Setter private short lastY = -1;
     @Getter @Setter private boolean trackingNextBobberId = false;
+    @Getter @Setter private boolean noRodAvailable = false;
     @Getter private boolean trackingNextEntityMeta = false;
     @Getter @Setter long lastFish = System.currentTimeMillis();
 
-    @Getter @Setter private int heldSlot;
+    @Getter @Setter private int currentFishingRodValue;
 
     @Getter private Thread stuckingFix;
     @Getter private boolean joined;
@@ -70,6 +73,9 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     public void stuck() {
+        if (isNoRodAvailable())
+            return;
+        setLastFish(System.currentTimeMillis());
         setTrackingNextBobberId(true);
         try {
             Thread.sleep(200);
@@ -92,7 +98,11 @@ public class FishingModule extends Module implements Runnable, Listener {
                 getCaughtItem();
                 Thread.sleep(200);
                 setTrackingNextBobberId(true);
-                try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+                Thread.sleep(200);
+                if (FishingBot.getInstance().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(FishingBot.getInstance().getPlayer().getHeldItem()) >= 63) {
+                    noRod();
+                    return;
+                }
                 FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -177,14 +187,12 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
 
         if (!item.getEnchantments().isEmpty()) {
-            for (Map<String, Short> enchantment : item.getEnchantments()) {
-                enchantment.keySet().forEach(s -> {
-                    String asText = "-> "
-                            + s.replace("minecraft:", "").toUpperCase()
-                            + " "
-                            + getRomanLevel(enchantment.get(s));
-                    announceEnchants.accept(asText);
-                });
+            for (Enchantment enchantment : item.getEnchantments()) {
+                String asText = "-> "
+                        + enchantment.getEnchantmentType().getName().toUpperCase()
+                        + " "
+                        + getRomanLevel(enchantment.getLevel());
+                announceEnchants.accept(asText);
             }
         }
     }
@@ -220,16 +228,31 @@ public class FishingModule extends Module implements Runnable, Listener {
         return Math.abs(item.getMotX()) + Math.abs(item.getMotY()) + Math.abs(item.getMotZ());
     }
 
-    private void noFishingRod() {
-        FishingBot.getLog().severe("No fishing rod equipped. Retrying later!");
+    private void noRod() {
+        boolean swapped = swapWithBestFishingRod();
+        if (!swapped) {
+            this.noRodAvailable = true;
+            FishingBot.getLog().warning("No rod available");
+        }
     }
 
     private void reFish(int id) {
         setTrackingNextBobberId(false);
         new Thread(() -> {
-            try { Thread.sleep(2500); } catch (InterruptedException e) { }     //Prevent Velocity grabbed from flying hook
+            try { Thread.sleep(2500); } catch (InterruptedException ignored) { }     //Prevent Velocity grabbed from flying hook
             setCurrentBobber(id);
         }).start();
+    }
+
+    private boolean swapWithBestFishingRod() {
+        int bestSlot = ItemUtils.getBestFishingRod(FishingBot.getInstance().getPlayer().getInventory());
+        if (bestSlot < 0)
+            return false;
+        if (bestSlot == FishingBot.getInstance().getPlayer().getHeldSlot())
+            return false;
+        int newSlot = FishingBot.getInstance().getPlayer().getHeldSlot() - 36;
+        FishingBot.getInstance().getPlayer().swapToHotBar(bestSlot, newSlot);
+        return true;
     }
 
     @EventHandler
@@ -244,8 +267,12 @@ public class FishingModule extends Module implements Runnable, Listener {
                 e.printStackTrace();
             }
             setTrackingNextBobberId(true);
-            FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
-            FishingBot.getLog().info("Starting fishing!");
+            if (!ItemUtils.isFishingRod(FishingBot.getInstance().getPlayer().getHeldItem()))
+                noRod();
+            else {
+                FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
+                FishingBot.getLog().info("Starting fishing!");
+            }
         }).start();
     }
 
@@ -292,42 +319,35 @@ public class FishingModule extends Module implements Runnable, Listener {
         lastY = event.getY();
     }
 
-    //TODO: Rewrite or delete including packets
     @EventHandler
     public void onUpdateSlot(UpdateSlotEvent event) {
-//        if(event.getWindowId() != 0)
-//            return;
-//        if(event.getSlotId() != FishingBot.getInstance().getPlayer().getHeldSlot())
-//            return;
-//        ByteArrayDataInputWrapper testFishRod = new ByteArrayDataInputWrapper(event.getSlotData().toByteArray().clone());
-//        int protocolId = FishingBot.getInstance().getServerProtocol();
-//        if(protocolId < ProtocolConstants.MINECRAFT_1_13) {
-//            short itemId = testFishRod.readShort();
-//            if (itemId != 346)  //Normal ID
-//                noFishingRod();
-//        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13) {
-//            short itemId = testFishRod.readShort();
-//            if (itemId != 563)  //ID in 1.13.0
-//                noFishingRod();
-//        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_1) {
-//            short itemId = testFishRod.readShort();
-//            if (itemId != 568)  //ID in 1.13.1
-//                noFishingRod();
-//        } else if(protocolId == ProtocolConstants.MINECRAFT_1_13_2) {
-//            boolean present = testFishRod.readBoolean();
-//            if(!present)
-//                noFishingRod();
-//            int itemId = Packet.readVarInt(testFishRod);
-//            if (itemId != 568) //ID in 1.13.2
-//                noFishingRod();
-//        } else {
-//            boolean present = testFishRod.readBoolean();
-//            if(!present)
-//                noFishingRod();
-//            int itemId = Packet.readVarInt(testFishRod);
-//            if (itemId != 622) //ID in 1.14
-//                noFishingRod();
-//        }
+        if(event.getWindowId() != 0)
+            return;
+        Slot slot = event.getSlot();
+
+        new Thread(() -> {
+            try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+            // check current fishing rod value and swap if a better one is in inventory
+            if (ItemUtils.isFishingRod(slot))
+                swapWithBestFishingRod();
+
+            if (FishingBot.getInstance().getPlayer().getHeldSlot() == event.getSlotId()) {
+                if (isNoRodAvailable() && ItemUtils.isFishingRod(slot)) {
+                    if (FishingBot.getInstance().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(slot) >= 63)
+                        return;
+                    setLastFish(System.currentTimeMillis());
+                    setNoRodAvailable(false);
+                    setCurrentBobber(-1);
+                    setTrackingNextEntityMeta(false);
+                    setTrackingNextBobberId(true);
+                    FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
+                    FishingBot.getLog().info("New rod available, restarting fishing");
+                } else if (!isNoRodAvailable() && !ItemUtils.isFishingRod(slot)) {
+                    noRod();
+                }
+                this.currentFishingRodValue = ItemUtils.getFishingRodValue(slot);
+            }
+        }).start();
     }
 
     @EventHandler
@@ -335,7 +355,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         if(!FishingBot.getInstance().getFishingModule().isTrackingNextBobberId())
             return;
 
-        //TODO: Refactor just make the objecttype with ifs
+        //TODO: Refactor just make the objecttype with if-constructs
         switch (FishingBot.getInstance().getServerProtocol()) {
             case ProtocolConstants.MINECRAFT_1_8:
             case ProtocolConstants.MINECRAFT_1_13_2:
@@ -402,6 +422,13 @@ public class FishingModule extends Module implements Runnable, Listener {
         while (!Thread.currentThread().isInterrupted()) {
             if (System.currentTimeMillis() - getLastFish() > 60000) {
                 setLastFish(System.currentTimeMillis());
+                if (noRodAvailable)
+                    continue;
+                Slot curr = FishingBot.getInstance().getPlayer().getHeldItem();
+                if (curr != null && ItemUtils.isFishingRod(curr) && ItemUtils.getDamage(curr) >= 63) {
+                    noRod();
+                    continue;
+                }
                 setCurrentBobber(-1);
                 setTrackingNextEntityMeta(false);
                 setTrackingNextBobberId(true);

@@ -153,7 +153,7 @@ public class FishingBot {
                 realmsAPI.agreeTos();
             else {
                 FishingBot.getLog().severe("*****************************************************************************");
-                FishingBot.getLog().severe("If you want to use realms you have to accept the tos in the config.properties");
+                FishingBot.getLog().severe("If you want to use realms you have to accept the tos in the config.json");
                 FishingBot.getLog().severe("*****************************************************************************");
                 if (!cmdLine.hasOption("nogui"))
                     Dialogs.showRealmsAcceptToS();
@@ -249,7 +249,7 @@ public class FishingBot {
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();
                 new ChatProxyModule().enable();
-                if(getConfig().isStartTextEnabled())
+                if (getConfig().isStartTextEnabled())
                     new ChatCommandModule().enable();
                 this.clientModule = new ClientDefaultsModule();
                 getClientModule().enable();
@@ -287,9 +287,14 @@ public class FishingBot {
                     this.getClientModule().disable();
                 if (getFishingModule() != null)
                     this.getFishingModule().disable();
+                if (getPlayer() != null)
+                    getEventManager().unregisterListener(getPlayer());
+                getEventManager().getRegisteredListener().clear();
+                getEventManager().getClassToInstanceMapping().clear();
                 this.socket = null;
                 this.fishingModule = null;
                 this.net = null;
+                this.player = null;
             }
             if (getConfig().isAutoReconnect()) {
                 getLog().info("FishingBot restarts in " + getConfig().getAutoReconnectTime() + " seconds...");

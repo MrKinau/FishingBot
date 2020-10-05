@@ -1,15 +1,20 @@
 package systems.kinau.fishingbot.gui;
 
+import javafx.scene.control.Alert;
+import systems.kinau.fishingbot.FishingBot;
+
 import javax.swing.*;
 import java.util.List;
 
 public class Dialogs {
 
     public static void showCredentialsNotSet() {
-        JOptionPane.showConfirmDialog(new JFrame(), "Your credentials are not set yet." +
-                        " Please set them in the config.json\n" +
-                        "You can also use it in offline-mode. Set the online-mode to false and the account.mail to your desired username.",
-                "FishingBot", JOptionPane.DEFAULT_OPTION);
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(FishingBot.PREFIX);
+        alert.setHeaderText("Your credentials are not set yet");
+        alert.setContentText("Please set your credentials in the config.json\n" +
+                "You can also use this bot in offline-mode. Set the online-mode to false and the account.mail to your desired username.");
+        alert.showAndWait();
     }
 
     public static void showJavaFXNotWorking() {
@@ -20,12 +25,17 @@ public class Dialogs {
     }
 
     public static void showRealmsWorlds(List<String> possibleWorldsText) {
-        JOptionPane.showConfirmDialog(new JFrame(), String.join("\n", possibleWorldsText), "FishingBot", JOptionPane.DEFAULT_OPTION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(FishingBot.PREFIX);
+        alert.setContentText(String.join("\n", possibleWorldsText));
+        alert.showAndWait();
     }
 
     public static void showRealmsAcceptToS() {
-        JOptionPane.showConfirmDialog(new JFrame(),
-                "If you want to use realms you have to accept the tos in the config.properties",
-                "FishingBot", JOptionPane.DEFAULT_OPTION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(FishingBot.PREFIX);
+        alert.setHeaderText("Accept ToS");
+        alert.setContentText("If you want to use realms you have to accept the tos in the config.json");
+        alert.showAndWait();
     }
 }

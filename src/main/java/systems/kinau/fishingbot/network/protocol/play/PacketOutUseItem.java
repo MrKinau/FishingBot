@@ -25,7 +25,7 @@ public class PacketOutUseItem extends Packet {
             case ProtocolConstants.MINECRAFT_1_8: {
                 out.writeLong(-1);      //Position
                 out.writeByte(255);     //Face
-                out.write(FishingBot.getInstance().getPlayer().getSlotData().toByteArray());  //Slot
+                Packet.writeSlot(FishingBot.getInstance().getPlayer().getHeldItem(), out);  //Slot
                 out.writeByte(0);       //Cursor X
                 out.writeByte(0);       //Cursor Y
                 out.writeByte(0);       //Cursor Z

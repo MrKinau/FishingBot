@@ -12,10 +12,7 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutClientSettings;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutKeepAlive;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
+import systems.kinau.fishingbot.network.protocol.play.*;
 
 import java.util.Arrays;
 
@@ -83,6 +80,12 @@ public class ClientDefaultsModule extends Module implements Listener {
             FishingBot.getInstance().setWontConnect(true);
             FishingBot.getInstance().setRunning(false);
         }
+    }
+
+    @EventHandler
+    public void onConfirmTransaction(ConfirmTransactionEvent event) {
+        if (!event.isAccepted())
+            FishingBot.getInstance().getNet().sendPacket(new PacketOutConfirmTransaction(event.getWindowId(), event.getAction(), true));
     }
 
     private void startPositionUpdate(NetworkHandler networkHandler) {

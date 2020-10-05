@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GUIController implements Listener {
@@ -85,10 +84,10 @@ public class GUIController implements Listener {
     private void runCommand(String text) {
         if (text.startsWith("/")) {
             boolean executed = FishingBot.getInstance().getCommandRegistry().dispatchCommand(text, CommandExecutor.CONSOLE);
-            if (!executed)
-                FishingBot.getLog().info("This command does not exist. Try /help for a list of commands.");
-        } else
-            FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(text));
+            if (executed)
+                return;
+        }
+        FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(text));
     }
 
     private void openFile(String fileUrl) {
@@ -160,23 +159,21 @@ public class GUIController implements Listener {
         table.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("count"));
     }
 
-    private void updateEnchantments(TableView<Enchantment> table, List<Map<String, Short>> enchantments) {
+    private void updateEnchantments(TableView<Enchantment> table, List<systems.kinau.fishingbot.network.utils.Enchantment> enchantments) {
         enchantments.forEach(enchantment -> {
             AtomicBoolean exists = new AtomicBoolean(false);
             table.getItems().forEach(item -> {
-                enchantment.keySet().forEach(enchantmentName -> {
-                    if (item.getName().equalsIgnoreCase(enchantmentName) && item.getLevel() == enchantment.get(enchantmentName)) {
-                        item.setCount(item.getCount() + 1);
-                        exists.set(true);
-                        Platform.runLater(() -> {
-                            table.getColumns().get(2).setVisible(false);
-                            table.getColumns().get(2).setVisible(true);
-                        });
-                    }
-                });
+                if (item.getName().equalsIgnoreCase(enchantment.getEnchantmentType().getName()) && item.getLevel() == enchantment.getLevel()) {
+                    item.setCount(item.getCount() + 1);
+                    exists.set(true);
+                    Platform.runLater(() -> {
+                        table.getColumns().get(2).setVisible(false);
+                        table.getColumns().get(2).setVisible(true);
+                    });
+                }
             });
             if (!exists.get())
-                enchantment.keySet().forEach(s -> table.getItems().add(new Enchantment(s, enchantment.get(s), 1)));
+                table.getItems().add(new Enchantment(enchantment.getEnchantmentType().getName(), enchantment.getLevel(), 1));
         });
     }
 }

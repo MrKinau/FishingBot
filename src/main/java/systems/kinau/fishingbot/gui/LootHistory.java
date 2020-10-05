@@ -1,17 +1,17 @@
 package systems.kinau.fishingbot.gui;
 
 import lombok.Getter;
+import systems.kinau.fishingbot.network.utils.Enchantment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class LootHistory {
 
     @Getter private List<LootItem> items = new ArrayList<>();
 
-    public LootItem registerItem(String name, List<Map<String, Short>> enchantments) {
+    public LootItem registerItem(String name, List<Enchantment> enchantments) {
         Optional<LootItem> optItem = items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findAny();
         if (optItem.isPresent()) {
             optItem.get().setCount(optItem.get().getCount() + 1);

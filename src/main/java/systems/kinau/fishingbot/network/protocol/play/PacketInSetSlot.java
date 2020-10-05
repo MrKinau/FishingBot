@@ -6,9 +6,9 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -18,7 +18,7 @@ public class PacketInSetSlot extends Packet {
 
     @Getter private int windowId;
     @Getter private short slotId;
-    @Getter private ByteArrayDataOutput slotData;
+    @Getter private Slot slot;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) { }
@@ -27,13 +27,8 @@ public class PacketInSetSlot extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.windowId = in.readByte();
         this.slotId = in.readShort();
+        this.slot = readSlot(in);
 
-        byte[] bytes = new byte[in.getAvailable()];
-        in.readBytes(bytes);
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.write(bytes.clone());
-        this.slotData = out;
-
-        FishingBot.getInstance().getEventManager().callEvent(new UpdateSlotEvent(windowId, slotId, slotData));
+        FishingBot.getInstance().getEventManager().callEvent(new UpdateSlotEvent(windowId, slotId, slot));
     }
 }

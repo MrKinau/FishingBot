@@ -5,30 +5,18 @@
 
 package systems.kinau.fishingbot.network.protocol.play;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.Tag;
-import com.flowpowered.nbt.TagType;
-import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.Enchantments_1_8;
-import systems.kinau.fishingbot.network.utils.Item;
-import systems.kinau.fishingbot.network.utils.MaterialMc18;
+import systems.kinau.fishingbot.network.utils.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 //TODO: Add as event, yes this code is ugly...
 @NoArgsConstructor
@@ -130,14 +118,10 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 6: {
-                    boolean present = in.readBoolean();
-                    if (!present)
-                        break;
-                    int itemID = readVarInt(in);
-                    byte count = in.readByte();
-                    List<Map<String, Short>> enchantments = readNBT(in);
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    Slot slot = readSlot(in);
+                    List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
+                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
+                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
                     return;
                 }
                 case 7: {
@@ -256,13 +240,12 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 6: {
-                    int itemID = in.readShort();
-                    byte count = in.readByte();
-                    List<Map<String, Short>> enchantments = readNBT(in);
+                    Slot slot = readSlot(in);
+                    List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
 
-                    String name = ItemHandler.getItemName(itemID, FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
+                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
 
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -376,13 +359,10 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 5: {
-                    int itemID = in.readShort();
-                    byte count = in.readByte();
-                    short damage = in.readShort();
-                    String name = MaterialMc18.getMaterial(itemID).name();
-                    List<Map<String, Short>> enchantments = readNBT_1_8(in);
-
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                    Slot slot = readSlot(in);
+                    String name = MaterialMc18.getMaterial(slot.getItemId()).name();
+                    List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
+                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -461,13 +441,10 @@ public class PacketInEntityMetadata extends Packet {
                     }
 
                     case 5: {
-                        int itemID = in.readShort();
-                        in.readByte(); //count
-                        in.readShort(); //damage
-                        String name = MaterialMc18.getMaterial(itemID).name();
-                        List<Map<String, Short>> enchantments = readNBT_1_8(in);
-
-                        FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, itemID, name, enchantments, -1, -1, -1));
+                        Slot slot = readSlot(in);
+                        String name = MaterialMc18.getMaterial(slot.getItemId()).name();
+                        List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
+                        FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 
                         return;
                     }
@@ -488,65 +465,5 @@ public class PacketInEntityMetadata extends Packet {
                 break;
             }
         }
-    }
-
-    private List<Map<String, Short>> readNBT(ByteArrayDataInputWrapper in) {
-
-        byte[] bytes = new byte[in.getAvailable()];
-        in.readFully(bytes);
-
-        List<Map<String, Short>> enchList = new ArrayList<>();
-
-        try {
-            NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(bytes), false);
-            Tag tag = nbtInputStream.readTag();
-            if (tag.getType() == TagType.TAG_COMPOUND) {
-                if (tag.getValue() instanceof CompoundMap) {
-                    CompoundMap root = (CompoundMap) tag.getValue();
-                    if (root.containsKey("StoredEnchantments")) {
-                        List<CompoundTag> enchants = (List<CompoundTag>) root.get("StoredEnchantments").getValue();
-                        for (CompoundTag enchant : enchants) {
-                            enchList.add(Collections.singletonMap((String) enchant.getValue().get("id").getValue(), (Short) enchant.getValue().get("lvl").getValue()));
-                        }
-                    } else if (root.containsKey("Enchantments")) {
-                        List<CompoundTag> enchants = (List<CompoundTag>) root.get("Enchantments").getValue();
-                        for (CompoundTag enchant : enchants) {
-                            enchList.add(Collections.singletonMap((String) enchant.getValue().get("id").getValue(), (Short) enchant.getValue().get("lvl").getValue()));
-                        }
-                    }
-                }
-            }
-        } catch (IOException ignored) {
-        }
-        return enchList;
-    }
-
-    private List<Map<String, Short>> readNBT_1_8(ByteArrayDataInputWrapper in) {
-
-        byte[] bytes = new byte[in.getAvailable()];
-        in.readFully(bytes);
-
-        List<Map<String, Short>> enchList = new ArrayList<>();
-
-        try {
-            NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(bytes), false);
-            Tag tag = nbtInputStream.readTag();
-            if (tag.getType() == TagType.TAG_COMPOUND && tag.getValue() instanceof CompoundMap) {
-                CompoundMap root = (CompoundMap) tag.getValue();
-                if (root.containsKey("StoredEnchantments")) {
-                    List<CompoundTag> enchants = (List<CompoundTag>) root.get("StoredEnchantments").getValue();
-                    for (CompoundTag enchant : enchants) {
-                        enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
-                    }
-                } else if (root.containsKey("ench")) {
-                    List<CompoundTag> enchants = (List<CompoundTag>) root.get("ench").getValue();
-                    for (CompoundTag enchant : enchants) {
-                        enchList.add(Collections.singletonMap(Enchantments_1_8.getFromId((Short) enchant.getValue().get("id").getValue()).name(), (Short) enchant.getValue().get("lvl").getValue()));
-                    }
-                }
-            }
-        } catch (IOException ignored) {
-        }
-        return enchList;
     }
 }

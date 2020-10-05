@@ -49,8 +49,9 @@ public class EventManager {
             }
         }
 
-        if (!classToInstanceMapping.containsKey(listener.getClass()))
+        if (!classToInstanceMapping.containsKey(listener.getClass())) {
             classToInstanceMapping.put(listener.getClass(), listener);
+        }
     }
 
     public void unregisterListener(Listener listener) {
@@ -69,7 +70,7 @@ public class EventManager {
         }
 
         toRemove.forEach(registeredListener::remove);
-        classToInstanceMapping.remove(registeredListener.getClass());
+        classToInstanceMapping.remove(listener.getClass());
     }
 
     public void callEvent(Event event) {

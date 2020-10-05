@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 public class Item {
@@ -18,7 +17,7 @@ public class Item {
     @Getter private int eid;
     @Getter private int itemId;
     @Getter private String name;
-    @Getter private List<Map<String, Short>> enchantments;
+    @Getter private List<Enchantment> enchantments;
     @Getter @Setter private int motX;
     @Getter @Setter private int motY;
     @Getter @Setter private int motZ;
