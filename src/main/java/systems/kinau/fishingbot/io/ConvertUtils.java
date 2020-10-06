@@ -4,8 +4,13 @@
  */
 package systems.kinau.fishingbot.io;
 
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConvertUtils {
 
@@ -31,6 +36,15 @@ public class ConvertUtils {
                 FishingBot.getLog().warning("Could not find Announce-Type: " + value);
                 ex.printStackTrace();
                 return AnnounceType.ALL;
+            }
+        } else if (type.isAssignableFrom(List.class)) {
+            // should be string list
+            try {
+                JSONArray array = (JSONArray) new JSONParser().parse(value);
+                return new ArrayList<>(array);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
         }
         return null;

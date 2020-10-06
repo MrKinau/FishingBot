@@ -62,7 +62,7 @@ public class LoginModule extends Module implements Listener {
             return;
         }
 
-        String var5 = (new BigInteger(serverIdHash)).toString(16);
+        String var5 = new BigInteger(serverIdHash).toString(16);
         String var6 = sendSessionRequest(FishingBot.getInstance().getAuthData().getUsername(), "token:" + FishingBot.getInstance().getAuthData().getAccessToken() + ":" + FishingBot.getInstance().getAuthData().getProfile(), var5);
 
         networkHandler.sendPacket(new PacketOutEncryptionResponse(event.getServerId(), event.getPublicKey(), event.getVerifyToken(), secretKey));

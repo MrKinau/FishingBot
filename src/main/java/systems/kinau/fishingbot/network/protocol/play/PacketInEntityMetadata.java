@@ -102,7 +102,7 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 2: {
                     float health = in.readFloat();
-                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                     return;
                 }
                 case 3: {
@@ -224,7 +224,7 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 2: {
                     float health = in.readFloat();
-                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                     return;
                 }
                 case 3: {
@@ -347,7 +347,7 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 2: {
                     float health = in.readFloat();
-                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                     return;
                 }
                 case 3: {
@@ -432,7 +432,7 @@ public class PacketInEntityMetadata extends Packet {
                     }
                     case 3: {
                         float health = in.readFloat();
-                        FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(health, -1, -1));
+                        FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                         return;
                     }
                     case 4: {

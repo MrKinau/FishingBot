@@ -51,10 +51,13 @@ public class PropertyProcessor {
 
             Object value = getValueByDottedKey(configJson, key);
             if (value != null) {
-                Object typedValue = ConvertUtils.convert(value.toString(), field.getType());
-                if (typedValue == null)
-                    throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
-                ReflectionUtils.setField(field, config, typedValue);
+                if (!convertChangedFields(key, value, field, config, configJson)) {
+                    Object typedValue = ConvertUtils.convert(value.toString(), field.getType());
+                    if (typedValue == null)
+                        throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
+                    ReflectionUtils.setField(field, config, typedValue);
+                } else
+                    unsetConfigOptions = true;
             } else
                 unsetConfigOptions = true;
         }
@@ -64,6 +67,31 @@ public class PropertyProcessor {
             FishingBot.getLog().warning("Missing config fields detected. Config appended!");
             saveConfig(config, file);
         }
+    }
+
+    private boolean convertChangedFields(String key, Object value, Field field, Config config, org.json.simple.JSONObject configJson) {
+        if (key.equals("start-text.text") && !value.toString().startsWith("[")) {
+            FishingBot.getLog().info("Converting config...");
+            ReflectionUtils.setField(field, config, Arrays.asList(value.toString().split(";")));
+            try {
+                Field discordField1 = config.getClass().getDeclaredField("webHookEnabled");
+                Field discordField2 = config.getClass().getDeclaredField("webHook");
+
+                Object value1 = getValueByDottedKey(configJson, "discord.enabled");
+                if (value1 != null) {
+                    value1 = ConvertUtils.convert(value1.toString(), boolean.class);
+                    ReflectionUtils.setField(discordField1, config, value1);
+                }
+
+                Object value2 = getValueByDottedKey(configJson, "discord.web-hook");
+                if (value2 != null) {
+                    value2 = ConvertUtils.convert(value2.toString(), String.class);
+                    ReflectionUtils.setField(discordField2, config, value2);
+                }
+            } catch (NoSuchFieldException ignore) { }
+            return true;
+        }
+        return false;
     }
 
     private Object getValueByDottedKey(org.json.simple.JSONObject object, String key) {
@@ -97,13 +125,13 @@ public class PropertyProcessor {
         JSONObject root = new JSONObject();
         configOptions.keySet().forEach(key -> {
             if (!key.contains(".")) {
-                root.put("key", configOptions.get(key));
+                root.put(key, configOptions.get(key));
                 return;
             }
             String[] parts = key.split("\\.");
             JSONObject curr = root;
             for (String part : Arrays.copyOfRange(parts, 0, parts.length - 1)) {
-                if (!root.has(part))
+                if (!curr.has(part))
                     curr.put(part, curr = new JSONObject());
                 else
                     curr = (JSONObject) curr.get(part);

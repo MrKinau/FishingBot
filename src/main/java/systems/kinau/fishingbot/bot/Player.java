@@ -10,6 +10,7 @@ import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -27,6 +28,9 @@ public class Player implements Listener {
 
     @Getter @Setter private int experience;
     @Getter @Setter private int levels;
+    @Getter @Setter private float health = -1;
+    @Getter @Setter private boolean sentLowHealth;
+    @Getter @Setter private boolean respawning;
 
     @Getter @Setter private int heldSlot;
     @Getter @Setter private Slot heldItem;
@@ -92,8 +96,41 @@ public class Player implements Listener {
 
     @EventHandler
     public void onUpdateHealth(UpdateHealthEvent event) {
-        if (event.getHealth() <= 0)
+        if (event.getEid() != getEntityID())
+            return;
+        if (getHealth() != -1 && event.getHealth() <= 0 && getEntityID() != -1 && !isRespawning()) {
+            setRespawning(true);
+            FishingBot.getInstance().getEventManager().callEvent(new RespawnEvent());
             respawn();
+        } else if (event.getHealth() > 0 && isRespawning())
+            setRespawning(false);
+
+        if (!FishingBot.getInstance().getConfig().isAutoCommandBeforeDeathEnabled()) {
+            if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getConfig().getMinHealthBeforeDeath() && !isSentLowHealth()) {
+                for (String command : FishingBot.getInstance().getConfig().getAutoCommandBeforeDeath()) {
+                    sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
+                }
+                setSentLowHealth(true);
+            } else if (isSentLowHealth() && event.getHealth() > FishingBot.getInstance().getConfig().getMinHealthBeforeDeath())
+                setSentLowHealth(false);
+        }
+        this.health = event.getHealth();
+    }
+
+    @EventHandler
+    public void onRespawn(RespawnEvent event) {
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (!FishingBot.getInstance().getConfig().isAutoCommandOnRespawnEnabled()) {
+                for (String command : FishingBot.getInstance().getConfig().getAutoCommandOnRespawn()) {
+                    sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
+                }
+            }
+        }).start();
     }
 
     @EventHandler

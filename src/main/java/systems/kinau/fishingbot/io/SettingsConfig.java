@@ -9,6 +9,10 @@ import lombok.ToString;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Getter
 @ToString
 public class SettingsConfig implements Config {
@@ -25,6 +29,11 @@ public class SettingsConfig implements Config {
     @Property(key = "auto.auto-reconnect-time") private int autoReconnectTime = 5;
     @Property(key = "auto.auto-disconnect") private boolean autoDisconnect = false;
     @Property(key = "auto.auto-disconnect-players-threshold") private int autoDisconnectPlayersThreshold = 5;
+    @Property(key = "auto.auto-command-on-respawn.enabled") private boolean autoCommandOnRespawnEnabled = false;
+    @Property(key = "auto.auto-command-on-respawn.commands") private List<String> autoCommandOnRespawn = Arrays.asList("%prefix%I respawned", "/home fishing");
+    @Property(key = "auto.auto-command-before-death.commands") private List<String> autoCommandBeforeDeath = Arrays.asList("%prefix%I am about to die", "/home");
+    @Property(key = "auto.auto-command-before-death.enabled") private boolean autoCommandBeforeDeathEnabled = false;
+    @Property(key = "auto.auto-command-before-death.min-health-before-death") private float minHealthBeforeDeath = 6.0F;
 
     @Property(key = "account.mail") private String userName = "my-minecraft@login.com";
     @Property(key = "account.password") private String password = "CHANGEME";
@@ -32,16 +41,23 @@ public class SettingsConfig implements Config {
     @Property(key = "logs.log-count") private int logCount = 15;
     @Property(key = "logs.log-packets") private boolean logPackets = false;
 
+    @Property(key = "announces.discord.enabled") private boolean webHookEnabled = false;
+    @Property(key = "announces.discord.web-hook") private String webHook = "YOURWEBHOOK";
+    @Property(key = "announces.discord.announce-type-discord") private AnnounceType announceTypeDiscord = AnnounceType.ONLY_ENCHANTED;
+    @Property(key = "announces.discord.alert-on-attack") private boolean alertOnAttack = true;
+    @Property(key = "announces.discord.alert-on-respawn") private boolean alertOnRespawn = true;
+    @Property(key = "announces.discord.ping-on-enchantment.enabled") private boolean pingOnEnchantmentEnabled = false;
+    @Property(key = "announces.discord.ping-on-enchantment.mention") private String pingOnEnchantmentMention = "<@USER_ID>";
+    @Property(key = "announces.discord.ping-on-enchantment.items") private List<String> pingOnEnchantmentItems = Collections.singletonList("enchanted_book");
+    @Property(key = "announces.discord.ping-on-enchantment.enchantments") private List<String> pingOnEnchantmentEnchantments = Arrays.asList("MENDING","UNBREAKING");
+
     @Property(key = "announces.announce-type-chat") private AnnounceType announceTypeChat = AnnounceType.ONLY_ENCHANTED;
     @Property(key = "announces.announce-type-console") private AnnounceType announceTypeConsole = AnnounceType.ALL;
     @Property(key = "announces.announce-lvl-up") private boolean announceLvlUp = true;
     @Property(key = "announces.announce-lvl-up-text") private String announceLvlUpText = "I am level %lvl% now";
 
     @Property(key = "start-text.enabled") private boolean startTextEnabled = true;
-    @Property(key = "start-text.text") private String startText = "%prefix%Starting fishing;/trigger Bot";
-
-    @Property(key = "discord.enabled") private boolean webHookEnabled = false;
-    @Property(key = "discord.web-hook") private String webHook = "YOURWEBHOOK";
+    @Property(key = "start-text.text") private List<String> startText = Arrays.asList("%prefix%Starting fishing", "/trigger Bot");
 
     @Property(key = "misc.stucking-fix-enabled") private boolean stuckingFixEnabled = true;
     @Property(key = "misc.prevent-rod-breaking") private boolean preventRodBreaking = true;

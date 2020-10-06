@@ -12,9 +12,10 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
-import systems.kinau.fishingbot.network.protocol.play.*;
-
-import java.util.Arrays;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClientSettings;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutKeepAlive;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 
 public class ClientDefaultsModule extends Module implements Listener {
 
@@ -47,8 +48,8 @@ public class ClientDefaultsModule extends Module implements Listener {
 
             //Send start texts
             if(FishingBot.getInstance().getConfig().isStartTextEnabled()) {
-                Arrays.asList(FishingBot.getInstance().getConfig().getStartText().split(";")).forEach(s -> {
-                    FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(s.replace("%prefix%", FishingBot.PREFIX)));
+                FishingBot.getInstance().getConfig().getStartText().forEach(s -> {
+                    FishingBot.getInstance().getPlayer().sendMessage(s.replace("%prefix%", FishingBot.PREFIX));
                 });
             }
 

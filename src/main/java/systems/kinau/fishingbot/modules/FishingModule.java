@@ -12,10 +12,7 @@ import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
-import systems.kinau.fishingbot.event.play.DifficultySetEvent;
-import systems.kinau.fishingbot.event.play.EntityVelocityEvent;
-import systems.kinau.fishingbot.event.play.SpawnObjectEvent;
-import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
+import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
@@ -168,7 +165,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         return "Caught \"" + item.getName() + "\"";
     }
 
-    private void logItem(Item item, AnnounceType noisiness, Consumer<String> announce, Consumer<String> announceEnchants) {
+    public void logItem(Item item, AnnounceType noisiness, Consumer<String> announce, Consumer<String> announceEnchants) {
         if (noisiness == AnnounceType.NONE)
             return;
         else if (noisiness == AnnounceType.ALL)
@@ -417,6 +414,12 @@ public class FishingModule extends Module implements Runnable, Listener {
         }
     }
 
+    @EventHandler
+    public void onDestroy(DestroyEntitiesEvent event) {
+        if (getCurrentBobber() != -1 && event.getEntityIds().contains(getCurrentBobber()))
+            stuck();
+    }
+
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
@@ -425,7 +428,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 if (noRodAvailable)
                     continue;
                 Slot curr = FishingBot.getInstance().getPlayer().getHeldItem();
-                if (curr != null && ItemUtils.isFishingRod(curr) && ItemUtils.getDamage(curr) >= 63) {
+                if (ItemUtils.isFishingRod(curr) && ItemUtils.getDamage(curr) >= 63) {
                     noRod();
                     continue;
                 }

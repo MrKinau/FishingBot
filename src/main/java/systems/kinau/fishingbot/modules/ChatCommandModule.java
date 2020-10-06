@@ -28,8 +28,8 @@ public class ChatCommandModule extends Module implements Listener {
         if (!isEnabled())
             return;
         String userName = FishingBot.getInstance().getAuthData().getUsername();
-        if (event.getText().contains(userName + ",")) {
-            String[] parts = event.getText().split(userName + ",");
+        if (event.getText().contains(userName) && event.getText().contains(",")) {
+            String[] parts = event.getText().split(",");
             if (parts.length <= 1)
                 return;
 

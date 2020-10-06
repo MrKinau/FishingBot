@@ -68,3 +68,4 @@ config.properties
 run*/
 logs/
 config.json
+account.json

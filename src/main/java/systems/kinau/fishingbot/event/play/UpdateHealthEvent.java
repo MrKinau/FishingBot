@@ -7,6 +7,7 @@ import systems.kinau.fishingbot.event.Event;
 @AllArgsConstructor
 public class UpdateHealthEvent extends Event {
 
+    @Getter private int eid;
     @Getter private float health;
     @Getter private int food;
     @Getter private float saturation;

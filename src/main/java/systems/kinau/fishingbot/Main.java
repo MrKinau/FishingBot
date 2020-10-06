@@ -20,6 +20,7 @@ public class Main {
         options.addOption("help", false, "shows help message");
         options.addOption("logsdir", true, "specifies where to save the logs");
         options.addOption("config", true, "specifies the path to the config");
+        options.addOption("accountfile", true, "specifies the path to the account file where the accessToken is stored");
 
         // add nogui option if Desktop is not supported
         if (!Desktop.isDesktopSupported()) {

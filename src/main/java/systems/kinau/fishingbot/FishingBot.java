@@ -18,7 +18,6 @@ import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
-import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
 import systems.kinau.fishingbot.modules.*;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -43,7 +42,6 @@ public class FishingBot {
 
     @Getter @Setter private boolean running;
     @Getter         private SettingsConfig config;
-    @Getter         private DiscordMessageDispatcher discord;
     @Getter @Setter private int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
     @Getter @Setter private String serverHost;
     @Getter @Setter private int serverPort;
@@ -62,6 +60,7 @@ public class FishingBot {
     @Getter @Setter private FishingModule fishingModule;
 
     @Getter         private File logsFolder = new File("logs");
+    @Getter         private File accountFile = new File("account.json");
 
     public FishingBot(CommandLine cmdLine) {
         instance = this;
@@ -86,6 +85,10 @@ public class FishingBot {
                     System.exit(1);
                 }
             }
+        }
+
+        if (cmdLine.hasOption("accountfile")) {
+            this.accountFile = new File(cmdLine.getOptionValue("accountfile"));
         }
 
         // initialize Logger
@@ -129,7 +132,7 @@ public class FishingBot {
 
         // authenticate player if online-mode is set
         if(getConfig().isOnlineMode())
-            authenticate();
+            authenticate(accountFile);
         else {
             getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
@@ -183,10 +186,6 @@ public class FishingBot {
         getLog().info("Pinging " + ip + ":" + port + " with protocol of MC-" + getConfig().getDefaultProtocol());
         ServerPinger sp = new ServerPinger(ip, port);
         sp.ping();
-
-        //Activate Discord web hook
-        if(getConfig().isWebHookEnabled() && !getConfig().getWebHook().equalsIgnoreCase("false") && !getConfig().getWebHook().equals("YOURWEBHOOK"))
-            this.discord = new DiscordMessageDispatcher(getConfig().getWebHook());
     }
 
     public void start() {
@@ -195,8 +194,8 @@ public class FishingBot {
         connect();
     }
 
-    private boolean authenticate() {
-        Authenticator authenticator = new Authenticator(getConfig().getUserName(), getConfig().getPassword());
+    private boolean authenticate(File accountFile) {
+        Authenticator authenticator = new Authenticator(accountFile);
         AuthData authData = authenticator.authenticate();
         if(authData == null) {
             setAuthData(new AuthData(null, null, null, getConfig().getUserName()));
@@ -253,6 +252,8 @@ public class FishingBot {
                     new ChatCommandModule().enable();
                 this.clientModule = new ClientDefaultsModule();
                 getClientModule().enable();
+                if (getConfig().isWebHookEnabled())
+                    new DiscordModule().enable();
                 new ItemHandler(getServerProtocol());
                 this.player = new Player();
 
@@ -305,7 +306,7 @@ public class FishingBot {
                 }
                 if (getAuthData() == null) {
                     if (getConfig().isOnlineMode())
-                        authenticate();
+                        authenticate(accountFile);
                     else {
                         getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
                         authData = new AuthData(null, null, null, getConfig().getUserName());
