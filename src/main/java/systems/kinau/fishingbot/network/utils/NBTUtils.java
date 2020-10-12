@@ -3,15 +3,17 @@ package systems.kinau.fishingbot.network.utils;
 //TODO: Replace with any NBT API
 public class NBTUtils {
 
-    public static int readNBT(ByteArrayDataInputWrapper in) {
+    public static byte[] readNBT(ByteArrayDataInputWrapper in) {
+        ByteArrayDataInputWrapper copy = in.clone();
         int startAvailable = in.getAvailable();
         int tabs = 0;
         boolean running = true;
         while (running) {
             byte type = in.readByte();
-            if(startAvailable - in.getAvailable() == 1 && type != 10)
-                return 1;
-            if(type == 0)
+            if (startAvailable - in.getAvailable() == 1 && type != 10) {
+                return new byte[]{type};
+            }
+            if (type == 0)
                 tabs = readTag(type, (short)0, tabs, in);
             else {
                 short nameLength = in.readShort();
@@ -21,7 +23,10 @@ public class NBTUtils {
                 running = false;
         }
         int stopAvailable = in.getAvailable();
-        return startAvailable - stopAvailable;
+        int read = startAvailable - stopAvailable;
+        byte[] dataRead = new byte[read];
+        copy.readBytes(dataRead);
+        return dataRead;
     }
 
     private static int readTag(byte type, short nameLength, int tabs, ByteArrayDataInputWrapper in) {

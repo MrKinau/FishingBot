@@ -318,17 +318,33 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @EventHandler
     public void onUpdateSlot(UpdateSlotEvent event) {
-        if(event.getWindowId() != 0)
+        if (event.getWindowId() != 0)
             return;
         Slot slot = event.getSlot();
 
+        updateInventory(slot, event.getSlotId());
+    }
+
+    @EventHandler
+    public void onUpdateWindowItems(UpdateWindowItemsEvent event) {
+        if (event.getWindowId() != 0)
+            return;
+        for (int i = 0; i < event.getSlots().size(); i++) {
+            if (ItemUtils.isFishingRod(event.getSlots().get(i))) {
+                updateInventory(event.getSlots().get(i), i);
+                break;
+            }
+        }
+    }
+
+    private void updateInventory(Slot slot, int slotId) {
         new Thread(() -> {
             try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
             // check current fishing rod value and swap if a better one is in inventory
             if (ItemUtils.isFishingRod(slot))
                 swapWithBestFishingRod();
 
-            if (FishingBot.getInstance().getPlayer().getHeldSlot() == event.getSlotId()) {
+            if (FishingBot.getInstance().getPlayer().getHeldSlot() == slotId) {
                 if (isNoRodAvailable() && ItemUtils.isFishingRod(slot)) {
                     if (FishingBot.getInstance().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(slot) >= 63)
                         return;

@@ -89,6 +89,18 @@ public class Player implements Listener {
     }
 
     @EventHandler
+    public void onUpdateWindow(UpdateWindowItemsEvent event) {
+        if (event.getWindowId() != 0)
+            return;
+
+        for (int i = 0; i < event.getSlots().size(); i++) {
+            getInventory().setItem(i, event.getSlots().get(i));
+            if(i == getHeldSlot())
+                this.heldItem = event.getSlots().get(i);
+        }
+    }
+
+    @EventHandler
     public void onJoinGame(JoinGameEvent event) {
         setEntityID(event.getEid());
         respawn();

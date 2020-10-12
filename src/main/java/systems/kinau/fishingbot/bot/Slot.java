@@ -2,8 +2,10 @@ package systems.kinau.fishingbot.bot;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @AllArgsConstructor
+@ToString
 public class Slot {
 
     @Getter private boolean present;

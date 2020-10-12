@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network.utils;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
+
 //Credits for this go to Lukasz Baran who made this wrapper class; can be found here http://stackoverflow.com/questions/9378862/alternative-to-com-google-common-io-ByteArrayDataInputWrapper
 public class ByteArrayDataInputWrapper implements ByteArrayDataInput {
 
@@ -25,8 +26,21 @@ public class ByteArrayDataInputWrapper implements ByteArrayDataInput {
         }
     }
 
+    private ByteArrayDataInputWrapper(ByteArrayDataInput in, int available) {
+        this.in = in;
+        this.available = available;
+    }
+
     public int getAvailable() {
         return available;
+    }
+
+    public ByteArrayDataInputWrapper clone() {
+        byte[] fully = new byte[available];
+        readFully(fully);
+        this.in = ByteStreams.newDataInput(fully.clone());
+        this.available = fully.length;
+        return new ByteArrayDataInputWrapper(ByteStreams.newDataInput(fully.clone()), available);
     }
 
     @Override

@@ -11,6 +11,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
+import systems.kinau.fishingbot.network.utils.NBTUtils;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
 
 import java.io.DataInputStream;
@@ -193,8 +194,7 @@ public abstract class Packet {
             if (present) {
                 int itemId = readVarInt(input);
                 byte itemCount = input.readByte();
-                byte[] nbtData = new byte[input.getAvailable()];
-                input.readFully(nbtData);
+                byte[] nbtData = NBTUtils.readNBT(input);
                 return new Slot(true, itemId, itemCount, (short)-1, nbtData);
             } else
                 return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
@@ -203,8 +203,7 @@ public abstract class Packet {
             if (itemId == -1)
                 return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
             byte itemCount = input.readByte();
-            byte[] nbtData = new byte[input.getAvailable()];
-            input.readFully(nbtData);
+            byte[] nbtData = NBTUtils.readNBT(input);
             return new Slot(true, itemId, itemCount, (short)-1, nbtData);
         } else {
             int itemId = input.readShort();
@@ -212,8 +211,7 @@ public abstract class Packet {
                 return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
             byte itemCount = input.readByte();
             short itemDamage = input.readShort();
-            byte[] nbtData = new byte[input.getAvailable()];
-            input.readFully(nbtData);
+            byte[] nbtData = NBTUtils.readNBT(input);
             return new Slot(true, itemId, itemCount, itemDamage, nbtData);
         }
     }
