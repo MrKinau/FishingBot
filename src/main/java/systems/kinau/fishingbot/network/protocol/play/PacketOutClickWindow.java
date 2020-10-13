@@ -22,7 +22,7 @@ public class PacketOutClickWindow extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        writeVarInt(getWindowId(), out);
+        out.writeByte(getWindowId());
         out.writeShort(slot);
         out.writeByte(button);
         out.writeShort(actionNumber);

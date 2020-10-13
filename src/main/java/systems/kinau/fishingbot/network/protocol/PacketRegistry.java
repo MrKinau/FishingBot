@@ -6,6 +6,7 @@
 package systems.kinau.fishingbot.network.protocol;
 
 import lombok.Getter;
+import systems.kinau.fishingbot.FishingBot;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,6 +31,10 @@ public class PacketRegistry {
                 .filter(integer -> registeredPackets.get(integer).getName().equals(clazz.getName()))
                 .findFirst()
                 .ifPresent(integer -> id[0] = integer);
+        if (id[0] == -1) {
+            FishingBot.getLog().severe("Packet id for " + clazz.getSimpleName() + " at " + ProtocolConstants.getVersionString(FishingBot.getInstance().getServerProtocol()) + " is not set! Please report this!");
+            System.exit(1);
+        }
         return id[0];
     }
 

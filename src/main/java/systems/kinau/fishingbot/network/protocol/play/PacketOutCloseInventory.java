@@ -16,7 +16,7 @@ public class PacketOutCloseInventory extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        writeVarInt(windowId, out);
+        out.writeByte(windowId);
     }
 
     @Override
