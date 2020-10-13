@@ -117,7 +117,7 @@ public class Player implements Listener {
         } else if (event.getHealth() > 0 && isRespawning())
             setRespawning(false);
 
-        if (!FishingBot.getInstance().getConfig().isAutoCommandBeforeDeathEnabled()) {
+        if (FishingBot.getInstance().getConfig().isAutoCommandBeforeDeathEnabled()) {
             if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getConfig().getMinHealthBeforeDeath() && !isSentLowHealth()) {
                 for (String command : FishingBot.getInstance().getConfig().getAutoCommandBeforeDeath()) {
                     sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
@@ -137,7 +137,7 @@ public class Player implements Listener {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (!FishingBot.getInstance().getConfig().isAutoCommandOnRespawnEnabled()) {
+            if (FishingBot.getInstance().getConfig().isAutoCommandOnRespawnEnabled()) {
                 for (String command : FishingBot.getInstance().getConfig().getAutoCommandOnRespawn()) {
                     sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
                 }
