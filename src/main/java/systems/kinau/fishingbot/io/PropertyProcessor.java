@@ -9,6 +9,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.i18n.Language;
 
 import java.io.*;
 import java.lang.annotation.AnnotationFormatError;
@@ -136,7 +137,7 @@ public class PropertyProcessor {
                 else
                     curr = (JSONObject) curr.get(part);
             }
-            if (configOptions.get(key) instanceof AnnounceType)
+            if (configOptions.get(key) instanceof AnnounceType || configOptions.get(key) instanceof Language)
                 curr.put(parts[parts.length - 1], configOptions.get(key).toString());
             else
                 curr.put(parts[parts.length - 1], configOptions.get(key));

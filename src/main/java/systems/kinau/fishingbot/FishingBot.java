@@ -16,6 +16,7 @@ import systems.kinau.fishingbot.command.commands.*;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.gui.Dialogs;
+import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.modules.*;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
+    @Getter         private static I18n i18n;
                     public static String PREFIX;
     @Getter         private static FishingBot instance;
     @Getter         public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
@@ -73,6 +75,7 @@ public class FishingBot {
             PREFIX = "FishingBot vUnknown - ";
             ex.printStackTrace();
         }
+
         this.eventManager = new EventManager();
 
         // use command line arguments
@@ -106,6 +109,8 @@ public class FishingBot {
         else
             this.config = new SettingsConfig("config.json");
 
+        FishingBot.i18n = new I18n(config.getLanguage(), PREFIX);
+        FishingBot.PREFIX = i18n.getPrefix();
 
         // set logger file handler
         try {

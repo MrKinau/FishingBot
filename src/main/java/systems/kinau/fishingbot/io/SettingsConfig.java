@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.io;
 import lombok.Getter;
 import lombok.ToString;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.util.Arrays;
@@ -62,6 +63,7 @@ public class SettingsConfig implements Config {
     @Property(key = "misc.stucking-fix-enabled") private boolean stuckingFixEnabled = true;
     @Property(key = "misc.prevent-rod-breaking") private boolean preventRodBreaking = true;
     @Property(key = "misc.wiki") private String readme = "https://github.com/MrKinau/FishingBot/wiki/config";
+    @Property(key = "misc.language") private Language language = Language.ENGLISH;
 
     @Getter private final String path;
 

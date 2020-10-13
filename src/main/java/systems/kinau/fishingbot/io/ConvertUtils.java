@@ -8,6 +8,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.i18n.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,12 @@ public class ConvertUtils {
                 FishingBot.getLog().warning("Could not find Announce-Type: " + value);
                 ex.printStackTrace();
                 return AnnounceType.ALL;
+            }
+        } else if (type.isAssignableFrom(Language.class)) {
+            try {
+                return Language.valueOf(value.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                FishingBot.getLog().severe("Could not find language " + value + ". Falling back to default langugae ENGLISH");
             }
         } else if (type.isAssignableFrom(List.class)) {
             // should be string list
