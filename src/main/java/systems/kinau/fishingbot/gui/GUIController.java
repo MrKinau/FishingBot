@@ -15,11 +15,13 @@ import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 
+import javax.annotation.Resources;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,6 +40,15 @@ public class GUIController implements Listener {
     public GUIController() {
         FishingBot.getInstance().getEventManager().registerListener(this);
         this.lootHistory = new LootHistory();
+    }
+
+    @FXML
+    protected void initialize(URL location, Resources resources) {
+        lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
+        setupEnchantmentTable(booksTable);
+        setupEnchantmentTable(bowsTable);
+        setupEnchantmentTable(rodsTable);
     }
 
     public void exit(Event e) {
@@ -112,9 +123,10 @@ public class GUIController implements Listener {
 
     @EventHandler
     public void onFishCaught(FishCaughtEvent event) {
-        lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
-
+        Platform.runLater(() -> {
+            lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+            lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
+        });
         LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
         AtomicBoolean existing = new AtomicBoolean(false);
         lootTable.getItems().forEach(item -> {
@@ -133,9 +145,11 @@ public class GUIController implements Listener {
         if (event.getItem().getEnchantments().isEmpty())
             return;
 
-        setupEnchantmentTable(booksTable);
-        setupEnchantmentTable(bowsTable);
-        setupEnchantmentTable(rodsTable);
+        Platform.runLater(() -> {
+            setupEnchantmentTable(booksTable);
+            setupEnchantmentTable(bowsTable);
+            setupEnchantmentTable(rodsTable);
+        });
 
         switch (event.getItem().getName().toLowerCase()) {
             case "enchanted_book": {
