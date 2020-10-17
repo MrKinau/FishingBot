@@ -17,16 +17,21 @@ import java.util.Properties;
 public class I18n {
 
     private Map<String, String> locales = new HashMap<>();
-    private String prefix = "FishingBot";
+    private String prefix;
 
     public I18n(Language language, String defaultPrefix) {
+        this(language, defaultPrefix, false);
+    }
+
+    public I18n(Language language, String defaultPrefix, boolean silent) {
+        this.prefix = defaultPrefix;
         try {
             Properties properties = new Properties();
             properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties"), StandardCharsets.UTF_8));
             this.locales = new HashMap(properties);
 
-            FishingBot.getLog().info("Using language: " + language + " @ /lang/" + language.getLanguageCode() + ".properties");
-            this.prefix = locales.getOrDefault("prefix", defaultPrefix);
+            if (!silent)
+                FishingBot.getLog().info("Using language: " + language + " @ /lang/" + language.getLanguageCode() + ".properties");
         } catch (Exception e) {
             FishingBot.getLog().severe("Failed loading language " + language.name() + ": /lang" + language.getLanguageCode() + ".properties");
             FishingBot.getLog().severe("Falling back to default langauge ENGLISH");
@@ -55,9 +60,5 @@ public class I18n {
         for (String line : t(key, args).split("\n")) {
             FishingBot.getLog().severe(line);
         }
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 }

@@ -13,6 +13,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Getter
 @ToString
@@ -62,8 +63,8 @@ public class SettingsConfig implements Config {
 
     @Property(key = "misc.stucking-fix-enabled") private boolean stuckingFixEnabled = true;
     @Property(key = "misc.prevent-rod-breaking") private boolean preventRodBreaking = true;
+    @Property(key = "misc.language") private Language language = Language.getByLocale(Locale.getDefault());
     @Property(key = "misc.wiki") private String readme = "https://github.com/MrKinau/FishingBot/wiki/config";
-    @Property(key = "misc.language") private Language language = Language.ENGLISH;
 
     @Getter private final String path;
 

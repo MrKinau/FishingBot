@@ -41,16 +41,23 @@ public class Main {
                 String[] finalArgs = args;
                 new Thread(() -> {
                     try {
-                        try { Thread.sleep(200); } catch (InterruptedException ignore) { }
+                        Main.class.getClassLoader().loadClass("javafx.embed.swing.JFXPanel");
+                        new Thread(() -> {
+                            FishingBot bot = new FishingBot(cmd);
+                            bot.start();
+                        }).start();
                         new MainGUI(finalArgs);
                         System.exit(0);
-                    } catch (NoClassDefFoundError ex) {
+                    } catch (NoClassDefFoundError | ClassNotFoundException ex) {
                         Dialogs.showJavaFXNotWorking();
+                        System.exit(0);
                     }
                 }, "GUIThread").start();
+
+            } else {
+                FishingBot bot = new FishingBot(cmd);
+                bot.start();
             }
-            FishingBot bot = new FishingBot(cmd);
-            bot.start();
         } catch (ParseException e) {
             e.printStackTrace();
         }

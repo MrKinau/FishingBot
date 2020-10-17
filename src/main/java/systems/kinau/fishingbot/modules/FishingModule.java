@@ -162,7 +162,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
 
     private String stringify(Item item) {
-        return "Caught \"" + item.getName() + "\"";
+        return FishingBot.getI18n().t("module-fishing-caught-item", item.getName());
     }
 
     public void logItem(Item item, AnnounceType noisiness, Consumer<String> announce, Consumer<String> announceEnchants) {

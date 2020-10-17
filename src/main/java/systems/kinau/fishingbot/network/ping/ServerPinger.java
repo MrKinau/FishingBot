@@ -91,7 +91,7 @@ public class ServerPinger {
                     description = "Unknown";
             }
 
-            FishingBot.getI18n().info("network-received-pong", description, ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()), protocolId, currPlayers);
+            FishingBot.getI18n().info("network-received-pong", description, ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()), String.valueOf(protocolId), String.valueOf(currPlayers));
             if (currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
                 FishingBot.getI18n().warning("network-server-is-full");
                 FishingBot.getInstance().setWontConnect(true);
@@ -119,7 +119,7 @@ public class ServerPinger {
             this.serverName = serverData[0];
             this.serverPort = Integer.valueOf(serverData[1]);
             if (serverPort != 25565)
-                FishingBot.getI18n().info("network-changed-port", serverPort);
+                FishingBot.getI18n().info("network-changed-port", String.valueOf(serverPort));
         }
 
         FishingBot.getInstance().setServerHost(serverName);

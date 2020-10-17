@@ -17,6 +17,7 @@ import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.i18n.I18n;
+import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.modules.*;
@@ -43,6 +44,7 @@ public class FishingBot {
     @Getter         public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
 
     @Getter @Setter private boolean running;
+    @Getter @Setter private boolean preventStartup;
     @Getter         private SettingsConfig config;
     @Getter @Setter private int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
     @Getter @Setter private String serverHost;
@@ -76,7 +78,18 @@ public class FishingBot {
             ex.printStackTrace();
         }
 
+        // initialize Logger
+        log.setLevel(Level.ALL);
+        ConsoleHandler ch;
+        log.addHandler(ch = new ConsoleHandler());
+        log.setUseParentHandlers(false);
+        LogFormatter formatter = new LogFormatter();
+        ch.setFormatter(formatter);
+
+        // init eventmanager & i18n pre init
+
         this.eventManager = new EventManager();
+        i18n = new I18n(Language.ENGLISH, PREFIX, true);
 
         // read config
 
@@ -85,8 +98,7 @@ public class FishingBot {
         else
             this.config = new SettingsConfig("config.json");
 
-        FishingBot.i18n = new I18n(config.getLanguage(), PREFIX);
-        FishingBot.PREFIX = i18n.getPrefix();
+        i18n = new I18n(config.getLanguage(), PREFIX);
 
         // use command line arguments
         if (cmdLine.hasOption("logsdir")) {
@@ -103,14 +115,6 @@ public class FishingBot {
         if (cmdLine.hasOption("accountfile")) {
             this.accountFile = new File(cmdLine.getOptionValue("accountfile"));
         }
-
-        // initialize Logger
-        log.setLevel(Level.ALL);
-        ConsoleHandler ch;
-        log.addHandler(ch = new ConsoleHandler());
-        log.setUseParentHandlers(false);
-        LogFormatter formatter = new LogFormatter();
-        ch.setFormatter(formatter);
 
         // set logger file handler
         try {
@@ -132,7 +136,8 @@ public class FishingBot {
             FishingBot.getI18n().warning("credentials-not-set");
             if (!cmdLine.hasOption("nogui"))
                 Dialogs.showCredentialsNotSet();
-            System.exit(0);
+            setPreventStartup(true);
+            return;
         }
 
         // authenticate player if online-mode is set
@@ -155,7 +160,8 @@ public class FishingBot {
                 FishingBot.getI18n().info("realms-id-not-set");
                 if (!cmdLine.hasOption("nogui"))
                     Dialogs.showRealmsWorlds(possibleWorldsText);
-                System.exit(0);
+                setPreventStartup(true);
+                return;
             }
             if (getConfig().isRealmAcceptTos())
                 realmsAPI.agreeTos();
@@ -163,14 +169,15 @@ public class FishingBot {
                 FishingBot.getI18n().severe("realms-tos-agreement");
                 if (!cmdLine.hasOption("nogui"))
                     Dialogs.showRealmsAcceptToS();
-                System.exit(0);
+                setPreventStartup(true);
+                return;
             }
 
             String ipAndPort = null;
             for (int i = 0; i < 5; i++) {
                 ipAndPort = realmsAPI.getServerIP(getConfig().getRealmId());
                 if (ipAndPort == null) {
-                    FishingBot.getI18n().info("realms-determining-address", (i + 1));
+                    FishingBot.getI18n().info("realms-determining-address", String.valueOf(i + 1));
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -186,13 +193,13 @@ public class FishingBot {
         }
 
         //Ping server
-        FishingBot.getI18n().info("server-pinging", ip, port, getConfig().getDefaultProtocol());
+        FishingBot.getI18n().info("server-pinging", ip, String.valueOf(port), getConfig().getDefaultProtocol());
         ServerPinger sp = new ServerPinger(ip, port);
         sp.ping();
     }
 
     public void start() {
-        if(isRunning())
+        if(isRunning() || isPreventStartup())
             return;
         connect();
     }
@@ -301,7 +308,7 @@ public class FishingBot {
                 this.player = null;
             }
             if (getConfig().isAutoReconnect()) {
-                FishingBot.getI18n().info("bot-automatic-reconnect", getConfig().getAutoReconnectTime());
+                FishingBot.getI18n().info("bot-automatic-reconnect", String.valueOf(getConfig().getAutoReconnectTime()));
 
                 try {
                     Thread.sleep(getConfig().getAutoReconnectTime() * 1000);

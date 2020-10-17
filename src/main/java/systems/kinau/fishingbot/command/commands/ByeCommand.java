@@ -12,7 +12,7 @@ public class ByeCommand extends Command {
 
     @Override
     public void onCommand(String label, String[] args, CommandExecutor executor) {
-        sendMessage(executor, "comand-bye");
+        sendMessage(executor, "command-bye");
 
         //TODO: cleaner solution
         System.exit(0);

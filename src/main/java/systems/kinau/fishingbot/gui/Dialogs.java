@@ -1,41 +1,78 @@
 package systems.kinau.fishingbot.gui;
 
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class Dialogs {
 
     public static void showCredentialsNotSet() {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(FishingBot.PREFIX);
+        setupJFX();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle(FishingBot.PREFIX);
 
-        alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-header"));
-        alert.setContentText(FishingBot.getI18n().t("dialog-credentials-content"));
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-header"));
+            alert.setContentText(FishingBot.getI18n().t("dialog-credentials-content"));
 
-        alert.showAndWait();
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.setAlwaysOnTop(true);
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("icon.png")));
+
+            alert.showAndWait();
+        });
     }
 
     public static void showJavaFXNotWorking() {
-        JOptionPane.showConfirmDialog(new JFrame(), FishingBot.getI18n().t("dialog-javafx-header") + "\n" + FishingBot.getI18n().t("dialog-javafx-content"), FishingBot.PREFIX, JOptionPane.DEFAULT_OPTION);
+        JOptionPane.showConfirmDialog(new JFrame(), "JavaFX seems to be not working properly on your computer!\nPlease look at the log.\n\n" +
+                "You can still use the bot in headless (nogui) mode using the start argument -nogui.", "FishingBot", JOptionPane.DEFAULT_OPTION);
     }
 
     public static void showRealmsWorlds(List<String> possibleWorldsText) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(FishingBot.PREFIX);
-        alert.setContentText(String.join("\n", possibleWorldsText));
-        alert.showAndWait();
+        setupJFX();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(FishingBot.PREFIX);
+            alert.setContentText(String.join("\n", possibleWorldsText));
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.setAlwaysOnTop(true);
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("icon.png")));
+
+            alert.showAndWait();
+        });
     }
 
     public static void showRealmsAcceptToS() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(FishingBot.PREFIX);
+        setupJFX();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(FishingBot.PREFIX);
 
-        alert.setHeaderText(FishingBot.getI18n().t("dialog-realms-tos-header"));
-        alert.setContentText(FishingBot.getI18n().t("dialog-realms-tos-content"));
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-realms-tos-header"));
+            alert.setContentText(FishingBot.getI18n().t("dialog-realms-tos-content"));
 
-        alert.showAndWait();
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.setAlwaysOnTop(true);
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("icon.png")));
+
+            alert.showAndWait();
+        });
+    }
+
+    private static void setupJFX() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        SwingUtilities.invokeLater(() -> {
+            new JFXPanel();
+            latch.countDown();
+        });
+        try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
     }
 }

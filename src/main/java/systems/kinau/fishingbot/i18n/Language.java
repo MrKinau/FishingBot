@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.i18n;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -22,6 +23,13 @@ public enum Language {
 
     public String getLanguageCode() {
         return locale.getLanguage();
+    }
+
+    public static Language getByLocale(Locale locale) {
+        return Arrays.stream(values())
+                .filter(language -> language.locale.equals(locale))
+                .findAny()
+                .orElse(Language.ENGLISH);
     }
 
 }

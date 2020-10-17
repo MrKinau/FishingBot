@@ -89,7 +89,7 @@ public class LoginModule extends Module implements Listener {
 
     @EventHandler
     public void onLoginSuccess(LoginSuccessEvent event) {
-        FishingBot.getI18n().info("module-login-successful", event.getUserName(), event.getUuid());
+        FishingBot.getI18n().info("module-login-successful", event.getUserName(), event.getUuid().toString());
         FishingBot.getInstance().getNet().setState(State.PLAY);
         FishingBot.getInstance().getPlayer().setUuid(event.getUuid());
     }
