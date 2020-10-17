@@ -82,7 +82,7 @@ public class DiscordModule extends Module implements Listener {
         if (mention.equals("<@USER_ID> "))
             mention = "";
         if (FishingBot.getInstance().getConfig().isAlertOnAttack() && getHealth() > event.getHealth())
-            getDiscord().dispatchMessage(mention + "I got damage. My current life is " + numberFormat.format(event.getHealth()), DISCORD_DETAILS);
+            getDiscord().dispatchMessage(mention + FishingBot.getI18n().t("discord-webhook-damage", numberFormat.format(event.getHealth())), DISCORD_DETAILS);
         this.health = event.getHealth();
     }
 
@@ -92,7 +92,8 @@ public class DiscordModule extends Module implements Listener {
             String mention = FishingBot.getInstance().getConfig().getPingOnEnchantmentMention() + " ";
             if (mention.equals("<@USER_ID> "))
                 mention = "";
-            getDiscord().dispatchMessage(mention + "I respawned", DISCORD_DETAILS);
+
+            getDiscord().dispatchMessage(mention + FishingBot.getI18n().t("discord-webhook-respawn"), DISCORD_DETAILS);
         }
     }
 }

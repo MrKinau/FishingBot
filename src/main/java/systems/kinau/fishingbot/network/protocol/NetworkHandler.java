@@ -50,7 +50,7 @@ public class NetworkHandler {
             this.state = State.HANDSHAKE;
             initPacketRegistries();
         } catch (IOException e) {
-            FishingBot.getLog().severe("Could not start bot: " + e.getMessage());
+            FishingBot.getI18n().severe("bot-could-not-be-started", e.getMessage());
         }
     }
 
@@ -467,8 +467,7 @@ public class NetworkHandler {
 
         //Register protocol of latest for unknown versions
         if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
-            FishingBot.getLog().severe("This server is not running a supported protocol version: ProtocolVersion " + FishingBot.getInstance().getServerProtocol());
-            FishingBot.getLog().severe("It is possible that it wont work correctly");
+            FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getServerProtocol());
 
             getPlayRegistryIn().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
             getPlayRegistryOut().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());

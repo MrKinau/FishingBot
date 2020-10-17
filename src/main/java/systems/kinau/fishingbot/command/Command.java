@@ -29,4 +29,8 @@ public abstract class Command {
             FishingBot.getInstance().getPlayer().sendMessage(message);
     }
 
+    public void sendMessage(CommandExecutor executor, String key, Object... args) {
+        this.sendMessage(FishingBot.getI18n().t(key, args), executor);
+    }
+
 }

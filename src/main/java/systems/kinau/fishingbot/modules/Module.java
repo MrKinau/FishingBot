@@ -14,13 +14,15 @@ public abstract class Module {
     public void enable() {
         this.enabled = true;
         onEnable();
-        FishingBot.getLog().info("Module \"" + this.getClass().getSimpleName() + "\" enabled!");
+
+        FishingBot.getI18n().info("module-enabled", getClass().getSimpleName());
     }
 
     public void disable() {
         this.enabled = false;
         onDisable();
-        FishingBot.getLog().info("Module \"" + this.getClass().getSimpleName() + "\" disabled!");
+
+        FishingBot.getI18n().info("module-disabled", getClass().getSimpleName());
     }
 
     public boolean isEnabled() {

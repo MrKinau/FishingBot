@@ -34,7 +34,7 @@ public class ServerPinger {
     public void ping() {
         FishingBot.getInstance().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()));
         if (serverName == null || serverName.trim().isEmpty()) {
-            FishingBot.getLog().severe("Invalid server host given. Please change the server.ip in your config.json");
+            FishingBot.getI18n().severe("network-invalid-server-address");
             System.exit(1);
         }
 
@@ -90,9 +90,10 @@ public class ServerPinger {
                 if (description.trim().isEmpty())
                     description = "Unknown";
             }
-            FishingBot.getLog().info("Received pong: " + description + ", Version: " + ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()) + " (" + protocolId + "), online: " + currPlayers);
+
+            FishingBot.getI18n().info("network-received-pong", description, ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()), protocolId, currPlayers);
             if (currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
-                FishingBot.getLog().warning("Max players threshold already reached. Stopping");
+                FishingBot.getI18n().warning("network-server-is-full");
                 FishingBot.getInstance().setWontConnect(true);
             }
 //            }
@@ -102,11 +103,10 @@ public class ServerPinger {
             socket.close();
 
         } catch (UnknownHostException e) {
-            FishingBot.getLog().severe("Unknown host: " + serverName);
+            FishingBot.getI18n().severe("network-unknown-host", serverName);
         } catch (Exception e) {
+            FishingBot.getI18n().severe("network-could-not-ping", serverName);
             e.printStackTrace();
-            FishingBot.getLog().severe("Could not ping: " + serverName);
-            FishingBot.getLog().severe("Automatic version detection may not work. Please set default-protocol in config.json");
         }
     }
 
@@ -115,11 +115,11 @@ public class ServerPinger {
         if (serverPort == 25565 || serverPort < 1) {
             String[] serverData = getServerAddress(serverName);
             if (!serverData[0].equalsIgnoreCase(serverName))
-                FishingBot.getLog().info("Changed server host to: " + serverData[0]);
+                FishingBot.getI18n().info("network-changed-address", serverData[0]);
             this.serverName = serverData[0];
             this.serverPort = Integer.valueOf(serverData[1]);
             if (serverPort != 25565)
-                FishingBot.getLog().info("Changed port to: " + serverPort);
+                FishingBot.getI18n().info("network-changed-port", serverPort);
         }
 
         FishingBot.getInstance().setServerHost(serverName);

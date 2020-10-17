@@ -9,6 +9,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.i18n.Language;
 
 import java.io.*;
 import java.lang.annotation.AnnotationFormatError;
@@ -64,14 +65,14 @@ public class PropertyProcessor {
 
         // fix config (add undefined keys)
         if (unsetConfigOptions) {
-            FishingBot.getLog().warning("Missing config fields detected. Config appended!");
+            FishingBot.getI18n().warning("config-missing-fields-detected");
             saveConfig(config, file);
         }
     }
 
     private boolean convertChangedFields(String key, Object value, Field field, Config config, org.json.simple.JSONObject configJson) {
         if (key.equals("start-text.text") && !value.toString().startsWith("[")) {
-            FishingBot.getLog().info("Converting config...");
+            FishingBot.getI18n().info("config-converting");
             ReflectionUtils.setField(field, config, Arrays.asList(value.toString().split(";")));
             try {
                 Field discordField1 = config.getClass().getDeclaredField("webHookEnabled");
@@ -136,7 +137,7 @@ public class PropertyProcessor {
                 else
                     curr = (JSONObject) curr.get(part);
             }
-            if (configOptions.get(key) instanceof AnnounceType)
+            if (configOptions.get(key) instanceof AnnounceType || configOptions.get(key) instanceof Language)
                 curr.put(parts[parts.length - 1], configOptions.get(key).toString());
             else
                 curr.put(parts[parts.length - 1], configOptions.get(key));
@@ -174,7 +175,8 @@ public class PropertyProcessor {
         fos.close();
         if (!oldConfig.delete())
             oldConfig.deleteOnExit();
-        FishingBot.getLog().info("Transformed old Properties-Config to new JSON-Config.");
+
+        FishingBot.getI18n().info("config-converted-properties-to-json");
     }
 
     private String translateKey(String newKey) {

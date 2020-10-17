@@ -229,7 +229,8 @@ public class FishingModule extends Module implements Runnable, Listener {
         boolean swapped = swapWithBestFishingRod();
         if (!swapped) {
             this.noRodAvailable = true;
-            FishingBot.getLog().warning("No rod available");
+
+            FishingBot.getI18n().warning("module-fishing-no-rod-available");
         }
     }
 
@@ -268,7 +269,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 noRod();
             else {
                 FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
-                FishingBot.getLog().info("Starting fishing!");
+                FishingBot.getI18n().info("module-fishing-start-fishing");
             }
         }).start();
     }
@@ -354,7 +355,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     setTrackingNextEntityMeta(false);
                     setTrackingNextBobberId(true);
                     FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
-                    FishingBot.getLog().info("New rod available, restarting fishing");
+                    FishingBot.getI18n().info("module-fishing-new-rod-available");
                 } else if (!isNoRodAvailable() && !ItemUtils.isFishingRod(slot)) {
                     noRod();
                 }
@@ -452,7 +453,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                 setTrackingNextEntityMeta(false);
                 setTrackingNextBobberId(true);
                 FishingBot.getInstance().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getNet()));
-                FishingBot.getLog().warning("Bot is slow (maybe stuck). Trying to restart!");
+
+                FishingBot.getI18n().warning("module-fishing-bot-is-slow");
             }
             try {
                 Thread.sleep(5000);

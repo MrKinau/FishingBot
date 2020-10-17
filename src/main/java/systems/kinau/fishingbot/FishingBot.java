@@ -16,6 +16,7 @@ import systems.kinau.fishingbot.command.commands.*;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.gui.Dialogs;
+import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.LogFormatter;
 import systems.kinau.fishingbot.io.SettingsConfig;
 import systems.kinau.fishingbot.modules.*;
@@ -36,6 +37,7 @@ import java.util.logging.Logger;
 
 public class FishingBot {
 
+    @Getter         private static I18n i18n;
                     public static String PREFIX;
     @Getter         private static FishingBot instance;
     @Getter         public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
@@ -73,7 +75,18 @@ public class FishingBot {
             PREFIX = "FishingBot vUnknown - ";
             ex.printStackTrace();
         }
+
         this.eventManager = new EventManager();
+
+        // read config
+
+        if (cmdLine.hasOption("config"))
+            this.config = new SettingsConfig(cmdLine.getOptionValue("config"));
+        else
+            this.config = new SettingsConfig("config.json");
+
+        FishingBot.i18n = new I18n(config.getLanguage(), PREFIX);
+        FishingBot.PREFIX = i18n.getPrefix();
 
         // use command line arguments
         if (cmdLine.hasOption("logsdir")) {
@@ -81,7 +94,7 @@ public class FishingBot {
             if (!logsFolder.exists()) {
                 boolean success = logsFolder.mkdirs();
                 if (!success) {
-                    System.err.println("Could not create logs-folder. Exiting.");
+                    FishingBot.getI18n().severe("log-failed-creating-folder");
                     System.exit(1);
                 }
             }
@@ -99,32 +112,24 @@ public class FishingBot {
         LogFormatter formatter = new LogFormatter();
         ch.setFormatter(formatter);
 
-        // read config
-
-        if (cmdLine.hasOption("config"))
-            this.config = new SettingsConfig(cmdLine.getOptionValue("config"));
-        else
-            this.config = new SettingsConfig("config.json");
-
-
         // set logger file handler
         try {
             FileHandler fh;
             if(!logsFolder.exists() && !logsFolder.mkdir() && logsFolder.isDirectory())
-                throw new IOException("Could not create logs folder!");
+                throw new IOException(i18n.t("log-failed-creating-folder"));
             log.addHandler(fh = new FileHandler(logsFolder.getPath() + "/log%g.log", 0 /* 0 = infinity */, getConfig().getLogCount()));
             fh.setFormatter(new LogFormatter());
         } catch (IOException e) {
-            System.err.println("Could not create log!");
+            FishingBot.getI18n().severe("log-failed-creating-log");
             System.exit(1);
         }
 
         // log config location
-        FishingBot.getLog().info("Loaded config from: " + new File(getConfig().getPath()).getAbsolutePath());
+        FishingBot.getI18n().info("config-loaded-from", new File(getConfig().getPath()).getAbsolutePath());
 
         // error if credentials are default credentials
         if (FishingBot.getInstance().getConfig().getUserName().equals("my-minecraft@login.com")) {
-            FishingBot.getLog().warning("Credentials not set. Please set your credentials in the config.json.");
+            FishingBot.getI18n().warning("credentials-not-set");
             if (!cmdLine.hasOption("nogui"))
                 Dialogs.showCredentialsNotSet();
             System.exit(0);
@@ -134,7 +139,7 @@ public class FishingBot {
         if(getConfig().isOnlineMode())
             authenticate(accountFile);
         else {
-            getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
+            FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
@@ -147,7 +152,7 @@ public class FishingBot {
             if (getConfig().getRealmId() == 0) {
                 List<String> possibleWorldsText = realmsAPI.getPossibleWorlds();
                 possibleWorldsText.forEach(getLog()::info);
-                FishingBot.getLog().info("Shutting down, because realm-id is not set...");
+                FishingBot.getI18n().info("realms-id-not-set");
                 if (!cmdLine.hasOption("nogui"))
                     Dialogs.showRealmsWorlds(possibleWorldsText);
                 System.exit(0);
@@ -155,9 +160,7 @@ public class FishingBot {
             if (getConfig().isRealmAcceptTos())
                 realmsAPI.agreeTos();
             else {
-                FishingBot.getLog().severe("*****************************************************************************");
-                FishingBot.getLog().severe("If you want to use realms you have to accept the tos in the config.json");
-                FishingBot.getLog().severe("*****************************************************************************");
+                FishingBot.getI18n().severe("realms-tos-agreement");
                 if (!cmdLine.hasOption("nogui"))
                     Dialogs.showRealmsAcceptToS();
                 System.exit(0);
@@ -167,7 +170,7 @@ public class FishingBot {
             for (int i = 0; i < 5; i++) {
                 ipAndPort = realmsAPI.getServerIP(getConfig().getRealmId());
                 if (ipAndPort == null) {
-                    FishingBot.getLog().info("Trying to receive IP (Try " + (i + 1) + ")...");
+                    FishingBot.getI18n().info("realms-determining-address", (i + 1));
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -183,7 +186,7 @@ public class FishingBot {
         }
 
         //Ping server
-        getLog().info("Pinging " + ip + ":" + port + " with protocol of MC-" + getConfig().getDefaultProtocol());
+        FishingBot.getI18n().info("server-pinging", ip, port, getConfig().getDefaultProtocol());
         ServerPinger sp = new ServerPinger(ip, port);
         sp.ping();
     }
@@ -270,12 +273,12 @@ public class FishingBot {
                         net.readData();
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        getLog().warning("Could not receive packet! Shutting down!");
+                        FishingBot.getI18n().warning("packet-could-not-be-received");
                         break;
                     }
                 }
             } catch (IOException e) {
-                getLog().severe("Could not start bot: " + e.getMessage());
+                FishingBot.getI18n().severe("bot-could-not-be-started", e.getMessage());
             } finally {
                 try {
                     if (socket != null)
@@ -298,17 +301,19 @@ public class FishingBot {
                 this.player = null;
             }
             if (getConfig().isAutoReconnect()) {
-                getLog().info("FishingBot restarts in " + getConfig().getAutoReconnectTime() + " seconds...");
+                FishingBot.getI18n().info("bot-automatic-reconnect", getConfig().getAutoReconnectTime());
+
                 try {
                     Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
                 if (getAuthData() == null) {
                     if (getConfig().isOnlineMode())
                         authenticate(accountFile);
                     else {
-                        getLog().info("Starting in offline-mode with username: " + getConfig().getUserName());
+                        FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
                         authData = new AuthData(null, null, null, getConfig().getUserName());
                     }
                 }

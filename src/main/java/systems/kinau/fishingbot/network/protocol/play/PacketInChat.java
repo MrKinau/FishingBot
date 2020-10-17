@@ -27,33 +27,33 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PacketInChat extends Packet {
 
-	@Getter private String text;
-	@Getter private UUID sender;
-	private final JSONParser PARSER = new JSONParser();
+    private final JSONParser PARSER = new JSONParser();
+    @Getter private String text;
+    @Getter private UUID sender;
 
-	@Override
-	public void write(ByteArrayDataOutput out, int protocolId) {
-		//Only incoming packet
-	}
-	
-	@Override
-	public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-		this.text = readString(in);
-		try {
-			JSONObject object = (JSONObject) PARSER.parse(text);
+    @Override
+    public void write(ByteArrayDataOutput out, int protocolId) {
+        //Only incoming packet
+    }
 
-			try {
-				this.text = TextComponent.toPlainText(object);
-			} catch (Exception ignored) {
-				//Ignored
-			}
+    @Override
+    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+        this.text = readString(in);
+        try {
+            JSONObject object = (JSONObject) PARSER.parse(text);
 
-			if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_16)
-				this.sender = readUUID(in);
+            try {
+                this.text = TextComponent.toPlainText(object);
+            } catch (Exception ignored) {
+                //Ignored
+            }
 
-			FishingBot.getInstance().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
-		} catch (Exception ignored) {
-			//Ignored
-		}
-	}
+            if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_16)
+                this.sender = readUUID(in);
+
+            FishingBot.getInstance().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
+        } catch (Exception ignored) {
+            //Ignored
+        }
+    }
 }
