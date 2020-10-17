@@ -28,6 +28,6 @@ public class HandshakeModule extends Module {
 
     @Override
     public void onDisable() {
-        FishingBot.getLog().warning("Tried to disable " + this.getClass().getSimpleName() + ", can not disable it!");
+        FishingBot.getI18n().warning("module-handshake-disabling");
     }
 }

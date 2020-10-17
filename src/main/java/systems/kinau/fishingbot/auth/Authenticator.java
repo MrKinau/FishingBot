@@ -56,7 +56,7 @@ public class Authenticator {
                 else
                     return authenticateWithUsernamePassword(userName, password);
             } catch (Exception e) {
-                FishingBot.getLog().warning("Could not read " + accountFile.getName() + ": " + e.getMessage());
+                FishingBot.getI18n().warning("auth-file-could-not-be-read", accountFile.getName(), e.getMessage());
                 return authenticateWithUsernamePassword(userName, password);
             }
         } else
@@ -74,21 +74,21 @@ public class Authenticator {
                     .setHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
                     .setEntity(new StringEntity(validateRequest.toString()))
                     .build();
-            FishingBot.getLog().info("Try to authenticate with accessToken");
+            FishingBot.getI18n().info("auth-using-access-token");
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() == 403) {
                 JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
-                FishingBot.getLog().warning("AccessToken is invalid: " + responseJson.get("errorMessage") + ", trying to refresh it");
+                FishingBot.getI18n().warning("auth-invalid-access-token", responseJson.get("errorMessage"));
                 return refresh(accessToken, clientToken, loginName, password);
             } else if (answer.getStatusLine().getStatusCode() == 204) {
-                FishingBot.getLog().info("Authentication successful!");
+                FishingBot.getI18n().info("auth-successful");
                 return new AuthData(accessToken, clientToken, profileId, accountName);
             } else {
-                FishingBot.getLog().warning("AccessToken is irrecoverably. Using password authentication");
+                FishingBot.getI18n().warning("auth-access-token-irrecoverably");
                 return authenticateWithUsernamePassword(loginName, password);
             }
         } catch (IOException | ParseException e) {
-            FishingBot.getLog().severe("Error while connecting to: " + AUTH_ENDPOINT + "/validate");
+            FishingBot.getI18n().severe("auth-could-not-connect", AUTH_ENDPOINT + "/validate");
         }
         return null;
     }
@@ -104,7 +104,8 @@ public class Authenticator {
                     .setHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
                     .setEntity(new StringEntity(validateRequest.toString()))
                     .build();
-            FishingBot.getLog().info("Try to refresh accessToken");
+
+            FishingBot.getI18n().info("auth-try-refreshing-access-token");
             HttpResponse answer = client.execute(request);
 
             if (answer.getStatusLine().getStatusCode() == 200) {
@@ -112,15 +113,15 @@ public class Authenticator {
                 String newAccessToken = (String) responseJson.get("accessToken");
                 String newUserName = (String) ((JSONObject)responseJson.get("selectedProfile")).get("name");
                 String newUUID = (String) ((JSONObject)responseJson.get("selectedProfile")).get("id");
-                FishingBot.getLog().info("Authentication successful!");
+                FishingBot.getI18n().info("auth-successful");
                 writeAccountFile(newAccessToken, clientToken, loginName, newUserName, newUUID);
                 return new AuthData(newAccessToken, clientToken, newUUID, newUserName);
             } else {
-                FishingBot.getLog().warning("AccessToken is irrecoverably. Using password authentication");
+                FishingBot.getI18n().warning("auth-access-token-irrecoverably");
                 return authenticateWithUsernamePassword(loginName, password);
             }
         } catch (IOException | ParseException e) {
-            FishingBot.getLog().severe("Error while connecting to: " + AUTH_ENDPOINT + "/validate");
+            FishingBot.getI18n().severe("auth-could-not-connect", AUTH_ENDPOINT + "/validate");
         }
         return null;
     }
@@ -142,10 +143,10 @@ public class Authenticator {
                     .build();
 
             HttpResponse answer = client.execute(request);
-            FishingBot.getLog().info("Try to authenticate " + loginName + ":********");
+            FishingBot.getI18n().info("auth-using-password", loginName);
 
             if (answer.getStatusLine().getStatusCode() != 200) {
-                FishingBot.getLog().severe("Authentication failed with code " + answer.getStatusLine().getStatusCode() + " from " + AUTH_ENDPOINT + ": " + answer.getStatusLine());
+                FishingBot.getI18n().severe("auth-failed", answer.getStatusLine().getStatusCode(), AUTH_ENDPOINT, answer.getStatusLine());
                 FishingBot.getLog().severe(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
                 return null;
             }
@@ -155,11 +156,11 @@ public class Authenticator {
             String clientToken = (String) responseJson.get("clientToken");
             String profile = (String) ((JSONObject)responseJson.get("selectedProfile")).get("id");
             String username = (String) ((JSONObject)responseJson.get("selectedProfile")).get("name");
-            FishingBot.getLog().info("Authentication successful!");
+            FishingBot.getI18n().info("auth-successful");
             writeAccountFile(accessToken, clientToken, loginName, username, profile);
             return new AuthData(accessToken, clientToken, profile, username);
         } catch (IOException | ParseException e) {
-            FishingBot.getLog().severe("Error while connecting to: " + AUTH_ENDPOINT + "/authenticate");
+            FishingBot.getI18n().severe("auth-could-not-connect", AUTH_ENDPOINT + "/validate");
         }
         return null;
     }
@@ -175,7 +176,7 @@ public class Authenticator {
         try {
             Files.write(Paths.get(accountFile.toURI()), Arrays.asList(output.split("\n")));
         } catch (IOException e) {
-            FishingBot.getLog().warning("Could not save " + accountFile.getName() + ": " + e.getMessage());
+            FishingBot.getI18n().warning("auth-file-could-not-be-saved", accountFile.getName(), e.getMessage());
         }
     }
 

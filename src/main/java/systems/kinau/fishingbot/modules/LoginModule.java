@@ -57,7 +57,7 @@ public class LoginModule extends Module implements Listener {
 
         byte[] serverIdHash = CryptManager.getServerIdHash(event.getServerId().trim(), event.getPublicKey(), secretKey);
         if(serverIdHash == null) {
-            FishingBot.getLog().severe("Cannot hash server id: exiting!");
+            FishingBot.getI18n().severe("module-login-hash-error");
             FishingBot.getInstance().setRunning(false);
             return;
         }
@@ -72,7 +72,7 @@ public class LoginModule extends Module implements Listener {
 
     @EventHandler
     public void onLoginDisconnect(LoginDisconnectEvent event) {
-        FishingBot.getLog().severe("Login failed: " + event.getErrorMessage());
+        FishingBot.getI18n().severe("module-login-failed", event.getErrorMessage());
         FishingBot.getInstance().setRunning(false);
         FishingBot.getInstance().setAuthData(null);
     }
@@ -89,9 +89,7 @@ public class LoginModule extends Module implements Listener {
 
     @EventHandler
     public void onLoginSuccess(LoginSuccessEvent event) {
-        FishingBot.getLog().info("Login successful!");
-        FishingBot.getLog().info("Name: " + event.getUserName());
-        FishingBot.getLog().info("UUID: " + event.getUuid());
+        FishingBot.getI18n().info("module-login-successful", event.getUserName(), event.getUuid());
         FishingBot.getInstance().getNet().setState(State.PLAY);
         FishingBot.getInstance().getPlayer().setUuid(event.getUuid());
     }

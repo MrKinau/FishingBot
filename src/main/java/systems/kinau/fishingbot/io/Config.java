@@ -17,10 +17,7 @@ public interface Config {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
-            FishingBot.getLog().severe("*****************************************************************************");
-            FishingBot.getLog().severe("Your config could not be parsed, because it does not fit the JSON-Style:");
-            FishingBot.getLog().severe(e.toString());
-            FishingBot.getLog().severe("*****************************************************************************");
+            FishingBot.getI18n().severe("config-failed-parsing", e.toString());
         }
     }
 

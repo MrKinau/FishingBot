@@ -103,10 +103,10 @@ public class RealmsAPI {
         try {
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() != 204) {
-                FishingBot.getLog().severe("Could not accept TOS: " + answer.getStatusLine());
+                FishingBot.getI18n().severe("realms-could-not-accept-tos", answer.getStatusLine());
                 return;
             } else
-                FishingBot.getLog().info("Accepted TOS!");
+                FishingBot.getI18n().info("realms-accepted-tos");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,14 +121,14 @@ public class RealmsAPI {
         try {
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() != 200) {
-                FishingBot.getLog().severe("Could not retrieve IP from " + REALMS_ENDPOINT + ": " + answer.getStatusLine());
+                FishingBot.getI18n().severe("realms-could-not-determine-address", REALMS_ENDPOINT, answer.getStatusLine());
                 return null;
             }
             JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
-            FishingBot.getLog().info("Connecting to: " + responseJson.toString());
+            FishingBot.getI18n().info("realms-connecting-to", responseJson.toJSONString());
             return (String) responseJson.get("address");
         } catch (IOException | ParseException e) {
-            FishingBot.getLog().severe("Could not connect to " + REALMS_ENDPOINT);
+            FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT);
         }
         return null;
     }
