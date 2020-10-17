@@ -44,6 +44,6 @@ public class ChatProxyModule extends Module implements Listener {
     @EventHandler
     public void onChat(ChatEvent event) {
         if (isEnabled() && !"".equals(event.getText()))
-            FishingBot.getLog().info("[CHAT] " + event.getText());
+            FishingBot.getI18n().info("module-chat-proxy-chat-message", event.getText());
     }
 }

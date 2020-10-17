@@ -7,18 +7,13 @@ import systems.kinau.fishingbot.command.CommandExecutor;
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super("help", "Displays this help message");
+        super("help", FishingBot.getI18n().t("command-help-desc"));
     }
 
     @Override
     public void onCommand(String label, String[] args, CommandExecutor executor) {
-        String cmdPrefix = "/";
-        if (executor == CommandExecutor.OTHER_PLAYER)
-            cmdPrefix = "<My name>, ";
-
-        String finalCmdPrefix = cmdPrefix;
         FishingBot.getInstance().getCommandRegistry().getRegisteredCommands().forEach(command -> {
-            sendMessage(finalCmdPrefix + command.getLabel() + " - " + command.getDescription(), executor);
+            sendMessage(executor, "command-help", command.getLabel(), command.getDescription());
         });
     }
 }

@@ -7,7 +7,7 @@ import systems.kinau.fishingbot.command.CommandExecutor;
 public class StuckCommand extends Command {
 
     public StuckCommand() {
-        super("stuck", "Casts the line again", "recast", "reeject", "refish", "recatch");
+        super("stuck", FishingBot.getI18n().t("command-stuck-help"), "recast", "reeject", "refish", "recatch");
     }
 
     @Override

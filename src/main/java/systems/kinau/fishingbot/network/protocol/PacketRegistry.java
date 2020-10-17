@@ -32,7 +32,7 @@ public class PacketRegistry {
                 .findFirst()
                 .ifPresent(integer -> id[0] = integer);
         if (id[0] == -1) {
-            FishingBot.getLog().severe("Packet id for " + clazz.getSimpleName() + " at " + ProtocolConstants.getVersionString(FishingBot.getInstance().getServerProtocol()) + " is not set! Please report this!");
+            FishingBot.getI18n().severe("network-unknown-packet-id", clazz.getSimpleName(), ProtocolConstants.getVersionString(FishingBot.getInstance().getServerProtocol()));
             System.exit(1);
         }
         return id[0];

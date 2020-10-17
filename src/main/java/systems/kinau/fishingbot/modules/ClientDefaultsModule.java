@@ -60,7 +60,7 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onDisconnect(DisconnectEvent event) {
-        FishingBot.getLog().info("Disconnected: " + event.getDisconnectMessage());
+        FishingBot.getI18n().info("module-client-disconnected", event.getDisconnectMessage());
         FishingBot.getInstance().setRunning(false);
     }
 
@@ -77,7 +77,7 @@ public class ClientDefaultsModule extends Module implements Listener {
     @EventHandler
     public void onUpdatePlayerList(UpdatePlayerListEvent event) {
         if(FishingBot.getInstance().getConfig().isAutoDisconnect() && event.getPlayers().size() > FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold()) {
-            FishingBot.getLog().warning("Max players threshold reached. Stopping");
+            FishingBot.getI18n().warning("network-server-is-full");
             FishingBot.getInstance().setWontConnect(true);
             FishingBot.getInstance().setRunning(false);
         }

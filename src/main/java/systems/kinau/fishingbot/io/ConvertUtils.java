@@ -34,7 +34,7 @@ public class ConvertUtils {
             try {
                 return AnnounceType.valueOf(value);
             } catch (IllegalArgumentException ex) {
-                FishingBot.getLog().warning("Could not find Announce-Type: " + value);
+                FishingBot.getI18n().warning("config-unknown-announce-type", value);
                 ex.printStackTrace();
                 return AnnounceType.ALL;
             }
@@ -43,6 +43,7 @@ public class ConvertUtils {
                 return Language.valueOf(value.toUpperCase());
             } catch (IllegalArgumentException ex) {
                 FishingBot.getLog().severe("Could not find language " + value + ". Falling back to default langugae ENGLISH");
+                return Language.ENGLISH;
             }
         } else if (type.isAssignableFrom(List.class)) {
             // should be string list

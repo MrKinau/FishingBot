@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.i18n;
 import systems.kinau.fishingbot.FishingBot;
 
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ public class I18n {
     public I18n(Language language, String defaultPrefix) {
         try {
             Properties properties = new Properties();
-            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties")));
+            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties"), StandardCharsets.UTF_8));
             this.locales = new HashMap(properties);
 
             FishingBot.getLog().info("Using language: " + language + " @ /lang/" + language.getLanguageCode() + ".properties");
@@ -36,6 +37,24 @@ public class I18n {
     public String t(String key, Object... args) {
         String value = locales.get(key);
         return value == null ? "N/A" : MessageFormat.format(value, args).replace("%prefix%", prefix);
+    }
+
+    public void info(String key, Object... args) {
+        for (String line : t(key, args).split("\n")) {
+            FishingBot.getLog().info(line);
+        }
+    }
+
+    public void warning(String key, Object... args) {
+        for (String line : t(key, args).split("\n")) {
+            FishingBot.getLog().warning(line);
+        }
+    }
+
+    public void severe(String key, Object... args) {
+        for (String line : t(key, args).split("\n")) {
+            FishingBot.getLog().severe(line);
+        }
     }
 
     public String getPrefix() {
