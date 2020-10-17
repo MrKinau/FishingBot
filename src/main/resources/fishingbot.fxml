@@ -6,24 +6,24 @@
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.kinau.fishingbot.gui.GUIController">
   <MenuBar BorderPane.alignment="CENTER">
     <menus>
-      <Menu mnemonicParsing="false" text="File">
+      <Menu mnemonicParsing="false" text="%ui-menu-file">
         <items>
-          <MenuItem mnemonicParsing="false" onAction="#exit" text="Close" />
+          <MenuItem mnemonicParsing="false" onAction="#exit" text="%ui-menu-file-close" />
         </items>
       </Menu>
-      <Menu mnemonicParsing="false" text="Edit">
+      <Menu mnemonicParsing="false" text="%ui-menu-edit">
         <items>
-          <MenuItem mnemonicParsing="false" onAction="#deleteAllData" text="Delete all data" />
-          <MenuItem mnemonicParsing="false" onAction="#openConfig" text="Open config..." />
-          <MenuItem mnemonicParsing="false" onAction="#openLog" text="Open current log..." />
-          <MenuItem mnemonicParsing="false" onAction="#openLogsDir" text="Open logs folder..." />
+          <MenuItem mnemonicParsing="false" onAction="#deleteAllData" text="%ui-menu-edit-delete" />
+          <MenuItem mnemonicParsing="false" onAction="#openConfig" text="%ui-menu-edit-open-config" />
+          <MenuItem mnemonicParsing="false" onAction="#openLog" text="%ui-menu-edit-open-log" />
+          <MenuItem mnemonicParsing="false" onAction="#openLogsDir" text="%ui-menu-edit-open-logdir" />
         </items>
       </Menu>
-      <Menu mnemonicParsing="false" text="Help">
+      <Menu mnemonicParsing="false" text="%ui-menu-help">
         <items>
-          <MenuItem mnemonicParsing="false" onAction="#github" text="GitHub..." />
-          <MenuItem mnemonicParsing="false" onAction="#issues" text="Issues..." />
-          <MenuItem mnemonicParsing="false" onAction="#discord" text="Discord..." />
+          <MenuItem mnemonicParsing="false" onAction="#github" text="%ui-menu-help-github" />
+          <MenuItem mnemonicParsing="false" onAction="#issues" text="%ui-menu-help-issues" />
+          <MenuItem mnemonicParsing="false" onAction="#discord" text="%ui-menu-help-discord" />
         </items>
       </Menu>
     </menus>
@@ -31,12 +31,12 @@
   <SplitPane dividerPositions="0.6" orientation="VERTICAL">
     <TabPane minHeight="200.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
       <tabs>
-        <Tab text="Loot">
+        <Tab text="%ui-tabs-loot">
           <content>
             <TableView fx:id="lootTable" prefWidth="600.0">
               <columns>
-                <TableColumn fx:id="lootItemColumn" prefWidth="530.0" text="Item" />
-                <TableColumn fx:id="lootCountColumn" prefWidth="60.0" text="Count" />
+                <TableColumn fx:id="lootItemColumn" prefWidth="530.0" text="%ui-tabs-loot-item" />
+                <TableColumn fx:id="lootCountColumn" prefWidth="60.0" text="%ui-tabs-loot-count" />
               </columns>
               <opaqueInsets>
                 <Insets />
@@ -44,17 +44,17 @@
             </TableView>
           </content>
         </Tab>
-        <Tab text="Enchantments">
+        <Tab text="%ui-tabs-enchantments">
           <content>
             <Accordion fx:id="enchantmentsAccordion">
               <panes>
-                <TitledPane fx:id="booksPane" text="Enchanted books">
+                <TitledPane fx:id="booksPane" text="%ui-tabs-enchantments-books">
                   <content>
                     <TableView fx:id="booksTable">
                       <columns>
-                        <TableColumn editable="false" prefWidth="445.0" text="Enchantment" />
-                        <TableColumn prefWidth="60.0" text="Level" />
-                        <TableColumn prefWidth="60.0" text="Count" />
+                        <TableColumn editable="false" prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
+                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
+                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
                       </columns>
                       <VBox.margin>
                         <Insets bottom="10.0" />
@@ -62,13 +62,13 @@
                     </TableView>
                   </content>
                 </TitledPane>
-                <TitledPane text="Fishing rods">
+                <TitledPane text="%ui-tabs-enchantments-rods">
                   <content>
                     <TableView fx:id="rodsTable">
                       <columns>
-                        <TableColumn prefWidth="445.0" text="Enchantment" />
-                        <TableColumn prefWidth="60.0" text="Level" />
-                        <TableColumn prefWidth="60.0" text="Count" />
+                        <TableColumn prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
+                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
+                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
                       </columns>
                       <VBox.margin>
                         <Insets bottom="10.0" />
@@ -76,13 +76,13 @@
                     </TableView>
                   </content>
                 </TitledPane>
-                <TitledPane text="Bows">
+                <TitledPane text="%ui-tabs-enchantments-bows">
                   <content>
                     <TableView fx:id="bowsTable">
                       <columns>
-                        <TableColumn prefWidth="445.0" text="Enchantment" />
-                        <TableColumn prefWidth="60.0" text="Level" />
-                        <TableColumn prefWidth="60.0" text="Count" />
+                        <TableColumn prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
+                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
+                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
                       </columns>
                       <VBox.margin>
                         <Insets bottom="10.0" />
@@ -105,7 +105,7 @@
       <AnchorPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" VBox.vgrow="NEVER">
         <children>
           <TextField fx:id="commandlineTextField" onAction="#commandlineSend" prefHeight="25.0" prefWidth="540.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="53.0" AnchorPane.topAnchor="5.0" />
-          <Button layoutX="548.0" mnemonicParsing="false" onAction="#commandlineSend" text="Send" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+          <Button layoutX="548.0" mnemonicParsing="false" onAction="#commandlineSend" text="%ui-console-send" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
         </children>
       </AnchorPane>
     </VBox>

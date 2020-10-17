@@ -129,6 +129,8 @@ public class GUIController implements Listener {
         });
         LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
         AtomicBoolean existing = new AtomicBoolean(false);
+        if (lootTable == null)
+            return;
         lootTable.getItems().forEach(item -> {
             if (item.getName().equalsIgnoreCase(lootItem.getName())) {
                 item.setCount(lootItem.getCount());
