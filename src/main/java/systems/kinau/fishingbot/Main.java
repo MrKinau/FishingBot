@@ -49,6 +49,7 @@ public class Main {
                         new MainGUI(finalArgs);
                         System.exit(0);
                     } catch (NoClassDefFoundError | ClassNotFoundException ex) {
+                        ex.printStackTrace();
                         Dialogs.showJavaFXNotWorking();
                         System.exit(0);
                     }

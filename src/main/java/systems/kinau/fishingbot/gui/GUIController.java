@@ -93,6 +93,8 @@ public class GUIController implements Listener {
     }
 
     private void runCommand(String text) {
+        if (FishingBot.getInstance() == null || FishingBot.getInstance().getNet() == null)
+            return;
         if (text.startsWith("/")) {
             boolean executed = FishingBot.getInstance().getCommandRegistry().dispatchCommand(text, CommandExecutor.CONSOLE);
             if (executed)
