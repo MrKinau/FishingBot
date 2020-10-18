@@ -13,7 +13,10 @@ public class HelpCommand extends Command {
     @Override
     public void onCommand(String label, String[] args, CommandExecutor executor) {
         FishingBot.getInstance().getCommandRegistry().getRegisteredCommands().forEach(command -> {
-            sendMessage(executor, "command-help", command.getLabel(), command.getDescription());
+            if (executor == CommandExecutor.OTHER_PLAYER)
+                sendMessage(executor, "command-help-other-player", command.getLabel(), command.getDescription());
+            else if (executor == CommandExecutor.CONSOLE)
+                sendMessage(executor, "command-help-console", command.getLabel(), command.getDescription());
         });
     }
 }
