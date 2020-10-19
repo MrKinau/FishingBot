@@ -16,10 +16,12 @@ import java.util.Locale;
 public enum Language {
 
     ENGLISH(new Locale("en", "EN")),
+    FRENCH(new Locale("fr", "FR")),
     GERMAN(new Locale("de", "DE")),
-    POLISH(new Locale("pl", "PL"));
+    POLISH(new Locale("pl", "PL")),
+    RUSSIAN(new Locale("ru", "RU"));
 
-    private Locale locale;
+    private final Locale locale;
 
     public String getLanguageCode() {
         return locale.getLanguage();
