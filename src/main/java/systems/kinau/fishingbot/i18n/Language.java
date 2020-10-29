@@ -19,7 +19,8 @@ public enum Language {
     FRENCH(new Locale("fr", "FR")),
     GERMAN(new Locale("de", "DE")),
     POLISH(new Locale("pl", "PL")),
-    RUSSIAN(new Locale("ru", "RU"));
+    RUSSIAN(new Locale("ru", "RU")),
+    SPANISH(new Locale("es", "ES"));
 
     private final Locale locale;
 
