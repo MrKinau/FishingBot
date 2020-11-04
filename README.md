@@ -59,6 +59,7 @@ A list of all commands can be found in the wiki ([here](https://github.com/MrKin
 - 1.16.1
 - 1.16.2
 - 1.16.3
+- 1.16.4
 
 ## Discord
 To follow the project. Get support. Request features or bugs you can join my Discord: https://discord.gg/xHpCDYf

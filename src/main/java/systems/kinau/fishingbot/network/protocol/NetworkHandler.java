@@ -465,6 +465,10 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_3).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2));
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_3).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2));
 
+        //Minecraft 1.16.4
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_4).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_3));
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_4).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_3));
+
         //Register protocol of latest for unknown versions
         if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
             FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getServerProtocol());
