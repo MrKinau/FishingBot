@@ -126,6 +126,7 @@ public class Authenticator {
         return null;
     }
 
+    @SuppressWarnings("SuspiciousRegexArgument")
     public AuthData authenticateWithUsernamePassword(String loginName, String password) {
         JSONObject data = new JSONObject();
         JSONObject agent = new JSONObject();
@@ -143,7 +144,10 @@ public class Authenticator {
                     .build();
 
             HttpResponse answer = client.execute(request);
-            FishingBot.getI18n().info("auth-using-password", loginName);
+
+            String maskedLoginName = loginName.contains("@") ? loginName.split("@")[0].replaceAll(".", "*") + loginName.split("@")[1] : loginName;
+
+            FishingBot.getI18n().info("auth-using-password", maskedLoginName);
 
             if (answer.getStatusLine().getStatusCode() != 200) {
                 FishingBot.getI18n().severe("auth-failed", answer.getStatusLine().getStatusCode(), AUTH_ENDPOINT, answer.getStatusLine());

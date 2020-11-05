@@ -15,8 +15,10 @@ import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class Player implements Listener {
 
@@ -31,6 +33,7 @@ public class Player implements Listener {
     @Getter @Setter private float health = -1;
     @Getter @Setter private boolean sentLowHealth;
     @Getter @Setter private boolean respawning;
+    @Getter @Setter private boolean sneaking;
 
     @Getter @Setter private int heldSlot;
     @Getter @Setter private Slot heldItem;
@@ -113,6 +116,7 @@ public class Player implements Listener {
         if (getHealth() != -1 && event.getHealth() <= 0 && getEntityID() != -1 && !isRespawning()) {
             setRespawning(true);
             FishingBot.getInstance().getEventManager().callEvent(new RespawnEvent());
+            this.sneaking = false;
             respawn();
         } else if (event.getHealth() > 0 && isRespawning())
             setRespawning(false);
@@ -126,6 +130,14 @@ public class Player implements Listener {
             } else if (isSentLowHealth() && event.getHealth() > FishingBot.getInstance().getConfig().getMinHealthBeforeDeath())
                 setSentLowHealth(false);
         }
+
+        if (FishingBot.getInstance().getConfig().isAutoQuitBeforeDeathEnabled()) {
+            if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getConfig().getMinHealthBeforeQuit()) {
+                FishingBot.getI18n().warning("module-fishing-health-threshold-reached");
+                System.exit(0);
+            }
+        }
+
         this.health = event.getHealth();
     }
 
@@ -133,7 +145,7 @@ public class Player implements Listener {
     public void onRespawn(RespawnEvent event) {
         new Thread(() -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(FishingBot.getInstance().getConfig().getAutoCommandOnRespawnDelay());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -152,6 +164,13 @@ public class Player implements Listener {
 
     public void respawn() {
         FishingBot.getInstance().getNet().sendPacket(new PacketOutClientStatus(PacketOutClientStatus.Action.PERFORM_RESPAWN));
+
+        if (FishingBot.getInstance().getConfig().isAutoSneak()) {
+            FishingBot.getScheduler().schedule(() -> {
+                FishingBot.getInstance().getNet().sendPacket(new PacketOutEntityAction(EntityAction.START_SNEAKING));
+                this.sneaking = true;
+            }, 250, TimeUnit.MILLISECONDS);
+        }
     }
 
     public void sendMessage(String message) {
