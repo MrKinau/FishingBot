@@ -178,6 +178,8 @@ public class Player implements Listener {
     }
 
     public void dropStack(short slot, short actionNumber) {
+        Slot emptySlot = new Slot(false, -1, (byte) -1, (short) -1, new byte[]{0});
+
         FishingBot.getInstance().getNet().sendPacket(
                 new PacketOutClickWindow(
                         /* player inventory */ 0,
@@ -185,9 +187,11 @@ public class Player implements Listener {
                         /* drop entire stack */ (byte) 1,
                         /* action count starting at 1 */ actionNumber,
                         /* drop entire stack */ 4,
-                        /* empty slot */ new Slot(false, -1, (byte) -1, (short) -1, new byte[]{0})
+                        /* empty slot */ emptySlot
                 )
         );
+
+        FishingBot.getInstance().getPlayer().getInventory().setItem(slot, emptySlot);
     }
 
     public void swapToHotBar(int slotId, int hotBarButton) {
