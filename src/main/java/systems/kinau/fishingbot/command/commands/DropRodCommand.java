@@ -20,13 +20,13 @@ public class DropRodCommand extends Command {
 
     @Override
     public void onCommand(String label, String[] args, CommandExecutor executor) {
-        Filter filter = Filter.DROP_ALL_BUT_SELECTED;
+        Filter filter = Filter.ALL_BUT_SELECTED;
 
-        if (args.length == 1) {
+        if (args.length >= 1) {
             try {
-                filter = Filter.valueOf(args[0].toUpperCase());
+                filter = Filter.valueOf(String.join("_", args).toUpperCase());
             } catch (Exception e) {
-                sendMessage(executor, "command-droprod-unknown-type", args[0]);
+                sendMessage(executor, "command-droprod-unknown-type", String.join("_", args).toUpperCase());
                 return;
             }
         }
@@ -38,11 +38,12 @@ public class DropRodCommand extends Command {
             Slot slot = inventory.getContent().get(slotId);
             if (!ItemUtils.isFishingRod(slot)) continue;
 
-            if (filter == Filter.DROP_ALL || (filter == Filter.DROP_ALL_BUT_SELECTED && slotId != FishingBot.getInstance().getPlayer().getHeldSlot())) {
+            if (filter == Filter.ALL || (filter == Filter.ALL_BUT_SELECTED && slotId != FishingBot.getInstance().getPlayer().getHeldSlot())) {
                 FishingBot.getInstance().getPlayer().dropStack((short) slotId, (short) (slotId - 8));
                 dropCount++;
-            } else if (filter == Filter.DROP_SELECTED && slotId == FishingBot.getInstance().getPlayer().getHeldSlot()) {
+            } else if (filter == Filter.SELECTED && slotId == FishingBot.getInstance().getPlayer().getHeldSlot()) {
                 FishingBot.getInstance().getPlayer().dropStack((short) slotId, (short) (slotId - 8));
+                FishingBot.getInstance().getFishingModule().swapWithBestFishingRod();
                 dropCount++;
                 break;
             }
@@ -52,9 +53,9 @@ public class DropRodCommand extends Command {
     }
 
     public enum Filter {
-        DROP_ALL,
-        DROP_SELECTED,
-        DROP_ALL_BUT_SELECTED
+        ALL,
+        SELECTED,
+        ALL_BUT_SELECTED
     }
 
 }

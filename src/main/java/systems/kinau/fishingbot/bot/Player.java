@@ -16,6 +16,7 @@ import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
+import systems.kinau.fishingbot.network.utils.StringUtils;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -85,7 +86,10 @@ public class Player implements Listener {
             return;
 
         Slot slot = event.getSlot();
-        getInventory().setItem(event.getSlotId(), slot);
+
+        if (getInventory() != null) {
+            getInventory().setItem(event.getSlotId(), slot);
+        }
 
         if(event.getSlotId() == getHeldSlot())
             this.heldItem = slot;
@@ -174,7 +178,15 @@ public class Player implements Listener {
     }
 
     public void sendMessage(String message) {
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(message));
+        for (String line : message.split("\n")) {
+            if (FishingBot.getInstance().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
+                for (String split : StringUtils.splitDescription(line)) {
+                    FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(split));
+                }
+            } else {
+                FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(line));
+            }
+        }
     }
 
     public void dropStack(short slot, short actionNumber) {
@@ -207,5 +219,9 @@ public class Player implements Listener {
         );
         try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
         FishingBot.getInstance().getNet().sendPacket(new PacketOutCloseInventory(0));
+
+        Slot slot = FishingBot.getInstance().getPlayer().getInventory().getContent().get(slotId);
+        FishingBot.getInstance().getPlayer().getInventory().getContent().put(slotId, FishingBot.getInstance().getPlayer().getInventory().getContent().get(hotBarButton + 36));
+        FishingBot.getInstance().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
     }
 }
