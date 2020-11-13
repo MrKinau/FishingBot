@@ -145,7 +145,7 @@ public class Authenticator {
 
             HttpResponse answer = client.execute(request);
 
-            String maskedLoginName = loginName.contains("@") ? loginName.split("@")[0].replaceAll(".", "*") + loginName.split("@")[1] : loginName;
+            String maskedLoginName = loginName.contains("@") ? loginName.split("@")[0].replaceAll(".", "*") + "@" + loginName.split("@")[1] : loginName;
 
             FishingBot.getI18n().info("auth-using-password", maskedLoginName);
 
