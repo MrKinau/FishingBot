@@ -127,6 +127,8 @@ public class ItemUtils {
     public static int getBestFishingRod(Inventory inventory) {
         AtomicInteger currentBestSlotId = new AtomicInteger(-1);
         AtomicInteger currentBestValue = new AtomicInteger(-1);
+        if (inventory == null)
+            return -1;
         inventory.getContent().forEach((slotId, slot) -> {
             int currValue = getFishingRodValue(slot);
             if (currValue > currentBestValue.get()) {
