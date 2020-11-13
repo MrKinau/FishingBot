@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -34,6 +35,7 @@ public class GUIController implements Listener {
     @FXML private TableColumn lootItemColumn;
     @FXML private TableColumn lootCountColumn;
     @FXML private TextField commandlineTextField;
+    @FXML private Tab lootTab;
 
     @Getter private LootHistory lootHistory;
 
@@ -129,10 +131,13 @@ public class GUIController implements Listener {
             lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
         });
+
         LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
         AtomicBoolean existing = new AtomicBoolean(false);
+
         if (lootTable == null)
             return;
+
         lootTable.getItems().forEach(item -> {
             if (item.getName().equalsIgnoreCase(lootItem.getName())) {
                 item.setCount(lootItem.getCount());
@@ -143,8 +148,13 @@ public class GUIController implements Listener {
                 });
             }
         });
+
         if (!existing.get())
             lootTable.getItems().add(lootItem);
+
+        Platform.runLater(() -> {
+            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
+        });
 
         if (event.getItem().getEnchantments().isEmpty())
             return;

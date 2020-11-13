@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
@@ -35,6 +36,7 @@ public class MainGUI extends Application {
 
         // Scene Builder does not accept this as fxml
         ((Accordion)loader.getNamespace().get("enchantmentsAccordion")).setExpandedPane((TitledPane)loader.getNamespace().get("booksPane"));
+        ((Tab) loader.getNamespace().get("lootTab")).setText(FishingBot.getI18n().t("ui-tabs-loot", 0));
     }
 
 }

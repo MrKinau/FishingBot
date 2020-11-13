@@ -85,7 +85,7 @@ public class ServerPinger {
                 } catch (UnsupportedOperationException ex) {
                     description = TextComponent.toPlainText(((JSONObject)root.get("description")));
                 }
-            } catch (UnsupportedOperationException ex) {
+            } catch (UnsupportedOperationException ignored) {
             } finally {
                 if (description.trim().isEmpty())
                     description = "Unknown";

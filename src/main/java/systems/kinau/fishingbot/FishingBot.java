@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -42,6 +44,7 @@ public class FishingBot {
                     public static String PREFIX;
     @Getter         private static FishingBot instance;
     @Getter         public static Logger log = Logger.getLogger(FishingBot.class.getSimpleName());
+    @Getter         private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
     @Getter @Setter private boolean running;
     @Getter @Setter private boolean preventStartup;
@@ -148,6 +151,8 @@ public class FishingBot {
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
+        FishingBot.getI18n().info("auth-username", authData.getUsername());
+
         String ip = getConfig().getServerIP();
         int port = getConfig().getServerPort();
 
@@ -207,10 +212,12 @@ public class FishingBot {
     private boolean authenticate(File accountFile) {
         Authenticator authenticator = new Authenticator(accountFile);
         AuthData authData = authenticator.authenticate();
+
         if(authData == null) {
             setAuthData(new AuthData(null, null, null, getConfig().getUserName()));
             return false;
         }
+
         setAuthData(authData);
         return true;
     }
@@ -222,6 +229,7 @@ public class FishingBot {
         getCommandRegistry().registerCommand(new EmptyCommand());
         getCommandRegistry().registerCommand(new ByeCommand());
         getCommandRegistry().registerCommand(new StuckCommand());
+        getCommandRegistry().registerCommand(new DropRodCommand());
     }
 
     private void connect() {

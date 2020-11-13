@@ -3,7 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.kinau.fishingbot.gui.GUIController">
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.kinau.fishingbot.gui.GUIController">
   <MenuBar BorderPane.alignment="CENTER">
     <menus>
       <Menu mnemonicParsing="false" text="%ui-menu-file">
@@ -31,7 +32,7 @@
   <SplitPane dividerPositions="0.6" orientation="VERTICAL">
     <TabPane minHeight="200.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
       <tabs>
-        <Tab text="%ui-tabs-loot">
+        <Tab fx:id="lootTab" text="%ui-tabs-loot">
           <content>
             <TableView fx:id="lootTable" prefWidth="600.0">
               <columns>

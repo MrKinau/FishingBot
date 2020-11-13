@@ -30,12 +30,16 @@ public class SettingsConfig implements Config {
     @Property(key = "auto.auto-reconnect") private boolean autoReconnect = true;
     @Property(key = "auto.auto-reconnect-time") private int autoReconnectTime = 5;
     @Property(key = "auto.auto-disconnect") private boolean autoDisconnect = false;
+    @Property(key = "auto.auto-sneak") private boolean autoSneak = false;
     @Property(key = "auto.auto-disconnect-players-threshold") private int autoDisconnectPlayersThreshold = 5;
     @Property(key = "auto.auto-command-on-respawn.enabled") private boolean autoCommandOnRespawnEnabled = false;
+    @Property(key = "auto.auto-command-on-respawn.delay") private long autoCommandOnRespawnDelay = 1000;
     @Property(key = "auto.auto-command-on-respawn.commands") private List<String> autoCommandOnRespawn = Arrays.asList("%prefix%I respawned", "/home fishing");
     @Property(key = "auto.auto-command-before-death.commands") private List<String> autoCommandBeforeDeath = Arrays.asList("%prefix%I am about to die", "/home");
     @Property(key = "auto.auto-command-before-death.enabled") private boolean autoCommandBeforeDeathEnabled = false;
     @Property(key = "auto.auto-command-before-death.min-health-before-death") private float minHealthBeforeDeath = 6.0F;
+    @Property(key = "auto.auto-quit-before-death.enabled") private boolean autoQuitBeforeDeathEnabled = false;
+    @Property(key = "auto.auto-quit-before-death.min-health-before-quit") private float minHealthBeforeQuit = 6.0F;
 
     @Property(key = "account.mail") private String userName = "my-minecraft@login.com";
     @Property(key = "account.password") private String password = "CHANGEME";
@@ -63,6 +67,7 @@ public class SettingsConfig implements Config {
 
     @Property(key = "misc.stucking-fix-enabled") private boolean stuckingFixEnabled = true;
     @Property(key = "misc.prevent-rod-breaking") private boolean preventRodBreaking = true;
+    @Property(key = "misc.gui-console-max-lines") private int guiConsoleMaxLines = 1000;
     @Property(key = "misc.language") private Language language = Language.getByLocale(Locale.getDefault());
     @Property(key = "misc.wiki") private String readme = "https://github.com/MrKinau/FishingBot/wiki/config";
 

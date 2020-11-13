@@ -242,7 +242,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
-    private boolean swapWithBestFishingRod() {
+    public boolean swapWithBestFishingRod() {
         int bestSlot = ItemUtils.getBestFishingRod(FishingBot.getInstance().getPlayer().getInventory());
         if (bestSlot < 0)
             return false;
