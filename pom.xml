@@ -11,7 +11,7 @@
 
     <groupId>systems.kinau</groupId>
     <artifactId>FishingBot</artifactId>
-    <version>2.7.11</version>
+    <version>2.7.12</version>
     <name>FishingBot</name>
     <description>An AFK fishing bot for minecraft</description>
 
