@@ -52,6 +52,7 @@ public class SettingsConfig implements Config {
     @Property(key = "announces.discord.announce-type-discord") private AnnounceType announceTypeDiscord = AnnounceType.ONLY_ENCHANTED;
     @Property(key = "announces.discord.alert-on-attack") private boolean alertOnAttack = true;
     @Property(key = "announces.discord.alert-on-respawn") private boolean alertOnRespawn = true;
+    @Property(key = "announces.discord.alert-on-level-update") private boolean alertOnLevelUpdate = true;
     @Property(key = "announces.discord.ping-on-enchantment.enabled") private boolean pingOnEnchantmentEnabled = false;
     @Property(key = "announces.discord.ping-on-enchantment.mention") private String pingOnEnchantmentMention = "<@USER_ID>";
     @Property(key = "announces.discord.ping-on-enchantment.items") private List<String> pingOnEnchantmentItems = Collections.singletonList("enchanted_book");

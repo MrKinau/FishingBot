@@ -7,6 +7,7 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
+import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.io.discord.DiscordDetails;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
@@ -22,6 +23,7 @@ public class DiscordModule extends Module implements Listener {
     @Getter private DiscordMessageDispatcher discord;
 
     @Getter @Setter private float health = -1;
+    @Getter @Setter private int level = -1;
 
     @Override
     public void onEnable() {
@@ -84,6 +86,13 @@ public class DiscordModule extends Module implements Listener {
         if (FishingBot.getInstance().getConfig().isAlertOnAttack() && getHealth() > event.getHealth())
             getDiscord().dispatchMessage(mention + FishingBot.getI18n().t("discord-webhook-damage", numberFormat.format(event.getHealth())), DISCORD_DETAILS);
         this.health = event.getHealth();
+    }
+
+    @EventHandler
+    public void onXP(UpdateExperienceEvent event) {
+        if (getLevel() != event.getLevel() && FishingBot.getInstance().getConfig().isAlertOnLevelUpdate())
+            getDiscord().dispatchMessage(FishingBot.getI18n().t("announce-level-up", String.valueOf(event.getLevel())), DISCORD_DETAILS);
+        this.level = event.getLevel();
     }
 
     @EventHandler
