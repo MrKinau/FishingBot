@@ -31,6 +31,6 @@ public class PacketInWindowItems extends Packet {
         for (int i = 0; i < count; i++) {
             this.slots.add(readSlot(in));
         }
-        FishingBot.getInstance().getEventManager().callEvent(new UpdateWindowItemsEvent(windowId, slots));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateWindowItemsEvent(windowId, slots));
     }
 }

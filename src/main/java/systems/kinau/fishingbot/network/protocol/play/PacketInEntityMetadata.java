@@ -29,12 +29,12 @@ public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (FishingBot.getInstance().getFishingModule() == null)
+        if (FishingBot.getInstance().getCurrentBot().getFishingModule() == null)
             return;
         int eid = readVarInt(in);
-        if (!FishingBot.getInstance().getFishingModule().isTrackingNextEntityMeta() && FishingBot.getInstance().getPlayer().getEntityID() != eid)
+        if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextEntityMeta() && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
             return;
-        if (FishingBot.getInstance().getFishingModule().containsPossibleItem(eid) && FishingBot.getInstance().getPlayer().getEntityID() != eid)
+        if (FishingBot.getInstance().getCurrentBot().getFishingModule().containsPossibleItem(eid) && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
             return;
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             readWatchableObjects18(in, networkHandler, eid);
@@ -102,7 +102,7 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 2: {
                     float health = in.readFloat();
-                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
+                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                     return;
                 }
                 case 3: {
@@ -120,8 +120,8 @@ public class PacketInEntityMetadata extends Packet {
                 case 6: {
                     Slot slot = readSlot(in);
                     List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
-                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getCurrentBot().getServerProtocol()).replace("minecraft:", "");
+                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
                     return;
                 }
                 case 7: {
@@ -224,7 +224,7 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 2: {
                     float health = in.readFloat();
-                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
+                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                     return;
                 }
                 case 3: {
@@ -243,9 +243,9 @@ public class PacketInEntityMetadata extends Packet {
                     Slot slot = readSlot(in);
                     List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
 
-                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getServerProtocol()).replace("minecraft:", "");
+                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getCurrentBot().getServerProtocol()).replace("minecraft:", "");
 
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -347,7 +347,7 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 2: {
                     float health = in.readFloat();
-                    FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
+                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                     return;
                 }
                 case 3: {
@@ -362,7 +362,7 @@ public class PacketInEntityMetadata extends Packet {
                     Slot slot = readSlot(in);
                     String name = MaterialMc18.getMaterial(slot.getItemId()).name();
                     List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
-                    FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 
                     return;
                 }
@@ -432,7 +432,7 @@ public class PacketInEntityMetadata extends Packet {
                     }
                     case 3: {
                         float health = in.readFloat();
-                        FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
+                        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
                         return;
                     }
                     case 4: {
@@ -444,7 +444,7 @@ public class PacketInEntityMetadata extends Packet {
                         Slot slot = readSlot(in);
                         String name = MaterialMc18.getMaterial(slot.getItemId()).name();
                         List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
-                        FishingBot.getInstance().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                        FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 
                         return;
                     }

@@ -90,7 +90,7 @@ public class PacketInSpawnObject extends Packet {
             }
         }
 
-        FishingBot.getInstance().getEventManager().callEvent(
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(
                 new SpawnObjectEvent(getId(), getType(), getX(), getY(), getZ(), getYaw(), getPitch(), getObjectData(), getXVelocity(), getYVelocity(), getZVelocity()));
     }
 }

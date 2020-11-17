@@ -51,6 +51,6 @@ public class PacketInSpawnMob extends Packet {
         this.velocityY = in.readShort();
         this.velocityZ = in.readShort();
 
-        FishingBot.getInstance().getEventManager().callEvent(new SpawnMobEvent(eID, uuid, type, x, y, z, yaw, pitch, headPitch, velocityX, velocityY, velocityZ));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new SpawnMobEvent(eID, uuid, type, x, y, z, yaw, pitch, headPitch, velocityX, velocityY, velocityZ));
     }
 }

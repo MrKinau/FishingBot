@@ -24,13 +24,13 @@ public class ItemUtils {
             return false;
         if (!slot.isPresent())
             return false;
-        if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13)
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13)
             return MaterialMc18.getMaterial(slot.getItemId()) == MaterialMc18.FISHING_ROD;
-        else if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13_1)
+        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13_1)
             return slot.getItemId() == 563;
-        else if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_14)
+        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_14)
             return slot.getItemId() == 568;
-        else if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16_2)
+        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16_2)
             return slot.getItemId() == 622;
         else
             return slot.getItemId() == 684;
@@ -56,7 +56,7 @@ public class ItemUtils {
                 for (CompoundTag enchant : enchants) {
                     Optional<EnchantmentType> enchType;
                     short level = (Short) enchant.getValue().get("lvl").getValue();
-                    if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+                    if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
                         String id = (String) enchant.getValue().get("id").getValue();
                         enchType = EnchantmentType.getFromName(id);
                         if (!enchType.isPresent()) {
@@ -81,7 +81,7 @@ public class ItemUtils {
     public static int getDamage(Slot slot) {
         if (slot == null)
             return -1;
-        if (FishingBot.getInstance().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13)
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13)
             return slot.getItemDamage();
         try {
             NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(slot.getNbtData().clone()), false);
@@ -103,7 +103,7 @@ public class ItemUtils {
     public static int getFishingRodValue(Slot slot) {
         if (!isFishingRod(slot))
             return -1;
-        if (FishingBot.getInstance().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(slot) >= 63)
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(slot) >= 63)
             return -1;
         List<Enchantment> enchantments = getEnchantments(slot);
         short luckOfTheSeaLevel = enchantments.stream()
@@ -127,6 +127,8 @@ public class ItemUtils {
     public static int getBestFishingRod(Inventory inventory) {
         AtomicInteger currentBestSlotId = new AtomicInteger(-1);
         AtomicInteger currentBestValue = new AtomicInteger(-1);
+        if (inventory == null)
+            return -1;
         inventory.getContent().forEach((slotId, slot) -> {
             int currValue = getFishingRodValue(slot);
             if (currValue > currentBestValue.get()) {

@@ -37,26 +37,24 @@ public class Main {
                 return;
             }
 
+            new FishingBot(cmd);
+
             if (!cmd.hasOption("nogui")) {
                 String[] finalArgs = args;
                 new Thread(() -> {
                     try {
                         Main.class.getClassLoader().loadClass("javafx.embed.swing.JFXPanel");
-                        new Thread(() -> {
-                            FishingBot bot = new FishingBot(cmd);
-                            bot.start();
-                        }).start();
                         new MainGUI(finalArgs);
                         System.exit(0);
                     } catch (NoClassDefFoundError | ClassNotFoundException ex) {
+                        ex.printStackTrace();
                         Dialogs.showJavaFXNotWorking();
                         System.exit(0);
                     }
                 }, "GUIThread").start();
 
             } else {
-                FishingBot bot = new FishingBot(cmd);
-                bot.start();
+                FishingBot.getInstance().startBot();
             }
         } catch (ParseException e) {
             e.printStackTrace();

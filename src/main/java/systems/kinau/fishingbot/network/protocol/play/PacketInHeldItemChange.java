@@ -28,6 +28,6 @@ public class PacketInHeldItemChange extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.heldItemSlot = in.readByte() + 36;
 
-        FishingBot.getInstance().getEventManager().callEvent(new SetHeldItemEvent(heldItemSlot));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new SetHeldItemEvent(heldItemSlot));
     }
 }

@@ -24,6 +24,6 @@ public class PacketInLoginDisconnect extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         String errorMessage = readString(in);
-        FishingBot.getInstance().getEventManager().callEvent(new LoginDisconnectEvent(errorMessage));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new LoginDisconnectEvent(errorMessage));
     }
 }

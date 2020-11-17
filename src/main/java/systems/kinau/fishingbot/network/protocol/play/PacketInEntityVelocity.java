@@ -34,6 +34,6 @@ public class PacketInEntityVelocity extends Packet {
         y = in.readShort();
         z = in.readShort();
 
-        FishingBot.getInstance().getEventManager().callEvent(new EntityVelocityEvent(x, y, z, eid));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityVelocityEvent(x, y, z, eid));
     }
 }

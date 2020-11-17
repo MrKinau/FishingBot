@@ -33,6 +33,6 @@ public class PacketInSetExperience extends Packet {
 		level = readVarInt(in);
 		experience = readVarInt(in);
 
-		FishingBot.getInstance().getEventManager().callEvent(new UpdateExperienceEvent(experience, level));
+		FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateExperienceEvent(experience, level));
 	}
 }

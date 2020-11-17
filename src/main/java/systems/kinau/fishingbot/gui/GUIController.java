@@ -3,16 +3,21 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.command.CommandExecutor;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
+import systems.kinau.fishingbot.gui.config.ConfigGUI;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 
 import javax.annotation.Resources;
@@ -23,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GUIController implements Listener {
@@ -34,11 +40,15 @@ public class GUIController implements Listener {
     @FXML private TableColumn lootItemColumn;
     @FXML private TableColumn lootCountColumn;
     @FXML private TextField commandlineTextField;
+    @FXML private Tab lootTab;
+    @FXML private Button startStopButton;
+    @FXML private Button configButton;
+    @FXML private ImageView skinPreview;
+    @FXML private Label usernamePreview;
 
     @Getter private LootHistory lootHistory;
 
     public GUIController() {
-        FishingBot.getInstance().getEventManager().registerListener(this);
         this.lootHistory = new LootHistory();
     }
 
@@ -61,6 +71,7 @@ public class GUIController implements Listener {
         booksTable.getItems().clear();
         bowsTable.getItems().clear();
         rodsTable.getItems().clear();
+        this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
     }
 
     public void github(Event e) {
@@ -76,15 +87,30 @@ public class GUIController implements Listener {
     }
 
     public void openConfig(Event e) {
-        openFile(FishingBot.getInstance().getConfig().getPath());
+        String file;
+        if (FishingBot.getInstance().getCurrentBot() == null)
+            file = new File("config.json").getPath();
+        else
+            file = FishingBot.getInstance().getCurrentBot().getConfig().getPath();
+        openFile(file);
     }
 
     public void openLogsDir(Event e) {
-        openFile(FishingBot.getInstance().getLogsFolder().getPath());
+        String file;
+        if (FishingBot.getInstance().getCurrentBot() == null)
+            file = new File("logs/").getPath();
+        else
+            file = FishingBot.getInstance().getCurrentBot().getLogsFolder().getPath();
+        openFile(file);
     }
 
     public void openLog(Event e) {
-        openFile(FishingBot.getInstance().getLogsFolder().getPath() + "/log0.log");
+        String file;
+        if (FishingBot.getInstance().getCurrentBot() == null)
+            file = new File("logs/log0.log").getPath();
+        else
+            file = FishingBot.getInstance().getCurrentBot().getLogsFolder().getPath() + "/log0.log";
+        openFile(file);
     }
 
     public void commandlineSend(Event e) {
@@ -93,12 +119,14 @@ public class GUIController implements Listener {
     }
 
     private void runCommand(String text) {
+        if (FishingBot.getInstance().getCurrentBot() == null || FishingBot.getInstance().getCurrentBot().getNet() == null)
+            return;
         if (text.startsWith("/")) {
-            boolean executed = FishingBot.getInstance().getCommandRegistry().dispatchCommand(text, CommandExecutor.CONSOLE);
+            boolean executed = FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(text, CommandExecutor.CONSOLE);
             if (executed)
                 return;
         }
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutChat(text));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(text));
     }
 
     private void openFile(String fileUrl) {
@@ -121,16 +149,68 @@ public class GUIController implements Listener {
         }
     }
 
+    public void startStop(Event e) {
+        if (FishingBot.getInstance().getCurrentBot() == null) {
+            startStopButton.setText(FishingBot.getI18n().t("ui-button-stop"));
+            new Thread(() -> FishingBot.getInstance().startBot()).start();
+        } else {
+            startStopButton.setDisable(true);
+            startStopButton.setText(FishingBot.getI18n().t("ui-button-start"));
+            FishingBot.getInstance().stopBot(true);
+        }
+    }
+
+    public void updateStartStop() {
+        Platform.runLater(() -> {
+            if (FishingBot.getInstance().getCurrentBot() == null) {
+                startStopButton.setText(FishingBot.getI18n().t("ui-button-start"));
+            } else {
+                startStopButton.setDisable(true);
+                startStopButton.setText(FishingBot.getI18n().t("ui-button-stop"));
+            }
+        });
+    }
+
+    public void enableStartStop() {
+        Platform.runLater(() -> {
+            startStopButton.setDisable(false);
+        });
+    }
+
+    public void openConfigGUI(Event e) {
+        Stage primaryStage = (Stage) configButton.getScene().getWindow();
+        new ConfigGUI(primaryStage);
+    }
+
+    public void setImage(String uuid) {
+        if (uuid == null || uuid.isEmpty())
+            uuid = UUID.randomUUID().toString().replace("-","").toLowerCase();
+        String finalUuid = uuid;
+        Platform.runLater(() -> {
+            skinPreview.setFitWidth(120);
+            skinPreview.setFitHeight(170);
+            skinPreview.setVisible(true);
+            skinPreview.setImage(new Image(String.format("https://crafatar.com/renders/body/%s?overlay", finalUuid)));
+        });
+    }
+
+    public void setAccountName(String name) {
+        Platform.runLater(() -> usernamePreview.setText(name));
+    }
+
     @EventHandler
     public void onFishCaught(FishCaughtEvent event) {
         Platform.runLater(() -> {
             lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
         });
+
         LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
         AtomicBoolean existing = new AtomicBoolean(false);
+
         if (lootTable == null)
             return;
+
         lootTable.getItems().forEach(item -> {
             if (item.getName().equalsIgnoreCase(lootItem.getName())) {
                 item.setCount(lootItem.getCount());
@@ -141,8 +221,13 @@ public class GUIController implements Listener {
                 });
             }
         });
+
         if (!existing.get())
             lootTable.getItems().add(lootItem);
+
+        Platform.runLater(() -> {
+            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
+        });
 
         if (event.getItem().getEnchantments().isEmpty())
             return;

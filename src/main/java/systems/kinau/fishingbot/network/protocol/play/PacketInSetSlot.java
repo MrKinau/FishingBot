@@ -29,6 +29,6 @@ public class PacketInSetSlot extends Packet {
         this.slotId = in.readShort();
         this.slot = readSlot(in);
 
-        FishingBot.getInstance().getEventManager().callEvent(new UpdateSlotEvent(windowId, slotId, slot));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateSlotEvent(windowId, slotId, slot));
     }
 }

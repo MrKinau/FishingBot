@@ -38,7 +38,7 @@ public class RealmsAPI {
 
         BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), authData.getProfile()));
         BasicClientCookie userCookie = new BasicClientCookie("user", authData.getUsername());
-        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getVersionString(FishingBot.getInstance().getServerProtocol()));
+        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getVersionString(FishingBot.getInstance().getCurrentBot().getServerProtocol()));
 
         sidCookie.setDomain(".pc.realms.minecraft.net");
         userCookie.setDomain(".pc.realms.minecraft.net");
@@ -78,10 +78,10 @@ public class RealmsAPI {
             }
             response.add("Possible realms to join:");
             servers.forEach(server -> {
-                long id = (long) ((JSONObject)server).get("id");
-                String owner = (String) ((JSONObject)server).get("owner");
-                String name = (String) ((JSONObject)server).get("name");
-                String motd = (String) ((JSONObject)server).get("motd");
+                long id = (long) ((JSONObject) server).get("id");
+                String owner = (String) ((JSONObject) server).get("owner");
+                String name = (String) ((JSONObject) server).get("name");
+                String motd = (String) ((JSONObject) server).get("motd");
                 response.add("ID: " + id);
                 response.add("name: " + name);
                 response.add("motd: " + motd);

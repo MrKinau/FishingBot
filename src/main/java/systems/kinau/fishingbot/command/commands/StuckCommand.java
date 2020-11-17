@@ -12,6 +12,6 @@ public class StuckCommand extends Command {
 
     @Override
     public void onCommand(String label, String[] args, CommandExecutor executor) {
-        FishingBot.getInstance().getFishingModule().stuck();
+        FishingBot.getInstance().getCurrentBot().getFishingModule().stuck();
     }
 }

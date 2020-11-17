@@ -31,6 +31,6 @@ public class PacketInDestroyEntities extends Packet {
             getEntityIds().add(readVarInt(in));
         }
 
-        FishingBot.getInstance().getEventManager().callEvent(new DestroyEntitiesEvent(getEntityIds()));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new DestroyEntitiesEvent(getEntityIds()));
     }
 }

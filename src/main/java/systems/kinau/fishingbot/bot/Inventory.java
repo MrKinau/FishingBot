@@ -11,6 +11,6 @@ public class Inventory {
     private Map<Integer, Slot> content = new HashMap<>();
 
     public void setItem(int slotId, Slot slot) {
-        content.put(slotId, slot);
+        this.content.put(slotId, slot);
     }
 }

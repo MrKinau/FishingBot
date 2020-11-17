@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -23,6 +24,10 @@ public class PacketOutPosLook extends Packet {
     @Getter private float yaw;
     @Getter private float pitch;
     @Getter private boolean onGround;
+
+    public PacketOutPosLook(float yaw, float pitch) {
+        this(FishingBot.getInstance().getCurrentBot().getPlayer().getX(), FishingBot.getInstance().getCurrentBot().getPlayer().getY(), FishingBot.getInstance().getCurrentBot().getPlayer().getZ(), yaw, pitch, true);
+    }
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

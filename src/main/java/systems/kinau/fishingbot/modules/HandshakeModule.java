@@ -22,8 +22,8 @@ public class HandshakeModule extends Module {
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutHandshake(serverName, serverPort));
-        FishingBot.getInstance().getNet().setState(State.LOGIN);
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHandshake(serverName, serverPort));
+        FishingBot.getInstance().getCurrentBot().getNet().setState(State.LOGIN);
     }
 
     @Override

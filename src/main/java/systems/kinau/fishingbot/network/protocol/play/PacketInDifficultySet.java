@@ -28,6 +28,6 @@ public class PacketInDifficultySet extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.difficulty = in.readUnsignedByte();
 
-        FishingBot.getInstance().getEventManager().callEvent(new DifficultySetEvent(getDifficulty()));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new DifficultySetEvent(getDifficulty()));
     }
 }

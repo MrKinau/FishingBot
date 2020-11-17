@@ -14,6 +14,6 @@ public class LevelCommand extends Command {
 
     @Override
     public void onCommand(String label, String[] args, CommandExecutor executor) {
-        sendMessage(executor, "command-level", FishingBot.getInstance().getPlayer().getLevels());
+        sendMessage(executor, "command-level", FishingBot.getInstance().getCurrentBot().getPlayer().getLevels());
     }
 }
