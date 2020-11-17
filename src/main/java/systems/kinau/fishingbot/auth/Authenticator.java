@@ -39,8 +39,8 @@ public class Authenticator {
     }
 
     public AuthData authenticate() {
-        String userName = FishingBot.getInstance().getConfig().getUserName();
-        String password = FishingBot.getInstance().getConfig().getPassword();
+        String userName = FishingBot.getInstance().getCurrentBot().getConfig().getUserName();
+        String password = FishingBot.getInstance().getCurrentBot().getConfig().getPassword();
         if (accountFile.exists()) {
             try {
                 List<String> content = Files.readAllLines(Paths.get(accountFile.toURI()));
@@ -51,7 +51,7 @@ public class Authenticator {
                 String loginName = (String) rootObj.get("loginName");
                 String accountName = (String) rootObj.get("accountName");
                 String profileId = (String) rootObj.get("profileId");
-                if (loginName.equals(FishingBot.getInstance().getConfig().getUserName()))
+                if (loginName.equals(FishingBot.getInstance().getCurrentBot().getConfig().getUserName()))
                     return authenticateWithTokens(accessToken, clientToken, loginName, password, accountName, profileId);
                 else
                     return authenticateWithUsernamePassword(userName, password);

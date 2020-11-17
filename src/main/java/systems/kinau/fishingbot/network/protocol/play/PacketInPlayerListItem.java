@@ -46,14 +46,14 @@ public class PacketInPlayerListItem extends Packet {
                 int ping = readVarInt(in);
                 if (in.readBoolean()) // has display name
                     readString(in); // display name
-                if (uuid.equals(FishingBot.getInstance().getPlayer().getUuid()))
-                    FishingBot.getInstance().getEventManager().callEvent(new PingChangeEvent(ping));
+                if (uuid.equals(FishingBot.getInstance().getCurrentBot().getPlayer().getUuid()))
+                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PingChangeEvent(ping));
             } else if (action == 1) {
                 readVarInt(in); // gamemode
             } else if (action == 2) {
                 int ping = readVarInt(in);
-                if (uuid.equals(FishingBot.getInstance().getPlayer().getUuid()))
-                    FishingBot.getInstance().getEventManager().callEvent(new PingChangeEvent(ping));
+                if (uuid.equals(FishingBot.getInstance().getCurrentBot().getPlayer().getUuid()))
+                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PingChangeEvent(ping));
             } else if (action == 3) {
                 if (in.readBoolean()) // has display name
                     readString(in); // dispaly name
@@ -63,6 +63,6 @@ public class PacketInPlayerListItem extends Packet {
         }
         in.skipBytes(in.getAvailable());
 
-        FishingBot.getInstance().getEventManager().callEvent(new UpdatePlayerListEvent(getCurrPlayers()));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdatePlayerListEvent(getCurrPlayers()));
     }
 }

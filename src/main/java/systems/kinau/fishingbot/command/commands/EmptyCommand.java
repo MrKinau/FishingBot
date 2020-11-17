@@ -16,11 +16,11 @@ public class EmptyCommand extends Command {
         sendMessage(executor, "command-empty");
 
         for (short slotId = 9; slotId <= 44; slotId++) {
-            if (slotId == FishingBot.getInstance().getPlayer().getHeldSlot())
+            if (slotId == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
                 continue;
-            if (ItemUtils.isFishingRod(FishingBot.getInstance().getPlayer().getInventory().getContent().get(slotId)))
+            if (ItemUtils.isFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId)))
                 continue;
-            FishingBot.getInstance().getPlayer().dropStack(slotId, (short) (slotId - 8));
+            FishingBot.getInstance().getCurrentBot().getPlayer().dropStack(slotId, (short) (slotId - 8));
         }
     }
 }

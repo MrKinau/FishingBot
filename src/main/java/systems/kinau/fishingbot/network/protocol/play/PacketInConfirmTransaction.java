@@ -29,6 +29,6 @@ public class PacketInConfirmTransaction extends Packet {
         this.action = in.readShort();
         this.accepted = in.readBoolean();
 
-        FishingBot.getInstance().getEventManager().callEvent(new ConfirmTransactionEvent(getWindowId(), getAction(), isAccepted()));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ConfirmTransactionEvent(getWindowId(), getAction(), isAccepted()));
     }
 }

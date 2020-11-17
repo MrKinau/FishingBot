@@ -41,6 +41,6 @@ public class PacketInSpawnPlayer extends Packet {
         this.yaw = in.readByte();
         this.pitch = in.readByte();
 
-        FishingBot.getInstance().getEventManager().callEvent(new SpawnPlayerEvent(eID, uuid, x, y, z, yaw, pitch));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new SpawnPlayerEvent(eID, uuid, x, y, z, yaw, pitch));
     }
 }

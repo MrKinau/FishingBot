@@ -46,7 +46,7 @@ public class PacketInPlayerPosLook extends Packet {
             if(protocolId >= ProtocolConstants.MINECRAFT_1_9) {
                 this.teleportId = readVarInt(in); //tID
             }
-            FishingBot.getInstance().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
+            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
         }
     }
 }

@@ -32,7 +32,7 @@ public class ServerPinger {
     private int serverPort;
 
     public void ping() {
-        FishingBot.getInstance().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()));
+        FishingBot.getInstance().getCurrentBot().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()));
         if (serverName == null || serverName.trim().isEmpty()) {
             FishingBot.getI18n().severe("network-invalid-server-address");
             System.exit(1);
@@ -50,7 +50,7 @@ public class ServerPinger {
 
             ByteArrayDataOutput buf = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, buf);
-            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getInstance().getConfig().getDefaultProtocol()), buf);
+            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()), buf);
             Packet.writeString(serverName, buf);
             buf.writeShort(serverPort);
             Packet.writeVarInt(1, buf);
@@ -74,7 +74,7 @@ public class ServerPinger {
             long protocolId = (long) ((JSONObject)root.get("version")).get("protocol");
             long currPlayers = (long) ((JSONObject)root.get("players")).get("online");
 
-            FishingBot.getInstance().setServerProtocol(Long.valueOf(protocolId).intValue());
+            FishingBot.getInstance().getCurrentBot().setServerProtocol(Long.valueOf(protocolId).intValue());
             String description = "Unknown";
             try {
                 try {
@@ -92,9 +92,9 @@ public class ServerPinger {
             }
 
             FishingBot.getI18n().info("network-received-pong", description, ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()), String.valueOf(protocolId), String.valueOf(currPlayers));
-            if (currPlayers >= FishingBot.getInstance().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getConfig().isAutoDisconnect()) {
+            if (currPlayers >= FishingBot.getInstance().getCurrentBot().getConfig().getAutoDisconnectPlayersThreshold() && FishingBot.getInstance().getCurrentBot().getConfig().isAutoDisconnect()) {
                 FishingBot.getI18n().warning("network-server-is-full");
-                FishingBot.getInstance().setWontConnect(true);
+                FishingBot.getInstance().getCurrentBot().setWontConnect(true);
             }
 //            }
 
@@ -122,8 +122,8 @@ public class ServerPinger {
                 FishingBot.getI18n().info("network-changed-port", String.valueOf(serverPort));
         }
 
-        FishingBot.getInstance().setServerHost(serverName);
-        FishingBot.getInstance().setServerPort(serverPort);
+        FishingBot.getInstance().getCurrentBot().setServerHost(serverName);
+        FishingBot.getInstance().getCurrentBot().setServerPort(serverPort);
     }
 
     /**

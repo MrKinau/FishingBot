@@ -44,8 +44,8 @@ public class NetworkHandler {
 
     public NetworkHandler() {
         try {
-            this.out = new DataOutputStream(FishingBot.getInstance().getSocket().getOutputStream());
-            this.in = new DataInputStream(FishingBot.getInstance().getSocket().getInputStream());
+            this.out = new DataOutputStream(FishingBot.getInstance().getCurrentBot().getSocket().getOutputStream());
+            this.in = new DataInputStream(FishingBot.getInstance().getCurrentBot().getSocket().getInputStream());
 
             this.state = State.HANDSHAKE;
             initPacketRegistries();
@@ -478,13 +478,13 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_4).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_3));
 
         //Register protocol of latest for unknown versions
-        if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getServerProtocol())) {
-            FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getServerProtocol());
+        if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getCurrentBot().getServerProtocol())) {
+           FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getCurrentBot().getServerProtocol());
 
-            getPlayRegistryIn().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
-            getPlayRegistryOut().put(FishingBot.getInstance().getServerProtocol(), new PacketRegistry());
-            getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.getLatest()));
-            getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.getLatest()));
+            getPlayRegistryIn().put(FishingBot.getInstance().getCurrentBot().getServerProtocol(), new PacketRegistry());
+            getPlayRegistryOut().put(FishingBot.getInstance().getCurrentBot().getServerProtocol(), new PacketRegistry());
+            getPlayRegistryIn().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.getLatest()));
+            getPlayRegistryOut().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.getLatest()));
         }
     }
 
@@ -500,7 +500,7 @@ public class NetworkHandler {
                 Packet.writeVarInt(getLoginRegistryOut().getId(packet.getClass()), buf);
                 break;
             case PLAY:
-                Packet.writeVarInt(getPlayRegistryOut().get(FishingBot.getInstance().getServerProtocol()).getId(packet.getClass()), buf);
+                Packet.writeVarInt(getPlayRegistryOut().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).getId(packet.getClass()), buf);
                 break;
             default:
                 return;
@@ -508,7 +508,7 @@ public class NetworkHandler {
 
         //Add packet payload
         try {
-            packet.write(buf, FishingBot.getInstance().getServerProtocol());
+            packet.write(buf, FishingBot.getInstance().getCurrentBot().getServerProtocol());
         } catch (IOException e) {
             FishingBot.getLog().warning("Could not instantiate " + packet.getClass().getSimpleName());
         }
@@ -540,7 +540,7 @@ public class NetworkHandler {
                 e.printStackTrace();
             }
         }
-        if (FishingBot.getInstance().getConfig().isLogPackets())
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
             FishingBot.getLog().info("[" + getState().name().toUpperCase() + "]  C  >>> |S|: " + packet.getClass().getSimpleName());
     }
 
@@ -613,25 +613,25 @@ public class NetworkHandler {
                 clazz = getLoginRegistryIn().getPacket(packetId);
                 break;
             case PLAY:
-                clazz = getPlayRegistryIn().get(FishingBot.getInstance().getServerProtocol()).getPacket(packetId);
+                clazz = getPlayRegistryIn().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).getPacket(packetId);
                 break;
             default:
                 return;
         }
 
         if (clazz == null) {
-            if (FishingBot.getInstance().getConfig().isLogPackets()) {
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets()) {
                 byte[] bytes = new byte[buf.getAvailable()];
                 buf.readFully(bytes);
                 FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] |C| <<<  S : 0x" + Integer.toHexString(packetId));
             }
             return;
-        } else if (FishingBot.getInstance().getConfig().isLogPackets())
+        } else if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
             FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] |C| <<<  S : " + clazz.getSimpleName());
 
         try {
             Packet packet = clazz.newInstance();
-            packet.read(buf, this, len, FishingBot.getInstance().getServerProtocol());
+            packet.read(buf, this, len, FishingBot.getInstance().getCurrentBot().getServerProtocol());
         } catch (InstantiationException | IllegalAccessException e) {
             FishingBot.getLog().warning("Could not create new instance of " + clazz.getSimpleName());
             e.printStackTrace();
@@ -642,7 +642,7 @@ public class NetworkHandler {
         try {
             out.flush();
             setOutputEncrypted(true);
-            BufferedOutputStream var1 = new BufferedOutputStream(CryptManager.encryptOuputStream(getSecretKey(), FishingBot.getInstance().getSocket().getOutputStream()), 5120);
+            BufferedOutputStream var1 = new BufferedOutputStream(CryptManager.encryptOuputStream(getSecretKey(), FishingBot.getInstance().getCurrentBot().getSocket().getOutputStream()), 5120);
             this.out = new DataOutputStream(var1);
         } catch (IOException e) {
             e.printStackTrace();
@@ -653,7 +653,7 @@ public class NetworkHandler {
         setInputBeingDecrypted(true);
         try {
             InputStream var1;
-            var1 = FishingBot.getInstance().getSocket().getInputStream();
+            var1 = FishingBot.getInstance().getCurrentBot().getSocket().getInputStream();
             this.in = new DataInputStream(CryptManager.decryptInputStream(getSecretKey(), var1));
         } catch (IOException e) {
             e.printStackTrace();

@@ -148,7 +148,7 @@ public class PacketInJoinGame extends Packet {
             }
         }
 
-        FishingBot.getInstance().getEventManager().callEvent(
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(
                 new JoinGameEvent(eid, gamemode, worldIdentifier, dimension, spawnWorld,
                         hashedSeed, difficulty, maxPlayers, viewDistance, levelType,
                         reducedDebugInfo, enableRespawnScreen, debug, flat));

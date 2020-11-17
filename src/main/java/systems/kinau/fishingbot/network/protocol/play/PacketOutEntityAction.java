@@ -27,7 +27,7 @@ public class PacketOutEntityAction extends Packet {
             throw new IllegalArgumentException("EntityAction#OTHER is not allowed in PacketOutEntityAction.");
         }
 
-        Packet.writeVarInt(FishingBot.getInstance().getPlayer().getEntityID(), out);   // Entity ID
+        Packet.writeVarInt(FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID(), out);   // Entity ID
         Packet.writeVarInt(entityAction.ordinal(), out);                               // Action ID (only supported 0-4, see EntityAction enum)
         Packet.writeVarInt(0, out);                                              // Horse jump strength
     }

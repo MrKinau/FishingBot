@@ -15,19 +15,19 @@ public class ChatCommandModule extends Module implements Listener {
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getEventManager().registerListener(this);
+        FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
     }
 
     @Override
     public void onDisable() {
-        FishingBot.getInstance().getEventManager().unregisterListener(this);
+        FishingBot.getInstance().getCurrentBot().getEventManager().unregisterListener(this);
     }
 
     @EventHandler
     public void onChat(ChatEvent event) {
         if (!isEnabled())
             return;
-        String userName = FishingBot.getInstance().getAuthData().getUsername();
+        String userName = FishingBot.getInstance().getCurrentBot().getAuthData().getUsername();
         if (event.getText().contains(userName) && event.getText().contains(",")) {
             String[] parts = event.getText().split(",");
             if (parts.length <= 1)
@@ -41,7 +41,7 @@ public class ChatCommandModule extends Module implements Listener {
             if (Character.isWhitespace(fullCommand.charAt(0)))
                 fullCommand = fullCommand.substring(1);
 
-            FishingBot.getInstance().getCommandRegistry().dispatchCommand(fullCommand, CommandExecutor.OTHER_PLAYER);
+            FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(fullCommand, CommandExecutor.OTHER_PLAYER);
         }
     }
 }

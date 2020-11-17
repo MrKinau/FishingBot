@@ -36,6 +36,6 @@ public class PacketInEncryptionRequest extends Packet {
         this.publicKey = CryptManager.decodePublicKey(readBytesFromStream(in));
         this.verifyToken = readBytesFromStream(in);
 
-        FishingBot.getInstance().getEventManager().callEvent(new EncryptionRequestEvent(serverId, publicKey, verifyToken));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EncryptionRequestEvent(serverId, publicKey, verifyToken));
     }
 }

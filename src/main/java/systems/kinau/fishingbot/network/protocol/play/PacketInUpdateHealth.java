@@ -29,6 +29,6 @@ public class PacketInUpdateHealth extends Packet {
         this.food = readVarInt(in);
         this.saturation = in.readFloat();
 
-        FishingBot.getInstance().getEventManager().callEvent(new UpdateHealthEvent(FishingBot.getInstance().getPlayer().getEntityID(), getHealth(), getFood(), getSaturation()));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID(), getHealth(), getFood(), getSaturation()));
     }
 }

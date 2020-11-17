@@ -28,8 +28,10 @@ public class GUILogHandler extends Handler {
 
             String[] lines = logWindow.getText().split("\n");
 
-            if (lines.length > FishingBot.getInstance().getConfig().getGuiConsoleMaxLines()) {
-                int delta = lines.length - FishingBot.getInstance().getConfig().getGuiConsoleMaxLines();
+            if (FishingBot.getInstance().getCurrentBot() == null) {
+                this.logWindow.setText(String.join("\n", lines) + "\n");
+            } else if (lines.length > FishingBot.getInstance().getCurrentBot().getConfig().getGuiConsoleMaxLines()) {
+                int delta = lines.length - FishingBot.getInstance().getCurrentBot().getConfig().getGuiConsoleMaxLines();
                 lines = Arrays.copyOfRange(lines, delta, lines.length);
 
                 this.logWindow.setText(String.join("\n", lines) + "\n");

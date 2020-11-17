@@ -26,7 +26,7 @@ public abstract class Command {
         if (executor == CommandExecutor.CONSOLE)
             FishingBot.getLog().info(message);
         else
-            FishingBot.getInstance().getPlayer().sendMessage(message);
+            FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(message);
     }
 
     public void sendMessage(CommandExecutor executor, String key, Object... args) {

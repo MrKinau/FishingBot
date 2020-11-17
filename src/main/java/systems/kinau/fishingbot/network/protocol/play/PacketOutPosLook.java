@@ -26,7 +26,7 @@ public class PacketOutPosLook extends Packet {
     @Getter private boolean onGround;
 
     public PacketOutPosLook(float yaw, float pitch) {
-        this(FishingBot.getInstance().getPlayer().getX(), FishingBot.getInstance().getPlayer().getY(), FishingBot.getInstance().getPlayer().getZ(), yaw, pitch, true);
+        this(FishingBot.getInstance().getCurrentBot().getPlayer().getX(), FishingBot.getInstance().getCurrentBot().getPlayer().getY(), FishingBot.getInstance().getCurrentBot().getPlayer().getZ(), yaw, pitch, true);
     }
 
     @Override

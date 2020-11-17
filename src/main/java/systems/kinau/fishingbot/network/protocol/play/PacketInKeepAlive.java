@@ -55,6 +55,6 @@ public class PacketInKeepAlive extends Packet {
                 break;
             }
         }
-        FishingBot.getInstance().getEventManager().callEvent(new KeepAliveEvent(getId()));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new KeepAliveEvent(getId()));
     }
 }

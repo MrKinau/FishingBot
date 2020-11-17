@@ -17,6 +17,7 @@ import systems.kinau.fishingbot.FishingBot;
 public class MainGUI extends Application {
 
     public MainGUI(String[] args) {
+        FishingBot.getInstance().setMainGUI(this);
         launch(args);
     }
 
@@ -37,6 +38,8 @@ public class MainGUI extends Application {
         // Scene Builder does not accept this as fxml
         ((Accordion)loader.getNamespace().get("enchantmentsAccordion")).setExpandedPane((TitledPane)loader.getNamespace().get("booksPane"));
         ((Tab) loader.getNamespace().get("lootTab")).setText(FishingBot.getI18n().t("ui-tabs-loot", 0));
+
+        FishingBot.getInstance().setMainGUIController(loader.getController());
     }
 
 }

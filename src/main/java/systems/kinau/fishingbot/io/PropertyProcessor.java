@@ -110,7 +110,7 @@ public class PropertyProcessor {
         return currentObj;
     }
 
-    private void saveConfig(Config config, File file) {
+    public void saveConfig(Config config, File file) {
         Map<String, Object> configOptions = new HashMap<>();
         List<Field> fields = ReflectionUtils.getAllFields(config);
         for (Field field : fields) {

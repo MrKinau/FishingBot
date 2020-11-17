@@ -31,19 +31,19 @@ public class DropRodCommand extends Command {
             }
         }
 
-        Inventory inventory = FishingBot.getInstance().getPlayer().getInventory();
+        Inventory inventory = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory();
         int dropCount = 0;
 
         for (int slotId : inventory.getContent().keySet()) {
             Slot slot = inventory.getContent().get(slotId);
             if (!ItemUtils.isFishingRod(slot)) continue;
 
-            if (filter == Filter.ALL || (filter == Filter.ALL_BUT_SELECTED && slotId != FishingBot.getInstance().getPlayer().getHeldSlot())) {
-                FishingBot.getInstance().getPlayer().dropStack((short) slotId, (short) (slotId - 8));
+            if (filter == Filter.ALL || (filter == Filter.ALL_BUT_SELECTED && slotId != FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())) {
+                FishingBot.getInstance().getCurrentBot().getPlayer().dropStack((short) slotId, (short) (slotId - 8));
                 dropCount++;
-            } else if (filter == Filter.SELECTED && slotId == FishingBot.getInstance().getPlayer().getHeldSlot()) {
-                FishingBot.getInstance().getPlayer().dropStack((short) slotId, (short) (slotId - 8));
-                FishingBot.getInstance().getFishingModule().swapWithBestFishingRod();
+            } else if (filter == Filter.SELECTED && slotId == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot()) {
+                FishingBot.getInstance().getCurrentBot().getPlayer().dropStack((short) slotId, (short) (slotId - 8));
+                FishingBot.getInstance().getCurrentBot().getFishingModule().swapWithBestFishingRod();
                 dropCount++;
                 break;
             }

@@ -161,14 +161,14 @@ public abstract class Packet {
     }
 
     public static void writeSlot(Slot slot, ByteArrayDataOutput output) {
-        if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
             output.writeBoolean(slot.isPresent());
             if (slot.isPresent()) {
                 writeVarInt(slot.getItemId(), output);
                 output.writeByte(slot.getItemCount());
                 output.write(slot.getNbtData());
             }
-        } else if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
             if (!slot.isPresent()) {
                 output.writeShort(-1);
                 return;
@@ -189,7 +189,7 @@ public abstract class Packet {
     }
 
     public static Slot readSlot(ByteArrayDataInputWrapper input) {
-        if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
             boolean present = input.readBoolean();
             if (present) {
                 int itemId = readVarInt(input);
@@ -198,7 +198,7 @@ public abstract class Packet {
                 return new Slot(true, itemId, itemCount, (short)-1, nbtData);
             } else
                 return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
-        } else if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
             int itemId = input.readShort();
             if (itemId == -1)
                 return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});

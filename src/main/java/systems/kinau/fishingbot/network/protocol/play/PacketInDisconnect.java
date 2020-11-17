@@ -28,6 +28,6 @@ public class PacketInDisconnect extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.disconnectMessage = readString(in);
 
-        FishingBot.getInstance().getEventManager().callEvent(new DisconnectEvent(getDisconnectMessage()));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new DisconnectEvent(getDisconnectMessage()));
     }
 }

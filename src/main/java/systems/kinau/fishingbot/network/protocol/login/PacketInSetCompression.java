@@ -29,6 +29,6 @@ public class PacketInSetCompression extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         threshold = readVarInt(in);
-        FishingBot.getInstance().getEventManager().callEvent(new SetCompressionEvent(threshold));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new SetCompressionEvent(threshold));
     }
 }

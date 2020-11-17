@@ -22,6 +22,6 @@ public class PacketInLoginPluginRequest extends Packet {
         String channel = readString(in);
         byte[] data = new byte[in.getAvailable()];
         in.readFully(data);
-        FishingBot.getInstance().getEventManager().callEvent(new LoginPluginRequestEvent(msgId, channel, data));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new LoginPluginRequestEvent(msgId, channel, data));
     }
 }

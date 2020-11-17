@@ -37,7 +37,7 @@ public class CommandRegistry {
     }
 
     public Command getCommand(String cmd) {
-        if (cmd.contains("-"))
+        if (cmd.contains(" - "))
             return null;
         if (cmd.startsWith("/"))
             cmd = cmd.substring(1);

@@ -48,10 +48,10 @@ public class PacketInChat extends Packet {
                 //Ignored
             }
 
-            if (FishingBot.getInstance().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_16)
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_16)
                 this.sender = readUUID(in);
 
-            FishingBot.getInstance().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
+            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
         } catch (Exception ignored) {
             //Ignored
         }

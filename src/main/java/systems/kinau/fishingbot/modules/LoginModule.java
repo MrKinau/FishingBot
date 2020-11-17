@@ -31,22 +31,22 @@ public class LoginModule extends Module implements Listener {
 
     public LoginModule(String userName) {
         this.userName = userName;
-        FishingBot.getInstance().getEventManager().registerListener(this);
+        FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
     }
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutLoginStart(getUserName()));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginStart(getUserName()));
     }
 
     @Override
     public void onDisable() {
-        FishingBot.getInstance().getEventManager().unregisterListener(this);
+        FishingBot.getInstance().getCurrentBot().getEventManager().unregisterListener(this);
     }
 
     @EventHandler
     public void onEncryptionRequest(EncryptionRequestEvent event) {
-        NetworkHandler networkHandler = FishingBot.getInstance().getNet();
+        NetworkHandler networkHandler = FishingBot.getInstance().getCurrentBot().getNet();
 
         //Set public key
         networkHandler.setPublicKey(event.getPublicKey());
@@ -58,12 +58,13 @@ public class LoginModule extends Module implements Listener {
         byte[] serverIdHash = CryptManager.getServerIdHash(event.getServerId().trim(), event.getPublicKey(), secretKey);
         if(serverIdHash == null) {
             FishingBot.getI18n().severe("module-login-hash-error");
-            FishingBot.getInstance().setRunning(false);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
             return;
         }
 
         String var5 = new BigInteger(serverIdHash).toString(16);
-        String var6 = sendSessionRequest(FishingBot.getInstance().getAuthData().getUsername(), "token:" + FishingBot.getInstance().getAuthData().getAccessToken() + ":" + FishingBot.getInstance().getAuthData().getProfile(), var5);
+        String var6 = sendSessionRequest(FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(),
+                "token:" + FishingBot.getInstance().getCurrentBot().getAuthData().getAccessToken() + ":" + FishingBot.getInstance().getCurrentBot().getAuthData().getProfile(), var5);
 
         networkHandler.sendPacket(new PacketOutEncryptionResponse(event.getServerId(), event.getPublicKey(), event.getVerifyToken(), secretKey));
         networkHandler.activateEncryption();
@@ -73,25 +74,25 @@ public class LoginModule extends Module implements Listener {
     @EventHandler
     public void onLoginDisconnect(LoginDisconnectEvent event) {
         FishingBot.getI18n().severe("module-login-failed", event.getErrorMessage());
-        FishingBot.getInstance().setRunning(false);
-        FishingBot.getInstance().setAuthData(null);
+        FishingBot.getInstance().getCurrentBot().setRunning(false);
+        FishingBot.getInstance().getCurrentBot().setAuthData(null);
     }
 
     @EventHandler
     public void onSetCompression(SetCompressionEvent event) {
-        FishingBot.getInstance().getNet().setThreshold(event.getThreshold());
+        FishingBot.getInstance().getCurrentBot().getNet().setThreshold(event.getThreshold());
     }
 
     @EventHandler
     public void onLoginPluginRequest(LoginPluginRequestEvent event) {
-        FishingBot.getInstance().getNet().sendPacket(new PacketOutLoginPluginResponse(event.getMsgId(), false, null));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginPluginResponse(event.getMsgId(), false, null));
     }
 
     @EventHandler
     public void onLoginSuccess(LoginSuccessEvent event) {
         FishingBot.getI18n().info("module-login-successful", event.getUserName(), event.getUuid().toString());
-        FishingBot.getInstance().getNet().setState(State.PLAY);
-        FishingBot.getInstance().getPlayer().setUuid(event.getUuid());
+        FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
+        FishingBot.getInstance().getCurrentBot().getPlayer().setUuid(event.getUuid());
     }
 
     private String sendSessionRequest(String user, String session, String serverid) {
