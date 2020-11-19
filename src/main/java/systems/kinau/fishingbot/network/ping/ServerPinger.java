@@ -48,9 +48,13 @@ public class ServerPinger {
 
             //send Handshake 0x00 - PING
 
+            int pingProtocol = (ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()));
+            if (pingProtocol == ProtocolConstants.AUTOMATIC)
+                pingProtocol = ProtocolConstants.getLatest();
+
             ByteArrayDataOutput buf = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, buf);
-            Packet.writeVarInt(ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()), buf);
+            Packet.writeVarInt(pingProtocol, buf);
             Packet.writeString(serverName, buf);
             buf.writeShort(serverPort);
             Packet.writeVarInt(1, buf);
@@ -74,7 +78,13 @@ public class ServerPinger {
             long protocolId = (long) ((JSONObject)root.get("version")).get("protocol");
             long currPlayers = (long) ((JSONObject)root.get("players")).get("online");
 
-            FishingBot.getInstance().getCurrentBot().setServerProtocol(Long.valueOf(protocolId).intValue());
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.AUTOMATIC)
+                FishingBot.getInstance().getCurrentBot().setServerProtocol(Long.valueOf(protocolId).intValue());
+            else if (protocolId != FishingBot.getInstance().getCurrentBot().getServerProtocol()) {
+                FishingBot.getI18n().warning("network-ping-differs-protocol",
+                        "\"" + ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()) + "\" (" + protocolId + ")",
+                        "\"" + ProtocolConstants.getVersionString(FishingBot.getInstance().getCurrentBot().getServerProtocol()) + "\" (" + FishingBot.getInstance().getCurrentBot().getServerProtocol() + ")");
+            }
             String description = "Unknown";
             try {
                 try {

@@ -11,6 +11,7 @@ import java.util.List;
 
 public class ProtocolConstants {
 
+    public static final int AUTOMATIC = -1;
     public static final int MINECRAFT_1_8 = 47;
     public static final int MINECRAFT_1_9 = 107;
     public static final int MINECRAFT_1_9_1 = 108;
@@ -40,6 +41,7 @@ public class ProtocolConstants {
     public static final int MINECRAFT_1_16_4 = 754;
 
     public static final List<Integer> SUPPORTED_VERSION_IDS = Arrays.asList(
+            ProtocolConstants.AUTOMATIC,
             ProtocolConstants.MINECRAFT_1_8,
             ProtocolConstants.MINECRAFT_1_9,
             ProtocolConstants.MINECRAFT_1_9_1,
@@ -72,6 +74,7 @@ public class ProtocolConstants {
 
     public static String getVersionString(int protocolId) {
         switch (protocolId) {
+            case AUTOMATIC: return "AUTOMATIC";
             case MINECRAFT_1_8: return "1.8";
             case MINECRAFT_1_9: return "1.9";
             case MINECRAFT_1_9_1: return "1.9.1";
@@ -105,6 +108,7 @@ public class ProtocolConstants {
 
     public static int getProtocolId(String versionString) {
         switch (versionString) {
+            case "AUTOMATIC": return AUTOMATIC;
             case "1.9": return MINECRAFT_1_9;
             case "1.9.1": return MINECRAFT_1_9_1;
             case "1.9.2": return MINECRAFT_1_9_2;

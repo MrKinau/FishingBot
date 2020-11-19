@@ -24,7 +24,7 @@ public class SettingsConfig implements Config {
     @Property(key = "server.realm-id", description = "config-server-realm-id") private long realmId = -1;
     @Property(key = "server.realm-accept-tos", description = "config-server-realm-accept-tos") private boolean realmAcceptTos = false;
     @Property(key = "server.online-mode", description = "config-server-online-mode") private boolean onlineMode = true;
-    @Property(key = "server.default-protocol", description = "config-server-default-protocol") private String defaultProtocol = ProtocolConstants.getVersionString(ProtocolConstants.MINECRAFT_1_8);
+    @Property(key = "server.default-protocol", description = "config-server-default-protocol") private String defaultProtocol = ProtocolConstants.getVersionString(ProtocolConstants.AUTOMATIC);
     @Property(key = "server.spoof-forge", description = "config-server-spoof-forge") private boolean spoofForge = false;
 
     @Property(key = "auto.auto-reconnect", description = "config-auto-auto-reconnect") private boolean autoReconnect = true;
