@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.utils.Item;
 import systems.kinau.fishingbot.network.utils.MaterialMc18;
 
 import java.io.IOException;
@@ -82,8 +83,9 @@ public class ItemHandler {
         return getItemsMap(protocol).get(id);
     }
 
-    public static String getImageUrl(String name) {
-        return String.format("https://minecraftitemids.com/item/128/%s.png", name.toLowerCase());
+    public static String getImageUrl(Item item) {
+        String fileType = (item.getEnchantments() == null || item.getEnchantments().isEmpty()) ? "png" : "gif";
+        return String.format("https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/items/%s." + fileType, item.getName().toLowerCase()).replace(" ", "%20");
     }
 
     public static Map<Integer, String> getItemsMap(int protocol) {

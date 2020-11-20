@@ -3,13 +3,17 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 public class Dialogs {
 
@@ -24,7 +28,7 @@ public class Dialogs {
 
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(true);
-            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("icon.png")));
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
 
             alert.showAndWait();
         });
@@ -44,7 +48,7 @@ public class Dialogs {
 
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(true);
-            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("icon.png")));
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
 
             alert.showAndWait();
         });
@@ -61,7 +65,7 @@ public class Dialogs {
 
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(true);
-            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("icon.png")));
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
 
             alert.showAndWait();
         });
@@ -74,5 +78,31 @@ public class Dialogs {
             latch.countDown();
         });
         try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
+    }
+
+    public static void showAboutWindow(Stage parent, Consumer<String> callBack) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(FishingBot.PREFIX);
+
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-about-header"));
+            FlowPane fp = new FlowPane();
+            Label lbl = new Label(FishingBot.getI18n().t("dialog-about-content"));
+            Hyperlink link = new Hyperlink(" faithful.team");
+            fp.getChildren().addAll( lbl, link);
+
+            link.setOnAction(event -> {
+                alert.close();
+                callBack.accept("https://faithful.team/");
+            });
+
+            alert.getDialogPane().contentProperty().set(fp);
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.initOwner(parent);
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
+
+            alert.showAndWait();
+        });
     }
 }

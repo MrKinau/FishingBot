@@ -182,6 +182,10 @@ public class GUIController implements Listener {
         new ConfigGUI(primaryStage);
     }
 
+    public void openAbout(Event e) {
+        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), s -> openWebpage(s));
+    }
+
     public void setImage(String uuid) {
         if (uuid == null || uuid.isEmpty())
             uuid = UUID.randomUUID().toString().replace("-","").toLowerCase();

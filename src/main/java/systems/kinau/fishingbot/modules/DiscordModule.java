@@ -12,6 +12,9 @@ import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.discord.DiscordDetails;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
+import systems.kinau.fishingbot.network.utils.Enchantment;
+import systems.kinau.fishingbot.network.utils.Item;
+import systems.kinau.fishingbot.network.utils.StringUtils;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -40,6 +43,41 @@ public class DiscordModule extends Module implements Listener {
         FishingBot.getInstance().getCurrentBot().getEventManager().unregisterListener(this);
     }
 
+    private String formatEnchantment(List<Enchantment> enchantments) {
+        if (enchantments == null || enchantments.isEmpty())
+            return null;
+        StringBuilder sb = new StringBuilder("**Enchantments:**\n");
+        enchantments.forEach(enchantment -> {
+            sb.append(enchantment.getEnchantmentType().getName().toUpperCase());
+            if (enchantment.getLevel() > 1)
+                sb.append(" ").append(StringUtils.getRomanLevel(enchantment.getLevel()));
+            sb.append("\n");
+        });
+        return sb.toString();
+    }
+
+    private int getColor(Item item) {
+        if (item.getEnchantments() != null && !item.getEnchantments().isEmpty())
+            return 0x6a01fb;
+        switch (item.getName()) {
+            case "nametag": return 0xf5e4bc;
+            case "leather":
+            case "saddle": return 0xda652a;
+            case "bowl":
+            case "stick":
+            case "fishing_rod":
+            case "leather_boots":
+            case "rotten_flesh":
+            case "tripwire_hook":
+            case "bow": return 0x70402e;
+            case "string":
+            case "bone": return 0xe0e0e2;
+            case "ink_sac": return 0x2c2c2d;
+            case "lily_pad": return 0x18661f;
+            default: return 0x3ac8e7;
+        }
+    }
+
     @EventHandler
     public void onCaught(FishCaughtEvent event) {
         if (getDiscord() != null) {
@@ -59,18 +97,27 @@ public class DiscordModule extends Module implements Listener {
                         mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
                     }
                 }
-//                getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
+                if (!mention.isEmpty())
+                    getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
+
+                String itemName = event.getItem().getName().substring(0, 1).toUpperCase() + event.getItem().getName().substring(1);
+                itemName = itemName.replace("_", " ");
+                StringBuilder sb = new StringBuilder();
+                for (String s : itemName.split(" ")) {
+                    s = s.substring(0, 1).toUpperCase() + s.substring(1);
+                    sb.append(s).append(" ");
+                }
+                String finalItemName = sb.toString().trim();
+
+                int durability = 64 - FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem().getItemDamage();
+
                 fishingModule.logItem(
                         event.getItem(),
                         FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeDiscord(),
-                        s -> getDiscord().dispatchEmbed(event.getItem().getName(), 0x00ff00,
-                                ItemHandler.getImageUrl(event.getItem().getName()), event.getItem().getEnchantments().toString(),
-                                "Fishing Rod Durability: 1/1 o " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(), DISCORD_DETAILS),
-                        s -> {
-                            getDiscord().dispatchEmbed(event.getItem().getName(), 0x00ff00,
-                                    ItemHandler.getImageUrl(event.getItem().getName()), event.getItem().getEnchantments().toString(),
-                                    "Fishing Rod Durability: 1/1 o " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(), DISCORD_DETAILS);
-                        });
+                        s -> getDiscord().dispatchEmbed("**" + finalItemName + "**", getColor(event.getItem()),
+                                ItemHandler.getImageUrl(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
+                                "Fishing Rod Durability: " + durability + "/64  ●  " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(), DISCORD_DETAILS),
+                        s -> { });
             }).start();
         }
     }

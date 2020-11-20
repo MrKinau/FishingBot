@@ -5,6 +5,8 @@
 
 package systems.kinau.fishingbot.network.protocol;
 
+import com.flowpowered.nbt.*;
+import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.FishingBot;
@@ -14,6 +16,7 @@ import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 import systems.kinau.fishingbot.network.utils.NBTUtils;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.UUID;
@@ -195,7 +198,18 @@ public abstract class Packet {
                 int itemId = readVarInt(input);
                 byte itemCount = input.readByte();
                 byte[] nbtData = NBTUtils.readNBT(input);
-                return new Slot(true, itemId, itemCount, (short)-1, nbtData);
+                int damage = -1;
+                try {
+                    NBTInputStream nbtStream = new NBTInputStream(new ByteArrayInputStream(nbtData.clone()), false);
+                    Tag tag = nbtStream.readTag();
+                    if (tag.getType() == TagType.TAG_COMPOUND) {
+                        CompoundMap tagMap = ((CompoundTag)tag).getValue();
+                        if (tagMap.containsKey("Damage"))
+                            damage = ((IntTag)tagMap.get("Damage")).getValue();
+                    }
+                } catch (IOException e) {
+                }
+                return new Slot(true, itemId, itemCount, (short) damage, nbtData);
             } else
                 return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
         } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
@@ -204,7 +218,18 @@ public abstract class Packet {
                 return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
             byte itemCount = input.readByte();
             byte[] nbtData = NBTUtils.readNBT(input);
-            return new Slot(true, itemId, itemCount, (short)-1, nbtData);
+            int damage = -1;
+            try {
+                NBTInputStream nbtStream = new NBTInputStream(new ByteArrayInputStream(nbtData.clone()), false);
+                Tag tag = nbtStream.readTag();
+                if (tag.getType() == TagType.TAG_COMPOUND) {
+                    CompoundMap tagMap = ((CompoundTag)tag).getValue();
+                    if (tagMap.containsKey("Damage"))
+                        damage = ((IntTag)tagMap.get("Damage")).getValue();
+                }
+            } catch (IOException e) {
+            }
+            return new Slot(true, itemId, itemCount, (short) damage, nbtData);
         } else {
             int itemId = input.readShort();
             if (itemId == -1)

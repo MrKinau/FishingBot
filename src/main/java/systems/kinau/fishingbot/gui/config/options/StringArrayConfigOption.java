@@ -88,7 +88,7 @@ public class StringArrayConfigOption extends ConfigOption {
 
             Stage window = new Stage();
             window.setTitle("FishingBot - Config");
-            window.getIcons().add(new Image(StringArrayConfigOption.class.getClassLoader().getResourceAsStream("icon.png")));
+            window.getIcons().add(new Image(StringArrayConfigOption.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
             window.setScene(scene);
 
             window.setMinHeight(150);

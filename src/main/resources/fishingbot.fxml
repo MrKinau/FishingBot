@@ -27,6 +27,7 @@
           <MenuItem mnemonicParsing="false" onAction="#github" text="%ui-menu-help-github" />
           <MenuItem mnemonicParsing="false" onAction="#issues" text="%ui-menu-help-issues" />
           <MenuItem mnemonicParsing="false" onAction="#discord" text="%ui-menu-help-discord" />
+          <MenuItem mnemonicParsing="false" onAction="#openAbout" text="%ui-menu-help-about" />
         </items>
       </Menu>
     </menus>

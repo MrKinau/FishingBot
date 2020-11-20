@@ -84,7 +84,7 @@ public class ConfigGUI {
         scene.getStylesheets().add("configstyle.css");
 
         window.setTitle("FishingBot - Config");
-        window.getIcons().add(new Image(ConfigGUI.class.getClassLoader().getResourceAsStream("icon.png")));
+        window.getIcons().add(new Image(ConfigGUI.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
         window.setScene(scene);
 
         window.setMaxHeight(430);
