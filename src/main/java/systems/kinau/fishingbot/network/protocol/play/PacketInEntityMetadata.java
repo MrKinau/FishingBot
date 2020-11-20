@@ -360,10 +360,9 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 5: {
                     Slot slot = readSlot(in);
-                    String name = MaterialMc18.getMaterial(slot.getItemId()).name();
+                    String name = MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
                     List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                     FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
-
                     return;
                 }
                 case 6: {
@@ -442,7 +441,7 @@ public class PacketInEntityMetadata extends Packet {
 
                     case 5: {
                         Slot slot = readSlot(in);
-                        String name = MaterialMc18.getMaterial(slot.getItemId()).name();
+                        String name = MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
                         List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                         FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 

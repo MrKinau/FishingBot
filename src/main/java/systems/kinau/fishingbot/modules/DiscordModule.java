@@ -9,6 +9,7 @@ import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
+import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.io.discord.DiscordDetails;
 import systems.kinau.fishingbot.io.discord.DiscordMessageDispatcher;
 
@@ -58,18 +59,17 @@ public class DiscordModule extends Module implements Listener {
                         mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
                     }
                 }
-                String finalMention = mention;
+//                getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
                 fishingModule.logItem(
                         event.getItem(),
                         FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeDiscord(),
-                        s -> getDiscord().dispatchMessage(finalMention + "`" + s + "`", DISCORD_DETAILS),
+                        s -> getDiscord().dispatchEmbed(event.getItem().getName(), 0x00ff00,
+                                ItemHandler.getImageUrl(event.getItem().getName()), event.getItem().getEnchantments().toString(),
+                                "Fishing Rod Durability: 1/1 o " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(), DISCORD_DETAILS),
                         s -> {
-                            try {
-                                Thread.sleep(50);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            getDiscord().dispatchMessage("`" + s + "`", DISCORD_DETAILS);
+                            getDiscord().dispatchEmbed(event.getItem().getName(), 0x00ff00,
+                                    ItemHandler.getImageUrl(event.getItem().getName()), event.getItem().getEnchantments().toString(),
+                                    "Fishing Rod Durability: 1/1 o " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(), DISCORD_DETAILS);
                         });
             }).start();
         }

@@ -462,6 +462,23 @@ public enum MaterialMc18 {
         }
     }
 
+    public static String getMaterialName(final int id, final short durability) {
+        if (byId.length > id && id >= 0) {
+            if (byId[id].equals(RAW_FISH) && durability == 0) {
+                return "cod";
+            } else if (byId[id].equals(RAW_FISH) && durability == 1) {
+                return "salmon";
+            } else if (byId[id].equals(RAW_FISH) && durability == 2) {
+                return "tropical_fish";
+            } else if (byId[id].equals(RAW_FISH) && durability == 3) {
+                return "pufferfish";
+            }
+            return byId[id].name();
+        } else {
+            return "";
+        }
+    }
+
 
     static {
         for (MaterialMc18 material : values()) {

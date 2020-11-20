@@ -82,6 +82,10 @@ public class ItemHandler {
         return getItemsMap(protocol).get(id);
     }
 
+    public static String getImageUrl(String name) {
+        return String.format("https://minecraftitemids.com/item/128/%s.png", name.toLowerCase());
+    }
+
     public static Map<Integer, String> getItemsMap(int protocol) {
         if (protocol < ProtocolConstants.MINECRAFT_1_13) {
             Map<Integer, String> itemsMap = new HashMap<>();

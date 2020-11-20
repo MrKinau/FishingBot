@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 
@@ -33,7 +32,6 @@ public class StringArrayConfigOption extends ConfigOption {
         editButton.setOnAction(event -> {
             ListView<String> listView = new ListView<>();
             if (getValue() instanceof String[]) {
-                System.out.println(Arrays.asList((String[])getValue()));
                 listView.getItems().addAll((String[]) getValue());
             }
             if (listView.getItems().size() > 0)
@@ -56,7 +54,6 @@ public class StringArrayConfigOption extends ConfigOption {
                 result.ifPresent(s -> {
                     listView.getItems().add(s);
                     setValue(new ArrayList<>(listView.getItems()).toArray(new String[0]));
-                    System.out.println(Arrays.asList((String[])getValue()));
                 });
             });
 
@@ -66,7 +63,6 @@ public class StringArrayConfigOption extends ConfigOption {
                 if (listView.getItems().size() <= 0)
                     removeButton.setDisable(true);
                 setValue(new ArrayList<>(listView.getItems()).toArray(new String[0]));
-                System.out.println(Arrays.asList((String[])getValue()));
             });
 
             listView.setOnMouseClicked(event1 -> {
