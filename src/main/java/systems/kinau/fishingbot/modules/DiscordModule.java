@@ -109,7 +109,7 @@ public class DiscordModule extends Module implements Listener {
                 }
                 String finalItemName = sb.toString().trim();
 
-                int durability = 64 - FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem().getItemDamage();
+                int durability = Math.min(64 - FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem().getItemDamage(), 64);
 
                 fishingModule.logItem(
                         event.getItem(),

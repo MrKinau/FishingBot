@@ -1,5 +1,7 @@
 package systems.kinau.fishingbot.network.utils;
 
+import lombok.Getter;
+
 public class LocationUtils {
 
     public static float yawDiff(float yaw1, float yaw2) {
@@ -20,6 +22,19 @@ public class LocationUtils {
             return -xDiff;
         } else {
             return xDiff;
+        }
+    }
+
+    public enum Direction {
+        NORTH(180.0F),
+        EAST(-90.0F),
+        SOUTH(0.0F),
+        WEST(90.0F);
+
+        @Getter private float yaw;
+
+        Direction(float yaw) {
+            this.yaw = yaw;
         }
     }
 

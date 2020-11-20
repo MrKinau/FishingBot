@@ -229,6 +229,10 @@ public class Player implements Listener {
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
     }
 
+    public void look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
+        look(direction.getYaw(), getPitch(), 8, onFinish);
+    }
+
     public void look(float yaw, float pitch, int speed) {
         look(yaw, pitch, speed, null);
     }
