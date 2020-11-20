@@ -74,6 +74,7 @@ public class DiscordModule extends Module implements Listener {
             case "bone": return 0xe0e0e2;
             case "ink_sac": return 0x2c2c2d;
             case "lily_pad": return 0x18661f;
+            case "bamboo": return 0x21a021;
             default: return 0x3ac8e7;
         }
     }
@@ -100,8 +101,7 @@ public class DiscordModule extends Module implements Listener {
                 if (!mention.isEmpty())
                     getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
 
-                String itemName = event.getItem().getName().substring(0, 1).toUpperCase() + event.getItem().getName().substring(1);
-                itemName = itemName.replace("_", " ");
+                String itemName = event.getItem().getName().replace("_", " ").toLowerCase();
                 StringBuilder sb = new StringBuilder();
                 for (String s : itemName.split(" ")) {
                     s = s.substring(0, 1).toUpperCase() + s.substring(1);

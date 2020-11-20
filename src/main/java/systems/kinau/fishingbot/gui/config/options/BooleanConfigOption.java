@@ -16,7 +16,10 @@ public class BooleanConfigOption extends ConfigOption {
         checkBox.setSelected(status);
         checkBox.setOnAction(event -> setValue(checkBox.isSelected()));
         if (onClick != null)
-            checkBox.setOnAction(onClick);
+            checkBox.setOnAction(event -> {
+                setValue(checkBox.isSelected());
+                onClick.handle(event);
+            });
         getChildren().add(checkBox);
     }
 

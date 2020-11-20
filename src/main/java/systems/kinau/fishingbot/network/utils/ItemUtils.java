@@ -30,7 +30,7 @@ public class ItemUtils {
             return slot.getItemId() == 563;
         else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_14)
             return slot.getItemId() == 568;
-        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16_2)
+        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16)
             return slot.getItemId() == 622;
         else
             return slot.getItemId() == 684;

@@ -472,6 +472,10 @@ public enum MaterialMc18 {
                 return "tropical_fish";
             } else if (byId[id].equals(RAW_FISH) && durability == 3) {
                 return "pufferfish";
+            } else if (byId[id].equals(WATER_LILY)) {
+                return "lily_pad";
+            }else if (byId[id].equals(INK_SACK)) {
+                return "ink_sac";
             }
             return byId[id].name();
         } else {

@@ -16,10 +16,12 @@ import systems.kinau.fishingbot.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
+import systems.kinau.fishingbot.network.utils.LocationUtils;
 import systems.kinau.fishingbot.network.utils.StringUtils;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class Player implements Listener {
 
@@ -44,6 +46,8 @@ public class Player implements Listener {
 
     @Getter @Setter private int entityID = -1;
     @Getter @Setter private int lastPing = 500;
+
+    @Getter @Setter private Thread lookThread;
 
     public Player() {
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
@@ -223,5 +227,46 @@ public class Player implements Listener {
         Slot slot = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId);
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(hotBarButton + 36));
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
+    }
+
+    public void look(float yaw, float pitch, int speed) {
+        look(yaw, pitch, speed, null);
+    }
+
+    public void look(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
+        if (lookThread != null && lookThread.isAlive())
+            lookThread.interrupt();
+
+        this.lookThread = new Thread(() -> {
+            float yawDiff = LocationUtils.yawDiff(getYaw(), yaw);
+            float pitchDiff = LocationUtils.yawDiff(getPitch(), pitch);
+
+            int steps = (int) Math.ceil(Math.max(Math.abs(yawDiff), Math.abs(pitchDiff)) / Math.max(1, speed));
+            float yawPerStep = yawDiff / steps;
+            float pitchPerStep = pitchDiff / steps;
+
+            for (int i = 0; i < steps; i++) {
+                if (lookThread.isInterrupted()) {
+                    if (onFinish != null)
+                        onFinish.accept(false);
+                    break;
+                }
+                setYaw(getYaw() + yawPerStep);
+                setPitch(getPitch() + pitchPerStep);
+                if (getYaw() > 180)
+                    setYaw(-180 + (getYaw() - 180));
+                if (getYaw() < -180)
+                    setYaw(180 + (getYaw() + 180));
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (onFinish != null)
+                onFinish.accept(true);
+        });
+        getLookThread().start();
     }
 }

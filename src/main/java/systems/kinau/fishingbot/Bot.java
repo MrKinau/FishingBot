@@ -124,7 +124,7 @@ public class Bot {
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
-        if (!FishingBot.getInstance().getCmdLine().hasOption("nogui")) {
+        if (!cmdLine.hasOption("nogui")) {
             FishingBot.getInstance().getMainGUIController().setImage(authData.getProfile());
             FishingBot.getInstance().getMainGUIController().setAccountName(authData.getUsername());
         }
@@ -188,7 +188,7 @@ public class Bot {
             FishingBot.getInstance().getMainGUIController().enableStartStop();
             return;
         }
-        connect(FishingBot.getInstance().getCmdLine());
+        connect();
     }
 
     private boolean authenticate(File accountFile) {
@@ -212,9 +212,10 @@ public class Bot {
         getCommandRegistry().registerCommand(new ByeCommand());
         getCommandRegistry().registerCommand(new StuckCommand());
         getCommandRegistry().registerCommand(new DropRodCommand());
+        getCommandRegistry().registerCommand(new LookCommand());
     }
 
-    private void connect(CommandLine cmdLine) {
+    private void connect() {
         String serverName = getServerHost();
         int port = getServerPort();
 

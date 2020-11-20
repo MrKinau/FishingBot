@@ -26,7 +26,7 @@ public class FishingBot {
     @Getter private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
     @Getter private SettingsConfig config;
-    @Getter private CommandLine cmdLine;
+    private CommandLine cmdLine;
 
     @Getter @Setter private Bot currentBot;
     @Getter @Setter private MainGUI mainGUI;
