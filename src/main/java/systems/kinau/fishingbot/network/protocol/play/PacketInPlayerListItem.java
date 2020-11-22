@@ -39,8 +39,11 @@ public class PacketInPlayerListItem extends Packet {
                 currPlayers.add(uuid);
                 int propCount = readVarInt(in);
                 for (int j = 0; j < propCount; j++) {
-                    if (in.readBoolean()) // signed
+                    readString(in); // name
+                    readString(in); // value
+                    if (in.readBoolean()) {// signed
                         readString(in); // signature
+                    }
                 }
                 readVarInt(in); // gamemode
                 int ping = readVarInt(in);
