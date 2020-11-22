@@ -69,6 +69,7 @@ public class FishingBot {
     public void startBot() {
         if (getCurrentBot() != null)
             stopBot(true);
+        Thread.currentThread().setName("mainThread");
         Bot bot = new Bot(cmdLine);
         bot.start();
     }

@@ -121,6 +121,7 @@ public class Player implements Listener {
     public void onUpdateHealth(UpdateHealthEvent event) {
         if (event.getEid() != getEntityID())
             return;
+
         if (getHealth() != -1 && event.getHealth() <= 0 && getEntityID() != -1 && !isRespawning()) {
             setRespawning(true);
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new RespawnEvent());
@@ -140,9 +141,10 @@ public class Player implements Listener {
         }
 
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoQuitBeforeDeathEnabled()) {
-            if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeQuit()) {
+            if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeQuit() && event.getHealth() != 0.0) {
                 FishingBot.getI18n().warning("module-fishing-health-threshold-reached");
-                System.exit(0);
+                FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
+                FishingBot.getInstance().getCurrentBot().setRunning(false);
             }
         }
 

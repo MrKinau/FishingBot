@@ -99,6 +99,7 @@ public class ClientDefaultsModule extends Module implements Listener {
                 try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }
         });
+        positionThread.setName("positionThread");
         positionThread.start();
     }
 }

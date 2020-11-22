@@ -49,6 +49,7 @@ public class Bot {
 
     @Getter         private Player player;
     @Getter         private ClientDefaultsModule clientModule;
+    @Getter         private ChatProxyModule chatProxyModule;
 
     @Getter         private Socket socket;
     @Getter         private NetworkHandler net;
@@ -82,7 +83,9 @@ public class Bot {
                 boolean success = logsFolder.mkdirs();
                 if (!success) {
                     FishingBot.getI18n().severe("log-failed-creating-folder");
-                    System.exit(1);
+                    FishingBot.getInstance().getCurrentBot().setRunning(false);
+                    FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+                    return;
                 }
             }
         }
@@ -101,7 +104,9 @@ public class Bot {
             fh.setFormatter(new LogFormatter());
         } catch (IOException e) {
             FishingBot.getI18n().severe("log-failed-creating-log");
-            System.exit(1);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
+            FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+            return;
         }
 
         // log config location
@@ -169,8 +174,12 @@ public class Bot {
                 } else
                     break;
             }
-            if (ipAndPort == null)
-                System.exit(0);
+            if (ipAndPort == null) {
+                setWontConnect(true);
+                setRunning(false);
+                setPreventReconnect(true);
+                return;
+            }
             ip = ipAndPort.split(":")[0];
             port = Integer.parseInt(ipAndPort.split(":")[1]);
         }
@@ -248,7 +257,8 @@ public class Bot {
 
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();
-                new ChatProxyModule().enable();
+                this.chatProxyModule = new ChatProxyModule();
+                getChatProxyModule().enable();
                 if (getConfig().isStartTextEnabled())
                     new ChatCommandModule().enable();
                 this.clientModule = new ClientDefaultsModule();
@@ -290,6 +300,8 @@ public class Bot {
                     this.getClientModule().disable();
                 if (getFishingModule() != null)
                     this.getFishingModule().disable();
+                if (getChatProxyModule() != null)
+                    this.getChatProxyModule().disable();
                 if (getPlayer() != null)
                     getEventManager().unregisterListener(getPlayer());
                 getEventManager().getRegisteredListener().clear();
@@ -319,11 +331,15 @@ public class Bot {
             }
         } while (getConfig().isAutoReconnect() && !isPreventReconnect());
         FishingBot.getInstance().setCurrentBot(null);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (FishingBot.getInstance().getMainGUIController() != null) {
+            FishingBot.getInstance().getMainGUIController().updateStartStop();
+            FishingBot.getInstance().getMainGUIController().updatePlayPaused();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            FishingBot.getInstance().getMainGUIController().enableStartStop();
         }
-        FishingBot.getInstance().getMainGUIController().enableStartStop();
     }
 }

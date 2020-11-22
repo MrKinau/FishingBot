@@ -53,9 +53,17 @@
                                <font>
                                  <Font size="24.0" />
                                </font>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </VBox.margin>
+                               <VBox.margin>
+                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                               </VBox.margin>
+                             </Button>
+                             <Button fx:id="playPauseButton" mnemonicParsing="false" onAction="#playPause" disable="true" text="%ui-button-pause">
+                               <font>
+                                 <Font size="24.0" />
+                               </font>
+                               <VBox.margin>
+                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                               </VBox.margin>
                              </Button>
                            </children>
                         </VBox>

@@ -14,7 +14,7 @@ public class ByeCommand extends Command {
     public void onCommand(String label, String[] args, CommandExecutor executor) {
         sendMessage(executor, "command-bye");
 
-        //TODO: cleaner solution
-        System.exit(0);
+        FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
+        FishingBot.getInstance().getCurrentBot().setRunning(false);
     }
 }

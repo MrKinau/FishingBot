@@ -35,7 +35,9 @@ public class ServerPinger {
         FishingBot.getInstance().getCurrentBot().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()));
         if (serverName == null || serverName.trim().isEmpty()) {
             FishingBot.getI18n().severe("network-invalid-server-address");
-            System.exit(1);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
+            FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+            return;
         }
 
         updateWithSRV();

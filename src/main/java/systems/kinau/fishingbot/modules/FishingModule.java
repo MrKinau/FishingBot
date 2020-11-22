@@ -42,6 +42,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     @Getter @Setter private short lastY = -1;
     @Getter @Setter private boolean trackingNextBobberId = false;
     @Getter @Setter private boolean noRodAvailable = false;
+    @Getter private boolean paused = false;
     @Getter private boolean trackingNextEntityMeta = false;
     @Getter @Setter long lastFish = System.currentTimeMillis();
 
@@ -59,6 +60,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
         if (FishingBot.getInstance().getCurrentBot().getConfig().isStuckingFixEnabled()) {
             stuckingFix = new Thread(this);
+            stuckingFix.setName("stuckingFixThread");
             stuckingFix.start();
         }
     }
@@ -71,6 +73,8 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     public void stuck() {
+        if (isPaused())
+            return;
         if (isNoRodAvailable())
             return;
         setLastFish(System.currentTimeMillis());
@@ -83,10 +87,22 @@ public class FishingModule extends Module implements Runnable, Listener {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
     }
 
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+        if (paused) {
+            if (getCurrentBobber() != -1 && !isTrackingNextEntityMeta())
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+        } else {
+            stuck();
+        }
+    }
+
     public void fish() {
         setLastFish(System.currentTimeMillis());
         setCurrentBobber(-1);
         setTrackingNextEntityMeta(true);
+        if (isPaused())
+            return;
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
         new Thread(() -> {
             try {
@@ -101,6 +117,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                     noRod();
                     return;
                 }
+                if (isPaused())
+                    return;
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -233,6 +251,8 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
         this.joined = true;
         new Thread(() -> {
+            if (isPaused())
+                return;
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {
@@ -318,6 +338,9 @@ public class FishingModule extends Module implements Runnable, Listener {
             // check current fishing rod value and swap if a better one is in inventory
             if (ItemUtils.isFishingRod(slot))
                 swapWithBestFishingRod();
+
+            if (isPaused())
+                return;
 
             if (FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() == slotId) {
                 if (isNoRodAvailable() && ItemUtils.isFishingRod(slot)) {
@@ -417,7 +440,9 @@ public class FishingModule extends Module implements Runnable, Listener {
         while (!Thread.currentThread().isInterrupted()) {
             if (System.currentTimeMillis() - getLastFish() > 60000) {
                 setLastFish(System.currentTimeMillis());
-                if (noRodAvailable)
+                if (isNoRodAvailable())
+                    continue;
+                if (isPaused())
                     continue;
                 Slot curr = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem();
                 if (ItemUtils.isFishingRod(curr) && ItemUtils.getDamage(curr) >= 63) {

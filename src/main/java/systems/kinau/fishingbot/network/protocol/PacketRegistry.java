@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network.protocol;
 
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class PacketRegistry {
         return registeredPackets.get(id);
     }
 
-    public int getId(Class<? extends Packet> clazz) {
+    public int getId(Class<? extends Packet> clazz) throws InvalidPacketException {
         final int[] id = {-1};
         registeredPackets.keySet().stream()
                 .filter(integer -> registeredPackets.get(integer).getName().equals(clazz.getName()))
@@ -33,7 +34,9 @@ public class PacketRegistry {
                 .ifPresent(integer -> id[0] = integer);
         if (id[0] == -1) {
             FishingBot.getI18n().severe("network-unknown-packet-id", clazz.getSimpleName(), ProtocolConstants.getVersionString(FishingBot.getInstance().getCurrentBot().getServerProtocol()));
-            System.exit(1);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
+            FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+            throw new InvalidPacketException("Packet not registered: " + clazz.getSimpleName());
         }
         return id[0];
     }
