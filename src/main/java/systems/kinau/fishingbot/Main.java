@@ -43,14 +43,13 @@ public class Main {
                 String[] finalArgs = args;
                 new Thread(() -> {
                     try {
-                        Main.class.getClassLoader().loadClass("javafx.embed.swing.JFXPanel");
                         new MainGUI(finalArgs);
                         if (FishingBot.getInstance().getCurrentBot() != null) {
                             FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
                             FishingBot.getInstance().getCurrentBot().setRunning(false);
                         }
                         FishingBot.getScheduler().shutdownNow();
-                    } catch (NoClassDefFoundError | ClassNotFoundException ex) {
+                    } catch (Throwable ex) {
                         ex.printStackTrace();
                         Dialogs.showJavaFXNotWorking();
                     }

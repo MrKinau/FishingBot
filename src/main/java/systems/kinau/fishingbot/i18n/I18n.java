@@ -30,9 +30,9 @@ public class I18n {
         this.prefix = defaultPrefix;
         try {
             Properties properties = new Properties();
-            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties"), StandardCharsets.ISO_8859_1));
+            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties"), StandardCharsets.UTF_8));
             this.locales = new HashMap(properties);
-            this.bundle = ResourceBundle.getBundle("lang/fb", language.getLocale());
+            this.bundle = ResourceBundle.getBundle("lang/fb", language.getLocale(), new UTF8Control());
 
             if (!silent)
                 FishingBot.getLog().info("Using language: " + language + " @ /lang/fb_" + language.getLanguageCode() + ".properties");
