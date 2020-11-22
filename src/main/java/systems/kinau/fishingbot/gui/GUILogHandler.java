@@ -40,8 +40,12 @@ public class GUILogHandler extends Handler {
     }
 
     @Override
-    public void flush() { }
+    public void flush() {
+        // Flush not implemented
+    }
 
     @Override
-    public void close() throws SecurityException { }
+    public void close() throws SecurityException {
+        // Close not implemented
+    }
 }

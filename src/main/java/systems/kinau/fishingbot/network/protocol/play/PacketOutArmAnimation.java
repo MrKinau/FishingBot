@@ -14,11 +14,11 @@ public class PacketOutArmAnimation extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //This packet needs no content
+        // This packet needs no content
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        //Only outgoing packet
+        // Only outgoing packet
     }
 }

@@ -26,10 +26,10 @@ public class CommandRegistry {
         Command cmd = getCommand(cmdStr);
         if (cmd == null)
             return false;
-        cmdStr = cmdStr.trim();
-        if (cmdStr.startsWith("/"))
-            cmdStr = cmdStr.substring(1);
-        String[] args = cmdStr.split(" ");
+        String command = cmdStr.trim();
+        if (command.startsWith("/"))
+            command = command.substring(1);
+        String[] args = command.split(" ");
         String label = args[0];
         args = Arrays.copyOfRange(args, 1, args.length);
         cmd.onCommand(label, args, commandExecutor);

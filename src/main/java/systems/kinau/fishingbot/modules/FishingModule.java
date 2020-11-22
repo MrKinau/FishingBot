@@ -44,7 +44,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     @Getter @Setter private boolean noRodAvailable = false;
     @Getter private boolean paused = false;
     @Getter private boolean trackingNextEntityMeta = false;
-    @Getter @Setter long lastFish = System.currentTimeMillis();
+    @Getter @Setter private long lastFish = System.currentTimeMillis();
 
     @Getter @Setter private int currentFishingRodValue;
 
@@ -366,66 +366,19 @@ public class FishingModule extends Module implements Runnable, Listener {
         if(!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextBobberId())
             return;
 
-        //TODO: Refactor just make the objecttype with if-constructs
-        switch (FishingBot.getInstance().getCurrentBot().getServerProtocol()) {
-            case ProtocolConstants.MINECRAFT_1_8:
-            case ProtocolConstants.MINECRAFT_1_13_2:
-            case ProtocolConstants.MINECRAFT_1_13_1:
-            case ProtocolConstants.MINECRAFT_1_13:
-            case ProtocolConstants.MINECRAFT_1_12_2:
-            case ProtocolConstants.MINECRAFT_1_12_1:
-            case ProtocolConstants.MINECRAFT_1_12:
-            case ProtocolConstants.MINECRAFT_1_11_1:
-            case ProtocolConstants.MINECRAFT_1_11:
-            case ProtocolConstants.MINECRAFT_1_10:
-            case ProtocolConstants.MINECRAFT_1_9_4:
-            case ProtocolConstants.MINECRAFT_1_9_2:
-            case ProtocolConstants.MINECRAFT_1_9_1:
-            case ProtocolConstants.MINECRAFT_1_9: {
-                if (event.getType() == 90) {   //90 = bobber
-                    if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
-                        reFish(event.getId());
-                }
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1:
-            case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4: {
-                if (event.getType() == 101) {   //101 = bobber
-                    if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
-                        reFish(event.getId());
-                }
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_15:
-            case ProtocolConstants.MINECRAFT_1_15_1:
-            case ProtocolConstants.MINECRAFT_1_15_2: {
-                if (event.getType() == 102) {   //102 = bobber
-                    if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
-                        reFish(event.getId());
-                }
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_16:
-            case ProtocolConstants.MINECRAFT_1_16_1: {
-                if (event.getType() == 106) {   //106 = bobber
-                    if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
-                        reFish(event.getId());
-                }
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_16_2:
-            case ProtocolConstants.MINECRAFT_1_16_3:
-            case ProtocolConstants.MINECRAFT_1_16_4:
-            default: {
-                if (event.getType() == 107) {   //107 = bobber
-                    if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() == -1 || event.getObjectData() == FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
-                        reFish(event.getId());
-                }
-                break;
-            }
+        if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != -1 && event.getObjectData() != FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
+            return;
+
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_13_2 && event.getType() == 90) {
+            reFish(event.getId());
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_14_4 && event.getType() == 101) {
+            reFish(event.getId());
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_15_2 && event.getType() == 102) {
+            reFish(event.getId());
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_16_1 && event.getType() == 106) {
+            reFish(event.getId());
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_16_4 && event.getType() == 107) {
+            reFish(event.getId());
         }
     }
 

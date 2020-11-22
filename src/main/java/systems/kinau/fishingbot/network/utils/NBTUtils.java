@@ -87,6 +87,7 @@ public class NBTUtils {
                 tabs--;
                 break;
             }
+            default: break;
         }
         return tabs;
     }
@@ -99,10 +100,11 @@ public class NBTUtils {
         return new String(name);
     }
 
-    private static String addSpaces(int tabs) {
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < tabs; i++)
-            sb.append("\t");
-        return sb.toString();
-    }
+// FOR DEBUG
+//    private static String addSpaces(int tabs) {
+//        StringBuilder sb = new StringBuilder();
+//        for(int i = 0; i < tabs; i++)
+//            sb.append("\t");
+//        return sb.toString();
+//    }
 }

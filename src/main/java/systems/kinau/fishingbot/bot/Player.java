@@ -140,12 +140,11 @@ public class Player implements Listener {
                 setSentLowHealth(false);
         }
 
-        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoQuitBeforeDeathEnabled()) {
-            if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeQuit() && event.getHealth() != 0.0) {
-                FishingBot.getI18n().warning("module-fishing-health-threshold-reached");
-                FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
-                FishingBot.getInstance().getCurrentBot().setRunning(false);
-            }
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoQuitBeforeDeathEnabled() && event.getHealth() < getHealth()
+                && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeQuit() && event.getHealth() != 0.0) {
+            FishingBot.getI18n().warning("module-fishing-health-threshold-reached");
+            FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
         }
 
         this.health = event.getHealth();

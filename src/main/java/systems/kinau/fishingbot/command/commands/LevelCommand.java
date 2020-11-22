@@ -6,8 +6,6 @@ import systems.kinau.fishingbot.command.CommandExecutor;
 
 public class LevelCommand extends Command {
 
-    private final String LEVEL_MSG = "I have %d levels";
-
     public LevelCommand() {
         super("level", FishingBot.getI18n().t("command-level-desc"), "level?");
     }
