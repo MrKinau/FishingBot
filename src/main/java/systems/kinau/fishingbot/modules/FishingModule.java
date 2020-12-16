@@ -218,6 +218,8 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     private void noRod() {
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isDisableRodChecking())
+            return;
         boolean swapped = swapWithBestFishingRod();
         if (!swapped) {
             this.noRodAvailable = true;

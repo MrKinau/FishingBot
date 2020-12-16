@@ -17,8 +17,6 @@ public class GUILogHandler extends Handler {
     public GUILogHandler(TextArea logWindow) {
         this.logWindow = logWindow;
         this.logFormatter = new LogFormatter();
-
-//        logWindow.
     }
 
     @Override

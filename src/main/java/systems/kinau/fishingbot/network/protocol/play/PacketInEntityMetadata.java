@@ -6,6 +6,7 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.Files;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Slot;
@@ -16,6 +17,8 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 //TODO: Add as event, yes this code is ugly...
@@ -31,15 +34,28 @@ public class PacketInEntityMetadata extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         if (FishingBot.getInstance().getCurrentBot().getFishingModule() == null)
             return;
-        int eid = readVarInt(in);
-        if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextEntityMeta() && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
-            return;
-        if (FishingBot.getInstance().getCurrentBot().getFishingModule().containsPossibleItem(eid) && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
-            return;
-        if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
-            readWatchableObjects18(in, networkHandler, eid);
-        } else {
-            defaultLoop(protocolId, in, networkHandler, eid);
+        ByteArrayDataInputWrapper clonedIn = in.clone();
+        try {
+            int eid = readVarInt(in);
+            if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextEntityMeta() && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
+                return;
+            if (FishingBot.getInstance().getCurrentBot().getFishingModule().containsPossibleItem(eid) && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
+                return;
+            if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
+                readWatchableObjects18(in, networkHandler, eid);
+            } else {
+                defaultLoop(protocolId, in, networkHandler, eid);
+            }
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            File file = new File("error.bin");
+            byte[] bytes = new byte[clonedIn.getAvailable()];
+            clonedIn.readFully(bytes);
+            try {
+                Files.write(bytes, file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -90,124 +106,120 @@ public class PacketInEntityMetadata extends Packet {
     }
 
     private void readWatchableObjects114(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
-        try {
-            switch (type) {
-                case 0: {
-                    in.readByte();
-                    break;
-                }
-                case 1: {
-                    readVarInt(in);
-                    break;
-                }
-                case 2: {
-                    float health = in.readFloat();
-                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
-                    return;
-                }
-                case 3: {
-                    readString(in);
-                    break;
-                }
-                case 4: {
-                    readString(in);
-                    break;
-                }
-                case 5: {
-                    in.readBoolean();
-                    break;
-                }
-                case 6: {
-                    Slot slot = readSlot(in);
-                    List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
-                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getCurrentBot().getServerProtocol()).replace("minecraft:", "");
-                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
-                    return;
-                }
-                case 7: {
-                    in.readBoolean();
-                    break;
-                }
-                case 8: {
-                    in.readFloat();
-                    in.readFloat();
-                    in.readFloat();
-                    break;
-                }
-                case 9: {
-                    in.readLong();
-                    break;
-                }
-                case 10: {
-                    boolean present = in.readBoolean();
-                    if (present) {
-                        in.readLong();
-                    }
-                    break;
-                }
-                case 11: {
-                    readVarInt(in);
-                    break;
-                }
-                case 12: {
-                    boolean present = in.readBoolean();
-                    if (present) {
-                        readUUID(in);
-                    }
-                    break;
-                }
-                case 13: {
-                    readVarInt(in);
-                    break;
-                }
-                case 14: {
-                    in.readFully(new byte[in.getAvailable()]);
-                    break;
-                }
-                case 15: {
-                    int id = readVarInt(in);
-                    switch (id) {
-                        case 20:
-                        case 3: {
-                            readVarInt(in);
-                            break;
-                        }
-                        case 11: {
-                            in.readFloat();
-                            in.readFloat();
-                            in.readFloat();
-                            in.readFloat();
-                            break;
-                        }
-                        case 27: {
-                            boolean present = in.readBoolean();
-                            if (!present)
-                                break;
-                            readVarInt(in);
-                            in.readByte();
-                            in.readFully(new byte[in.getAvailable()]);
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case 16: {
-                    readVarInt(in);
-                    readVarInt(in);
-                    readVarInt(in);
-                    break;
-                }
-                case 17: {
-                    readVarInt(in);
-                    break;
-                }
-                case 18: {
-                    readVarInt(in);
-                    break;
-                }
+        switch (type) {
+            case 0: {
+                in.readByte();
+                break;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            case 1: {
+                readVarInt(in);
+                break;
+            }
+            case 2: {
+                float health = in.readFloat();
+                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
+                return;
+            }
+            case 3: {
+                readString(in);
+                break;
+            }
+            case 4: {
+                readString(in);
+                break;
+            }
+            case 5: {
+                in.readBoolean();
+                break;
+            }
+            case 6: {
+                Slot slot = readSlot(in);
+                List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
+                String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getCurrentBot().getServerProtocol()).replace("minecraft:", "");
+                FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                return;
+            }
+            case 7: {
+                in.readBoolean();
+                break;
+            }
+            case 8: {
+                in.readFloat();
+                in.readFloat();
+                in.readFloat();
+                break;
+            }
+            case 9: {
+                in.readLong();
+                break;
+            }
+            case 10: {
+                boolean present = in.readBoolean();
+                if (present) {
+                    in.readLong();
+                }
+                break;
+            }
+            case 11: {
+                readVarInt(in);
+                break;
+            }
+            case 12: {
+                boolean present = in.readBoolean();
+                if (present) {
+                    readUUID(in);
+                }
+                break;
+            }
+            case 13: {
+                readVarInt(in);
+                break;
+            }
+            case 14: {
+                in.readFully(new byte[in.getAvailable()]);
+                break;
+            }
+            case 15: {
+                int id = readVarInt(in);
+                switch (id) {
+                    case 20:
+                    case 3: {
+                        readVarInt(in);
+                        break;
+                    }
+                    case 11: {
+                        in.readFloat();
+                        in.readFloat();
+                        in.readFloat();
+                        in.readFloat();
+                        break;
+                    }
+                    case 27: {
+                        boolean present = in.readBoolean();
+                        if (!present)
+                            break;
+                        readVarInt(in);
+                        in.readByte();
+                        in.readFully(new byte[in.getAvailable()]);
+                        break;
+                    }
+                }
+                break;
+            }
+            case 16: {
+                readVarInt(in);
+                readVarInt(in);
+                readVarInt(in);
+                break;
+            }
+            case 17: {
+                readVarInt(in);
+                break;
+            }
+            case 18: {
+                readVarInt(in);
+                break;
+            }
         }
     }
 

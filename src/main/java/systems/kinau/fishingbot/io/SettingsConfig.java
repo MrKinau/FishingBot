@@ -68,6 +68,7 @@ public class SettingsConfig implements Config {
 
     @Property(key = "misc.stucking-fix-enabled", description = "config-misc-stucking-fix-enabled") private boolean stuckingFixEnabled = true;
     @Property(key = "misc.prevent-rod-breaking", description = "config-misc-prevent-rod-breaking") private boolean preventRodBreaking = true;
+    @Property(key = "misc.disable-rod-checking", description = "config-misc-disable-rod-checking") private boolean disableRodChecking = false;
     @Property(key = "misc.gui-console-max-lines", description = "config-misc-gui-console-max-lines") private int guiConsoleMaxLines = 1000;
     @Property(key = "misc.language", description = "config-misc-language") private Language language = Language.getByLocale(Locale.getDefault());
     @Property(key = "misc.wiki", description = "") private String readme = "https://github.com/MrKinau/FishingBot/wiki/config";
