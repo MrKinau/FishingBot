@@ -19,4 +19,8 @@ public abstract class ConfigOption extends HBox {
 
         setAlignment(Pos.CENTER_LEFT);
     }
+
+    public void updateValue() {
+        //may be implemented by nodes
+    }
 }

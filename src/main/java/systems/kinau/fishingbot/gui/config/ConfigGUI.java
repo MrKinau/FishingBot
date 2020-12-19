@@ -201,6 +201,8 @@ public class ConfigGUI {
     }
 
     private void saveConfig(WindowEvent event) {
+        configOptions.values().forEach(ConfigOption::updateValue);
+
         SettingsConfig config = FishingBot.getInstance().getConfig();
 
         List<Field> fields = ReflectionUtils.getAllFields(config);
