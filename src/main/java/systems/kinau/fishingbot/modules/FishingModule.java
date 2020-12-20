@@ -265,13 +265,8 @@ public class FishingModule extends Module implements Runnable, Listener {
         if (isPaused())
             return;
         new Thread(() -> {
-            try {
-                setTrackingNextBobberId(true);
-                Thread.sleep(200);
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
+            setTrackingNextBobberId(true);
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
         }).start();
     }
 
