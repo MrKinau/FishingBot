@@ -13,12 +13,15 @@ import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.fishing.EjectionRule;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
+import systems.kinau.fishingbot.network.utils.ItemUtils;
 import systems.kinau.fishingbot.network.utils.LocationUtils;
 import systems.kinau.fishingbot.network.utils.StringUtils;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -97,6 +100,10 @@ public class Player implements Listener {
 
         if(event.getSlotId() == getHeldSlot())
             this.heldItem = slot;
+
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()) {
+            executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), slot, event.getSlotId());
+        }
     }
 
     @EventHandler
@@ -108,6 +115,9 @@ public class Player implements Listener {
             getInventory().setItem(i, event.getSlots().get(i));
             if(i == getHeldSlot())
                 this.heldItem = event.getSlots().get(i);
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()) {
+                executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), event.getSlots().get(i), (short)i);
+            }
         }
     }
 
@@ -252,9 +262,10 @@ public class Player implements Listener {
 
             for (int i = 0; i < steps; i++) {
                 if (lookThread.isInterrupted()) {
-                    if (onFinish != null)
+                    if (onFinish != null) {
                         onFinish.accept(false);
-                    break;
+                    }
+                    return;
                 }
                 setYaw(getYaw() + yawPerStep);
                 setPitch(getPitch() + pitchPerStep);
@@ -273,5 +284,32 @@ public class Player implements Listener {
                 onFinish.accept(true);
         });
         getLookThread().start();
+    }
+
+    public void executeEjectionRules(List<EjectionRule> ejectionRules, Slot updatedItem, short slotId) {
+        if (!updatedItem.isPresent())
+            return;
+        String itemName = ItemUtils.getItemName(updatedItem);
+        for (EjectionRule ejectionRule : ejectionRules) {
+            if (ejectionRule.getAllowList().contains(itemName)) {
+                switch (ejectionRule.getEjectionType()) {
+                    case DROP: {
+                        float savedYaw = this.yaw;
+                        look(ejectionRule.getDirection().getYaw(), getPitch(), 12, finished -> {
+                            dropStack(slotId, (short) (slotId - 8));
+                            look(savedYaw, getPitch(), 12, finished2 -> {
+                                FishingBot.getInstance().getCurrentBot().getFishingModule().finishedLooking();
+                            });
+                        });
+                        break;
+                    }
+                    case FILL_CHEST: {
+                        FishingBot.getLog().warning("FILL_CHEST is currently WIP");
+                        break;
+                    }
+                }
+                break;
+            }
+        }
     }
 }

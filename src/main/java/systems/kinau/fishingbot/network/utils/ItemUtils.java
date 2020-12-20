@@ -8,6 +8,7 @@ import com.flowpowered.nbt.stream.NBTInputStream;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Inventory;
 import systems.kinau.fishingbot.bot.Slot;
+import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.ByteArrayInputStream;
@@ -137,5 +138,16 @@ public class ItemUtils {
             }
         });
         return currentBestSlotId.get();
+    }
+
+    public static String getItemName(Slot slot) {
+        if (FishingBot.getInstance().getCurrentBot() == null || !slot.isPresent())
+            return "N/A";
+        int version = FishingBot.getInstance().getCurrentBot().getServerProtocol();
+        if (version <= ProtocolConstants.MINECRAFT_1_12_2) {
+            return MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
+        } else {
+            return ItemHandler.getItemName(slot.getItemId(), version).replace("minecraft:", "");
+        }
     }
 }

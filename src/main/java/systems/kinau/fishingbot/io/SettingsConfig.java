@@ -7,8 +7,10 @@ package systems.kinau.fishingbot.io;
 import lombok.Getter;
 import lombok.ToString;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.fishing.EjectionRule;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.utils.LocationUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +42,11 @@ public class SettingsConfig implements Config {
     @Property(key = "auto.auto-command-before-death.min-health-before-death", description = "config-auto-auto-command-before-death-min-health-before-death") private float minHealthBeforeDeath = 6.0F;
     @Property(key = "auto.auto-quit-before-death.enabled", description = "config-auto-auto-quit-before-death") private boolean autoQuitBeforeDeathEnabled = false;
     @Property(key = "auto.auto-quit-before-death.min-health-before-quit", description = "config-auto-auto-quit-before-death-min-health-before-quit") private float minHealthBeforeQuit = 6.0F;
+    @Property(key = "auto.auto-eject.enabled", description = "config-auto-auto-eject") private boolean autoLootEjectionEnabled = false;
+    @Property(key = "auto.auto-eject.rules", description = "config-auto-auto-eject") private List<EjectionRule> autoLootEjectionRules = Arrays.asList(
+            new EjectionRule("fish", LocationUtils.Direction.WEST, Arrays.asList("cod", "salmon", "pufferfish", "tropical_fish"), EjectionRule.EjectionType.DROP),
+            new EjectionRule("treasure", LocationUtils.Direction.EAST, Arrays.asList("bow", "enchanted_book", "name_tag", "nautilus_shell", "saddle"), EjectionRule.EjectionType.DROP),
+            new EjectionRule("junk", LocationUtils.Direction.SOUTH, Arrays.asList("lily_pad", "bowl", "leather", "leather_boots", "fotten_flesh", "stick", "string", "potion", "bone", "ink_sac", "tripwire_hook"), EjectionRule.EjectionType.DROP));
 
     @Property(key = "account.mail", description = "config-account-mail") private String userName = "my-minecraft@login.com";
     @Property(key = "account.password", description = "config-account-password") private String password = "CHANGEME";

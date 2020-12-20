@@ -53,7 +53,7 @@ public class PropertyProcessor {
             Object value = getValueByDottedKey(configJson, key);
             if (value != null) {
                 if (!convertChangedFields(key, value, field, config, configJson)) {
-                    Object typedValue = ConvertUtils.convert(value.toString(), field.getType());
+                    Object typedValue = ConvertUtils.convert(value.toString(), field.getType(), field.getGenericType());
                     if (typedValue == null)
                         throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
                     ReflectionUtils.setField(field, config, typedValue);
@@ -80,13 +80,13 @@ public class PropertyProcessor {
 
                 Object value1 = getValueByDottedKey(configJson, "discord.enabled");
                 if (value1 != null) {
-                    value1 = ConvertUtils.convert(value1.toString(), boolean.class);
+                    value1 = ConvertUtils.convert(value1.toString(), boolean.class, boolean.class);
                     ReflectionUtils.setField(discordField1, config, value1);
                 }
 
                 Object value2 = getValueByDottedKey(configJson, "discord.web-hook");
                 if (value2 != null) {
-                    value2 = ConvertUtils.convert(value2.toString(), String.class);
+                    value2 = ConvertUtils.convert(value2.toString(), String.class, String.class);
                     ReflectionUtils.setField(discordField2, config, value2);
                 }
             } catch (NoSuchFieldException ignore) { }
@@ -166,7 +166,7 @@ public class PropertyProcessor {
 
             String value = properties.getProperty(key);
 
-            Object typedValue = ConvertUtils.convert(value, field.getType());
+            Object typedValue = ConvertUtils.convert(value, field.getType(), field.getGenericType());
             if (typedValue == null)
                 throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
             ReflectionUtils.setField(field, config, typedValue);

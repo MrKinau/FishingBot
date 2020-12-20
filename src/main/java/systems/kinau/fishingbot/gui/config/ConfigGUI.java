@@ -68,6 +68,7 @@ public class ConfigGUI {
         configOptionsBox = new VBox(5);
         configOptionsBox.setPadding(new Insets(5, 20, 5, 20));
         ScrollPane scrollPane = new ScrollPane(configOptionsBox);
+        scrollPane.setFitToWidth(true);
         scrollPane.getContent().setOnScroll(scrollEvent -> {
             double deltaY = scrollEvent.getDeltaY() * 0.01;
             scrollPane.setVvalue(scrollPane.getVvalue() - deltaY);
@@ -136,7 +137,7 @@ public class ConfigGUI {
                 addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), AnnounceType.values()));
             } else if (field.getType().isAssignableFrom(Language.class)) {
                 addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), Language.values()));
-            } else if (field.getType().isAssignableFrom(List.class)) {
+            } else if (field.getType().isAssignableFrom(List.class) && field.getGenericType().equals(String.class)) {
                 List<String> content = (List<String>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new StringArrayConfigOption(key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
             }
@@ -221,7 +222,7 @@ public class ConfigGUI {
                         jsonArray.addAll(Arrays.asList((String[]) option.getValue()));
                     value = jsonArray.toJSONString();
                 }
-                Object typedValue = ConvertUtils.convert(value, field.getType());
+                Object typedValue = ConvertUtils.convert(value, field.getType(), field.getGenericType());
                 if (typedValue == null)
                     throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
                 ReflectionUtils.setField(field, config, typedValue);

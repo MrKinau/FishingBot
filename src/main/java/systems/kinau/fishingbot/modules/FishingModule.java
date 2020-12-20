@@ -44,6 +44,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     @Getter @Setter private boolean noRodAvailable = false;
     @Getter private boolean paused = false;
     @Getter private boolean trackingNextEntityMeta = false;
+    @Getter private boolean waitForLookFinish = false;
     @Getter @Setter private long lastFish = System.currentTimeMillis();
 
     @Getter @Setter private int currentFishingRodValue;
@@ -111,15 +112,22 @@ public class FishingModule extends Module implements Runnable, Listener {
                 setTrackingNextEntityMeta(false);
                 getCaughtItem();
                 Thread.sleep(200);
-                setTrackingNextBobberId(true);
-                Thread.sleep(200);
                 if (FishingBot.getInstance().getCurrentBot().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem()) >= 63) {
                     noRod();
                     return;
                 }
                 if (isPaused())
                     return;
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+                setTrackingNextBobberId(true);
+                Thread.sleep(200);
+                Thread lookThread = FishingBot.getInstance().getCurrentBot().getPlayer().getLookThread();
+
+                if (lookThread == null || lookThread.isInterrupted() || !lookThread.isAlive()) {
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+                } else {
+                    this.waitForLookFinish = true;
+                    setTrackingNextBobberId(false);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -245,6 +253,23 @@ public class FishingModule extends Module implements Runnable, Listener {
         int newSlot = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() - 36;
         FishingBot.getInstance().getCurrentBot().getPlayer().swapToHotBar(bestSlot, newSlot);
         return true;
+    }
+
+    public void finishedLooking() {
+        if (!waitForLookFinish)
+            return;
+        this.waitForLookFinish = false;
+        if (isPaused())
+            return;
+        new Thread(() -> {
+            try {
+                setTrackingNextBobberId(true);
+                Thread.sleep(200);
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }).start();
     }
 
     @EventHandler

@@ -5,17 +5,22 @@
 package systems.kinau.fishingbot.io;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.fishing.EjectionRule;
 import systems.kinau.fishingbot.i18n.Language;
+import systems.kinau.fishingbot.network.utils.LocationUtils;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConvertUtils {
 
-    public static Object convert(String value, Class type) {
+    public static Object convert(String value, Class type, Type genericType) {
         if(type.isAssignableFrom(String.class)) {
             return value;
         } else if(type.isAssignableFrom(double.class)) {
@@ -38,12 +43,49 @@ public class ConvertUtils {
                 ex.printStackTrace();
                 return AnnounceType.ALL;
             }
+        } else if(type.isAssignableFrom(EjectionRule.EjectionType.class)) {
+            try {
+                return EjectionRule.EjectionType.valueOf(value);
+            } catch (IllegalArgumentException ex) {
+                FishingBot.getI18n().warning("config-unknown-announce-type", value);
+                ex.printStackTrace();
+                return EjectionRule.EjectionType.DROP;
+            }
+        } else if(type.isAssignableFrom(LocationUtils.Direction.class)) {
+            try {
+                return LocationUtils.Direction.valueOf(value);
+            } catch (IllegalArgumentException ex) {
+                FishingBot.getI18n().warning("config-unknown-announce-type", value);
+                ex.printStackTrace();
+                return LocationUtils.Direction.SOUTH;
+            }
         } else if (type.isAssignableFrom(Language.class)) {
             try {
                 return Language.valueOf(value.toUpperCase());
             } catch (IllegalArgumentException ex) {
                 FishingBot.getLog().severe("Could not find language " + value + ". Falling back to default langugae ENGLISH");
                 return Language.ENGLISH;
+            }
+        } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(EjectionRule.class)) {
+            try {
+                List<EjectionRule> rules = new ArrayList<>();
+                JSONArray array = (JSONArray) new JSONParser().parse(value);
+                array.forEach(o -> {
+                    try {
+                        org.json.simple.JSONObject obj = (JSONObject) new JSONParser().parse(o.toString());
+                        String name = obj.get("name").toString();
+                        LocationUtils.Direction direction = LocationUtils.Direction.valueOf((String) obj.get("direction"));
+                        EjectionRule.EjectionType ejectionType = EjectionRule.EjectionType.valueOf((String) obj.get("ejectionType"));
+                        JSONArray allowList = (JSONArray) new JSONParser().parse(obj.get("allowList").toString());
+                        rules.add(new EjectionRule(name, direction, new ArrayList<String>(allowList), ejectionType));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+                return rules;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return null;
             }
         } else if (type.isAssignableFrom(List.class)) {
             // should be string list
