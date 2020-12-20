@@ -16,10 +16,12 @@ public class LookCommand extends Command {
             try {
                 float yaw = Float.valueOf(args[0]);
                 float pitch = Float.valueOf(args[1]);
-                int speed = 5;
+                int speed = FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed();
                 if (args.length == 3)
                     speed = Integer.valueOf(args[2]);
                 FishingBot.getInstance().getCurrentBot().getPlayer().look(yaw, pitch, speed);
+                FishingBot.getInstance().getCurrentBot().getPlayer().setOriginYaw(yaw);
+                FishingBot.getInstance().getCurrentBot().getPlayer().setOriginPitch(pitch);
             } catch (NumberFormatException ex) {
                 sendMessage("/look <yaw> <pitch> [speed]", executor);
             }

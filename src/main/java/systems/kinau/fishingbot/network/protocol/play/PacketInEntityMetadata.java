@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
-import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -134,8 +133,10 @@ public class PacketInEntityMetadata extends Packet {
             }
             case 6: {
                 Slot slot = readSlot(in);
+                if (!slot.isPresent())
+                    return;
                 List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
-                String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getCurrentBot().getServerProtocol()).replace("minecraft:", "");
+                String name = ItemUtils.getItemName(slot);
                 FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
                 return;
             }
@@ -253,9 +254,12 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 6: {
                     Slot slot = readSlot(in);
+                    if (!slot.isPresent())
+                        return;
+
                     List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
 
-                    String name = ItemHandler.getItemName(slot.getItemId(), FishingBot.getInstance().getCurrentBot().getServerProtocol()).replace("minecraft:", "");
+                    String name = ItemUtils.getItemName(slot);
 
                     FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 
@@ -372,7 +376,9 @@ public class PacketInEntityMetadata extends Packet {
                 }
                 case 5: {
                     Slot slot = readSlot(in);
-                    String name = MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
+                    if (!slot.isPresent())
+                        return;
+                    String name = ItemUtils.getItemName(slot);
                     List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                     FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
                     return;

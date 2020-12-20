@@ -78,6 +78,10 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
         if (isNoRodAvailable())
             return;
+        if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
+            waitForLookFinish = true;
+            return;
+        }
         setLastFish(System.currentTimeMillis());
         setTrackingNextBobberId(true);
         try {
@@ -120,9 +124,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                     return;
                 setTrackingNextBobberId(true);
                 Thread.sleep(200);
-                Thread lookThread = FishingBot.getInstance().getCurrentBot().getPlayer().getLookThread();
 
-                if (lookThread == null || lookThread.isInterrupted() || !lookThread.isAlive()) {
+                if (!FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
                 } else {
                     this.waitForLookFinish = true;
@@ -289,8 +292,12 @@ public class FishingModule extends Module implements Runnable, Listener {
             if (!ItemUtils.isFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem()))
                 noRod();
             else {
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
                 FishingBot.getI18n().info("module-fishing-start-fishing");
+                if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
+                    this.waitForLookFinish = true;
+                    return;
+                }
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
             }
         }).start();
     }
@@ -373,13 +380,18 @@ public class FishingModule extends Module implements Runnable, Listener {
                 if (isNoRodAvailable() && ItemUtils.isFishingRod(slot)) {
                     if (FishingBot.getInstance().getCurrentBot().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(slot) >= 63)
                         return;
+                    FishingBot.getI18n().info("module-fishing-new-rod-available");
                     setLastFish(System.currentTimeMillis());
                     setNoRodAvailable(false);
                     setCurrentBobber(-1);
                     setTrackingNextEntityMeta(false);
+
+                    if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
+                        this.waitForLookFinish = true;
+                        return;
+                    }
                     setTrackingNextBobberId(true);
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
-                    FishingBot.getI18n().info("module-fishing-new-rod-available");
                 } else if (!isNoRodAvailable() && !ItemUtils.isFishingRod(slot)) {
                     noRod();
                 }
@@ -431,10 +443,14 @@ public class FishingModule extends Module implements Runnable, Listener {
                 }
                 setCurrentBobber(-1);
                 setTrackingNextEntityMeta(false);
+                FishingBot.getI18n().warning("module-fishing-bot-is-slow");
+
+                if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
+                    this.waitForLookFinish = true;
+                    return;
+                }
                 setTrackingNextBobberId(true);
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
-
-                FishingBot.getI18n().warning("module-fishing-bot-is-slow");
             }
             try {
                 Thread.sleep(5000);

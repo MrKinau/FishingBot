@@ -21,6 +21,7 @@ import systems.kinau.fishingbot.network.utils.ItemUtils;
 import systems.kinau.fishingbot.network.utils.LocationUtils;
 import systems.kinau.fishingbot.network.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +34,8 @@ public class Player implements Listener {
     @Getter @Setter private double z;
     @Getter @Setter private float yaw;
     @Getter @Setter private float pitch;
+    @Getter @Setter private float originYaw = -255;
+    @Getter @Setter private float originPitch = -255;
 
     @Getter @Setter private int experience;
     @Getter @Setter private int levels;
@@ -51,6 +54,7 @@ public class Player implements Listener {
     @Getter @Setter private int lastPing = 500;
 
     @Getter @Setter private Thread lookThread;
+    @Getter         private final List<LookEjectFunction> lookEjectFunctionQueue = new ArrayList<>();
 
     public Player() {
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
@@ -63,6 +67,10 @@ public class Player implements Listener {
         this.z = event.getZ();
         this.yaw = event.getYaw();
         this.pitch = event.getPitch();
+        if (originYaw == -255 && originPitch == -255) {
+            this.originYaw = yaw;
+            this.originPitch = pitch;
+        }
         this.inventory = new Inventory();
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
@@ -89,21 +97,18 @@ public class Player implements Listener {
 
     @EventHandler
     public void onUpdateSlot(UpdateSlotEvent event) {
-        if(event.getWindowId() != 0)
+        if (event.getWindowId() != 0)
             return;
 
         Slot slot = event.getSlot();
 
-        if (getInventory() != null) {
+        if (getInventory() != null)
             getInventory().setItem(event.getSlotId(), slot);
-        }
 
-        if(event.getSlotId() == getHeldSlot())
+        if (event.getSlotId() == getHeldSlot())
             this.heldItem = slot;
-
-        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()) {
+        else if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled())
             executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), slot, event.getSlotId());
-        }
     }
 
     @EventHandler
@@ -113,11 +118,10 @@ public class Player implements Listener {
 
         for (int i = 0; i < event.getSlots().size(); i++) {
             getInventory().setItem(i, event.getSlots().get(i));
-            if(i == getHeldSlot())
+            if (i == getHeldSlot())
                 this.heldItem = event.getSlots().get(i);
-            if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()) {
+            else if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled())
                 executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), event.getSlots().get(i), (short)i);
-            }
         }
     }
 
@@ -241,66 +245,89 @@ public class Player implements Listener {
     }
 
     public void look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
-        look(direction.getYaw(), getPitch(), 8, onFinish);
+        look(direction.getYaw(), getPitch(), 8, onFinish, false, (short)-1);
     }
 
     public void look(float yaw, float pitch, int speed) {
-        look(yaw, pitch, speed, null);
+        look(yaw, pitch, speed, null, false, (short)-1);
     }
 
-    public void look(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
-        if (lookThread != null && lookThread.isAlive())
-            lookThread.interrupt();
+    public void look(LookEjectFunction lookEjectFunction) {
+        look(lookEjectFunction.getYaw(), lookEjectFunction.getPitch(), lookEjectFunction.getSpeed(), lookEjectFunction.getOnFinish(), false, lookEjectFunction.getSlot());
+    }
+
+    public void look(float yaw, float pitch, int speed, Consumer<Boolean> onFinish, boolean force, short dropSlot) {
+        if (lookThread != null && lookThread.isAlive() && !force) {
+            lookEjectFunctionQueue.add(new LookEjectFunction(yaw, pitch, speed, onFinish, dropSlot));
+            return;
+        } else if (lookThread != null && lookThread.isAlive()) {
+            internalLook(yaw, pitch, speed, onFinish);
+            return;
+        }
 
         this.lookThread = new Thread(() -> {
-            float yawDiff = LocationUtils.yawDiff(getYaw(), yaw);
-            float pitchDiff = LocationUtils.yawDiff(getPitch(), pitch);
-
-            int steps = (int) Math.ceil(Math.max(Math.abs(yawDiff), Math.abs(pitchDiff)) / Math.max(1, speed));
-            float yawPerStep = yawDiff / steps;
-            float pitchPerStep = pitchDiff / steps;
-
-            for (int i = 0; i < steps; i++) {
-                if (lookThread.isInterrupted()) {
-                    if (onFinish != null) {
-                        onFinish.accept(false);
-                    }
-                    return;
-                }
-                setYaw(getYaw() + yawPerStep);
-                setPitch(getPitch() + pitchPerStep);
-                if (getYaw() > 180)
-                    setYaw(-180 + (getYaw() - 180));
-                if (getYaw() < -180)
-                    setYaw(180 + (getYaw() + 180));
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (onFinish != null)
-                onFinish.accept(true);
+            internalLook(yaw, pitch, speed, onFinish);
         });
         getLookThread().start();
+    }
+
+    private void internalLook(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
+        float yawDiff = LocationUtils.yawDiff(getYaw(), yaw);
+        float pitchDiff = LocationUtils.yawDiff(getPitch(), pitch);
+
+        int steps = (int) Math.ceil(Math.max(Math.abs(yawDiff), Math.abs(pitchDiff)) / Math.max(1, speed));
+        float yawPerStep = yawDiff / steps;
+        float pitchPerStep = pitchDiff / steps;
+
+        for (int i = 0; i < steps; i++) {
+            setYaw(getYaw() + yawPerStep);
+            setPitch(getPitch() + pitchPerStep);
+            if (getYaw() > 180)
+                setYaw(-180 + (getYaw() - 180));
+            if (getYaw() < -180)
+                setYaw(180 + (getYaw() + 180));
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (onFinish != null)
+            onFinish.accept(true);
+
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        if (!getLookEjectFunctionQueue().isEmpty()) {
+            LookEjectFunction lookEjectFunction = getLookEjectFunctionQueue().remove(0);
+            look(lookEjectFunction.getYaw(), lookEjectFunction.getPitch(), lookEjectFunction.getSpeed(), lookEjectFunction.getOnFinish(), true, lookEjectFunction.getSlot());
+        }
     }
 
     public void executeEjectionRules(List<EjectionRule> ejectionRules, Slot updatedItem, short slotId) {
         if (!updatedItem.isPresent())
             return;
         String itemName = ItemUtils.getItemName(updatedItem);
+
         for (EjectionRule ejectionRule : ejectionRules) {
             if (ejectionRule.getAllowList().contains(itemName)) {
                 switch (ejectionRule.getEjectionType()) {
                     case DROP: {
-                        float savedYaw = this.yaw;
-                        look(ejectionRule.getDirection().getYaw(), getPitch(), 12, finished -> {
+                        for (LookEjectFunction lookEjectFunction : getLookEjectFunctionQueue()) {
+                            if (lookEjectFunction.getSlot() == slotId)
+                                return;
+                        }
+                        look(ejectionRule.getDirection().getYaw(), getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), finished -> {
                             dropStack(slotId, (short) (slotId - 8));
-                            look(savedYaw, getPitch(), 12, finished2 -> {
+                            look(getOriginYaw(), getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), finished2 -> {
                                 FishingBot.getInstance().getCurrentBot().getFishingModule().finishedLooking();
-                            });
-                        });
+                            }, true, (short) -1);
+                        }, false, slotId);
                         break;
                     }
                     case FILL_CHEST: {
@@ -311,5 +338,9 @@ public class Player implements Listener {
                 break;
             }
         }
+    }
+
+    public boolean isCurrentlyLooking() {
+        return !(lookThread == null || lookThread.isInterrupted() || !lookThread.isAlive());
     }
 }
