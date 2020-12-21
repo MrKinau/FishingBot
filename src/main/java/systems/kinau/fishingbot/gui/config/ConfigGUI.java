@@ -19,6 +19,7 @@ import lombok.Getter;
 import org.json.simple.JSONArray;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.fishing.EjectionRule;
 import systems.kinau.fishingbot.gui.config.options.*;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.io.*;
@@ -26,6 +27,7 @@ import systems.kinau.fishingbot.io.*;
 import java.io.File;
 import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +50,7 @@ public class ConfigGUI {
         // init categories
 
         ListView<ConfigCategory> categoriesList = new ListView<>();
+        categoriesList.prefHeightProperty().bind(window.heightProperty());
         categoriesList.getItems().addAll(configOptions.asMap().keySet().stream()
                 .map(s -> new ConfigCategory(s, FishingBot.getI18n().t("config-" + s)))
                 .sorted(Comparator.comparing(o -> o.translation))
@@ -69,8 +72,9 @@ public class ConfigGUI {
         configOptionsBox.setPadding(new Insets(5, 20, 5, 20));
         ScrollPane scrollPane = new ScrollPane(configOptionsBox);
         scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
         scrollPane.getContent().setOnScroll(scrollEvent -> {
-            double deltaY = scrollEvent.getDeltaY() * 0.01;
+            double deltaY = scrollEvent.getDeltaY() * 0.002;
             scrollPane.setVvalue(scrollPane.getVvalue() - deltaY);
         });
         configOptionsBox.getChildren().addAll(configOptions.get(categoriesList.getItems().get(0).getKey()));
@@ -88,7 +92,7 @@ public class ConfigGUI {
         window.getIcons().add(new Image(ConfigGUI.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
         window.setScene(scene);
 
-        window.setMaxHeight(430);
+        window.setMaxHeight(800);
         window.setMinHeight(200);
         window.setMinWidth(500);
         window.setHeight(400);
@@ -137,9 +141,12 @@ public class ConfigGUI {
                 addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), AnnounceType.values()));
             } else if (field.getType().isAssignableFrom(Language.class)) {
                 addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), Language.values()));
-            } else if (field.getType().isAssignableFrom(List.class) && field.getGenericType().equals(String.class)) {
+            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(String.class)) {
                 List<String> content = (List<String>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new StringArrayConfigOption(key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
+            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(EjectionRule.class)) {
+                List<EjectionRule> content = (List<EjectionRule>) ReflectionUtils.getField(field, config);
+                addConfigOption(key, new EjectionRulesOption(key, FishingBot.getI18n().t(description), content, window));
             }
         }
     }
