@@ -50,6 +50,7 @@ public class NetworkHandler {
             this.state = State.HANDSHAKE;
             initPacketRegistries();
         } catch (IOException e) {
+            e.printStackTrace();
             FishingBot.getI18n().severe("bot-could-not-be-started", e.getMessage());
         }
     }

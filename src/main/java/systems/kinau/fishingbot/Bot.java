@@ -277,6 +277,7 @@ public class Bot {
                     }
                 }
             } catch (IOException e) {
+                e.printStackTrace();
                 FishingBot.getI18n().severe("bot-could-not-be-started", e.getMessage());
             } finally {
                 try {
