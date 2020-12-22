@@ -1,6 +1,6 @@
 Minecraft 1.8 - 1.16.4 AFK Fishing bot
 =============
-![Codacy grade](https://img.shields.io/codacy/grade/05f0f6a5d76444a1b710f911b661bf1d)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/22e2d15847fb4deaaed97efc3b755ebd)](https://www.codacy.com/gh/MrKinau/FishingBot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MrKinau/FishingBot&amp;utm_campaign=Badge_Grade)
 [![GitHub issues](https://img.shields.io/github/issues/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/issues)
 [![GitHub](https://img.shields.io/github/license/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/blob/master/LICENSE)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/releases/latest)

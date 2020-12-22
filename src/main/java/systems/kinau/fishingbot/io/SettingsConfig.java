@@ -34,12 +34,15 @@ public class SettingsConfig implements Config {
     @Property(key = "auto.auto-disconnect", description = "config-auto-auto-disconnect") private boolean autoDisconnect = false;
     @Property(key = "auto.auto-sneak", description = "config-auto-auto-sneak") private boolean autoSneak = false;
     @Property(key = "auto.auto-disconnect-players-threshold", description = "config-auto-auto-disconnect-players-threshold") private int autoDisconnectPlayersThreshold = 5;
+
     @Property(key = "auto.auto-command-on-respawn.enabled", description = "config-auto-auto-command-on-respawn") private boolean autoCommandOnRespawnEnabled = false;
     @Property(key = "auto.auto-command-on-respawn.delay", description = "config-auto-auto-command-on-respawn-delay") private long autoCommandOnRespawnDelay = 1000;
     @Property(key = "auto.auto-command-on-respawn.commands", description = "config-auto-auto-command-on-respawn-commands") private List<String> autoCommandOnRespawn = Arrays.asList("%prefix%I respawned", "/home fishing");
+
     @Property(key = "auto.auto-command-before-death.enabled", description = "config-auto-auto-command-before-death") private boolean autoCommandBeforeDeathEnabled = false;
     @Property(key = "auto.auto-command-before-death.commands", description = "config-auto-auto-command-before-death-commands") private List<String> autoCommandBeforeDeath = Arrays.asList("%prefix%I am about to die", "/home");
     @Property(key = "auto.auto-command-before-death.min-health-before-death", description = "config-auto-auto-command-before-death-min-health-before-death") private float minHealthBeforeDeath = 6.0F;
+
     @Property(key = "auto.auto-quit-before-death.enabled", description = "config-auto-auto-quit-before-death") private boolean autoQuitBeforeDeathEnabled = false;
     @Property(key = "auto.auto-quit-before-death.min-health-before-quit", description = "config-auto-auto-quit-before-death-min-health-before-quit") private float minHealthBeforeQuit = 6.0F;
     @Property(key = "auto.auto-eject.enabled", description = "config-auto-auto-eject") private boolean autoLootEjectionEnabled = false;
