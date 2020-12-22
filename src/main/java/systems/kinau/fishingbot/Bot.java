@@ -231,12 +231,12 @@ public class Bot {
         do {
             try {
                 setRunning(true);
-                if(isWontConnect()) {
+                if (isWontConnect()) {
                     setWontConnect(false);
                     ServerPinger sp = new ServerPinger(getServerHost(), getServerPort());
                     sp.ping();
-                    if(isWontConnect()) {
-                        if(!getConfig().isAutoReconnect())
+                    if (isWontConnect()) {
+                        if (!getConfig().isAutoReconnect())
                             return;
                         try {
                             Thread.sleep(getConfig().getAutoReconnectTime() * 1000);

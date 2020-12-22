@@ -25,6 +25,10 @@ public class LocationUtils {
         }
     }
 
+    public static long toBlockPos(int x, int y, int z) {
+        return ((long) (x & 0x3FFFFFF) << 38) | ((long) (z & 0x3FFFFFF) << 12) | (y & 0xFFF);
+    }
+
     public enum Direction {
         NORTH(180.0F),
         EAST(-90.0F),

@@ -442,6 +442,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x0D, PacketInDifficultySet.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x0E, PacketInChat.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x11, PacketInConfirmTransaction.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x12, PacketInWindowClose.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x13, PacketInWindowItems.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x15, PacketInSetSlot.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x19, PacketInDisconnect.class);
@@ -467,6 +468,7 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x12, PacketOutPosition.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x13, PacketOutPosLook.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x1C, PacketOutEntityAction.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x2E, PacketOutBlockPlace.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_2).registerPacket(0x2F, PacketOutUseItem.class);
 
         //Minecraft 1.16.3
@@ -478,7 +480,7 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_4).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_3));
 
         //Register protocol of latest for unknown versions
-        if(!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getCurrentBot().getServerProtocol())) {
+        if (!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getCurrentBot().getServerProtocol())) {
            FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getCurrentBot().getServerProtocol());
 
             getPlayRegistryIn().put(FishingBot.getInstance().getCurrentBot().getServerProtocol(), new PacketRegistry());

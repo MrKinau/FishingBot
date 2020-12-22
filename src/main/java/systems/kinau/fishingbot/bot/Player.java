@@ -21,9 +21,7 @@ import systems.kinau.fishingbot.network.utils.ItemUtils;
 import systems.kinau.fishingbot.network.utils.LocationUtils;
 import systems.kinau.fishingbot.network.utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -47,6 +45,7 @@ public class Player implements Listener {
     @Getter @Setter private int heldSlot;
     @Getter @Setter private Slot heldItem;
     @Getter @Setter private Inventory inventory;
+    @Getter         private Map<Integer, Inventory> openedInventories;
 
     @Getter @Setter private UUID uuid;
 
@@ -57,6 +56,8 @@ public class Player implements Listener {
     @Getter         private final List<LookEjectFunction> lookEjectFunctionQueue = new ArrayList<>();
 
     public Player() {
+        this.openedInventories = new HashMap<>();
+        this.inventory = new Inventory();
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
     }
 
@@ -71,7 +72,6 @@ public class Player implements Listener {
             this.originYaw = yaw;
             this.originPitch = pitch;
         }
-        this.inventory = new Inventory();
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
 
@@ -107,22 +107,39 @@ public class Player implements Listener {
 
         if (event.getSlotId() == getHeldSlot())
             this.heldItem = slot;
-        else if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled())
+        if (!(event.getSlotId() == getHeldSlot() && ItemUtils.isFishingRod(slot)))
             executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), slot, event.getSlotId());
     }
 
     @EventHandler
     public void onUpdateWindow(UpdateWindowItemsEvent event) {
-        if (event.getWindowId() != 0)
-            return;
-
-        for (int i = 0; i < event.getSlots().size(); i++) {
-            getInventory().setItem(i, event.getSlots().get(i));
-            if (i == getHeldSlot())
-                this.heldItem = event.getSlots().get(i);
-            else if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled())
-                executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), event.getSlots().get(i), (short)i);
+        System.out.println("UPDATE WINDOW ITEMS: " + event.getWindowId());
+        if (event.getWindowId() == 0) {
+            for (int i = 0; i < event.getSlots().size(); i++) {
+                getInventory().setItem(i, event.getSlots().get(i));
+                if (i == getHeldSlot())
+                    this.heldItem = event.getSlots().get(i);
+                if (!(i == getHeldSlot() && ItemUtils.isFishingRod(event.getSlots().get(i))))
+                    executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), event.getSlots().get(i), (short) i);
+            }
+        } else if (event.getWindowId() > 0) {
+            Inventory inventory;
+            if (getOpenedInventories().containsKey(event.getWindowId()))
+                inventory = getOpenedInventories().get(event.getWindowId());
+            else {
+                inventory = new Inventory();
+                inventory.setWindowId(event.getWindowId());
+                getOpenedInventories().put(event.getWindowId(), inventory);
+            }
+            for (int i = 0; i < event.getSlots().size(); i++)
+                inventory.setItem(i, event.getSlots().get(i));
         }
+    }
+
+    @EventHandler
+    public void onInventoryCloseEvent(InventoryCloseEvent event) {
+        System.out.println("CLOSE WINDOW: " + event.getWindowId());
+        getOpenedInventories().remove(event.getWindowId());
     }
 
     @EventHandler
@@ -237,11 +254,30 @@ public class Player implements Listener {
                 )
         );
         try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCloseInventory(0));
+        closeInventory();
 
         Slot slot = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId);
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(hotBarButton + 36));
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
+    }
+
+    public void shiftToInventory(int slotId, Inventory inventory) {
+        for (int i = 0; i < inventory.getContent().size(); i++) {
+            Slot slot = inventory.getContent().get(i);
+            if (slot.isPresent())
+                System.out.println(slot.getItemCount() + "x "+ ItemUtils.getItemName(slot) + "[" + i + "]");
+        }
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
+                new PacketOutClickWindow(
+                        /* player inventory */ inventory.getWindowId(),
+                        /* the clicked slot */ (short) (slotId + 18),
+                        /* use right click */ (byte) 0,
+                        /* action count starting at 1 */ inventory.getActionCounter(),
+                        /* shift click mode */ 1,
+                        /* slot */ getInventory().getContent().get(slotId)
+                )
+        );
+        try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
     }
 
     public void look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
@@ -313,7 +349,6 @@ public class Player implements Listener {
         if (!updatedItem.isPresent())
             return;
         String itemName = ItemUtils.getItemName(updatedItem);
-
         for (EjectionRule ejectionRule : ejectionRules) {
             if (ejectionRule.getAllowList().contains(itemName)) {
                 switch (ejectionRule.getEjectionType()) {
@@ -328,11 +363,31 @@ public class Player implements Listener {
                                 FishingBot.getInstance().getCurrentBot().getFishingModule().finishedLooking();
                             }, true, (short) -1);
                         }, false, slotId);
-                        break;
+                        return;
                     }
                     case FILL_CHEST: {
-                        FishingBot.getLog().warning("FILL_CHEST is currently WIP");
-                        break;
+                        openAdjacentChest(ejectionRule.getDirection());
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            System.out.println(getOpenedInventories());
+                            for (Inventory inventory : getOpenedInventories().values()) {
+                                shiftToInventory(slotId, inventory);
+                                inventory.setActionCounter((short) (inventory.getActionCounter() + 1));
+                            }
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            for (Integer window : new HashSet<>(getOpenedInventories().keySet())) {
+                                closeInventory(window);
+                            }
+                        }).start();
+                        return;
                     }
                 }
                 break;
@@ -342,5 +397,32 @@ public class Player implements Listener {
 
     public boolean isCurrentlyLooking() {
         return !(lookThread == null || lookThread.isInterrupted() || !lookThread.isAlive());
+    }
+
+    public void openAdjacentChest(LocationUtils.Direction direction) {
+        int x = (int)Math.floor(getX());
+        int y = (int)Math.floor(getY());
+        int z = (int)Math.floor(getZ());
+        PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.SOUTH;
+        switch (direction) {
+            case EAST: x++; blockFace = PacketOutBlockPlace.BlockFace.WEST; break;
+            case WEST: x--; blockFace = PacketOutBlockPlace.BlockFace.EAST; break;
+            case NORTH: z--; blockFace = PacketOutBlockPlace.BlockFace.SOUTH; break;
+            case SOUTH: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
+        }
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutBlockPlace(
+                PacketOutBlockPlace.Hand.MAIN_HAND,
+                x, y, z, blockFace,
+                0.5F, 0.5F, 0.5F,
+                false
+        ));
+    }
+
+    public void closeInventory() {
+        closeInventory(0);
+    }
+
+    public void closeInventory(int windowId) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCloseInventory(windowId));
     }
 }
