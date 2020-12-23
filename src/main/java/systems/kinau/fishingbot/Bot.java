@@ -50,6 +50,7 @@ public class Bot {
     @Getter         private Player player;
     @Getter         private ClientDefaultsModule clientModule;
     @Getter         private ChatProxyModule chatProxyModule;
+    @Getter         private EjectionModule ejectModule;
 
     @Getter         private Socket socket;
     @Getter         private NetworkHandler net;
@@ -74,7 +75,7 @@ public class Bot {
 
         // update i18n
 
-        FishingBot.setI18n(new I18n(config.getLanguage(), FishingBot.PREFIX));
+        FishingBot.setI18n(new I18n(config.getLanguage(), FishingBot.PREFIX, true));
 
         // use command line arguments
         if (cmdLine.hasOption("logsdir")) {
@@ -265,6 +266,10 @@ public class Bot {
                 getClientModule().enable();
                 if (getConfig().isWebHookEnabled())
                     new DiscordModule().enable();
+                if (getConfig().isAutoLootEjectionEnabled()) {
+                    this.ejectModule = new EjectionModule();
+                    getEjectModule().enable();
+                }
                 new ItemHandler(getServerProtocol());
                 this.player = new Player();
 
@@ -297,11 +302,13 @@ public class Bot {
                 }
 
                 if (getClientModule() != null)
-                    this.getClientModule().disable();
+                    getClientModule().disable();
                 if (getFishingModule() != null)
-                    this.getFishingModule().disable();
+                    getFishingModule().disable();
                 if (getChatProxyModule() != null)
-                    this.getChatProxyModule().disable();
+                    getChatProxyModule().disable();
+                if (getEjectModule() != null)
+                    getEjectModule().disable();
                 if (getPlayer() != null)
                     getEventManager().unregisterListener(getPlayer());
                 getEventManager().getRegisteredListener().clear();

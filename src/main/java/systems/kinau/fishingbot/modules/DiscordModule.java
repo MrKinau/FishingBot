@@ -79,6 +79,11 @@ public class DiscordModule extends Module implements Listener {
         }
     }
 
+    private String getFooter() {
+        int durability = Math.min(64 - FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem().getItemDamage(), 64);
+        return "Fishing Rod Durability: " + durability + "/64  ●  " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername();
+    }
+
     @EventHandler
     public void onCaught(FishCaughtEvent event) {
         if (getDiscord() != null) {
@@ -109,14 +114,12 @@ public class DiscordModule extends Module implements Listener {
                 }
                 String finalItemName = sb.toString().trim();
 
-                int durability = Math.min(64 - FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem().getItemDamage(), 64);
-
                 fishingModule.logItem(
                         event.getItem(),
                         FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeDiscord(),
                         s -> getDiscord().dispatchEmbed("**" + finalItemName + "**", getColor(event.getItem()),
                                 ItemHandler.getImageUrl(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
-                                "Fishing Rod Durability: " + durability + "/64  ●  " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(), DISCORD_DETAILS),
+                                getFooter(), DISCORD_DETAILS),
                         s -> { });
             }).start();
         }
@@ -131,15 +134,25 @@ public class DiscordModule extends Module implements Listener {
         String mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
         if (mention.equals("<@USER_ID> "))
             mention = "";
-        if (FishingBot.getInstance().getCurrentBot().getConfig().isAlertOnAttack() && getHealth() > event.getHealth())
-            getDiscord().dispatchMessage(mention + FishingBot.getI18n().t("discord-webhook-damage", numberFormat.format(event.getHealth())), DISCORD_DETAILS);
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isAlertOnAttack() && getHealth() > event.getHealth()) {
+            if (!mention.isEmpty())
+                getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
+            getDiscord().dispatchEmbed(FishingBot.getI18n().t("config-announces-discord-alert-on-attack"), 0xff0000,
+                    "https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/general/heart.png",
+                    FishingBot.getI18n().t("discord-webhook-damage", numberFormat.format(event.getHealth())),
+                    getFooter(), DISCORD_DETAILS);
+        }
         this.health = event.getHealth();
     }
 
     @EventHandler
     public void onXP(UpdateExperienceEvent event) {
-        if (getLevel() != event.getLevel() && FishingBot.getInstance().getCurrentBot().getConfig().isAlertOnLevelUpdate())
-            getDiscord().dispatchMessage(FishingBot.getI18n().t("announce-level-up", String.valueOf(event.getLevel())), DISCORD_DETAILS);
+        if (getLevel() != event.getLevel() && FishingBot.getInstance().getCurrentBot().getConfig().isAlertOnLevelUpdate()) {
+            getDiscord().dispatchEmbed(FishingBot.getI18n().t("config-announces-discord-alert-on-level-update"), 0xb5ea3a,
+                    "https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/general/xp.png",
+                    FishingBot.getI18n().t("announce-level-up", String.valueOf(event.getLevel())),
+                    getFooter(), DISCORD_DETAILS);
+        }
         this.level = event.getLevel();
     }
 
@@ -149,8 +162,12 @@ public class DiscordModule extends Module implements Listener {
             String mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
             if (mention.equals("<@USER_ID> "))
                 mention = "";
-
-            getDiscord().dispatchMessage(mention + FishingBot.getI18n().t("discord-webhook-respawn"), DISCORD_DETAILS);
+            if (!mention.isEmpty())
+                getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
+            getDiscord().dispatchEmbed(FishingBot.getI18n().t("config-announces-discord-alert-on-respawn"), 0x666666,
+                    "https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/general/heart.png",
+                    FishingBot.getI18n().t("discord-webhook-respawn"),
+                    getFooter(), DISCORD_DETAILS);
         }
     }
 }

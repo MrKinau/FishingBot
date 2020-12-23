@@ -49,7 +49,7 @@ public class SettingsConfig implements Config {
     @Property(key = "auto.auto-eject.rules", description = "config-auto-auto-eject") private List<EjectionRule> autoLootEjectionRules = Arrays.asList(
             new EjectionRule("fish", LocationUtils.Direction.WEST, Arrays.asList("cod", "salmon", "pufferfish", "tropical_fish"), EjectionRule.EjectionType.DROP),
             new EjectionRule("treasure", LocationUtils.Direction.EAST, Arrays.asList("bow", "enchanted_book", "name_tag", "nautilus_shell", "saddle"), EjectionRule.EjectionType.DROP),
-            new EjectionRule("junk", LocationUtils.Direction.SOUTH, Arrays.asList("lily_pad", "bowl", "leather", "leather_boots", "fotten_flesh", "stick", "string", "potion", "bone", "ink_sac", "tripwire_hook"), EjectionRule.EjectionType.DROP));
+            new EjectionRule("junk", LocationUtils.Direction.SOUTH, Arrays.asList("lily_pad", "bowl", "leather", "leather_boots", "rotten_flesh", "stick", "string", "potion", "bone", "ink_sac", "tripwire_hook"), EjectionRule.EjectionType.DROP));
 
     @Property(key = "account.mail", description = "config-account-mail") private String userName = "my-minecraft@login.com";
     @Property(key = "account.password", description = "config-account-password") private String password = "CHANGEME";

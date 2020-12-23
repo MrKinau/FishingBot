@@ -211,11 +211,11 @@ public abstract class Packet {
                 }
                 return new Slot(true, itemId, itemCount, (short) damage, nbtData);
             } else
-                return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
+                return Slot.EMPTY;
         } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
             int itemId = input.readShort();
             if (itemId == -1)
-                return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
+                return Slot.EMPTY;
             byte itemCount = input.readByte();
             byte[] nbtData = NBTUtils.readNBT(input);
             int damage = -1;
@@ -233,7 +233,7 @@ public abstract class Packet {
         } else {
             int itemId = input.readShort();
             if (itemId == -1)
-                return new Slot(false, -1, (byte) -1, (short)-1, new byte[]{0});
+                return Slot.EMPTY;
             byte itemCount = input.readByte();
             short itemDamage = input.readShort();
             byte[] nbtData = NBTUtils.readNBT(input);

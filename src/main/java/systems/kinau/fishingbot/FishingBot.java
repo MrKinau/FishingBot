@@ -54,6 +54,9 @@ public class FishingBot {
         LogFormatter formatter = new LogFormatter();
         ch.setFormatter(formatter);
 
+        // start message
+        getLog().info("Using " + PREFIX.substring(0, PREFIX.length() - 3));
+
         // i18n pre init
 
         i18n = new I18n(Language.ENGLISH, PREFIX, true);

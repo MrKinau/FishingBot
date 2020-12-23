@@ -38,7 +38,7 @@ public class EjectionRulesOption extends ConfigOption {
         addRuleButton = new Button(FishingBot.getI18n().t("config-auto-auto-eject-add-rule"));
         root.getChildren().add(addRuleButton);
         for (EditableEjectionRule ejectionRule : ejectionRules) {
-            addRule(ejectionRule.getEjectionRule(), primaryStage);
+            addRule(ejectionRule.getEjectionRule(), primaryStage, false);
         }
         getChildren().add(root);
 
@@ -50,16 +50,17 @@ public class EjectionRulesOption extends ConfigOption {
             result.ifPresent(s -> {
                 EjectionRule ejectionRule = new EjectionRule(s, LocationUtils.Direction.SOUTH, new ArrayList<>(), EjectionRule.EjectionType.DROP);
                 ejectionRules.add(new EditableEjectionRule(ejectionRule, null, null, null));
-                addRule(ejectionRule, primaryStage);
+                addRule(ejectionRule, primaryStage, true);
             });
         });
     }
 
-    private void addRule(EjectionRule ejectionRule, Stage primaryStage) {
+    private void addRule(EjectionRule ejectionRule, Stage primaryStage, boolean expanded) {
         VBox content = new VBox(5);
         TitledPane titledPane = new TitledPane();
         titledPane.setText(ejectionRule.getName());
         titledPane.setContent(content);
+        titledPane.setExpanded(expanded);
 
         EnumConfigOption directionOption = new EnumConfigOption("auto.auto-eject.rules.direction", FishingBot.getI18n().t("config-auto-auto-eject-direction"), ejectionRule.getDirection().name(), LocationUtils.Direction.values());
         EnumConfigOption ejectionType = new EnumConfigOption("auto.auto-eject.rules.ejection-type", FishingBot.getI18n().t("config-auto-auto-eject-ejection-type"), ejectionRule.getEjectionType().name(), EjectionRule.EjectionType.values());
