@@ -187,9 +187,7 @@ public class Player implements Listener {
         new Thread(() -> {
             try {
                 Thread.sleep(FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandOnRespawnDelay());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
             if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandOnRespawnEnabled()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandOnRespawn()) {
                     sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
@@ -252,7 +250,7 @@ public class Player implements Listener {
                         /* slot */ getInventory().getContent().get(slotId)
                 )
         );
-        try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(20); } catch (InterruptedException ignore) { }
         closeInventory();
 
         Slot slot = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId);
@@ -271,7 +269,7 @@ public class Player implements Listener {
                         /* slot */ getInventory().getContent().get(slotId)
                 )
         );
-        try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(20); } catch (InterruptedException ignore) { }
 
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, Slot.EMPTY);
 
@@ -318,18 +316,14 @@ public class Player implements Listener {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
         }
         if (onFinish != null)
             onFinish.accept(true);
 
         try {
             Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        } catch (InterruptedException ignore) { }
     }
 
     public boolean isCurrentlyLooking() {
@@ -347,12 +341,18 @@ public class Player implements Listener {
             case NORTH: z--; blockFace = PacketOutBlockPlace.BlockFace.SOUTH; break;
             case SOUTH: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
         }
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutBlockPlace(
-                PacketOutBlockPlace.Hand.MAIN_HAND,
-                x, y, z, blockFace,
-                0.5F, 0.5F, 0.5F,
-                false
-        ));
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(
+                    x, y, z, (byte)0, (byte)0, (byte)0, blockFace
+            ));
+        } else {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutBlockPlace(
+                    PacketOutBlockPlace.Hand.MAIN_HAND,
+                    x, y, z, blockFace,
+                    0.5F, 0.5F, 0.5F,
+                    false
+            ));
+        }
     }
 
     public void closeInventory() {

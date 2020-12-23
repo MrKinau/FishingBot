@@ -119,9 +119,7 @@ public class EjectionModule extends Module {
         player.openAdjacentChest(chestEjectFunction.getDirection());
         try {
             Thread.sleep(50 + player.getLastPing());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        } catch (InterruptedException ignore) { }
         List<ChestEjectFunction> fittingFunctions = getChestEjectFunctions(chestEjectFunction.getDirection());
         fittingFunctions.forEach(fittingFunction -> {
             for (Inventory inventory : player.getOpenedInventories().values()) {
@@ -130,9 +128,7 @@ public class EjectionModule extends Module {
             }
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
         });
         for (Integer window : new HashSet<>(player.getOpenedInventories().keySet())) {
             player.closeInventory(window);

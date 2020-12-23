@@ -86,17 +86,15 @@ public class FishingModule extends Module implements Runnable, Listener {
         setTrackingNextBobberId(true);
         try {
             Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+        } catch (InterruptedException ignore) { }
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
     }
 
     public void setPaused(boolean paused) {
         this.paused = paused;
         if (paused) {
             if (getCurrentBobber() != -1 && !isTrackingNextEntityMeta())
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
         } else {
             stuck();
         }
@@ -108,7 +106,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         setTrackingNextEntityMeta(true);
         if (isPaused())
             return;
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
         new Thread(() -> {
             try {
                 int timeToWait = FishingBot.getInstance().getCurrentBot().getPlayer().getLastPing() + 200;
@@ -126,14 +124,12 @@ public class FishingModule extends Module implements Runnable, Listener {
                 Thread.sleep(200);
 
                 if (!FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
                 } else {
                     this.waitForLookFinish = true;
                     setTrackingNextBobberId(false);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
         }).start();
     }
 
@@ -181,9 +177,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     // Delay the enchant messages to arrive after the item announcement
                     try {
                         Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (InterruptedException ignore) { }
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(str));
                 });
 
@@ -266,7 +260,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
         new Thread(() -> {
             setTrackingNextBobberId(true);
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
         }).start();
     }
 
@@ -280,9 +274,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 return;
             try {
                 Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
             setTrackingNextBobberId(true);
             if (!ItemUtils.isFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem()))
                 noRod();
@@ -292,7 +284,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     this.waitForLookFinish = true;
                     return;
                 }
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
             }
         }).start();
     }
@@ -363,7 +355,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     private void updateInventory(Slot slot, int slotId) {
         new Thread(() -> {
-            try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+            try { Thread.sleep(100); } catch (InterruptedException ignore) { }
             // check current fishing rod value and swap if a better one is in inventory
             if (ItemUtils.isFishingRod(slot))
                 swapWithBestFishingRod();
@@ -386,7 +378,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                         return;
                     }
                     setTrackingNextBobberId(true);
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
                 } else if (!isNoRodAvailable() && !ItemUtils.isFishingRod(slot)) {
                     noRod();
                 }
@@ -445,7 +437,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     return;
                 }
                 setTrackingNextBobberId(true);
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(FishingBot.getInstance().getCurrentBot().getNet()));
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
             }
             try {
                 Thread.sleep(5000);

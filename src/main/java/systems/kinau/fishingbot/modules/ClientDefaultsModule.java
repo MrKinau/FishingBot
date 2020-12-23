@@ -42,9 +42,7 @@ public class ClientDefaultsModule extends Module implements Listener {
         new Thread(() -> {
             try {
                 Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
 
             //Send start texts
             if (FishingBot.getInstance().getCurrentBot().getConfig().isStartTextEnabled()) {

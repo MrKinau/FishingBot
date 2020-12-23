@@ -8,30 +8,39 @@ package systems.kinau.fishingbot.network.protocol.play;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
+import systems.kinau.fishingbot.utils.LocationUtils;
 
 @AllArgsConstructor
+@NoArgsConstructor
 public class PacketOutUseItem extends Packet {
 
-    @Getter private NetworkHandler networkHandler;
+    @Getter private int x = -1;   // ||
+    @Getter private int y = 4095; // \/
+    @Getter private int z = -1;   // blockpos = -1
+    @Getter private byte cursorX = 0;
+    @Getter private byte cursorY = 0;
+    @Getter private byte cursorZ = 0;
+    @Getter private PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.UNSET;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         switch (protocolId) {
             case ProtocolConstants.MINECRAFT_1_8: {
-                out.writeLong(-1);      //Position
-                out.writeByte(255);     //Face
-                Packet.writeSlot(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem(), out);  //Slot
-                out.writeByte(0);       //Cursor X
-                out.writeByte(0);       //Cursor Y
-                out.writeByte(0);       //Cursor Z
+                out.writeLong(LocationUtils.toBlockPos(x, y, z));
+                out.writeByte(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal());
+                Packet.writeSlot(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem(), out);
+                out.writeByte(cursorX);
+                out.writeByte(cursorY);
+                out.writeByte(cursorZ);
                 new Thread(() -> {
-                    try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
-                    networkHandler.sendPacket(new PacketOutArmAnimation());
+                    try { Thread.sleep(100); } catch (InterruptedException ignore) { }
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutArmAnimation());
                 }).start();
                 break;
             }
@@ -54,7 +63,7 @@ public class PacketOutUseItem extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_3:
             case ProtocolConstants.MINECRAFT_1_14_4:
             default: {
-                out.writeByte(0);       //main hand
+                out.writeByte(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal());       //main hand
                 break;
             }
         }

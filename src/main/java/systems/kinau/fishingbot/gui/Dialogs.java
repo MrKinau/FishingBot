@@ -77,7 +77,7 @@ public class Dialogs {
             new JFXPanel();
             latch.countDown();
         });
-        try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { latch.await(); } catch (InterruptedException ignore) { }
     }
 
     public static void showAboutWindow(Stage parent, Consumer<String> callBack) {

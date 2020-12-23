@@ -176,9 +176,7 @@ public class Bot {
                     FishingBot.getI18n().info("realms-determining-address", String.valueOf(i + 1));
                     try {
                         Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (InterruptedException ignore) { }
                 } else
                     break;
             }
@@ -248,9 +246,7 @@ public class Bot {
                             return;
                         try {
                             Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        } catch (InterruptedException ignore) { }
                         continue;
                     }
                 }
@@ -330,9 +326,7 @@ public class Bot {
 
                 try {
                     Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                } catch (InterruptedException ignore) { }
 
                 if (getAuthData() == null) {
                     if (getConfig().isOnlineMode())
@@ -350,9 +344,7 @@ public class Bot {
             FishingBot.getInstance().getMainGUIController().updatePlayPaused();
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
             FishingBot.getInstance().getMainGUIController().enableStartStop();
         }
     }
