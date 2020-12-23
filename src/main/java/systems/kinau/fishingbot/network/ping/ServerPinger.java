@@ -13,7 +13,7 @@ import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.utils.TextComponent;
+import systems.kinau.fishingbot.utils.TextComponent;
 
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;

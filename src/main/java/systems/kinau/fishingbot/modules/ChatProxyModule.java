@@ -6,10 +6,10 @@
 package systems.kinau.fishingbot.modules;
 
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.command.CommandExecutor;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.ChatEvent;
+import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 
 import java.io.BufferedReader;

@@ -13,8 +13,8 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
-import systems.kinau.fishingbot.network.utils.NBTUtils;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
+import systems.kinau.fishingbot.utils.NBTUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

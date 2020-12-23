@@ -6,7 +6,7 @@ import lombok.Getter;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.LocationUtils;
+import systems.kinau.fishingbot.utils.LocationUtils;
 
 @AllArgsConstructor
 public class PacketOutBlockPlace extends Packet {

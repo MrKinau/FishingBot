@@ -12,13 +12,13 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.*;
-import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
-import systems.kinau.fishingbot.network.utils.ItemUtils;
-import systems.kinau.fishingbot.network.utils.LocationUtils;
-import systems.kinau.fishingbot.network.utils.StringUtils;
+import systems.kinau.fishingbot.utils.ItemUtils;
+import systems.kinau.fishingbot.utils.LocationUtils;
+import systems.kinau.fishingbot.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;

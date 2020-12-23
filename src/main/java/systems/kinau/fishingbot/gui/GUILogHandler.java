@@ -3,7 +3,7 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.io.LogFormatter;
+import systems.kinau.fishingbot.io.logging.LogFormatter;
 
 import java.util.Arrays;
 import java.util.logging.Handler;

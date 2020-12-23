@@ -13,11 +13,11 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.command.CommandExecutor;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.gui.config.ConfigGUI;
+import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 
 import javax.annotation.Resources;
@@ -291,7 +291,7 @@ public class GUIController implements Listener {
         table.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("count"));
     }
 
-    private void updateEnchantments(TableView<Enchantment> table, List<systems.kinau.fishingbot.network.utils.Enchantment> enchantments) {
+    private void updateEnchantments(TableView<Enchantment> table, List<systems.kinau.fishingbot.bot.Enchantment> enchantments) {
         enchantments.forEach(enchantment -> {
             AtomicBoolean exists = new AtomicBoolean(false);
             table.getItems().forEach(item -> {

@@ -9,12 +9,16 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.Files;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Enchantment;
+import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.Slot;
+import systems.kinau.fishingbot.enums.MaterialMc18;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.utils.*;
+import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
+import systems.kinau.fishingbot.utils.ItemUtils;
 
 import java.io.File;
 import java.io.IOException;

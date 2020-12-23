@@ -12,8 +12,8 @@ import lombok.Data;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.fishing.EjectionRule;
-import systems.kinau.fishingbot.network.utils.LocationUtils;
+import systems.kinau.fishingbot.modules.ejection.EjectionRule;
+import systems.kinau.fishingbot.utils.LocationUtils;
 
 import java.util.*;
 
