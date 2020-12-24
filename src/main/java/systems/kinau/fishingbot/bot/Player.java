@@ -334,12 +334,12 @@ public class Player implements Listener {
         int x = (int)Math.floor(getX());
         int y = (int)Math.floor(getY());
         int z = (int)Math.floor(getZ());
-        PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.SOUTH;
+        PacketOutBlockPlace.BlockFace blockFace;
         switch (direction) {
             case EAST: x++; blockFace = PacketOutBlockPlace.BlockFace.WEST; break;
             case WEST: x--; blockFace = PacketOutBlockPlace.BlockFace.EAST; break;
             case NORTH: z--; blockFace = PacketOutBlockPlace.BlockFace.SOUTH; break;
-            case SOUTH: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
+            default: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
         }
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(

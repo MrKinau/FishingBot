@@ -12,6 +12,9 @@ public class CustomPrintStream extends PrintStream {
     private static final PrintStream originalSystemErr = System.err;
     private static CustomPrintStream systemOutToLogger;
 
+    private String packageOrClassToLog;
+    private Logger logger;
+
     /**
      * Enable forwarding System.out.println calls to the logger if the stacktrace contains the package parameter
      * @param packageToLog
@@ -31,9 +34,6 @@ public class CustomPrintStream extends PrintStream {
         System.setErr(originalSystemErr);
         systemOutToLogger = null;
     }
-
-    private String packageOrClassToLog;
-    private Logger logger;
 
     private CustomPrintStream(PrintStream original, String packageOrClassToLog, Logger logger) {
         super(original);

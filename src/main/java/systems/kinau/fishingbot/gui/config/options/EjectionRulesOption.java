@@ -1,6 +1,5 @@
 package systems.kinau.fishingbot.gui.config.options;
 
-import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
@@ -20,14 +19,9 @@ import java.util.*;
 public class EjectionRulesOption extends ConfigOption {
 
     private VBox root;
-    private Button addRuleButton;
     private List<EditableEjectionRule> ejectionRules;
 
-    public EjectionRulesOption(String key, String description, List<EjectionRule> ejectionRules, Stage primaryStage) {
-        this(key, description, ejectionRules, primaryStage, null);
-    }
-
-    public EjectionRulesOption(String key, String description, List<EjectionRule> value, Stage primaryStage, ChangeListener<Integer> onClick) {
+    public EjectionRulesOption(String key, String description, List<EjectionRule> value, Stage primaryStage) {
         super(key, description, value);
         this.ejectionRules = new ArrayList<>();
         for (EjectionRule ejectionRule : value) {
@@ -35,7 +29,7 @@ public class EjectionRulesOption extends ConfigOption {
         }
         this.root = new VBox(5);
         setValue(createValue());
-        addRuleButton = new Button(FishingBot.getI18n().t("config-auto-auto-eject-add-rule"));
+        Button addRuleButton = new Button(FishingBot.getI18n().t("config-auto-auto-eject-add-rule"));
         root.getChildren().add(addRuleButton);
         for (EditableEjectionRule ejectionRule : ejectionRules) {
             addRule(ejectionRule.getEjectionRule(), primaryStage, false);

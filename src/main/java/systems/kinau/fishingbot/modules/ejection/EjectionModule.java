@@ -43,17 +43,6 @@ public class EjectionModule extends Module {
         for (EjectionRule ejectionRule : ejectionRules) {
             if (ejectionRule.getAllowList().contains(itemName)) {
                 switch (ejectionRule.getEjectionType()) {
-                    case DROP: {
-                        for (LookEjectFunction lookEjectFunction : lookEjectFunctions) {
-                            if (lookEjectFunction.getSlot() == slotId)
-                                return;
-                        }
-
-                        LookEjectFunction lookEjectFunction = new LookEjectFunction(ejectionRule.getDirection().getYaw(), player.getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), slotId);
-                        lookEjectFunctions.add(lookEjectFunction);
-                        lookAndDrop(lookEjectFunction);
-                        return;
-                    }
                     case FILL_CHEST: {
                         for (ChestEjectFunction chestEjectFunction : chestEjectFunctions) {
                             if (chestEjectFunction.getSlot() == slotId)
@@ -65,8 +54,19 @@ public class EjectionModule extends Module {
                         fillAdjacentChest(chestEjectFunction);
                         return;
                     }
+                    case DROP:
+                    default: {
+                        for (LookEjectFunction lookEjectFunction : lookEjectFunctions) {
+                            if (lookEjectFunction.getSlot() == slotId)
+                                return;
+                        }
+
+                        LookEjectFunction lookEjectFunction = new LookEjectFunction(ejectionRule.getDirection().getYaw(), player.getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), slotId);
+                        lookEjectFunctions.add(lookEjectFunction);
+                        lookAndDrop(lookEjectFunction);
+                        return;
+                    }
                 }
-                break;
             }
         }
     }

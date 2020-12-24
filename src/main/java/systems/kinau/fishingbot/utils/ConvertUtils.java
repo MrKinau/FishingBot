@@ -71,7 +71,7 @@ public class ConvertUtils {
                 JSONArray array = (JSONArray) new JSONParser().parse(value);
                 array.forEach(o -> {
                     try {
-                        org.json.simple.JSONObject obj = (JSONObject) new JSONParser().parse(o.toString());
+                        JSONObject obj = (JSONObject) new JSONParser().parse(o.toString());
                         String name = obj.get("name").toString();
                         LocationUtils.Direction direction = LocationUtils.Direction.valueOf((String) obj.get("direction"));
                         EjectionRule.EjectionType ejectionType = EjectionRule.EjectionType.valueOf((String) obj.get("ejectionType"));
