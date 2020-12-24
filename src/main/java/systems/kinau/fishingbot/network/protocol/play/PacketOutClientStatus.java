@@ -21,7 +21,7 @@ public class PacketOutClientStatus extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        //Only outgoing packet
+        // Only outgoing packet
     }
 
     public enum Action {

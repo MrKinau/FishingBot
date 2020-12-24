@@ -25,7 +25,7 @@ public class ActivateableTitledPaneOption extends TitledPaneOption {
     }
 
     private void updateDisabledStatus() {
-        content.getChildren().forEach(node -> {
+        getContent().getChildren().forEach(node -> {
             if (node instanceof BooleanConfigOption && ((BooleanConfigOption) node).getDescription().equals(FishingBot.getI18n().t("ui-config-enabled")))
                 return;
             node.setDisable(!isEnabled());

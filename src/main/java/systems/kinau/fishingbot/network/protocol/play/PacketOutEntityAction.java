@@ -34,7 +34,7 @@ public class PacketOutEntityAction extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        // Outgoing packet only
+        // Only outgoing packet
     }
 
     public enum EntityAction {

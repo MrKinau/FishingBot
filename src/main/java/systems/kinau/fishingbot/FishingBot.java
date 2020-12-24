@@ -7,8 +7,9 @@ import systems.kinau.fishingbot.gui.GUIController;
 import systems.kinau.fishingbot.gui.MainGUI;
 import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.i18n.Language;
-import systems.kinau.fishingbot.io.LogFormatter;
-import systems.kinau.fishingbot.io.SettingsConfig;
+import systems.kinau.fishingbot.io.config.SettingsConfig;
+import systems.kinau.fishingbot.io.logging.CustomPrintStream;
+import systems.kinau.fishingbot.io.logging.LogFormatter;
 
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -53,6 +54,10 @@ public class FishingBot {
         log.setUseParentHandlers(false);
         LogFormatter formatter = new LogFormatter();
         ch.setFormatter(formatter);
+        CustomPrintStream.enableForPackage("systems.kinau.fishingbot", getLog());
+
+        // start message
+        getLog().info("Using " + PREFIX.substring(0, PREFIX.length() - 3));
 
         // i18n pre init
 
@@ -69,6 +74,7 @@ public class FishingBot {
     public void startBot() {
         if (getCurrentBot() != null)
             stopBot(true);
+        Thread.currentThread().setName("mainThread");
         Bot bot = new Bot(cmdLine);
         bot.start();
     }

@@ -40,6 +40,6 @@ public class PacketOutUseEntity extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-
+        // Only outgoing packet
     }
 }

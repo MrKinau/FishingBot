@@ -13,7 +13,7 @@ import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.utils.TextComponent;
+import systems.kinau.fishingbot.utils.TextComponent;
 
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -35,7 +35,9 @@ public class ServerPinger {
         FishingBot.getInstance().getCurrentBot().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()));
         if (serverName == null || serverName.trim().isEmpty()) {
             FishingBot.getI18n().severe("network-invalid-server-address");
-            System.exit(1);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
+            FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+            return;
         }
 
         updateWithSRV();

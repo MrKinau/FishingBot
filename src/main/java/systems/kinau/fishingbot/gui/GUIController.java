@@ -13,11 +13,11 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.command.CommandExecutor;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.gui.config.ConfigGUI;
+import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 
 import javax.annotation.Resources;
@@ -43,6 +43,7 @@ public class GUIController implements Listener {
     @FXML private Tab lootTab;
     @FXML private Button startStopButton;
     @FXML private Button configButton;
+    @FXML private Button playPauseButton;
     @FXML private ImageView skinPreview;
     @FXML private Label usernamePreview;
 
@@ -149,12 +150,35 @@ public class GUIController implements Listener {
         }
     }
 
+    public void playPause(Event e) {
+        if (FishingBot.getInstance().getCurrentBot() == null)
+            return;
+        boolean paused = FishingBot.getInstance().getCurrentBot().getFishingModule().isPaused();
+        FishingBot.getInstance().getCurrentBot().getFishingModule().setPaused(!paused);
+        updatePlayPaused();
+    }
+
+    public void updatePlayPaused() {
+        boolean paused = false;
+        if (FishingBot.getInstance().getCurrentBot() != null)
+            paused = FishingBot.getInstance().getCurrentBot().getFishingModule().isPaused();
+        boolean finalPaused = paused;
+        Platform.runLater(() -> {
+            if (finalPaused)
+                playPauseButton.setText(FishingBot.getI18n().t("ui-button-play"));
+            else
+                playPauseButton.setText(FishingBot.getI18n().t("ui-button-pause"));
+        });
+    }
+
     public void startStop(Event e) {
         if (FishingBot.getInstance().getCurrentBot() == null) {
             startStopButton.setText(FishingBot.getI18n().t("ui-button-stop"));
+            playPauseButton.setDisable(false);
             new Thread(() -> FishingBot.getInstance().startBot()).start();
         } else {
             startStopButton.setDisable(true);
+            playPauseButton.setDisable(true);
             startStopButton.setText(FishingBot.getI18n().t("ui-button-start"));
             FishingBot.getInstance().stopBot(true);
         }
@@ -164,9 +188,12 @@ public class GUIController implements Listener {
         Platform.runLater(() -> {
             if (FishingBot.getInstance().getCurrentBot() == null) {
                 startStopButton.setText(FishingBot.getI18n().t("ui-button-start"));
+                playPauseButton.setDisable(true);
             } else {
                 startStopButton.setDisable(true);
+                playPauseButton.setDisable(false);
                 startStopButton.setText(FishingBot.getI18n().t("ui-button-stop"));
+
             }
         });
     }
@@ -264,7 +291,7 @@ public class GUIController implements Listener {
         table.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("count"));
     }
 
-    private void updateEnchantments(TableView<Enchantment> table, List<systems.kinau.fishingbot.network.utils.Enchantment> enchantments) {
+    private void updateEnchantments(TableView<Enchantment> table, List<systems.kinau.fishingbot.bot.Enchantment> enchantments) {
         enchantments.forEach(enchantment -> {
             AtomicBoolean exists = new AtomicBoolean(false);
             table.getItems().forEach(item -> {

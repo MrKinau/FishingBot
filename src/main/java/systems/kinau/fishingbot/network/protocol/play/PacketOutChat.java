@@ -23,5 +23,7 @@ public class PacketOutChat extends Packet {
     }
 
     @Override
-    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) { }
+    public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
+        // Only outgoing packet
+    }
 }
