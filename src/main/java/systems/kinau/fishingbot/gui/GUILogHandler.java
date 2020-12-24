@@ -3,7 +3,7 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.io.LogFormatter;
+import systems.kinau.fishingbot.io.logging.LogFormatter;
 
 import java.util.Arrays;
 import java.util.logging.Handler;
@@ -17,8 +17,6 @@ public class GUILogHandler extends Handler {
     public GUILogHandler(TextArea logWindow) {
         this.logWindow = logWindow;
         this.logFormatter = new LogFormatter();
-
-//        logWindow.
     }
 
     @Override
@@ -40,8 +38,12 @@ public class GUILogHandler extends Handler {
     }
 
     @Override
-    public void flush() { }
+    public void flush() {
+        // Flush not implemented
+    }
 
     @Override
-    public void close() throws SecurityException { }
+    public void close() throws SecurityException {
+        // Close not implemented
+    }
 }

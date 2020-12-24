@@ -13,7 +13,7 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.network.utils.NBTUtils;
+import systems.kinau.fishingbot.utils.NBTUtils;
 
 public class PacketInJoinGame extends Packet {
 

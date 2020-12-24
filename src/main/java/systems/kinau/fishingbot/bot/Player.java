@@ -12,13 +12,16 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.*;
-import systems.kinau.fishingbot.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
-import systems.kinau.fishingbot.network.utils.LocationUtils;
-import systems.kinau.fishingbot.network.utils.StringUtils;
+import systems.kinau.fishingbot.utils.ItemUtils;
+import systems.kinau.fishingbot.utils.LocationUtils;
+import systems.kinau.fishingbot.utils.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -30,6 +33,8 @@ public class Player implements Listener {
     @Getter @Setter private double z;
     @Getter @Setter private float yaw;
     @Getter @Setter private float pitch;
+    @Getter @Setter private float originYaw = -255;
+    @Getter @Setter private float originPitch = -255;
 
     @Getter @Setter private int experience;
     @Getter @Setter private int levels;
@@ -41,6 +46,7 @@ public class Player implements Listener {
     @Getter @Setter private int heldSlot;
     @Getter @Setter private Slot heldItem;
     @Getter @Setter private Inventory inventory;
+    @Getter         private final Map<Integer, Inventory> openedInventories = new HashMap<>();
 
     @Getter @Setter private UUID uuid;
 
@@ -50,6 +56,7 @@ public class Player implements Listener {
     @Getter @Setter private Thread lookThread;
 
     public Player() {
+        this.inventory = new Inventory();
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
     }
 
@@ -60,7 +67,10 @@ public class Player implements Listener {
         this.z = event.getZ();
         this.yaw = event.getYaw();
         this.pitch = event.getPitch();
-        this.inventory = new Inventory();
+        if (originYaw == -255 && originPitch == -255) {
+            this.originYaw = yaw;
+            this.originPitch = pitch;
+        }
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
 
@@ -86,29 +96,51 @@ public class Player implements Listener {
 
     @EventHandler
     public void onUpdateSlot(UpdateSlotEvent event) {
-        if(event.getWindowId() != 0)
+        if (event.getWindowId() != 0)
             return;
 
         Slot slot = event.getSlot();
 
-        if (getInventory() != null) {
+        if (getInventory() != null)
             getInventory().setItem(event.getSlotId(), slot);
-        }
 
-        if(event.getSlotId() == getHeldSlot())
+        if (event.getSlotId() == getHeldSlot())
             this.heldItem = slot;
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()
+                && !(event.getSlotId() == getHeldSlot() && ItemUtils.isFishingRod(slot)))
+            FishingBot.getInstance().getCurrentBot().getEjectModule()
+                    .executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), slot, event.getSlotId());
     }
 
     @EventHandler
     public void onUpdateWindow(UpdateWindowItemsEvent event) {
-        if (event.getWindowId() != 0)
-            return;
-
-        for (int i = 0; i < event.getSlots().size(); i++) {
-            getInventory().setItem(i, event.getSlots().get(i));
-            if(i == getHeldSlot())
-                this.heldItem = event.getSlots().get(i);
+        if (event.getWindowId() == 0) {
+            for (int i = 0; i < event.getSlots().size(); i++) {
+                getInventory().setItem(i, event.getSlots().get(i));
+                if (i == getHeldSlot())
+                    this.heldItem = event.getSlots().get(i);
+                if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()
+                        && !(i == getHeldSlot() && ItemUtils.isFishingRod(event.getSlots().get(i))))
+                    FishingBot.getInstance().getCurrentBot().getEjectModule()
+                            .executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), event.getSlots().get(i), (short) i);
+            }
+        } else if (event.getWindowId() > 0) {
+            Inventory inventory;
+            if (getOpenedInventories().containsKey(event.getWindowId()))
+                inventory = getOpenedInventories().get(event.getWindowId());
+            else {
+                inventory = new Inventory();
+                inventory.setWindowId(event.getWindowId());
+                getOpenedInventories().put(event.getWindowId(), inventory);
+            }
+            for (int i = 0; i < event.getSlots().size(); i++)
+                inventory.setItem(i, event.getSlots().get(i));
         }
+    }
+
+    @EventHandler
+    public void onInventoryCloseEvent(InventoryCloseEvent event) {
+        getOpenedInventories().remove(event.getWindowId());
     }
 
     @EventHandler
@@ -121,6 +153,7 @@ public class Player implements Listener {
     public void onUpdateHealth(UpdateHealthEvent event) {
         if (event.getEid() != getEntityID())
             return;
+
         if (getHealth() != -1 && event.getHealth() <= 0 && getEntityID() != -1 && !isRespawning()) {
             setRespawning(true);
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new RespawnEvent());
@@ -139,11 +172,11 @@ public class Player implements Listener {
                 setSentLowHealth(false);
         }
 
-        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoQuitBeforeDeathEnabled()) {
-            if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeQuit()) {
-                FishingBot.getI18n().warning("module-fishing-health-threshold-reached");
-                System.exit(0);
-            }
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoQuitBeforeDeathEnabled() && event.getHealth() < getHealth()
+                && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeQuit() && event.getHealth() != 0.0) {
+            FishingBot.getI18n().warning("module-fishing-health-threshold-reached");
+            FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
         }
 
         this.health = event.getHealth();
@@ -154,9 +187,7 @@ public class Player implements Listener {
         new Thread(() -> {
             try {
                 Thread.sleep(FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandOnRespawnDelay());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) { }
             if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandOnRespawnEnabled()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandOnRespawn()) {
                     sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
@@ -194,8 +225,6 @@ public class Player implements Listener {
     }
 
     public void dropStack(short slot, short actionNumber) {
-        Slot emptySlot = new Slot(false, -1, (byte) -1, (short) -1, new byte[]{0});
-
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
                 new PacketOutClickWindow(
                         /* player inventory */ 0,
@@ -203,11 +232,11 @@ public class Player implements Listener {
                         /* drop entire stack */ (byte) 1,
                         /* action count starting at 1 */ actionNumber,
                         /* drop entire stack */ 4,
-                        /* empty slot */ emptySlot
+                        /* empty slot */ Slot.EMPTY
                 )
         );
 
-        FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().setItem(slot, emptySlot);
+        FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().setItem(slot, Slot.EMPTY);
     }
 
     public void swapToHotBar(int slotId, int hotBarButton) {
@@ -221,56 +250,116 @@ public class Player implements Listener {
                         /* slot */ getInventory().getContent().get(slotId)
                 )
         );
-        try { Thread.sleep(20); } catch (InterruptedException e) { e.printStackTrace(); }
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCloseInventory(0));
+        try { Thread.sleep(20); } catch (InterruptedException ignore) { }
+        closeInventory();
 
         Slot slot = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId);
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(hotBarButton + 36));
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
     }
 
-    public void look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
-        look(direction.getYaw(), getPitch(), 8, onFinish);
+    public void shiftToInventory(int slotId, Inventory inventory) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
+                new PacketOutClickWindow(
+                        /* player inventory */ inventory.getWindowId(),
+                        /* the clicked slot */ (short) (slotId + (inventory.getContent().size() == 63 ? 18 : 45)),
+                        /* use right click */ (byte) 0,
+                        /* action count starting at 1 */ inventory.getActionCounter(),
+                        /* shift click mode */ 1,
+                        /* slot */ getInventory().getContent().get(slotId)
+                )
+        );
+        try { Thread.sleep(20); } catch (InterruptedException ignore) { }
+
+        FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, Slot.EMPTY);
+
     }
 
-    public void look(float yaw, float pitch, int speed) {
-        look(yaw, pitch, speed, null);
+    public boolean look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
+        return look(direction.getYaw(), getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), onFinish);
     }
 
-    public void look(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
-        if (lookThread != null && lookThread.isAlive())
-            lookThread.interrupt();
+    public boolean look(float yaw, float pitch, int speed) {
+        return look(yaw, pitch, speed, null);
+    }
+
+    public boolean look(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
+        if (lookThread != null && Thread.currentThread().getId() != lookThread.getId() && lookThread.isAlive()) {
+            return false;
+        } else if (lookThread != null && Thread.currentThread().getId() == lookThread.getId() && lookThread.isAlive()) {
+            internalLook(yaw, pitch, speed, onFinish); // calling look inside onFinish
+            return true;
+        }
 
         this.lookThread = new Thread(() -> {
-            float yawDiff = LocationUtils.yawDiff(getYaw(), yaw);
-            float pitchDiff = LocationUtils.yawDiff(getPitch(), pitch);
-
-            int steps = (int) Math.ceil(Math.max(Math.abs(yawDiff), Math.abs(pitchDiff)) / Math.max(1, speed));
-            float yawPerStep = yawDiff / steps;
-            float pitchPerStep = pitchDiff / steps;
-
-            for (int i = 0; i < steps; i++) {
-                if (lookThread.isInterrupted()) {
-                    if (onFinish != null)
-                        onFinish.accept(false);
-                    break;
-                }
-                setYaw(getYaw() + yawPerStep);
-                setPitch(getPitch() + pitchPerStep);
-                if (getYaw() > 180)
-                    setYaw(-180 + (getYaw() - 180));
-                if (getYaw() < -180)
-                    setYaw(180 + (getYaw() + 180));
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (onFinish != null)
-                onFinish.accept(true);
+            internalLook(yaw, pitch, speed, onFinish);
         });
         getLookThread().start();
+        return true;
+    }
+
+    private void internalLook(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
+        float yawDiff = LocationUtils.yawDiff(getYaw(), yaw);
+        float pitchDiff = LocationUtils.yawDiff(getPitch(), pitch);
+
+        int steps = (int) Math.ceil(Math.max(Math.abs(yawDiff), Math.abs(pitchDiff)) / Math.max(1, speed));
+        float yawPerStep = yawDiff / steps;
+        float pitchPerStep = pitchDiff / steps;
+
+        for (int i = 0; i < steps; i++) {
+            setYaw(getYaw() + yawPerStep);
+            setPitch(getPitch() + pitchPerStep);
+            if (getYaw() > 180)
+                setYaw(-180 + (getYaw() - 180));
+            if (getYaw() < -180)
+                setYaw(180 + (getYaw() + 180));
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ignore) { }
+        }
+        if (onFinish != null)
+            onFinish.accept(true);
+
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ignore) { }
+    }
+
+    public boolean isCurrentlyLooking() {
+        return !(lookThread == null || lookThread.isInterrupted() || !lookThread.isAlive());
+    }
+
+    public void openAdjacentChest(LocationUtils.Direction direction) {
+        int x = (int)Math.floor(getX());
+        int y = (int)Math.floor(getY());
+        int z = (int)Math.floor(getZ());
+        PacketOutBlockPlace.BlockFace blockFace;
+        switch (direction) {
+            case EAST: x++; blockFace = PacketOutBlockPlace.BlockFace.WEST; break;
+            case WEST: x--; blockFace = PacketOutBlockPlace.BlockFace.EAST; break;
+            case NORTH: z--; blockFace = PacketOutBlockPlace.BlockFace.SOUTH; break;
+            default: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
+        }
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(
+                    x, y, z, (byte)0, (byte)0, (byte)0, blockFace
+            ));
+        } else {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutBlockPlace(
+                    PacketOutBlockPlace.Hand.MAIN_HAND,
+                    x, y, z, blockFace,
+                    0.5F, 0.5F, 0.5F,
+                    false
+            ));
+        }
+    }
+
+    public void closeInventory() {
+        closeInventory(0);
+    }
+
+    public void closeInventory(int windowId) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCloseInventory(windowId));
     }
 }

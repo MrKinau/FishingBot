@@ -1,7 +1,7 @@
 package systems.kinau.fishingbot.gui;
 
 import lombok.Getter;
-import systems.kinau.fishingbot.network.utils.Enchantment;
+import systems.kinau.fishingbot.bot.Enchantment;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public class TitledPaneOption extends ConfigOption {
 
-    @Getter TitledPane titledPane;
-    @Getter VBox content;
+    @Getter private TitledPane titledPane;
+    @Getter private VBox content;
 
     public TitledPaneOption(String key, String title, VBox content) {
         super(key, title, content);

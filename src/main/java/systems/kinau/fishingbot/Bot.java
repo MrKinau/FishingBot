@@ -11,19 +11,26 @@ import org.apache.commons.cli.CommandLine;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.bot.Player;
-import systems.kinau.fishingbot.command.CommandRegistry;
-import systems.kinau.fishingbot.command.commands.*;
 import systems.kinau.fishingbot.event.EventManager;
-import systems.kinau.fishingbot.fishing.ItemHandler;
 import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.i18n.I18n;
-import systems.kinau.fishingbot.io.LogFormatter;
-import systems.kinau.fishingbot.io.SettingsConfig;
-import systems.kinau.fishingbot.modules.*;
+import systems.kinau.fishingbot.io.config.SettingsConfig;
+import systems.kinau.fishingbot.io.logging.LogFormatter;
+import systems.kinau.fishingbot.modules.ChatProxyModule;
+import systems.kinau.fishingbot.modules.ClientDefaultsModule;
+import systems.kinau.fishingbot.modules.HandshakeModule;
+import systems.kinau.fishingbot.modules.LoginModule;
+import systems.kinau.fishingbot.modules.command.ChatCommandModule;
+import systems.kinau.fishingbot.modules.command.CommandRegistry;
+import systems.kinau.fishingbot.modules.command.commands.*;
+import systems.kinau.fishingbot.modules.discord.DiscordModule;
+import systems.kinau.fishingbot.modules.ejection.EjectionModule;
+import systems.kinau.fishingbot.modules.fishing.FishingModule;
+import systems.kinau.fishingbot.modules.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.realms.RealmsAPI;
+import systems.kinau.fishingbot.network.realms.RealmsAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +56,8 @@ public class Bot {
 
     @Getter         private Player player;
     @Getter         private ClientDefaultsModule clientModule;
+    @Getter         private ChatProxyModule chatProxyModule;
+    @Getter         private EjectionModule ejectModule;
 
     @Getter         private Socket socket;
     @Getter         private NetworkHandler net;
@@ -73,7 +82,7 @@ public class Bot {
 
         // update i18n
 
-        FishingBot.setI18n(new I18n(config.getLanguage(), FishingBot.PREFIX));
+        FishingBot.setI18n(new I18n(config.getLanguage(), FishingBot.PREFIX, true));
 
         // use command line arguments
         if (cmdLine.hasOption("logsdir")) {
@@ -82,7 +91,9 @@ public class Bot {
                 boolean success = logsFolder.mkdirs();
                 if (!success) {
                     FishingBot.getI18n().severe("log-failed-creating-folder");
-                    System.exit(1);
+                    FishingBot.getInstance().getCurrentBot().setRunning(false);
+                    FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+                    return;
                 }
             }
         }
@@ -101,7 +112,9 @@ public class Bot {
             fh.setFormatter(new LogFormatter());
         } catch (IOException e) {
             FishingBot.getI18n().severe("log-failed-creating-log");
-            System.exit(1);
+            FishingBot.getInstance().getCurrentBot().setRunning(false);
+            FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+            return;
         }
 
         // log config location
@@ -163,14 +176,16 @@ public class Bot {
                     FishingBot.getI18n().info("realms-determining-address", String.valueOf(i + 1));
                     try {
                         Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (InterruptedException ignore) { }
                 } else
                     break;
             }
-            if (ipAndPort == null)
-                System.exit(0);
+            if (ipAndPort == null) {
+                setWontConnect(true);
+                setRunning(false);
+                setPreventReconnect(true);
+                return;
+            }
             ip = ipAndPort.split(":")[0];
             port = Integer.parseInt(ipAndPort.split(":")[1]);
         }
@@ -222,18 +237,16 @@ public class Bot {
         do {
             try {
                 setRunning(true);
-                if(isWontConnect()) {
+                if (isWontConnect()) {
                     setWontConnect(false);
                     ServerPinger sp = new ServerPinger(getServerHost(), getServerPort());
                     sp.ping();
-                    if(isWontConnect()) {
-                        if(!getConfig().isAutoReconnect())
+                    if (isWontConnect()) {
+                        if (!getConfig().isAutoReconnect())
                             return;
                         try {
                             Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        } catch (InterruptedException ignore) { }
                         continue;
                     }
                 }
@@ -248,13 +261,18 @@ public class Bot {
 
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();
-                new ChatProxyModule().enable();
+                this.chatProxyModule = new ChatProxyModule();
+                getChatProxyModule().enable();
                 if (getConfig().isStartTextEnabled())
                     new ChatCommandModule().enable();
                 this.clientModule = new ClientDefaultsModule();
                 getClientModule().enable();
                 if (getConfig().isWebHookEnabled())
                     new DiscordModule().enable();
+                if (getConfig().isAutoLootEjectionEnabled()) {
+                    this.ejectModule = new EjectionModule();
+                    getEjectModule().enable();
+                }
                 new ItemHandler(getServerProtocol());
                 this.player = new Player();
 
@@ -287,9 +305,13 @@ public class Bot {
                 }
 
                 if (getClientModule() != null)
-                    this.getClientModule().disable();
+                    getClientModule().disable();
                 if (getFishingModule() != null)
-                    this.getFishingModule().disable();
+                    getFishingModule().disable();
+                if (getChatProxyModule() != null)
+                    getChatProxyModule().disable();
+                if (getEjectModule() != null)
+                    getEjectModule().disable();
                 if (getPlayer() != null)
                     getEventManager().unregisterListener(getPlayer());
                 getEventManager().getRegisteredListener().clear();
@@ -304,9 +326,7 @@ public class Bot {
 
                 try {
                     Thread.sleep(getConfig().getAutoReconnectTime() * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                } catch (InterruptedException ignore) { }
 
                 if (getAuthData() == null) {
                     if (getConfig().isOnlineMode())
@@ -319,11 +339,13 @@ public class Bot {
             }
         } while (getConfig().isAutoReconnect() && !isPreventReconnect());
         FishingBot.getInstance().setCurrentBot(null);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (FishingBot.getInstance().getMainGUIController() != null) {
+            FishingBot.getInstance().getMainGUIController().updateStartStop();
+            FishingBot.getInstance().getMainGUIController().updatePlayPaused();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignore) { }
+            FishingBot.getInstance().getMainGUIController().enableStartStop();
         }
-        FishingBot.getInstance().getMainGUIController().enableStartStop();
     }
 }
