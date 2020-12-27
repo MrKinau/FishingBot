@@ -28,13 +28,17 @@ public class ItemUtils {
             return false;
         if (!slot.isPresent())
             return false;
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13)
+        int protocol = ProtocolConstants.getLatest();
+        if (FishingBot.getInstance().getCurrentBot() != null)
+            protocol = FishingBot.getInstance().getCurrentBot().getServerProtocol();
+
+        if (protocol < ProtocolConstants.MINECRAFT_1_13)
             return MaterialMc18.getMaterial(slot.getItemId()) == MaterialMc18.FISHING_ROD;
-        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13_1)
+        else if (protocol < ProtocolConstants.MINECRAFT_1_13_1)
             return slot.getItemId() == 563;
-        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_14)
+        else if (protocol < ProtocolConstants.MINECRAFT_1_14)
             return slot.getItemId() == 568;
-        else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_16)
+        else if (protocol < ProtocolConstants.MINECRAFT_1_16)
             return slot.getItemId() == 622;
         else
             return slot.getItemId() == 684;

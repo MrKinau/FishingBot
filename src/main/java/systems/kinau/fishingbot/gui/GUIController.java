@@ -234,55 +234,53 @@ public class GUIController implements Listener {
         Platform.runLater(() -> {
             lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
-        });
 
-        LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
-        AtomicBoolean existing = new AtomicBoolean(false);
+            LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
+            AtomicBoolean existing = new AtomicBoolean(false);
 
-        if (lootTable == null)
-            return;
+            if (lootTable == null)
+                return;
 
-        lootTable.getItems().forEach(item -> {
-            if (item.getName().equalsIgnoreCase(lootItem.getName())) {
-                item.setCount(lootItem.getCount());
-                existing.set(true);
-                Platform.runLater(() -> {
+
+            lootTable.getItems().forEach(item -> {
+                if (item.getName().equalsIgnoreCase(lootItem.getName())) {
+                    item.setCount(lootItem.getCount());
+                    existing.set(true);
+
                     lootCountColumn.setVisible(false);
                     lootCountColumn.setVisible(true);
-                });
-            }
-        });
+                }
+            });
 
-        if (!existing.get())
-            lootTable.getItems().add(lootItem);
 
-        Platform.runLater(() -> {
+            if (!existing.get())
+                lootTable.getItems().add(lootItem);
+
             this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
-        });
 
-        if (event.getItem().getEnchantments().isEmpty())
-            return;
 
-        Platform.runLater(() -> {
+            if (event.getItem().getEnchantments().isEmpty())
+                return;
+
             setupEnchantmentTable(booksTable);
             setupEnchantmentTable(bowsTable);
             setupEnchantmentTable(rodsTable);
-        });
 
-        switch (event.getItem().getName().toLowerCase()) {
-            case "enchanted_book": {
-                updateEnchantments(booksTable, event.getItem().getEnchantments());
-                break;
+            switch (event.getItem().getName().toLowerCase()) {
+                case "enchanted_book": {
+                    updateEnchantments(booksTable, event.getItem().getEnchantments());
+                    break;
+                }
+                case "bow": {
+                    updateEnchantments(bowsTable, event.getItem().getEnchantments());
+                    break;
+                }
+                case "fishing_rod": {
+                    updateEnchantments(rodsTable, event.getItem().getEnchantments());
+                    break;
+                }
             }
-            case "bow": {
-                updateEnchantments(bowsTable, event.getItem().getEnchantments());
-                break;
-            }
-            case "fishing_rod": {
-                updateEnchantments(rodsTable, event.getItem().getEnchantments());
-                break;
-            }
-        }
+        });
     }
 
     private void setupEnchantmentTable(TableView<Enchantment> table) {
@@ -298,10 +296,8 @@ public class GUIController implements Listener {
                 if (item.getName().equalsIgnoreCase(enchantment.getEnchantmentType().getName()) && item.getLevel() == enchantment.getLevel()) {
                     item.setCount(item.getCount() + 1);
                     exists.set(true);
-                    Platform.runLater(() -> {
-                        table.getColumns().get(2).setVisible(false);
-                        table.getColumns().get(2).setVisible(true);
-                    });
+                    table.getColumns().get(2).setVisible(false);
+                    table.getColumns().get(2).setVisible(true);
                 }
             });
             if (!exists.get())
