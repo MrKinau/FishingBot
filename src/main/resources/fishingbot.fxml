@@ -57,7 +57,7 @@
                                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                </VBox.margin>
                              </Button>
-                             <Button fx:id="playPauseButton" mnemonicParsing="false" onAction="#playPause" disable="true" text="%ui-button-pause">
+                             <Button fx:id="playPauseButton" disable="true" mnemonicParsing="false" onAction="#playPause" text="%ui-button-pause">
                                <font>
                                  <Font size="24.0" />
                                </font>
@@ -153,7 +153,7 @@
       </TextArea>
       <AnchorPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" VBox.vgrow="NEVER">
         <children>
-          <TextField fx:id="commandlineTextField" onAction="#commandlineSend" prefHeight="25.0" prefWidth="540.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="53.0" AnchorPane.topAnchor="5.0" />
+          <TextField fx:id="commandlineTextField" onAction="#commandlineSend" onKeyPressed="#consoleKeyPressed" prefHeight="25.0" prefWidth="540.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="53.0" AnchorPane.topAnchor="5.0" />
           <Button layoutX="548.0" mnemonicParsing="false" onAction="#commandlineSend" text="%ui-console-send" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
         </children>
       </AnchorPane>

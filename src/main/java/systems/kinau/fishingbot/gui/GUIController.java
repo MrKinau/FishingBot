@@ -10,6 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,9 +51,12 @@ public class GUIController implements Listener {
     @FXML private Label usernamePreview;
 
     @Getter private LootHistory lootHistory;
+    @Getter private final List<String> lastCommands;
+    @Getter private int currLastCommandIndex;
 
     public GUIController() {
         this.lootHistory = new LootHistory();
+        this.lastCommands = new ArrayList<>();
     }
 
     @FXML
@@ -115,8 +121,33 @@ public class GUIController implements Listener {
     }
 
     public void commandlineSend(Event e) {
+        if (getLastCommands().isEmpty() || !getLastCommands().get(getLastCommands().size() - 1).equals(commandlineTextField.getText())) {
+            getLastCommands().add(commandlineTextField.getText());
+            if (getLastCommands().size() > 1000)
+                getLastCommands().remove(0);
+        }
+        currLastCommandIndex = 0;
         runCommand(commandlineTextField.getText());
         commandlineTextField.setText("");
+    }
+
+    public void consoleKeyPressed(KeyEvent e) {
+        if (e.getCode() == KeyCode.UP) {
+            if (getLastCommands().size() > currLastCommandIndex) {
+                currLastCommandIndex++;
+                commandlineTextField.setText(getLastCommands().get(getLastCommands().size() - currLastCommandIndex));
+                commandlineTextField.end();
+            }
+        } else if (e.getCode() == KeyCode.DOWN) {
+            if (currLastCommandIndex > 0) {
+                currLastCommandIndex--;
+                if (currLastCommandIndex == 0)
+                    commandlineTextField.setText("");
+                else
+                    commandlineTextField.setText(getLastCommands().get(getLastCommands().size() - currLastCommandIndex));
+                commandlineTextField.end();
+            }
+        }
     }
 
     private void runCommand(String text) {

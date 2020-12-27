@@ -89,5 +89,11 @@ public class SettingsConfig implements Config {
     public SettingsConfig(String path) {
         this.path = path;
         init(path);
+
+        // fix: User do not understand split of port and IP
+        if (serverIP.contains(":")) {
+            serverPort = Integer.parseInt(serverIP.split(":")[1]);
+            serverIP = serverIP.split(":")[0];
+        }
     }
 }
