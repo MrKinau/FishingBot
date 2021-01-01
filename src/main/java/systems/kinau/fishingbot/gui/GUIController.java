@@ -15,8 +15,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.loot.LootHistory;
+import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.custom.BotStartEvent;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.gui.config.ConfigGUI;
 import systems.kinau.fishingbot.modules.command.CommandExecutor;
@@ -50,12 +53,10 @@ public class GUIController implements Listener {
     @FXML private ImageView skinPreview;
     @FXML private Label usernamePreview;
 
-    @Getter private LootHistory lootHistory;
     @Getter private final List<String> lastCommands;
     @Getter private int currLastCommandIndex;
 
     public GUIController() {
-        this.lootHistory = new LootHistory();
         this.lastCommands = new ArrayList<>();
     }
 
@@ -73,12 +74,13 @@ public class GUIController implements Listener {
     }
 
     public void deleteAllData(Event e) {
-        this.lootHistory = new LootHistory();
+        if (FishingBot.getInstance().getCurrentBot() != null && FishingBot.getInstance().getCurrentBot().getFishingModule() != null)
+            FishingBot.getInstance().getCurrentBot().getFishingModule().setLootHistory(new LootHistory());
         lootTable.getItems().clear();
         booksTable.getItems().clear();
         bowsTable.getItems().clear();
         rodsTable.getItems().clear();
-        this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
+        this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", 0));
     }
 
     public void github(Event e) {
@@ -261,21 +263,27 @@ public class GUIController implements Listener {
     }
 
     @EventHandler
+    public void onBotStart(BotStartEvent event) {
+        Platform.runLater(() -> {
+            deleteAllData(null);
+        });
+    }
+
+    @EventHandler
     public void onFishCaught(FishCaughtEvent event) {
         Platform.runLater(() -> {
             lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
             lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
         });
 
-        LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
         AtomicBoolean existing = new AtomicBoolean(false);
 
         if (lootTable == null)
             return;
 
         lootTable.getItems().forEach(item -> {
-            if (item.getName().equalsIgnoreCase(lootItem.getName())) {
-                item.setCount(lootItem.getCount());
+            if (item.getName().equalsIgnoreCase(event.getLootItem().getName())) {
+                item.setCount(event.getLootItem().getCount());
                 existing.set(true);
                 Platform.runLater(() -> {
                     lootCountColumn.setVisible(false);
@@ -285,10 +293,11 @@ public class GUIController implements Listener {
         });
 
         if (!existing.get())
-            lootTable.getItems().add(lootItem);
+            lootTable.getItems().add(event.getLootItem());
 
         Platform.runLater(() -> {
-            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
+            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot",
+                    FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory().getItems().stream().mapToInt(LootItem::getCount).sum()));
         });
 
         if (event.getItem().getEnchantments().isEmpty())

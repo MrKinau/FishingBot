@@ -58,6 +58,7 @@ public class Bot {
     @Getter         private ClientDefaultsModule clientModule;
     @Getter         private ChatProxyModule chatProxyModule;
     @Getter         private EjectionModule ejectModule;
+    @Getter         private DiscordModule discordModule;
 
     @Getter         private Socket socket;
     @Getter         private NetworkHandler net;
@@ -228,6 +229,7 @@ public class Bot {
         getCommandRegistry().registerCommand(new StuckCommand());
         getCommandRegistry().registerCommand(new DropRodCommand());
         getCommandRegistry().registerCommand(new LookCommand());
+        getCommandRegistry().registerCommand(new SummaryCommand());
     }
 
     private void connect() {
@@ -256,25 +258,39 @@ public class Bot {
 
                 registerCommands();
 
+                // enable required modules
+
                 this.fishingModule = new FishingModule();
                 getFishingModule().enable();
 
                 new HandshakeModule(serverName, port).enable();
                 new LoginModule(getAuthData().getUsername()).enable();
+
                 this.chatProxyModule = new ChatProxyModule();
                 getChatProxyModule().enable();
-                if (getConfig().isStartTextEnabled())
-                    new ChatCommandModule().enable();
+
                 this.clientModule = new ClientDefaultsModule();
                 getClientModule().enable();
-                if (getConfig().isWebHookEnabled())
-                    new DiscordModule().enable();
+
+                if (getConfig().isStartTextEnabled())
+                    new ChatCommandModule().enable();
+
+                if (getConfig().isWebHookEnabled()) {
+                    this.discordModule = new DiscordModule();
+                    getDiscordModule().enable();
+                }
+
                 if (getConfig().isAutoLootEjectionEnabled()) {
                     this.ejectModule = new EjectionModule();
                     getEjectModule().enable();
                 }
+
+                // init item handler & player
+
                 new ItemHandler(getServerProtocol());
                 this.player = new Player();
+
+                // add shutdown hook
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     try {
@@ -284,6 +300,8 @@ public class Bot {
                         e.printStackTrace();
                     }
                 }));
+
+                // game loop (for receiving packets)
 
                 while (running) {
                     try {
@@ -313,6 +331,8 @@ public class Bot {
                     getChatProxyModule().disable();
                 if (getEjectModule() != null)
                     getEjectModule().disable();
+                if (getDiscordModule() != null)
+                    getDiscordModule().disable();
                 if (getPlayer() != null)
                     getEventManager().unregisterListener(getPlayer());
                 getEventManager().getRegisteredListener().clear();

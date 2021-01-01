@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 public class EjectionModule extends Module {
 
-    private List<LookEjectFunction> lookEjectFunctions;
-    private List<ChestEjectFunction> chestEjectFunctions;
+    private List<LookEjectFunction> lookEjectFunctions = new ArrayList<>();
+    private List<ChestEjectFunction> chestEjectFunctions = new ArrayList<>();
 
     private Thread chestFillingThread;
 

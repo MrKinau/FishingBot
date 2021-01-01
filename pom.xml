@@ -129,7 +129,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
                 <configuration>
-                    <mainClass>systems.kinau.fishingbot.gui.MainGUI</mainClass>
+                    <mainClass>systems.kinau.fishingbot.Main</mainClass>
                 </configuration>
             </plugin>
 

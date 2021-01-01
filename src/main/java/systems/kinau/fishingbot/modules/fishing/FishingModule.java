@@ -11,6 +11,8 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.Slot;
+import systems.kinau.fishingbot.bot.loot.LootHistory;
+import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
@@ -51,6 +53,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @Getter private Thread stuckingFix;
     @Getter private boolean joined;
+    @Getter @Setter private LootHistory lootHistory = new LootHistory();
 
     public void setTrackingNextEntityMeta(boolean trackingNextEntityMeta) {
         this.trackingNextEntityMeta = trackingNextEntityMeta;
@@ -123,7 +126,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                 setTrackingNextBobberId(true);
                 Thread.sleep(200);
 
-                if (!FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
+                if (FishingBot.getInstance().getCurrentBot().getPlayer() != null
+                        && !FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
                 } else {
                     this.waitForLookFinish = true;
@@ -181,7 +185,9 @@ public class FishingModule extends Module implements Runnable, Listener {
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(str));
                 });
 
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new FishCaughtEvent(currentMax));
+        LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getEnchantments());
+
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new FishCaughtEvent(currentMax, lootItem));
     }
 
 

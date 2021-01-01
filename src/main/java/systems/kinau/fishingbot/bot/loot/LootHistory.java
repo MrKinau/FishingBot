@@ -1,4 +1,4 @@
-package systems.kinau.fishingbot.gui;
+package systems.kinau.fishingbot.bot.loot;
 
 import lombok.Getter;
 import systems.kinau.fishingbot.bot.Enchantment;
