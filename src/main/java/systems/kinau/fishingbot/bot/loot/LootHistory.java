@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.bot.loot;
 
 import lombok.Getter;
 import systems.kinau.fishingbot.bot.Enchantment;
+import systems.kinau.fishingbot.utils.ImageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class LootHistory {
             optItem.get().setCount(optItem.get().getCount() + 1);
             return optItem.get();
         } else {
-            LootItem lootItem = new LootItem(name, 1, enchantments);
+            LootItem lootItem = new LootItem(name, 1, enchantments, new ImagedName(name, ImageUtils.getFileName(name, enchantments)));
             items.add(lootItem);
             return lootItem;
         }

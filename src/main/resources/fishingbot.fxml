@@ -73,7 +73,7 @@
                           <Label fx:id="usernamePreview" />
                            <ImageView fx:id="skinPreview" fitHeight="0.0" fitWidth="0.0" pickOnBounds="true" preserveRatio="true" visible="false" />
                            <BorderPane.margin>
-                              <Insets right="30.0" />
+                              <Insets right="20.0" />
                            </BorderPane.margin>
                         </VBox>
                       </right>

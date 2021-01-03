@@ -45,6 +45,9 @@ public class DiscordModule extends Module implements Listener {
     @Override
     public void onDisable() {
         FishingBot.getInstance().getCurrentBot().getEventManager().unregisterListener(this);
+        if (this.discord != null)
+            this.discord.shutdown();
+        this.discord = null;
     }
 
     public void sendSummary(LootHistory lootHistory) {

@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -12,9 +13,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.Main;
+import systems.kinau.fishingbot.bot.loot.ImagedName;
 import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.event.EventHandler;
@@ -24,6 +28,7 @@ import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.gui.config.ConfigGUI;
 import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
+import systems.kinau.fishingbot.utils.ImageUtils;
 
 import javax.annotation.Resources;
 import java.awt.*;
@@ -34,7 +39,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GUIController implements Listener {
@@ -62,8 +66,7 @@ public class GUIController implements Listener {
 
     @FXML
     protected void initialize(URL location, Resources resources) {
-        lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
+        setupLootTable();
         setupEnchantmentTable(booksTable);
         setupEnchantmentTable(bowsTable);
         setupEnchantmentTable(rodsTable);
@@ -247,15 +250,20 @@ public class GUIController implements Listener {
     }
 
     public void setImage(String uuid) {
-        if (uuid == null || uuid.isEmpty())
-            uuid = UUID.randomUUID().toString().replace("-","").toLowerCase();
-        String finalUuid = uuid;
+        Image noSkinImage = new Image(Main.class.getClassLoader().getResourceAsStream("img/general/noskin.png"));
         Platform.runLater(() -> {
-            skinPreview.setFitWidth(120);
-            skinPreview.setFitHeight(170);
+            skinPreview.setFitHeight(180);
             skinPreview.setVisible(true);
-            skinPreview.setImage(new Image(String.format("https://crafatar.com/renders/body/%s?overlay", finalUuid)));
+            skinPreview.setImage(noSkinImage);
         });
+        if (uuid != null && !uuid.isEmpty()) {
+            Image image = new Image(String.format("https://crafatar.com/renders/body/%s?overlay", uuid), true);
+            image.progressProperty().addListener((value, oldProgress, progress) -> {
+                if (progress.doubleValue() >= 1) {
+                    Platform.runLater(() -> skinPreview.setImage(image));
+                }
+            });
+        }
     }
 
     public void setAccountName(String name) {
@@ -271,10 +279,7 @@ public class GUIController implements Listener {
 
     @EventHandler
     public void onFishCaught(FishCaughtEvent event) {
-        Platform.runLater(() -> {
-            lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-            lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
-        });
+        Platform.runLater(this::setupLootTable);
 
         AtomicBoolean existing = new AtomicBoolean(false);
 
@@ -323,6 +328,38 @@ public class GUIController implements Listener {
                 break;
             }
         }
+    }
+
+    private void setupLootTable() {
+        lootItemColumn.setCellFactory(param -> {
+            HBox box = new HBox();
+            box.setSpacing(10);
+            box.setAlignment(Pos.CENTER_LEFT);
+
+            final ImageView imageview = new ImageView();
+            imageview.setFitHeight(24);
+            imageview.setFitWidth(24);
+
+            final Label nameLabel = new Label();
+
+            TableCell<LootItem, ImagedName> cell = new TableCell<LootItem, ImagedName>() {
+                public void updateItem(ImagedName item, boolean empty) {
+                    if (item != null) {
+                        imageview.setImage(ImageUtils.getImage(item.getFileName()));
+                        nameLabel.setText(item.getName());
+                    }
+                }
+            };
+
+            box.getChildren().addAll(imageview, nameLabel);
+
+            cell.setGraphic(box);
+            return cell;
+        });
+        lootItemColumn.setCellValueFactory(new PropertyValueFactory<LootItem, ImagedName>("imagedName"));
+
+
+        lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
     }
 
     private void setupEnchantmentTable(TableView<Enchantment> table) {

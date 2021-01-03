@@ -13,4 +13,5 @@ public class LootItem {
     private String name;
     private int count;
     private List<Enchantment> enchantments;
+    private ImagedName imagedName;
 }

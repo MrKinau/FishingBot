@@ -341,6 +341,10 @@ public class Bot {
                 this.fishingModule = null;
                 this.net = null;
                 this.player = null;
+                this.clientModule = null;
+                this.chatProxyModule = null;
+                this.ejectModule = null;
+                this.discordModule = null;
             }
             if (getConfig().isAutoReconnect() && !isPreventReconnect()) {
                 FishingBot.getI18n().info("bot-automatic-reconnect", String.valueOf(getConfig().getAutoReconnectTime()));
