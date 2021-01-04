@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.bot;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.actions.BotAction;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
@@ -165,7 +166,7 @@ public class Player implements Listener {
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandBeforeDeathEnabled()) {
             if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeDeath() && !isSentLowHealth()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandBeforeDeath()) {
-                    sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
+                    sendMessage(command);
                 }
                 setSentLowHealth(true);
             } else if (isSentLowHealth() && event.getHealth() > FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeDeath())
@@ -190,7 +191,7 @@ public class Player implements Listener {
             } catch (InterruptedException ignore) { }
             if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandOnRespawnEnabled()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandOnRespawn()) {
-                    sendMessage(command.replace("%prefix%", FishingBot.PREFIX));
+                    sendMessage(command);
                 }
             }
         }).start();
@@ -213,6 +214,7 @@ public class Player implements Listener {
     }
 
     public void sendMessage(String message) {
+        message = message.replace("%prefix%", FishingBot.PREFIX);
         for (String line : message.split("\n")) {
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
                 for (String split : StringUtils.splitDescription(line)) {
@@ -361,5 +363,9 @@ public class Player implements Listener {
 
     public void closeInventory(int windowId) {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCloseInventory(windowId));
+    }
+
+    public boolean executeBotAction(BotAction botAction) {
+        return botAction.execute(FishingBot.getInstance().getCurrentBot());
     }
 }

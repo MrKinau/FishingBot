@@ -11,11 +11,13 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.timer.Timer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ConvertUtils {
 
@@ -82,6 +84,27 @@ public class ConvertUtils {
                     }
                 });
                 return rules;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return null;
+            }
+        } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(Timer.class)) {
+            try {
+                List<Timer> timers = new ArrayList<>();
+                JSONArray array = (JSONArray) new JSONParser().parse(value);
+                array.forEach(o -> {
+                    try {
+                        JSONObject obj = (JSONObject) new JSONParser().parse(o.toString());
+                        String name = obj.get("name").toString();
+                        int units = Integer.valueOf(obj.get("units").toString());
+                        TimeUnit timeUnit = TimeUnit.valueOf((String) obj.get("timeUnit"));
+                        JSONArray command = (JSONArray) new JSONParser().parse(obj.get("commands").toString());
+                        timers.add(new Timer(name, units, timeUnit, new ArrayList<String>(command)));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+                return timers;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;

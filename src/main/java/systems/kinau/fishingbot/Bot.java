@@ -25,6 +25,7 @@ import systems.kinau.fishingbot.modules.discord.DiscordModule;
 import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
 import systems.kinau.fishingbot.modules.fishing.ItemHandler;
+import systems.kinau.fishingbot.modules.timer.TimerModule;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -286,6 +287,9 @@ public class Bot {
 
                 if (getConfig().isAutoLootEjectionEnabled())
                     getModuleManager().enableModule(new EjectionModule());
+
+                if (getConfig().isTimerEnabled())
+                    getModuleManager().enableModule(new TimerModule());
 
                 // init item handler & player
 
