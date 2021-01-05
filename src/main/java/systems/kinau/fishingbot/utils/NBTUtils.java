@@ -33,13 +33,33 @@ public class NBTUtils {
 
     private static int readTag(byte type, short nameLength, int tabs, ByteArrayDataInputWrapper in) {
         switch (type) {
+            case 12: {
+                /*System.out.println(addSpaces(tabs) + "TAG_Long_Array (" + */readName(nameLength, in)/* + ")")*/;
+                tabs++;
+                int size = in.readInt();
+                for (int i = 0; i < size; i++) {
+                    /*System.out.println(addSpaces(tabs) + "TAG_Long (" + i + "): " + */in.readLong()/*)*/;
+                }
+                tabs--;
+                break;
+            }
+            case 11: {
+                /*System.out.println(addSpaces(tabs) + "TAG_Int_Array (" + */readName(nameLength, in)/* + ")")*/;
+                tabs++;
+                int size = in.readInt();
+                for (int i = 0; i < size; i++) {
+                    /*System.out.println(addSpaces(tabs) + "TAG_Int (" + i + "): " + */in.readInt()/*)*/;
+                }
+                tabs--;
+                break;
+            }
             case 10: {
-                readName(nameLength, in);
+                /*System.out.println(addSpaces(tabs) + "TAG_Compound (" + */readName(nameLength, in) /*+ ")")*/;
                 tabs++;
                 break;
             }
             case 9: {
-                readName(nameLength, in);
+                /*System.out.println(addSpaces(tabs) + "TAG_List (" + */readName(nameLength, in) /*+ ")")*/;
                 tabs++;
                 byte listType = in.readByte();
                 int listCount = in.readInt();
@@ -49,47 +69,56 @@ public class NBTUtils {
                 break;
             }
             case 8: {
-                readName(nameLength, in);
+                String name = readName(nameLength, in);
                 int stringLength = in.readUnsignedShort();
                 byte[] stringData = new byte[stringLength];
                 in.readBytes(stringData);
+                /*System.out.println(addSpaces(tabs) + "TAG_String (" + name + "): " + content);*/
+                break;
+            }
+            case 7: {
+                /*System.out.println(addSpaces(tabs) + "TAG_Byte_Array (" + */readName(nameLength, in)/* + ")")*/;
+                tabs++;
+                int size = in.readInt();
+                for (int i = 0; i < size; i++) {
+                    /*System.out.println(addSpaces(tabs) + "TAG_Byte (" + i + "): " + */in.readByte()/*)*/;
+                }
+                tabs--;
                 break;
             }
             case 6: {
-                readName(nameLength, in);
-                in.readDouble();
+                /*System.out.println(addSpaces(tabs) + "TAG_Double (" + */readName(nameLength, in) /*+ "): " + */;in.readDouble()/*)*/;
                 break;
             }
             case 5: {
-                readName(nameLength, in);
-                in.readFloat();
+                /*System.out.println(addSpaces(tabs) + "TAG_Float (" + */readName(nameLength, in) /*+ "): " + */;in.readFloat()/*)*/;
                 break;
             }
             case 4: {
-                readName(nameLength, in);
-                in.readLong();
+                /*System.out.println(addSpaces(tabs) + "TAG_Long (" + */readName(nameLength, in) /*+ "): " + */;in.readLong()/*)*/;
                 break;
             }
             case 3: {
-                readName(nameLength, in);
-                in.readInt();
+                /*System.out.println(addSpaces(tabs) + "TAG_Int (" + */readName(nameLength, in) /*+ "): " + */;in.readInt()/*)*/;
                 break;
             }
             case 2: {
-                readName(nameLength, in);
-                in.readShort();
+                /*System.out.println(addSpaces(tabs) + "TAG_Short (" + */readName(nameLength, in) /*+ "): " + */;in.readShort()/*)*/;
                 break;
             }
             case 1: {
-                readName(nameLength, in);
-                in.readByte();
+                /*System.out.println(addSpaces(tabs) + "TAG_Byte (" + */readName(nameLength, in) /*+ "): " + */;in.readByte()/*)*/;
                 break;
             }
             case 0: {
                 tabs--;
+                /*System.out.println(addSpaces(tabs) + "TAG_End");*/
                 break;
             }
-            default: break;
+            default: {
+                /*System.out.println("UNKNOWN: " + type);*/
+                break;
+            }
         }
         return tabs;
     }
