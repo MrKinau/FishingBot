@@ -6,7 +6,6 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.Files;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Enchantment;
@@ -20,8 +19,6 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.ItemUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 //TODO: Add as event, yes this code is ugly...
@@ -37,7 +34,6 @@ public class PacketInEntityMetadata extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         if (FishingBot.getInstance().getCurrentBot().getFishingModule() == null)
             return;
-        ByteArrayDataInputWrapper clonedIn = in.clone();
         try {
             int eid = readVarInt(in);
             if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextEntityMeta() && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
@@ -51,14 +47,6 @@ public class PacketInEntityMetadata extends Packet {
             }
         } catch (Throwable ex) {
             ex.printStackTrace();
-            File file = new File("error.bin");
-            byte[] bytes = new byte[clonedIn.getAvailable()];
-            clonedIn.readFully(bytes);
-            try {
-                Files.write(bytes, file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -132,7 +120,10 @@ public class PacketInEntityMetadata extends Packet {
                 break;
             }
             case 5: {
-                in.readBoolean();
+                boolean present = in.readBoolean();
+                if (present) {
+                    readString(in);
+                }
                 break;
             }
             case 6: {
