@@ -57,8 +57,8 @@ public class RealmsAPI {
                 .build();
     }
 
-    public List<String> getPossibleWorlds() {
-        List<String> response = new ArrayList<>();
+    public List<Realm> getPossibleWorlds() {
+        List<Realm> joinableRealms = new ArrayList<>();
         HttpUriRequest request = RequestBuilder.get()
                 .setUri(REALMS_ENDPOINT + "/worlds")
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -67,31 +67,40 @@ public class RealmsAPI {
         try {
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() != 200) {
-                response.add("Could not connect to " + REALMS_ENDPOINT + ": " + answer.getStatusLine());
-                return response;
+                FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT, answer.getStatusLine().toString());
+                return joinableRealms;
             }
             JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
             JSONArray servers = (JSONArray) responseJson.get("servers");
-            if (servers.size() == 0) {
-                response.add("There are no possible realms this account can join");
-                return response;
-            }
-            response.add("Possible realms to join:");
+            if (servers.size() == 0)
+                return joinableRealms;
+
             servers.forEach(server -> {
                 long id = (long) ((JSONObject) server).get("id");
                 String owner = (String) ((JSONObject) server).get("owner");
                 String name = (String) ((JSONObject) server).get("name");
                 String motd = (String) ((JSONObject) server).get("motd");
-                response.add("ID: " + id);
-                response.add("name: " + name);
-                response.add("motd: " + motd);
-                response.add("owner: " + owner);
-                response.add("");
+                joinableRealms.add(new Realm(id, name, owner, motd));
             });
         } catch (IOException | ParseException e) {
-            response.add("Could not connect to " + REALMS_ENDPOINT);
+            e.printStackTrace();
+            FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT, e.getMessage());
         }
-        return response;
+        return joinableRealms;
+    }
+    
+    public void printRealms(List<Realm> realms) {
+        if (realms.isEmpty()) {
+            FishingBot.getI18n().info("realms-no-realms");
+            return;
+        }
+        realms.forEach(realm -> {
+            FishingBot.getLog().info("");
+            FishingBot.getLog().info("ID: " + realm.getId());
+            FishingBot.getLog().info("name: " + realm.getName());
+            FishingBot.getLog().info("motd: " + realm.getMotd());
+            FishingBot.getLog().info("owner: " + realm.getOwner());
+        });
     }
 
     public void agreeTos() {
@@ -128,7 +137,8 @@ public class RealmsAPI {
             FishingBot.getI18n().info("realms-connecting-to", responseJson.toJSONString());
             return (String) responseJson.get("address");
         } catch (IOException | ParseException e) {
-            FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT);
+            e.printStackTrace();
+            FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT, e.getMessage());
         }
         return null;
     }

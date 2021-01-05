@@ -130,6 +130,8 @@ public class ConfigGUI {
 
             if (field.getName().equals("defaultProtocol")) {
                 addConfigOption(key, new VersionConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString()));
+            } else if (field.getName().equals("realmId")) {
+                addConfigOption(key, new RealmConfigOption(key, FishingBot.getI18n().t(description), (long)ReflectionUtils.getField(field, config), this));
             } else if (field.getType().isAssignableFrom(boolean.class)) {
                 addConfigOption(key, new BooleanConfigOption(key, FishingBot.getI18n().t(description), (boolean)ReflectionUtils.getField(field, config)));
             } else if (field.getType().isAssignableFrom(String.class)) {
@@ -187,7 +189,7 @@ public class ConfigGUI {
             lastSubCatPane.getContent().getChildren().add(configOption);
     }
 
-    private Optional<ConfigOption> getConfigOption(String key) {
+    public Optional<ConfigOption> getConfigOption(String key) {
         String[] parts = key.split("\\.");
         String category = parts[0];
 
