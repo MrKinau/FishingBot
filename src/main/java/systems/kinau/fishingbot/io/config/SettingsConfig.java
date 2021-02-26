@@ -6,6 +6,7 @@ package systems.kinau.fishingbot.io.config;
 
 import lombok.Getter;
 import lombok.ToString;
+import systems.kinau.fishingbot.auth.AuthService;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
@@ -53,6 +54,7 @@ public class SettingsConfig implements Config {
 
     @Property(key = "account.mail", description = "config-account-mail") private String userName = "my-minecraft@login.com";
     @Property(key = "account.password", description = "config-account-password") private String password = "CHANGEME";
+    @Property(key = "account.auth-service", description = "config-account-auth-service") private AuthService authService = AuthService.MOJANG;
 
     @Property(key = "logs.log-count", description = "config-logs-log-count") private int logCount = 15;
     @Property(key = "logs.log-packets", description = "config-logs-log-packets") private boolean logPackets = false;

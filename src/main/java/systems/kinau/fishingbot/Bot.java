@@ -13,6 +13,7 @@ import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.gui.Dialogs;
+import systems.kinau.fishingbot.gui.GUIController;
 import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.FileHandler;
 
 public class Bot {
@@ -131,12 +133,20 @@ public class Bot {
         }
 
         // authenticate player if online-mode is set
-        if(getConfig().isOnlineMode())
-            authenticate(accountFile);
-        else {
+        if (getConfig().isOnlineMode()) {
+            boolean authSuccessful = authenticate(accountFile);
+            if (!authSuccessful) {
+                setPreventStartup(true);
+                FishingBot.getI18n().severe("credentials-invalid");
+                if (!cmdLine.hasOption("nogui")) {
+                    Dialogs.showCredentialsInvalid(GUIController::openWebpage);
+                }
+            }
+        } else {
             FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
+
 
         if (!cmdLine.hasOption("nogui")) {
             FishingBot.getInstance().getMainGUIController().setImage(authData.getProfile());
@@ -209,14 +219,14 @@ public class Bot {
 
     private boolean authenticate(File accountFile) {
         Authenticator authenticator = new Authenticator(accountFile);
-        AuthData authData = authenticator.authenticate();
+        Optional<AuthData> authData = authenticator.authenticate(getConfig().getAuthService());
 
-        if (authData == null) {
+        if (!authData.isPresent()) {
             setAuthData(new AuthData(null, null, null, getConfig().getUserName()));
             return false;
         }
 
-        setAuthData(authData);
+        setAuthData(authData.get());
         return true;
     }
 
@@ -230,6 +240,7 @@ public class Bot {
         getCommandRegistry().registerCommand(new DropRodCommand());
         getCommandRegistry().registerCommand(new LookCommand());
         getCommandRegistry().registerCommand(new SummaryCommand());
+        getCommandRegistry().registerCommand(new RightClickCommand());
     }
 
     private void connect() {

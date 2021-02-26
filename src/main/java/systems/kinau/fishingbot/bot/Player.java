@@ -276,7 +276,9 @@ public class Player implements Listener {
     }
 
     public boolean look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
-        return look(direction.getYaw(), getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), onFinish);
+        float yaw = direction.getYaw() == Float.MIN_VALUE ? getYaw() : direction.getYaw();
+        float pitch = direction.getPitch() == Float.MIN_VALUE ? getPitch() : direction.getPitch();
+        return look(yaw, pitch, FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), onFinish);
     }
 
     public boolean look(float yaw, float pitch, int speed) {
@@ -332,13 +334,14 @@ public class Player implements Listener {
 
     public void openAdjacentChest(LocationUtils.Direction direction) {
         int x = (int)Math.floor(getX());
-        int y = (int)Math.floor(getY());
+        int y = (int)Math.round(getY());
         int z = (int)Math.floor(getZ());
         PacketOutBlockPlace.BlockFace blockFace;
         switch (direction) {
             case EAST: x++; blockFace = PacketOutBlockPlace.BlockFace.WEST; break;
             case WEST: x--; blockFace = PacketOutBlockPlace.BlockFace.EAST; break;
             case NORTH: z--; blockFace = PacketOutBlockPlace.BlockFace.SOUTH; break;
+            case DOWN: y--; blockFace = PacketOutBlockPlace.BlockFace.TOP; break;
             default: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
         }
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {

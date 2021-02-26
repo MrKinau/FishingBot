@@ -176,7 +176,7 @@ public class GUIController implements Listener {
         }
     }
 
-    private void openWebpage(String url) {
+    public static void openWebpage(String url) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
@@ -246,7 +246,7 @@ public class GUIController implements Listener {
     }
 
     public void openAbout(Event e) {
-        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), s -> openWebpage(s));
+        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), GUIController::openWebpage);
     }
 
     public void setImage(String uuid) {
