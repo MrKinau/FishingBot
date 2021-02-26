@@ -71,7 +71,7 @@ public class ServerPinger {
 
             //TODO: Sometimes it's an int sometimes a varint? investigate how to fix the auto-version detection (e.g. based on getAvailable())
             Packet.readVarInt(in); //ignore
-            //in.readInt(); //ignore
+//            in.readInt(); //ignore
             Packet.readVarInt(in); //id
 
 //            if (id != 2) {
@@ -118,6 +118,8 @@ public class ServerPinger {
             FishingBot.getI18n().severe("network-unknown-host", serverName);
         } catch (Exception e) {
             FishingBot.getI18n().severe("network-could-not-ping", serverName);
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.AUTOMATIC)
+                FishingBot.getInstance().getCurrentBot().setServerProtocol(ProtocolConstants.getLatest());
             e.printStackTrace();
         }
     }

@@ -61,8 +61,10 @@ public class EjectionModule extends Module {
                             if (lookEjectFunction.getSlot() == slotId)
                                 return;
                         }
-
-                        LookEjectFunction lookEjectFunction = new LookEjectFunction(ejectionRule.getDirection().getYaw(), player.getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), slotId);
+                        LocationUtils.Direction direction = ejectionRule.getDirection();
+                        float yaw = direction.getYaw() == Float.MIN_VALUE ? player.getYaw() : direction.getYaw();
+                        float pitch = direction.getPitch() == Float.MIN_VALUE ? player.getPitch() : direction.getPitch();
+                        LookEjectFunction lookEjectFunction = new LookEjectFunction(yaw, pitch, FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), slotId);
                         lookEjectFunctions.add(lookEjectFunction);
                         lookAndDrop(lookEjectFunction);
                         return;
@@ -97,7 +99,7 @@ public class EjectionModule extends Module {
                 player.dropStack(fittingFunction.getSlot(), (short) (fittingFunction.getSlot() - 8));
             });
 
-            player.look(player.getOriginYaw(), player.getPitch(), lookEjectFunction.getSpeed(), finished2 -> {
+            player.look(player.getOriginYaw(), player.getOriginPitch(), lookEjectFunction.getSpeed(), finished2 -> {
                 FishingBot.getInstance().getCurrentBot().getFishingModule().finishedLooking();
                 lookEjectFunctions.removeAll(fittingFunctions);
                 if (!lookEjectFunctions.isEmpty())

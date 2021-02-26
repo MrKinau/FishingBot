@@ -99,7 +99,12 @@ public class DiscordModule extends Module implements Listener {
     }
 
     private String getFooter() {
-        int durability = Math.min(64 - FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem().getItemDamage(), 64);
+        int durability = 0;
+        if (FishingBot.getInstance().getCurrentBot() == null)
+            return "";
+        if (FishingBot.getInstance().getCurrentBot().getPlayer() != null
+                && FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem() != null)
+            durability = Math.min(64 - FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem().getItemDamage(), 64);
         return "Fishing Rod Durability: " + durability + "/64  ●  " + FishingBot.getInstance().getCurrentBot().getAuthData().getUsername();
     }
 

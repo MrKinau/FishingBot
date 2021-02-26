@@ -19,7 +19,6 @@ import lombok.Getter;
 import org.json.simple.JSONArray;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.gui.config.options.*;
-import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.io.config.ConvertException;
 import systems.kinau.fishingbot.io.config.Property;
 import systems.kinau.fishingbot.io.config.PropertyProcessor;
@@ -131,6 +130,8 @@ public class ConfigGUI {
 
             if (field.getName().equals("defaultProtocol")) {
                 addConfigOption(key, new VersionConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString()));
+            } else if (field.getName().equals("realmId")) {
+                addConfigOption(key, new RealmConfigOption(key, FishingBot.getI18n().t(description), (long)ReflectionUtils.getField(field, config), this));
             } else if (field.getType().isAssignableFrom(boolean.class)) {
                 addConfigOption(key, new BooleanConfigOption(key, FishingBot.getI18n().t(description), (boolean)ReflectionUtils.getField(field, config)));
             } else if (field.getType().isAssignableFrom(String.class)) {
@@ -143,10 +144,9 @@ public class ConfigGUI {
                 addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Double.valueOf((double)ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isAssignableFrom(long.class)) {
                 addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Long.valueOf((long)ReflectionUtils.getField(field, config)).intValue()));
-            } else if (field.getType().isAssignableFrom(AnnounceType.class)) {
-                addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), AnnounceType.values()));
-            } else if (field.getType().isAssignableFrom(Language.class)) {
-                addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), Language.values()));
+            } else if (field.getType().isEnum()) {
+                Enum currEnum = (Enum) ReflectionUtils.getField(field, config);
+                addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), (Enum[]) currEnum.getDeclaringClass().getEnumConstants()));
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(String.class)) {
                 List<String> content = (List<String>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new StringArrayConfigOption(key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
@@ -191,7 +191,7 @@ public class ConfigGUI {
             lastSubCatPane.getContent().getChildren().add(configOption);
     }
 
-    private Optional<ConfigOption> getConfigOption(String key) {
+    public Optional<ConfigOption> getConfigOption(String key) {
         String[] parts = key.split("\\.");
         String category = parts[0];
 

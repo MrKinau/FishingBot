@@ -8,6 +8,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.auth.AuthService;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
@@ -16,8 +17,10 @@ import systems.kinau.fishingbot.modules.timer.Timer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ConvertUtils {
 
@@ -66,6 +69,14 @@ public class ConvertUtils {
             } catch (IllegalArgumentException ex) {
                 FishingBot.getLog().severe("Could not find language " + value + ". Falling back to default langugae ENGLISH");
                 return Language.ENGLISH;
+            }
+        } else if (type.isAssignableFrom(AuthService.class)) {
+            try {
+                return AuthService.valueOf(value.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                FishingBot.getI18n().warning("config-unknown-auth-service", value, Arrays.stream(AuthService.values()).map(Enum::name).collect(Collectors.joining(", ")));
+                ex.printStackTrace();
+                return LocationUtils.Direction.SOUTH;
             }
         } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(EjectionRule.class)) {
             try {

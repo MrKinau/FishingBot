@@ -26,6 +26,10 @@
             <id>bintray-jcenter</id>
             <url>https://jcenter.bintray.com</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -86,39 +90,47 @@
             <artifactId>javax.annotation-api</artifactId>
             <version>1.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.GeyserMC</groupId>
+            <artifactId>MCAuthLib</artifactId>
+            <version>0e48a094f2</version>
+        </dependency>
 
         <!-- JAVAFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>14.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>14.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>14.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>14.0.1</version>
+            <version>15.0.1</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>14.0.1</version>
+            <artifactId>javafx-fxml</artifactId>
+            <version>15.0.1</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>15.0.1</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics </artifactId>
+            <version>15.0.1</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics </artifactId>
+            <version>15.0.1</version>
             <classifier>linux</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>14.0.1</version>
+            <artifactId>javafx-graphics </artifactId>
+            <version>15.0.1</version>
             <classifier>mac</classifier>
         </dependency>
         <dependency>
@@ -197,41 +209,6 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                <artifactId>launch4j-maven-plugin</artifactId>
-                <version>1.5.1</version>
-                <executions>
-                    <execution>
-                        <id>l4j-gui</id>
-                        <phase>package</phase>
-                        <goals><goal>launch4j</goal></goals>
-                        <configuration>
-                            <headerType>gui</headerType>
-                            <outfile>${project.build.directory}/${project.name}-${project.version}.exe</outfile>
-                            <jar>${project.build.directory}/${project.name}-${project.version}.jar</jar>
-                            <errTitle>${project.name} v${project.version}</errTitle>
-                            <classPath>
-                                <mainClass>systems.kinau.fishingbot.Main</mainClass>
-                            </classPath>
-                            <jre>
-                                <minVersion>1.8.0</minVersion>
-                            </jre>
-                            <versionInfo>
-                                <fileVersion>1.0.0.0</fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
-                                <fileDescription>${project.description}</fileDescription>
-                                <productVersion>1.0.0.0</productVersion>
-                                <txtProductVersion>1.0.0.0</txtProductVersion>
-                                <productName>${project.name}</productName>
-                                <copyright>no copyright</copyright>
-                                <internalName>${project.name}</internalName>
-                                <originalFilename>${project.name}-${project.version}.exe</originalFilename>
-                            </versionInfo>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

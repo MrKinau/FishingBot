@@ -43,22 +43,37 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GUIController implements Listener {
 
-    @FXML private TableView<LootItem> lootTable;
-    @FXML private TableView<Enchantment> booksTable;
-    @FXML private TableView<Enchantment> bowsTable;
-    @FXML private TableView<Enchantment> rodsTable;
-    @FXML private TableColumn lootItemColumn;
-    @FXML private TableColumn lootCountColumn;
-    @FXML private TextField commandlineTextField;
-    @FXML private Tab lootTab;
-    @FXML private Button startStopButton;
-    @FXML private Button configButton;
-    @FXML private Button playPauseButton;
-    @FXML private ImageView skinPreview;
-    @FXML private Label usernamePreview;
+    @FXML
+    private TableView<LootItem> lootTable;
+    @FXML
+    private TableView<Enchantment> booksTable;
+    @FXML
+    private TableView<Enchantment> bowsTable;
+    @FXML
+    private TableView<Enchantment> rodsTable;
+    @FXML
+    private TableColumn lootItemColumn;
+    @FXML
+    private TableColumn lootCountColumn;
+    @FXML
+    private TextField commandlineTextField;
+    @FXML
+    private Tab lootTab;
+    @FXML
+    private Button startStopButton;
+    @FXML
+    private Button configButton;
+    @FXML
+    private Button playPauseButton;
+    @FXML
+    private ImageView skinPreview;
+    @FXML
+    private Label usernamePreview;
 
-    @Getter private final List<String> lastCommands;
-    @Getter private int currLastCommandIndex;
+    @Getter
+    private final List<String> lastCommands;
+    @Getter
+    private int currLastCommandIndex;
 
     public GUIController() {
         this.lastCommands = new ArrayList<>();
@@ -176,7 +191,7 @@ public class GUIController implements Listener {
         }
     }
 
-    private void openWebpage(String url) {
+    public static void openWebpage(String url) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
@@ -246,7 +261,7 @@ public class GUIController implements Listener {
     }
 
     public void openAbout(Event e) {
-        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), s -> openWebpage(s));
+        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), GUIController::openWebpage);
     }
 
     public void setImage(String uuid) {
@@ -280,54 +295,49 @@ public class GUIController implements Listener {
     @EventHandler
     public void onFishCaught(FishCaughtEvent event) {
         Platform.runLater(this::setupLootTable);
+        Platform.runLater(() -> {
+            AtomicBoolean existing = new AtomicBoolean(false);
 
-        AtomicBoolean existing = new AtomicBoolean(false);
+            if (lootTable == null)
+                return;
 
-        if (lootTable == null)
-            return;
-
-        lootTable.getItems().forEach(item -> {
-            if (item.getName().equalsIgnoreCase(event.getLootItem().getName())) {
-                item.setCount(event.getLootItem().getCount());
-                existing.set(true);
-                Platform.runLater(() -> {
+            lootTable.getItems().forEach(item -> {
+                if (item.getName().equalsIgnoreCase(event.getLootItem().getName())) {
+                    item.setCount(event.getLootItem().getCount());
+                    existing.set(true);
                     lootCountColumn.setVisible(false);
                     lootCountColumn.setVisible(true);
-                });
-            }
-        });
+                }
+            });
 
-        if (!existing.get())
-            lootTable.getItems().add(event.getLootItem());
 
-        Platform.runLater(() -> {
-            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot",
-                    FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory().getItems().stream().mapToInt(LootItem::getCount).sum()));
-        });
+            if (!existing.get())
+                lootTable.getItems().add(event.getLootItem());
 
-        if (event.getItem().getEnchantments().isEmpty())
-            return;
+            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory().getItems().stream().mapToInt(LootItem::getCount).sum()));
 
-        Platform.runLater(() -> {
+            if (event.getItem().getEnchantments().isEmpty())
+                return;
+
             setupEnchantmentTable(booksTable);
             setupEnchantmentTable(bowsTable);
             setupEnchantmentTable(rodsTable);
-        });
 
-        switch (event.getItem().getName().toLowerCase()) {
-            case "enchanted_book": {
-                updateEnchantments(booksTable, event.getItem().getEnchantments());
-                break;
+            switch (event.getItem().getName().toLowerCase()) {
+                case "enchanted_book": {
+                    updateEnchantments(booksTable, event.getItem().getEnchantments());
+                    break;
+                }
+                case "bow": {
+                    updateEnchantments(bowsTable, event.getItem().getEnchantments());
+                    break;
+                }
+                case "fishing_rod": {
+                    updateEnchantments(rodsTable, event.getItem().getEnchantments());
+                    break;
+                }
             }
-            case "bow": {
-                updateEnchantments(bowsTable, event.getItem().getEnchantments());
-                break;
-            }
-            case "fishing_rod": {
-                updateEnchantments(rodsTable, event.getItem().getEnchantments());
-                break;
-            }
-        }
+        });
     }
 
     private void setupLootTable() {
@@ -375,10 +385,8 @@ public class GUIController implements Listener {
                 if (item.getName().equalsIgnoreCase(enchantment.getEnchantmentType().getName()) && item.getLevel() == enchantment.getLevel()) {
                     item.setCount(item.getCount() + 1);
                     exists.set(true);
-                    Platform.runLater(() -> {
-                        table.getColumns().get(2).setVisible(false);
-                        table.getColumns().get(2).setVisible(true);
-                    });
+                    table.getColumns().get(2).setVisible(false);
+                    table.getColumns().get(2).setVisible(true);
                 }
             });
             if (!exists.get())

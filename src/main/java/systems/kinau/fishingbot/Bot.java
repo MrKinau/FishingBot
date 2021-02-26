@@ -14,6 +14,7 @@ import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.gui.Dialogs;
+import systems.kinau.fishingbot.gui.GUIController;
 import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
@@ -29,6 +30,7 @@ import systems.kinau.fishingbot.modules.timer.TimerModule;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.realms.Realm;
 import systems.kinau.fishingbot.network.realms.RealmsAPI;
 
 import java.io.File;
@@ -36,6 +38,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.FileHandler;
 
 public class Bot {
@@ -128,9 +132,16 @@ public class Bot {
         }
 
         // authenticate player if online-mode is set
-        if(getConfig().isOnlineMode())
-            authenticate(accountFile);
-        else {
+        if (getConfig().isOnlineMode()) {
+            boolean authSuccessful = authenticate(accountFile);
+            if (!authSuccessful) {
+                setPreventStartup(true);
+                FishingBot.getI18n().severe("credentials-invalid");
+                if (!cmdLine.hasOption("nogui")) {
+                    Dialogs.showCredentialsInvalid(GUIController::openWebpage);
+                }
+            }
+        } else {
             FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
@@ -149,22 +160,65 @@ public class Bot {
         if (getConfig().getRealmId() != -1) {
             RealmsAPI realmsAPI = new RealmsAPI(getAuthData());
             if (getConfig().getRealmId() == 0) {
-                List<String> possibleWorldsText = realmsAPI.getPossibleWorlds();
-                possibleWorldsText.forEach(FishingBot.getLog()::info);
+                List<Realm> possibleRealms = realmsAPI.getPossibleWorlds();
+                realmsAPI.printRealms(possibleRealms);
                 FishingBot.getI18n().info("realms-id-not-set");
-                if (!cmdLine.hasOption("nogui"))
-                    Dialogs.showRealmsWorlds(possibleWorldsText);
-                setPreventStartup(true);
-                return;
+                if (!cmdLine.hasOption("nogui")) {
+                    AtomicBoolean dialogClicked = new AtomicBoolean(false);
+                    Dialogs.showRealmsWorlds(possibleRealms, realm -> {
+                        if (realm != null) {
+                            FishingBot.getInstance().getConfig().setRealmId(realm.getId());
+                            FishingBot.getInstance().getConfig().save();
+                            getConfig().setRealmId(realm.getId());
+                            getConfig().save();
+                        }
+                        dialogClicked.set(true);
+                    });
+
+                    // wait in this thread until the dialog is answered
+                    while (!dialogClicked.get()) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (getConfig().getRealmId() == 0) {
+                    setPreventStartup(true);
+                    return;
+                }
             }
             if (getConfig().isRealmAcceptTos())
                 realmsAPI.agreeTos();
             else {
-                FishingBot.getI18n().severe("realms-tos-agreement");
-                if (!cmdLine.hasOption("nogui"))
-                    Dialogs.showRealmsAcceptToS();
-                setPreventStartup(true);
-                return;
+                if (!cmdLine.hasOption("nogui")) {
+                    AtomicBoolean dialogClicked = new AtomicBoolean(false);
+                    Dialogs.showRealmsAcceptToS(clickedYes -> {
+                        if (clickedYes) {
+                            FishingBot.getInstance().getConfig().setRealmAcceptTos(true);
+                            FishingBot.getInstance().getConfig().save();
+                            getConfig().setRealmAcceptTos(true);
+                            getConfig().save();
+                        }
+                        dialogClicked.set(true);
+                    });
+
+                    // wait in this thread until the dialog is answered
+                    while (!dialogClicked.get()) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (!getConfig().isRealmAcceptTos()) {
+                    FishingBot.getI18n().severe("realms-tos-agreement");
+                    setPreventStartup(true);
+                    return;
+                }
             }
 
             String ipAndPort = null;
@@ -218,14 +272,14 @@ public class Bot {
 
     private boolean authenticate(File accountFile) {
         Authenticator authenticator = new Authenticator(accountFile);
-        AuthData authData = authenticator.authenticate();
+        Optional<AuthData> authData = authenticator.authenticate(getConfig().getAuthService());
 
-        if (authData == null) {
+        if (!authData.isPresent()) {
             setAuthData(new AuthData(null, null, null, getConfig().getUserName()));
             return false;
         }
 
-        setAuthData(authData);
+        setAuthData(authData.get());
         return true;
     }
 
@@ -239,6 +293,7 @@ public class Bot {
         getCommandRegistry().registerCommand(new DropRodCommand());
         getCommandRegistry().registerCommand(new LookCommand());
         getCommandRegistry().registerCommand(new SummaryCommand());
+        getCommandRegistry().registerCommand(new RightClickCommand());
     }
 
     private void connect() {

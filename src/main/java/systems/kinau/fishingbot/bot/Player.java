@@ -44,7 +44,7 @@ public class Player implements Listener {
     @Getter @Setter private boolean respawning;
     @Getter @Setter private boolean sneaking;
 
-    @Getter @Setter private int heldSlot;
+    @Getter         private int heldSlot;
     @Getter @Setter private Slot heldItem;
     @Getter @Setter private Inventory inventory;
     @Getter         private final Map<Integer, Inventory> openedInventories = new HashMap<>();
@@ -278,7 +278,9 @@ public class Player implements Listener {
     }
 
     public boolean look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
-        return look(direction.getYaw(), getPitch(), FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), onFinish);
+        float yaw = direction.getYaw() == Float.MIN_VALUE ? getYaw() : direction.getYaw();
+        float pitch = direction.getPitch() == Float.MIN_VALUE ? getPitch() : direction.getPitch();
+        return look(yaw, pitch, FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), onFinish);
     }
 
     public boolean look(float yaw, float pitch, int speed) {
@@ -334,13 +336,14 @@ public class Player implements Listener {
 
     public void openAdjacentChest(LocationUtils.Direction direction) {
         int x = (int)Math.floor(getX());
-        int y = (int)Math.floor(getY());
+        int y = (int)Math.round(getY());
         int z = (int)Math.floor(getZ());
         PacketOutBlockPlace.BlockFace blockFace;
         switch (direction) {
             case EAST: x++; blockFace = PacketOutBlockPlace.BlockFace.WEST; break;
             case WEST: x--; blockFace = PacketOutBlockPlace.BlockFace.EAST; break;
             case NORTH: z--; blockFace = PacketOutBlockPlace.BlockFace.SOUTH; break;
+            case DOWN: y--; blockFace = PacketOutBlockPlace.BlockFace.TOP; break;
             default: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
         }
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
@@ -363,6 +366,20 @@ public class Player implements Listener {
 
     public void closeInventory(int windowId) {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCloseInventory(windowId));
+    }
+
+    public void setHeldSlot(int heldSlot) {
+        setHeldSlot(heldSlot, true);
+    }
+
+    public void setHeldSlot(int heldSlot, boolean sendPacket) {
+        if (sendPacket)
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHeldItemChange(heldSlot));
+        this.heldSlot = heldSlot;
+    }
+
+    public void use() {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
     }
 
     public boolean executeBotAction(BotAction botAction) {
