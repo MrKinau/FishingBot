@@ -43,22 +43,37 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GUIController implements Listener {
 
-    @FXML private TableView<LootItem> lootTable;
-    @FXML private TableView<Enchantment> booksTable;
-    @FXML private TableView<Enchantment> bowsTable;
-    @FXML private TableView<Enchantment> rodsTable;
-    @FXML private TableColumn lootItemColumn;
-    @FXML private TableColumn lootCountColumn;
-    @FXML private TextField commandlineTextField;
-    @FXML private Tab lootTab;
-    @FXML private Button startStopButton;
-    @FXML private Button configButton;
-    @FXML private Button playPauseButton;
-    @FXML private ImageView skinPreview;
-    @FXML private Label usernamePreview;
+    @FXML
+    private TableView<LootItem> lootTable;
+    @FXML
+    private TableView<Enchantment> booksTable;
+    @FXML
+    private TableView<Enchantment> bowsTable;
+    @FXML
+    private TableView<Enchantment> rodsTable;
+    @FXML
+    private TableColumn lootItemColumn;
+    @FXML
+    private TableColumn lootCountColumn;
+    @FXML
+    private TextField commandlineTextField;
+    @FXML
+    private Tab lootTab;
+    @FXML
+    private Button startStopButton;
+    @FXML
+    private Button configButton;
+    @FXML
+    private Button playPauseButton;
+    @FXML
+    private ImageView skinPreview;
+    @FXML
+    private Label usernamePreview;
 
-    @Getter private final List<String> lastCommands;
-    @Getter private int currLastCommandIndex;
+    @Getter
+    private final List<String> lastCommands;
+    @Getter
+    private int currLastCommandIndex;
 
     public GUIController() {
         this.lastCommands = new ArrayList<>();
@@ -281,17 +296,15 @@ public class GUIController implements Listener {
     public void onFishCaught(FishCaughtEvent event) {
         Platform.runLater(this::setupLootTable);
         Platform.runLater(() -> {
-            LootItem lootItem = FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory().registerItem(event.getItem().getName(), event.getItem().getEnchantments());
             AtomicBoolean existing = new AtomicBoolean(false);
 
             if (lootTable == null)
                 return;
 
             lootTable.getItems().forEach(item -> {
-                if (item.getName().equalsIgnoreCase(lootItem.getName())) {
-                    item.setCount(lootItem.getCount());
+                if (item.getName().equalsIgnoreCase(event.getLootItem().getName())) {
+                    item.setCount(event.getLootItem().getCount());
                     existing.set(true);
-
                     lootCountColumn.setVisible(false);
                     lootCountColumn.setVisible(true);
                 }
@@ -299,10 +312,9 @@ public class GUIController implements Listener {
 
 
             if (!existing.get())
-                lootTable.getItems().add(lootItem);
+                lootTable.getItems().add(event.getLootItem());
 
             this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory().getItems().stream().mapToInt(LootItem::getCount).sum()));
-
 
             if (event.getItem().getEnchantments().isEmpty())
                 return;
