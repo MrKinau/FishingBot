@@ -5,6 +5,7 @@
 package systems.kinau.fishingbot.io.config;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import systems.kinau.fishingbot.auth.AuthService;
 import systems.kinau.fishingbot.i18n.Language;
@@ -13,6 +14,7 @@ import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -24,8 +26,8 @@ public class SettingsConfig implements Config {
 
     @Property(key = "server.ip", description = "config-server-ip") private String serverIP = "127.0.0.1";
     @Property(key = "server.port", description = "config-server-port") private int serverPort = 25565;
-    @Property(key = "server.realm-id", description = "config-server-realm-id") private long realmId = -1;
-    @Property(key = "server.realm-accept-tos", description = "config-server-realm-accept-tos") private boolean realmAcceptTos = false;
+    @Property(key = "server.realm-id", description = "config-server-realm-id") @Setter private long realmId = -1;
+    @Property(key = "server.realm-accept-tos", description = "config-server-realm-accept-tos") @Setter private boolean realmAcceptTos = false;
     @Property(key = "server.online-mode", description = "config-server-online-mode") private boolean onlineMode = true;
     @Property(key = "server.default-protocol", description = "config-server-default-protocol") private String defaultProtocol = ProtocolConstants.getVersionString(ProtocolConstants.AUTOMATIC);
     @Property(key = "server.spoof-forge", description = "config-server-spoof-forge") private boolean spoofForge = false;
@@ -97,5 +99,9 @@ public class SettingsConfig implements Config {
             serverPort = Integer.parseInt(serverIP.split(":")[1]);
             serverIP = serverIP.split(":")[0];
         }
+    }
+
+    public void save() {
+        new PropertyProcessor().saveConfig(this, new File(path));
     }
 }

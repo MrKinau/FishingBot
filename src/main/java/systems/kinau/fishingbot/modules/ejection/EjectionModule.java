@@ -9,6 +9,7 @@ import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,6 +75,8 @@ public class EjectionModule extends Module {
     }
 
     public List<LookEjectFunction> getLookEjectFunctions(float yaw, float pitch) {
+        if (lookEjectFunctions == null)
+            return Collections.emptyList();
         return lookEjectFunctions.stream()
                 .filter(lookEjectFunction -> lookEjectFunction.getYaw() == yaw)
                 .filter(lookEjectFunction -> lookEjectFunction.getPitch() == pitch)
@@ -81,6 +84,8 @@ public class EjectionModule extends Module {
     }
 
     public List<ChestEjectFunction> getChestEjectFunctions(LocationUtils.Direction direction) {
+        if (chestEjectFunctions == null)
+            return Collections.emptyList();
         return chestEjectFunctions.stream()
                 .filter(chestEjectFunction -> chestEjectFunction.getDirection() == direction)
                 .collect(Collectors.toList());

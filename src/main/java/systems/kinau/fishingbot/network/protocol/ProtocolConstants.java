@@ -101,7 +101,7 @@ public class ProtocolConstants {
             case MINECRAFT_1_16_1: return "1.16.1";
             case MINECRAFT_1_16_2: return "1.16.2";
             case MINECRAFT_1_16_3: return "1.16.3";
-            case MINECRAFT_1_16_4: return "1.16.4";
+            case MINECRAFT_1_16_4: return "1.16.4 / 1.16.5";
             default: return "Unknown version";
         }
     }
@@ -134,6 +134,8 @@ public class ProtocolConstants {
             case "1.16.1": return MINECRAFT_1_16_1;
             case "1.16.2": return MINECRAFT_1_16_2;
             case "1.16.3": return MINECRAFT_1_16_3;
+            case "1.16.4 / 1.16.5":
+            case "1.16.5":
             case "1.16.4": return MINECRAFT_1_16_4;
             default: return MINECRAFT_1_8;
         }

@@ -31,6 +31,7 @@ import systems.kinau.fishingbot.modules.fishing.ItemHandler;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.realms.Realm;
 import systems.kinau.fishingbot.network.realms.RealmsAPI;
 
 import java.io.File;
@@ -39,6 +40,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.FileHandler;
 
 public class Bot {
@@ -147,7 +149,6 @@ public class Bot {
             this.authData = new AuthData(null, null, null, getConfig().getUserName());
         }
 
-
         if (!cmdLine.hasOption("nogui")) {
             FishingBot.getInstance().getMainGUIController().setImage(authData.getProfile());
             FishingBot.getInstance().getMainGUIController().setAccountName(authData.getUsername());
@@ -162,22 +163,65 @@ public class Bot {
         if (getConfig().getRealmId() != -1) {
             RealmsAPI realmsAPI = new RealmsAPI(getAuthData());
             if (getConfig().getRealmId() == 0) {
-                List<String> possibleWorldsText = realmsAPI.getPossibleWorlds();
-                possibleWorldsText.forEach(FishingBot.getLog()::info);
+                List<Realm> possibleRealms = realmsAPI.getPossibleWorlds();
+                realmsAPI.printRealms(possibleRealms);
                 FishingBot.getI18n().info("realms-id-not-set");
-                if (!cmdLine.hasOption("nogui"))
-                    Dialogs.showRealmsWorlds(possibleWorldsText);
-                setPreventStartup(true);
-                return;
+                if (!cmdLine.hasOption("nogui")) {
+                    AtomicBoolean dialogClicked = new AtomicBoolean(false);
+                    Dialogs.showRealmsWorlds(possibleRealms, realm -> {
+                        if (realm != null) {
+                            FishingBot.getInstance().getConfig().setRealmId(realm.getId());
+                            FishingBot.getInstance().getConfig().save();
+                            getConfig().setRealmId(realm.getId());
+                            getConfig().save();
+                        }
+                        dialogClicked.set(true);
+                    });
+
+                    // wait in this thread until the dialog is answered
+                    while (!dialogClicked.get()) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                if (getConfig().getRealmId() == 0) {
+                    setPreventStartup(true);
+                    return;
+                }
             }
             if (getConfig().isRealmAcceptTos())
                 realmsAPI.agreeTos();
             else {
-                FishingBot.getI18n().severe("realms-tos-agreement");
-                if (!cmdLine.hasOption("nogui"))
-                    Dialogs.showRealmsAcceptToS();
-                setPreventStartup(true);
-                return;
+                if (!cmdLine.hasOption("nogui")) {
+                    AtomicBoolean dialogClicked = new AtomicBoolean(false);
+                    Dialogs.showRealmsAcceptToS(clickedYes -> {
+                        if (clickedYes) {
+                            FishingBot.getInstance().getConfig().setRealmAcceptTos(true);
+                            FishingBot.getInstance().getConfig().save();
+                            getConfig().setRealmAcceptTos(true);
+                            getConfig().save();
+                        }
+                        dialogClicked.set(true);
+                    });
+
+                    // wait in this thread until the dialog is answered
+                    while (!dialogClicked.get()) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (!getConfig().isRealmAcceptTos()) {
+                    FishingBot.getI18n().severe("realms-tos-agreement");
+                    setPreventStartup(true);
+                    return;
+                }
             }
 
             String ipAndPort = null;
