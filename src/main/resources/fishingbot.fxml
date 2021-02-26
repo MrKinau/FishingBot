@@ -33,7 +33,7 @@
     </menus>
   </MenuBar>
   <SplitPane dividerPositions="0.6" orientation="VERTICAL">
-    <TabPane minHeight="200.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+    <TabPane minHeight="32.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
       <tabs>
         <Tab fx:id="controlTab" text="%ui-tabs-controlpanel">
           <content>

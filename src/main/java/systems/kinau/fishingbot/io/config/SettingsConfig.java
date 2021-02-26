@@ -11,6 +11,7 @@ import systems.kinau.fishingbot.auth.AuthService;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.timer.Timer;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @ToString
@@ -53,6 +55,9 @@ public class SettingsConfig implements Config {
             new EjectionRule("fish", LocationUtils.Direction.WEST, Arrays.asList("cod", "salmon", "pufferfish", "tropical_fish"), EjectionRule.EjectionType.DROP),
             new EjectionRule("treasure", LocationUtils.Direction.EAST, Arrays.asList("bow", "enchanted_book", "name_tag", "nautilus_shell", "saddle"), EjectionRule.EjectionType.DROP),
             new EjectionRule("junk", LocationUtils.Direction.SOUTH, Arrays.asList("lily_pad", "bowl", "leather", "leather_boots", "rotten_flesh", "stick", "string", "potion", "bone", "ink_sac", "tripwire_hook"), EjectionRule.EjectionType.DROP));
+
+    @Property(key = "auto.timer.enabled", description = "config-auto-timer") private boolean timerEnabled = false;
+    @Property(key = "auto.timer.timers", description = "config-auto-timers") private List<Timer> timers = Collections.singletonList(new Timer("test", 5, TimeUnit.MINUTES, Collections.singletonList("Every five minutes")));
 
     @Property(key = "account.mail", description = "config-account-mail") private String userName = "my-minecraft@login.com";
     @Property(key = "account.password", description = "config-account-password") private String password = "CHANGEME";

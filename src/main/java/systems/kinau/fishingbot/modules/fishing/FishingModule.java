@@ -53,7 +53,11 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @Getter private Thread stuckingFix;
     @Getter private boolean joined;
-    @Getter @Setter private LootHistory lootHistory = new LootHistory();
+    @Getter @Setter private LootHistory lootHistory;
+
+    public FishingModule(LootHistory savedLootHistory) {
+        this.lootHistory = savedLootHistory;
+    }
 
     public void setTrackingNextEntityMeta(boolean trackingNextEntityMeta) {
         this.trackingNextEntityMeta = trackingNextEntityMeta;

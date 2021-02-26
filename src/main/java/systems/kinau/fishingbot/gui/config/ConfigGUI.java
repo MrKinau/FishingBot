@@ -24,6 +24,8 @@ import systems.kinau.fishingbot.io.config.Property;
 import systems.kinau.fishingbot.io.config.PropertyProcessor;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
+import systems.kinau.fishingbot.modules.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.timer.Timer;
 import systems.kinau.fishingbot.utils.ConvertUtils;
 import systems.kinau.fishingbot.utils.ReflectionUtils;
 
@@ -148,6 +150,9 @@ public class ConfigGUI {
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(String.class)) {
                 List<String> content = (List<String>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new StringArrayConfigOption(key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
+            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(Timer.class)) {
+                List<Timer> content = (List<Timer>) ReflectionUtils.getField(field, config);
+                addConfigOption(key, new TimersConfigOption(key, FishingBot.getI18n().t(description), content, window));
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(EjectionRule.class)) {
                 List<EjectionRule> content = (List<EjectionRule>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new EjectionRulesOption(key, FishingBot.getI18n().t(description), content, window));

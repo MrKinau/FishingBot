@@ -11,16 +11,14 @@ import org.apache.commons.cli.CommandLine;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.bot.Player;
+import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.gui.GUIController;
 import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
-import systems.kinau.fishingbot.modules.ChatProxyModule;
-import systems.kinau.fishingbot.modules.ClientDefaultsModule;
-import systems.kinau.fishingbot.modules.HandshakeModule;
-import systems.kinau.fishingbot.modules.LoginModule;
+import systems.kinau.fishingbot.modules.*;
 import systems.kinau.fishingbot.modules.command.ChatCommandModule;
 import systems.kinau.fishingbot.modules.command.CommandRegistry;
 import systems.kinau.fishingbot.modules.command.commands.*;
@@ -28,6 +26,7 @@ import systems.kinau.fishingbot.modules.discord.DiscordModule;
 import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
 import systems.kinau.fishingbot.modules.fishing.ItemHandler;
+import systems.kinau.fishingbot.modules.timer.TimerModule;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -57,12 +56,9 @@ public class Bot {
 
     @Getter         private EventManager eventManager;
     @Getter         private CommandRegistry commandRegistry;
+    @Getter         private ModuleManager moduleManager;
 
     @Getter         private Player player;
-    @Getter         private ClientDefaultsModule clientModule;
-    @Getter         private ChatProxyModule chatProxyModule;
-    @Getter         private EjectionModule ejectModule;
-    @Getter         private DiscordModule discordModule;
 
     @Getter         private Socket socket;
     @Getter         private NetworkHandler net;
@@ -75,6 +71,7 @@ public class Bot {
     public Bot(CommandLine cmdLine) {
         FishingBot.getInstance().setCurrentBot(this);
         this.eventManager = new EventManager();
+        this.moduleManager = new ModuleManager();
         if (!cmdLine.hasOption("nogui"))
             getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
 
@@ -251,6 +248,18 @@ public class Bot {
         sp.ping();
     }
 
+    public FishingModule getFishingModule() {
+        return (FishingModule) getModuleManager().getLoadedModule(FishingModule.class).orElse(null);
+    }
+
+    public EjectionModule getEjectModule() {
+        return (EjectionModule) getModuleManager().getLoadedModule(EjectionModule.class).orElse(null);
+    }
+
+    public DiscordModule getDiscordModule() {
+        return (DiscordModule) getModuleManager().getLoadedModule(DiscordModule.class).orElse(null);
+    }
+
     public void start() {
         if (isRunning() || isPreventStartup()) {
             FishingBot.getInstance().setCurrentBot(null);
@@ -291,6 +300,8 @@ public class Bot {
         String serverName = getServerHost();
         int port = getServerPort();
 
+        LootHistory savedLootHistory = new LootHistory();
+
         do {
             try {
                 setRunning(true);
@@ -312,36 +323,31 @@ public class Bot {
                 this.net = new NetworkHandler();
 
                 registerCommands();
+                if (FishingBot.getInstance().getMainGUIController() != null)
+                    getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
 
                 if (FishingBot.getInstance().getMainGUIController() != null && !getEventManager().isRegistered(FishingBot.getInstance().getMainGUIController()))
                     getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
 
                 // enable required modules
 
-                this.fishingModule = new FishingModule();
-                getFishingModule().enable();
-
-                new HandshakeModule(serverName, port).enable();
-                new LoginModule(getAuthData().getUsername()).enable();
-
-                this.chatProxyModule = new ChatProxyModule();
-                getChatProxyModule().enable();
-
-                this.clientModule = new ClientDefaultsModule();
-                getClientModule().enable();
+                getModuleManager().enableModule(new HandshakeModule(serverName, port));
+                getModuleManager().enableModule(new LoginModule(getAuthData().getUsername()));
+                getModuleManager().enableModule(new ClientDefaultsModule());
+                getModuleManager().enableModule(new FishingModule(savedLootHistory));
+                getModuleManager().enableModule(new ChatProxyModule());
 
                 if (getConfig().isStartTextEnabled())
-                    new ChatCommandModule().enable();
+                    getModuleManager().enableModule(new ChatCommandModule());
 
-                if (getConfig().isWebHookEnabled()) {
-                    this.discordModule = new DiscordModule();
-                    getDiscordModule().enable();
-                }
+                if (getConfig().isWebHookEnabled())
+                    getModuleManager().enableModule(new DiscordModule());
 
-                if (getConfig().isAutoLootEjectionEnabled()) {
-                    this.ejectModule = new EjectionModule();
-                    getEjectModule().enable();
-                }
+                if (getConfig().isAutoLootEjectionEnabled())
+                    getModuleManager().enableModule(new EjectionModule());
+
+                if (getConfig().isTimerEnabled())
+                    getModuleManager().enableModule(new TimerModule());
 
                 // init item handler & player
 
@@ -381,28 +387,16 @@ public class Bot {
                     e.printStackTrace();
                 }
 
-                if (getClientModule() != null)
-                    getClientModule().disable();
-                if (getFishingModule() != null)
-                    getFishingModule().disable();
-                if (getChatProxyModule() != null)
-                    getChatProxyModule().disable();
-                if (getEjectModule() != null)
-                    getEjectModule().disable();
-                if (getDiscordModule() != null)
-                    getDiscordModule().disable();
                 if (getPlayer() != null)
                     getEventManager().unregisterListener(getPlayer());
                 getEventManager().getRegisteredListener().clear();
                 getEventManager().getClassToInstanceMapping().clear();
+                if (getFishingModule() != null)
+                    savedLootHistory = getFishingModule().getLootHistory();
+                getModuleManager().disableAll();
                 this.socket = null;
-                this.fishingModule = null;
                 this.net = null;
                 this.player = null;
-                this.clientModule = null;
-                this.chatProxyModule = null;
-                this.ejectModule = null;
-                this.discordModule = null;
             }
             if (getConfig().isAutoReconnect() && !isPreventReconnect()) {
                 FishingBot.getI18n().info("bot-automatic-reconnect", String.valueOf(getConfig().getAutoReconnectTime()));
