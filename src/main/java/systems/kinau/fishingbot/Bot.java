@@ -313,6 +313,9 @@ public class Bot {
 
                 registerCommands();
 
+                if (FishingBot.getInstance().getMainGUIController() != null && !getEventManager().isRegistered(FishingBot.getInstance().getMainGUIController()))
+                    getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
+
                 // enable required modules
 
                 this.fishingModule = new FishingModule();

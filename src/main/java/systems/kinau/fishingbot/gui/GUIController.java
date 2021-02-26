@@ -43,37 +43,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GUIController implements Listener {
 
-    @FXML
-    private TableView<LootItem> lootTable;
-    @FXML
-    private TableView<Enchantment> booksTable;
-    @FXML
-    private TableView<Enchantment> bowsTable;
-    @FXML
-    private TableView<Enchantment> rodsTable;
-    @FXML
-    private TableColumn lootItemColumn;
-    @FXML
-    private TableColumn lootCountColumn;
-    @FXML
-    private TextField commandlineTextField;
-    @FXML
-    private Tab lootTab;
-    @FXML
-    private Button startStopButton;
-    @FXML
-    private Button configButton;
-    @FXML
-    private Button playPauseButton;
-    @FXML
-    private ImageView skinPreview;
-    @FXML
-    private Label usernamePreview;
+    @FXML private TableView<LootItem> lootTable;
+    @FXML private TableView<Enchantment> booksTable;
+    @FXML private TableView<Enchantment> bowsTable;
+    @FXML private TableView<Enchantment> rodsTable;
+    @FXML private TableColumn lootItemColumn;
+    @FXML private TableColumn lootCountColumn;
+    @FXML private TextField commandlineTextField;
+    @FXML private Tab lootTab;
+    @FXML private Button startStopButton;
+    @FXML private Button configButton;
+    @FXML private Button playPauseButton;
+    @FXML private ImageView skinPreview;
+    @FXML private Label usernamePreview;
 
-    @Getter
-    private final List<String> lastCommands;
-    @Getter
-    private int currLastCommandIndex;
+    @Getter private final List<String> lastCommands;
+    @Getter private int currLastCommandIndex;
 
     public GUIController() {
         this.lastCommands = new ArrayList<>();
