@@ -43,7 +43,7 @@ public class Player implements Listener {
     @Getter @Setter private boolean respawning;
     @Getter @Setter private boolean sneaking;
 
-    @Getter @Setter private int heldSlot;
+    @Getter         private int heldSlot;
     @Getter @Setter private Slot heldItem;
     @Getter @Setter private Inventory inventory;
     @Getter         private final Map<Integer, Inventory> openedInventories = new HashMap<>();
@@ -364,5 +364,19 @@ public class Player implements Listener {
 
     public void closeInventory(int windowId) {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCloseInventory(windowId));
+    }
+
+    public void setHeldSlot(int heldSlot) {
+        setHeldSlot(heldSlot, true);
+    }
+
+    public void setHeldSlot(int heldSlot, boolean sendPacket) {
+        if (sendPacket)
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHeldItemChange(heldSlot));
+        this.heldSlot = heldSlot;
+    }
+
+    public void use() {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
     }
 }
