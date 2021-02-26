@@ -74,7 +74,7 @@ public class EventManager {
     }
 
     public void callEvent(Event event) {
-        if(!registeredListener.containsKey(event.getClass()))
+        if (!registeredListener.containsKey(event.getClass()))
             return;
         registeredListener.get(event.getClass()).forEach(method -> {
             try {
@@ -83,5 +83,9 @@ public class EventManager {
                 e.printStackTrace();
             }
         });
+    }
+
+    public boolean isRegistered(Listener listener) {
+        return classToInstanceMapping.containsKey(listener.getClass());
     }
 }

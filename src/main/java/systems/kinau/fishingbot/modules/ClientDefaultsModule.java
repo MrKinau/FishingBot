@@ -47,7 +47,7 @@ public class ClientDefaultsModule extends Module implements Listener {
             //Send start texts
             if (FishingBot.getInstance().getCurrentBot().getConfig().isStartTextEnabled()) {
                 FishingBot.getInstance().getCurrentBot().getConfig().getStartText().forEach(s -> {
-                    FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(s.replace("%prefix%", FishingBot.PREFIX));
+                    FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(s);
                 });
             }
 

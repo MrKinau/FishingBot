@@ -8,14 +8,19 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.auth.AuthService;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.timer.Timer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ConvertUtils {
 
@@ -65,6 +70,14 @@ public class ConvertUtils {
                 FishingBot.getLog().severe("Could not find language " + value + ". Falling back to default langugae ENGLISH");
                 return Language.ENGLISH;
             }
+        } else if (type.isAssignableFrom(AuthService.class)) {
+            try {
+                return AuthService.valueOf(value.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                FishingBot.getI18n().warning("config-unknown-auth-service", value, Arrays.stream(AuthService.values()).map(Enum::name).collect(Collectors.joining(", ")));
+                ex.printStackTrace();
+                return LocationUtils.Direction.SOUTH;
+            }
         } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(EjectionRule.class)) {
             try {
                 List<EjectionRule> rules = new ArrayList<>();
@@ -82,6 +95,27 @@ public class ConvertUtils {
                     }
                 });
                 return rules;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return null;
+            }
+        } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(Timer.class)) {
+            try {
+                List<Timer> timers = new ArrayList<>();
+                JSONArray array = (JSONArray) new JSONParser().parse(value);
+                array.forEach(o -> {
+                    try {
+                        JSONObject obj = (JSONObject) new JSONParser().parse(o.toString());
+                        String name = obj.get("name").toString();
+                        int units = Integer.valueOf(obj.get("units").toString());
+                        TimeUnit timeUnit = TimeUnit.valueOf((String) obj.get("timeUnit"));
+                        JSONArray command = (JSONArray) new JSONParser().parse(obj.get("commands").toString());
+                        timers.add(new Timer(name, units, timeUnit, new ArrayList<String>(command)));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+                return timers;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;

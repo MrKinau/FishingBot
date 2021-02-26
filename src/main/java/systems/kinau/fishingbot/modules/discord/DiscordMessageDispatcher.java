@@ -11,6 +11,11 @@ import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import okhttp3.OkHttpClient;
+import systems.kinau.fishingbot.utils.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class DiscordMessageDispatcher {
 
@@ -45,5 +50,22 @@ public class DiscordMessageDispatcher {
             builder.setAvatarUrl(details.getAvatar());
 
         webHook.send(builder.build());
+    }
+
+    // hacky method to close all webhook connections
+    public void shutdown() {
+        try {
+            Field poolField = webHook.getClass().getDeclaredField("pool");
+            ScheduledExecutorService service = (ScheduledExecutorService) ReflectionUtils.getField(poolField, webHook);
+            if (service != null)
+                service.shutdownNow();
+
+            Field clientField = webHook.getClass().getDeclaredField("client");
+            OkHttpClient client = (OkHttpClient) ReflectionUtils.getField(clientField, webHook);
+            if (client != null)
+                client.connectionPool().evictAll();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 }

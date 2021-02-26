@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -10,15 +11,24 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.Main;
+import systems.kinau.fishingbot.bot.loot.ImagedName;
+import systems.kinau.fishingbot.bot.loot.LootHistory;
+import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.custom.BotStartEvent;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.gui.config.ConfigGUI;
 import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
+import systems.kinau.fishingbot.utils.ImageUtils;
 
 import javax.annotation.Resources;
 import java.awt.*;
@@ -27,8 +37,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GUIController implements Listener {
@@ -47,16 +57,16 @@ public class GUIController implements Listener {
     @FXML private ImageView skinPreview;
     @FXML private Label usernamePreview;
 
-    @Getter private LootHistory lootHistory;
+    @Getter private final List<String> lastCommands;
+    @Getter private int currLastCommandIndex;
 
     public GUIController() {
-        this.lootHistory = new LootHistory();
+        this.lastCommands = new ArrayList<>();
     }
 
     @FXML
     protected void initialize(URL location, Resources resources) {
-        lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
+        setupLootTable();
         setupEnchantmentTable(booksTable);
         setupEnchantmentTable(bowsTable);
         setupEnchantmentTable(rodsTable);
@@ -67,12 +77,13 @@ public class GUIController implements Listener {
     }
 
     public void deleteAllData(Event e) {
-        this.lootHistory = new LootHistory();
+        if (FishingBot.getInstance().getCurrentBot() != null && FishingBot.getInstance().getCurrentBot().getFishingModule() != null)
+            FishingBot.getInstance().getCurrentBot().getFishingModule().setLootHistory(new LootHistory());
         lootTable.getItems().clear();
         booksTable.getItems().clear();
         bowsTable.getItems().clear();
         rodsTable.getItems().clear();
-        this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
+        this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", 0));
     }
 
     public void github(Event e) {
@@ -115,8 +126,33 @@ public class GUIController implements Listener {
     }
 
     public void commandlineSend(Event e) {
+        if (getLastCommands().isEmpty() || !getLastCommands().get(getLastCommands().size() - 1).equals(commandlineTextField.getText())) {
+            getLastCommands().add(commandlineTextField.getText());
+            if (getLastCommands().size() > 1000)
+                getLastCommands().remove(0);
+        }
+        currLastCommandIndex = 0;
         runCommand(commandlineTextField.getText());
         commandlineTextField.setText("");
+    }
+
+    public void consoleKeyPressed(KeyEvent e) {
+        if (e.getCode() == KeyCode.UP) {
+            if (getLastCommands().size() > currLastCommandIndex) {
+                currLastCommandIndex++;
+                commandlineTextField.setText(getLastCommands().get(getLastCommands().size() - currLastCommandIndex));
+                commandlineTextField.end();
+            }
+        } else if (e.getCode() == KeyCode.DOWN) {
+            if (currLastCommandIndex > 0) {
+                currLastCommandIndex--;
+                if (currLastCommandIndex == 0)
+                    commandlineTextField.setText("");
+                else
+                    commandlineTextField.setText(getLastCommands().get(getLastCommands().size() - currLastCommandIndex));
+                commandlineTextField.end();
+            }
+        }
     }
 
     private void runCommand(String text) {
@@ -140,7 +176,7 @@ public class GUIController implements Listener {
         }
     }
 
-    private void openWebpage(String url) {
+    public static void openWebpage(String url) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
@@ -210,19 +246,24 @@ public class GUIController implements Listener {
     }
 
     public void openAbout(Event e) {
-        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), s -> openWebpage(s));
+        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), GUIController::openWebpage);
     }
 
     public void setImage(String uuid) {
-        if (uuid == null || uuid.isEmpty())
-            uuid = UUID.randomUUID().toString().replace("-","").toLowerCase();
-        String finalUuid = uuid;
+        Image noSkinImage = new Image(Main.class.getClassLoader().getResourceAsStream("img/general/noskin.png"));
         Platform.runLater(() -> {
-            skinPreview.setFitWidth(120);
-            skinPreview.setFitHeight(170);
+            skinPreview.setFitHeight(180);
             skinPreview.setVisible(true);
-            skinPreview.setImage(new Image(String.format("https://crafatar.com/renders/body/%s?overlay", finalUuid)));
+            skinPreview.setImage(noSkinImage);
         });
+        if (uuid != null && !uuid.isEmpty()) {
+            Image image = new Image(String.format("https://crafatar.com/renders/body/%s?overlay", uuid), true);
+            image.progressProperty().addListener((value, oldProgress, progress) -> {
+                if (progress.doubleValue() >= 1) {
+                    Platform.runLater(() -> skinPreview.setImage(image));
+                }
+            });
+        }
     }
 
     public void setAccountName(String name) {
@@ -230,23 +271,25 @@ public class GUIController implements Listener {
     }
 
     @EventHandler
-    public void onFishCaught(FishCaughtEvent event) {
+    public void onBotStart(BotStartEvent event) {
         Platform.runLater(() -> {
-            lootItemColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-            lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
+            deleteAllData(null);
+        });
+    }
 
-            LootItem lootItem = lootHistory.registerItem(event.getItem().getName(), event.getItem().getEnchantments());
+    @EventHandler
+    public void onFishCaught(FishCaughtEvent event) {
+        Platform.runLater(this::setupLootTable);
+        Platform.runLater(() -> {
             AtomicBoolean existing = new AtomicBoolean(false);
 
             if (lootTable == null)
                 return;
 
-
             lootTable.getItems().forEach(item -> {
-                if (item.getName().equalsIgnoreCase(lootItem.getName())) {
-                    item.setCount(lootItem.getCount());
+                if (item.getName().equalsIgnoreCase(event.getLootItem().getName())) {
+                    item.setCount(event.getLootItem().getCount());
                     existing.set(true);
-
                     lootCountColumn.setVisible(false);
                     lootCountColumn.setVisible(true);
                 }
@@ -254,10 +297,9 @@ public class GUIController implements Listener {
 
 
             if (!existing.get())
-                lootTable.getItems().add(lootItem);
+                lootTable.getItems().add(event.getLootItem());
 
-            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()));
-
+            this.lootTab.setText(FishingBot.getI18n().t("ui-tabs-loot", FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory().getItems().stream().mapToInt(LootItem::getCount).sum()));
 
             if (event.getItem().getEnchantments().isEmpty())
                 return;
@@ -281,6 +323,38 @@ public class GUIController implements Listener {
                 }
             }
         });
+    }
+
+    private void setupLootTable() {
+        lootItemColumn.setCellFactory(param -> {
+            HBox box = new HBox();
+            box.setSpacing(10);
+            box.setAlignment(Pos.CENTER_LEFT);
+
+            final ImageView imageview = new ImageView();
+            imageview.setFitHeight(24);
+            imageview.setFitWidth(24);
+
+            final Label nameLabel = new Label();
+
+            TableCell<LootItem, ImagedName> cell = new TableCell<LootItem, ImagedName>() {
+                public void updateItem(ImagedName item, boolean empty) {
+                    if (item != null) {
+                        imageview.setImage(ImageUtils.getImage(item.getFileName()));
+                        nameLabel.setText(item.getName());
+                    }
+                }
+            };
+
+            box.getChildren().addAll(imageview, nameLabel);
+
+            cell.setGraphic(box);
+            return cell;
+        });
+        lootItemColumn.setCellValueFactory(new PropertyValueFactory<LootItem, ImagedName>("imagedName"));
+
+
+        lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
     }
 
     private void setupEnchantmentTable(TableView<Enchantment> table) {

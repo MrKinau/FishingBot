@@ -64,4 +64,8 @@ public class StringUtils {
         }
     }
 
+    public static String maskUsername(String loginName) {
+        return loginName.contains("@") ? loginName.split("@")[0].replaceAll(".", "*") + "@" + loginName.split("@")[1] : loginName;
+    }
+
 }

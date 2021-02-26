@@ -3,6 +3,8 @@ package systems.kinau.fishingbot;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.cli.CommandLine;
+import systems.kinau.fishingbot.event.custom.BotStartEvent;
+import systems.kinau.fishingbot.event.custom.BotStopEvent;
 import systems.kinau.fishingbot.gui.GUIController;
 import systems.kinau.fishingbot.gui.MainGUI;
 import systems.kinau.fishingbot.i18n.I18n;
@@ -76,12 +78,14 @@ public class FishingBot {
             stopBot(true);
         Thread.currentThread().setName("mainThread");
         Bot bot = new Bot(cmdLine);
+        bot.getEventManager().callEvent(new BotStartEvent());
         bot.start();
     }
 
     public void stopBot(boolean preventReconnect) {
         if (getCurrentBot() == null)
             return;
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new BotStopEvent());
         // TODO: Send Disconnect Packet
         getCurrentBot().setPreventReconnect(preventReconnect);
         getCurrentBot().setRunning(false);

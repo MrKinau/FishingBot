@@ -5,8 +5,11 @@ import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.bot.Item;
+import systems.kinau.fishingbot.bot.loot.LootHistory;
+import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.custom.BotStopEvent;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
@@ -17,6 +20,7 @@ import systems.kinau.fishingbot.modules.fishing.ItemHandler;
 import systems.kinau.fishingbot.utils.StringUtils;
 
 import java.text.NumberFormat;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +45,21 @@ public class DiscordModule extends Module implements Listener {
     @Override
     public void onDisable() {
         FishingBot.getInstance().getCurrentBot().getEventManager().unregisterListener(this);
+        if (this.discord != null)
+            this.discord.shutdown();
+        this.discord = null;
+    }
+
+    public void sendSummary(LootHistory lootHistory) {
+        if (!FishingBot.getInstance().getCurrentBot().getConfig().isWebHookEnabled())
+            return;
+        StringBuilder lootStr = new StringBuilder();
+        lootHistory.getItems().stream().sorted(Comparator.comparingInt(LootItem::getCount).reversed())
+                .forEach(lootItem -> lootStr.append(lootItem.getCount()).append("x ").append(lootItem.getName()).append("\n"));
+        getDiscord().dispatchEmbed(FishingBot.getI18n().t("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum()), 0xff0000,
+                "https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/items/fishing_rod.png",
+                lootStr.toString(),
+                getFooter(), DISCORD_DETAILS);
     }
 
     private String formatEnchantment(List<Enchantment> enchantments) {
@@ -174,5 +193,10 @@ public class DiscordModule extends Module implements Listener {
                     FishingBot.getI18n().t("discord-webhook-respawn"),
                     getFooter(), DISCORD_DETAILS);
         }
+    }
+
+    @EventHandler
+    public void onBotStop(BotStopEvent event) {
+        sendSummary(FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory());
     }
 }

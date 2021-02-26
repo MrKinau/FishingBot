@@ -7,9 +7,11 @@ package systems.kinau.fishingbot.io.config;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import systems.kinau.fishingbot.auth.AuthService;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.timer.Timer;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
@@ -18,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @ToString
@@ -53,8 +56,12 @@ public class SettingsConfig implements Config {
             new EjectionRule("treasure", LocationUtils.Direction.EAST, Arrays.asList("bow", "enchanted_book", "name_tag", "nautilus_shell", "saddle"), EjectionRule.EjectionType.DROP),
             new EjectionRule("junk", LocationUtils.Direction.SOUTH, Arrays.asList("lily_pad", "bowl", "leather", "leather_boots", "rotten_flesh", "stick", "string", "potion", "bone", "ink_sac", "tripwire_hook"), EjectionRule.EjectionType.DROP));
 
+    @Property(key = "auto.timer.enabled", description = "config-auto-timer") private boolean timerEnabled = false;
+    @Property(key = "auto.timer.timers", description = "config-auto-timers") private List<Timer> timers = Collections.singletonList(new Timer("test", 5, TimeUnit.MINUTES, Collections.singletonList("Every five minutes")));
+
     @Property(key = "account.mail", description = "config-account-mail") private String userName = "my-minecraft@login.com";
     @Property(key = "account.password", description = "config-account-password") private String password = "CHANGEME";
+    @Property(key = "account.auth-service", description = "config-account-auth-service") private AuthService authService = AuthService.MOJANG;
 
     @Property(key = "logs.log-count", description = "config-logs-log-count") private int logCount = 15;
     @Property(key = "logs.log-packets", description = "config-logs-log-packets") private boolean logPackets = false;
@@ -91,6 +98,12 @@ public class SettingsConfig implements Config {
     public SettingsConfig(String path) {
         this.path = path;
         init(path);
+
+        // fix: User do not understand split of port and IP
+        if (serverIP.contains(":")) {
+            serverPort = Integer.parseInt(serverIP.split(":")[1]);
+            serverIP = serverIP.split(":")[0];
+        }
     }
 
     public void save() {

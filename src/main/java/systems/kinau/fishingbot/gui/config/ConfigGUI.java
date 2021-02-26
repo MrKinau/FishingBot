@@ -19,13 +19,13 @@ import lombok.Getter;
 import org.json.simple.JSONArray;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.gui.config.options.*;
-import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.io.config.ConvertException;
 import systems.kinau.fishingbot.io.config.Property;
 import systems.kinau.fishingbot.io.config.PropertyProcessor;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
+import systems.kinau.fishingbot.modules.timer.Timer;
 import systems.kinau.fishingbot.utils.ConvertUtils;
 import systems.kinau.fishingbot.utils.ReflectionUtils;
 
@@ -144,13 +144,15 @@ public class ConfigGUI {
                 addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Double.valueOf((double)ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isAssignableFrom(long.class)) {
                 addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Long.valueOf((long)ReflectionUtils.getField(field, config)).intValue()));
-            } else if (field.getType().isAssignableFrom(AnnounceType.class)) {
-                addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), AnnounceType.values()));
-            } else if (field.getType().isAssignableFrom(Language.class)) {
-                addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), Language.values()));
+            } else if (field.getType().isEnum()) {
+                Enum currEnum = (Enum) ReflectionUtils.getField(field, config);
+                addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), (Enum[]) currEnum.getDeclaringClass().getEnumConstants()));
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(String.class)) {
                 List<String> content = (List<String>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new StringArrayConfigOption(key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
+            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(Timer.class)) {
+                List<Timer> content = (List<Timer>) ReflectionUtils.getField(field, config);
+                addConfigOption(key, new TimersConfigOption(key, FishingBot.getI18n().t(description), content, window));
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(EjectionRule.class)) {
                 List<EjectionRule> content = (List<EjectionRule>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new EjectionRulesOption(key, FishingBot.getI18n().t(description), content, window));

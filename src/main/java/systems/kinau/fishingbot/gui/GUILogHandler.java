@@ -29,10 +29,12 @@ public class GUILogHandler extends Handler {
             if (FishingBot.getInstance().getCurrentBot() == null) {
                 this.logWindow.setText(String.join("\n", lines) + "\n");
             } else if (lines.length > FishingBot.getInstance().getCurrentBot().getConfig().getGuiConsoleMaxLines()) {
+                double topScroll = this.logWindow.getScrollTop();
                 int delta = lines.length - FishingBot.getInstance().getCurrentBot().getConfig().getGuiConsoleMaxLines();
                 lines = Arrays.copyOfRange(lines, delta, lines.length);
 
                 this.logWindow.setText(String.join("\n", lines) + "\n");
+                this.logWindow.setScrollTop(topScroll);
             }
         });
     }

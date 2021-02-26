@@ -129,4 +129,31 @@ public class Dialogs {
             alert.showAndWait();
         });
     }
+
+    public static void showCredentialsInvalid(Consumer<String> callBack) {
+        setupJFX();
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(FishingBot.PREFIX);
+
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-invalid-header"));
+            FlowPane fp = new FlowPane();
+            Label lbl = new Label(FishingBot.getI18n().t("dialog-credentials-invalid-content"));
+            Hyperlink link = new Hyperlink(" FishingBot Wiki");
+            fp.getChildren().addAll( lbl, link);
+
+            link.setOnAction(event -> {
+                alert.close();
+                callBack.accept("https://github.com/MrKinau/FishingBot/wiki/Troubleshooting");
+            });
+
+            alert.getDialogPane().contentProperty().set(fp);
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
+
+            alert.showAndWait();
+        });
+    }
 }
