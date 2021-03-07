@@ -15,13 +15,14 @@ import java.util.Locale;
 @Getter
 public enum Language {
 
+    CHINESE(new Locale("zh", "CN")),
     ENGLISH(new Locale("en", "EN")),
     FRENCH(new Locale("fr", "FR")),
     GERMAN(new Locale("de", "DE")),
+    ITALIAN(new Locale("it", "IT")),
     POLISH(new Locale("pl", "PL")),
     RUSSIAN(new Locale("ru", "RU")),
-    SPANISH(new Locale("es", "ES")),
-    ITALIAN(new Locale("it", "IT"));
+    SPANISH(new Locale("es", "ES"));
 
     private final Locale locale;
 

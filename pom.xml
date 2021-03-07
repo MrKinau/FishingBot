@@ -100,37 +100,37 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>15.0.1</version>
+            <version>16-ea+7</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>15.0.1</version>
+            <version>16-ea+7</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>15.0.1</version>
+            <version>16-ea+7</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
-            <version>15.0.1</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>16-ea+7</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
-            <version>15.0.1</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>16-ea+7</version>
             <classifier>linux</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics </artifactId>
-            <version>15.0.1</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>16-ea+7</version>
             <classifier>mac</classifier>
         </dependency>
         <dependency>
