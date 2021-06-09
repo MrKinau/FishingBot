@@ -6,8 +6,8 @@ import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.loot.LootItem;
 
+import java.io.InputStream;
 import java.util.List;
-import java.util.Objects;
 
 public class ImageUtils {
 
@@ -21,7 +21,10 @@ public class ImageUtils {
     }
 
     public static Image getImage(String filename) {
-        return new Image(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("img/items/" + filename.toLowerCase())));
+        InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("img/items/" + filename.toLowerCase());
+        if (inputStream == null)
+            return null;
+        return new Image(inputStream);
     }
 
     public static Image getImage(LootItem item) {

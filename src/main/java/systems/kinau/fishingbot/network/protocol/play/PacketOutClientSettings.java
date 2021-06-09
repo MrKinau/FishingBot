@@ -42,6 +42,22 @@ public class PacketOutClientSettings extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_2:
             case ProtocolConstants.MINECRAFT_1_14_3:
             case ProtocolConstants.MINECRAFT_1_14_4:
+            case ProtocolConstants.MINECRAFT_1_15:
+            case ProtocolConstants.MINECRAFT_1_15_1:
+            case ProtocolConstants.MINECRAFT_1_15_2:
+            case ProtocolConstants.MINECRAFT_1_16:
+            case ProtocolConstants.MINECRAFT_1_16_1:
+            case ProtocolConstants.MINECRAFT_1_16_2:
+            case ProtocolConstants.MINECRAFT_1_16_3:
+            case ProtocolConstants.MINECRAFT_1_16_4:
+                writeString("lol_aa", out); //use speach "LOLCAT", lol
+                out.writeByte(1);           //render-distance
+                writeVarInt(0, out);        //chat enabled
+                out.writeBoolean(true);     //support colors
+                out.writeByte(128);         //skin bitmask
+                writeVarInt(1, out);        //right = main hand
+                break;
+            case ProtocolConstants.MINECRAFT_1_17:
             default: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
                 out.writeByte(1);           //render-distance
@@ -49,6 +65,7 @@ public class PacketOutClientSettings extends Packet {
                 out.writeBoolean(true);     //support colors
                 out.writeByte(128);         //skin bitmask
                 writeVarInt(1, out);        //right = main hand
+                out.writeBoolean(true);     //Disable text filtering
                 break;
             }
         }

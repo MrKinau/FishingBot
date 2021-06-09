@@ -342,7 +342,9 @@ public class GUIController implements Listener {
             TableCell<LootItem, ImagedName> cell = new TableCell<LootItem, ImagedName>() {
                 public void updateItem(ImagedName item, boolean empty) {
                     if (item != null) {
-                        imageview.setImage(ImageUtils.getImage(item.getFileName()));
+                        Image img = ImageUtils.getImage(item.getFileName());
+                        if (img != null)
+                            imageview.setImage(img);
                         nameLabel.setText(item.getName());
                     }
                 }

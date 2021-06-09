@@ -125,6 +125,7 @@ public class PacketInJoinGame extends Packet {
             case ProtocolConstants.MINECRAFT_1_16_2:
             case ProtocolConstants.MINECRAFT_1_16_3:
             case ProtocolConstants.MINECRAFT_1_16_4:
+            case ProtocolConstants.MINECRAFT_1_17:
             default: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore

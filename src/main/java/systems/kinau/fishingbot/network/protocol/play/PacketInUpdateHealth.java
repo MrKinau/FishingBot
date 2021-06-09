@@ -25,9 +25,9 @@ public class PacketInUpdateHealth extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        this.health = in.readFloat();
-        this.food = readVarInt(in);
-        this.saturation = in.readFloat();
+//        this.health = in.readFloat();
+//        this.food = readVarInt(in);
+//        this.saturation = in.readFloat();
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID(), getHealth(), getFood(), getSaturation()));
     }

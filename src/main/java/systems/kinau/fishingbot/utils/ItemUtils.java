@@ -40,8 +40,10 @@ public class ItemUtils {
             return slot.getItemId() == 568;
         else if (protocol < ProtocolConstants.MINECRAFT_1_16)
             return slot.getItemId() == 622;
-        else
+        else if (protocol < ProtocolConstants.MINECRAFT_1_17)
             return slot.getItemId() == 684;
+        else
+            return slot.getItemId() == 797;
     }
 
     public static List<Enchantment> getEnchantments(Slot slot) {

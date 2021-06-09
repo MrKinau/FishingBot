@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 // TODO: Change fishing ids based on current version
 public class FishingModule extends Module implements Runnable, Listener {
 
+    private static final List<Integer> FISH_IDS_1_17 = Arrays.asList(801, 802, 803, 804);
     private static final List<Integer> FISH_IDS_1_16 = Arrays.asList(687, 688, 689, 690);
     private static final List<Integer> FISH_IDS_1_14 = Arrays.asList(625, 626, 627, 628);
     private static final List<Integer> FISH_IDS_1_8 = Collections.singletonList(349);
@@ -204,7 +205,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
         else if (noisiness == AnnounceType.ALL)
             announce.accept(stringify(item));
-        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId())&& !FISH_IDS_1_16.contains(item.getItemId()))
+        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId()) && !FISH_IDS_1_16.contains(item.getItemId()))
             announce.accept(stringify(item));
 
         if (item.getEnchantments().isEmpty())
@@ -414,6 +415,8 @@ public class FishingModule extends Module implements Runnable, Listener {
         } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_16_1 && event.getType() == 106) {
             reFish(event.getId());
         } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_16_4 && event.getType() == 107) {
+            reFish(event.getId());
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_17 && event.getType() == 112) {
             reFish(event.getId());
         }
     }

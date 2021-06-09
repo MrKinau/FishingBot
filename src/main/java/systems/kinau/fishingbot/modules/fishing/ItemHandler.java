@@ -61,11 +61,15 @@ public class ItemHandler {
                 }
                 case ProtocolConstants.MINECRAFT_1_16_2:
                 case ProtocolConstants.MINECRAFT_1_16_3:
-                case ProtocolConstants.MINECRAFT_1_16_4:
-                default: {
+                case ProtocolConstants.MINECRAFT_1_16_4: {
                     root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_16_2.json")));
                     break;
                 }
+                case ProtocolConstants.MINECRAFT_1_17:
+                default:
+                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_17.json")));
+
+                    break;
             }
         } catch (ParseException | IOException ignore) {}
 
