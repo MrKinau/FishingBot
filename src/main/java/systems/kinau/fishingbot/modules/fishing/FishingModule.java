@@ -252,15 +252,19 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
+    //TODO: Currently crashing the client in 1.17
     public boolean swapWithBestFishingRod() {
-        int bestSlot = ItemUtils.getBestFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getInventory());
-        if (bestSlot < 0)
-            return false;
-        if (bestSlot == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
-            return false;
-        int newSlot = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() - 36;
-        FishingBot.getInstance().getCurrentBot().getPlayer().swapToHotBar(bestSlot, newSlot);
-        return true;
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_17) {
+            int bestSlot = ItemUtils.getBestFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getInventory());
+            if (bestSlot < 0)
+                return false;
+            if (bestSlot == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
+                return false;
+            int newSlot = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() - 36;
+            FishingBot.getInstance().getCurrentBot().getPlayer().swapToHotBar(bestSlot, newSlot);
+            return true;
+        }
+        return false;
     }
 
     public void finishedLooking() {
