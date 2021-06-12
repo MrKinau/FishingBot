@@ -62,17 +62,22 @@ public class Dialogs {
             stage.setAlwaysOnTop(true);
             stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
 
-            Optional<String> result = dialog.showAndWait();
             AtomicReference<Realm> returningRealm = new AtomicReference<>(null);
-            result.ifPresent(s -> {
-                String name = s.split(" by ")[0];
-                String owner = s.split(" by ")[1];
-                Optional<Realm> optRealm = possibleRealms.stream()
-                        .filter(realm -> realm.getName().equals(name))
-                        .filter(realm -> realm.getOwner().equals(owner))
-                        .findAny();
-                optRealm.ifPresent(returningRealm::set);
-            });
+
+            try {
+                Optional<String> result = dialog.showAndWait();
+
+                result.ifPresent(s -> {
+                    String name = s.split(" by ")[0];
+                    String owner = s.split(" by ")[1];
+                    Optional<Realm> optRealm = possibleRealms.stream()
+                            .filter(realm -> realm.getName().equals(name))
+                            .filter(realm -> realm.getOwner().equals(owner))
+                            .findAny();
+                    optRealm.ifPresent(returningRealm::set);
+                });
+            } catch (Throwable ignore) {
+            }
             callback.accept(returningRealm.get());
         });
     }
@@ -101,7 +106,10 @@ public class Dialogs {
             new JFXPanel();
             latch.countDown();
         });
-        try { latch.await(); } catch (InterruptedException ignore) { }
+        try {
+            latch.await();
+        } catch (InterruptedException ignore) {
+        }
     }
 
     public static void showAboutWindow(Stage parent, Consumer<String> callBack) {
@@ -113,7 +121,7 @@ public class Dialogs {
             FlowPane fp = new FlowPane();
             Label lbl = new Label(FishingBot.getI18n().t("dialog-about-content"));
             Hyperlink link = new Hyperlink(" faithful.team");
-            fp.getChildren().addAll( lbl, link);
+            fp.getChildren().addAll(lbl, link);
 
             link.setOnAction(event -> {
                 alert.close();
@@ -141,7 +149,7 @@ public class Dialogs {
             FlowPane fp = new FlowPane();
             Label lbl = new Label(FishingBot.getI18n().t("dialog-credentials-invalid-content"));
             Hyperlink link = new Hyperlink(" FishingBot Wiki");
-            fp.getChildren().addAll( lbl, link);
+            fp.getChildren().addAll(lbl, link);
 
             link.setOnAction(event -> {
                 alert.close();

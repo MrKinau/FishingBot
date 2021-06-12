@@ -19,7 +19,7 @@ public class MicrosoftAuthenticator implements IAuthenticator {
         try {
             authService.login();
             FishingBot.getI18n().info("auth-successful");
-            return Optional.of(new AuthData(authService.getAccessToken(), authService.getClientToken(), authService.getSelectedProfile().getIdAsString(), authService.getUsername()));
+            return Optional.of(new AuthData(authService.getAccessToken(), authService.getClientToken(), authService.getSelectedProfile().getIdAsString().replace("-", ""), authService.getUsername()));
         } catch (RequestException e) {
             e.printStackTrace();
         }

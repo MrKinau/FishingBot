@@ -7,8 +7,10 @@ package systems.kinau.fishingbot.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @AllArgsConstructor
+@ToString
 public class AuthData {
 
     @Getter private String accessToken;
