@@ -17,7 +17,7 @@ public class EmptyCommand extends Command {
     public void onCommand(String label, String[] args, CommandExecutor executor) {
         sendMessage(executor, "command-empty");
 
-        if (args.length == 1) {
+        if (args.length >= 1) {
             LocationUtils.Direction direction;
             try {
                 direction = LocationUtils.Direction.valueOf(args[0]);
@@ -29,7 +29,12 @@ public class EmptyCommand extends Command {
             float yawBefore = FishingBot.getInstance().getCurrentBot().getPlayer().getYaw();
             float pitchBefore = FishingBot.getInstance().getCurrentBot().getPlayer().getPitch();
             FishingBot.getInstance().getCurrentBot().getPlayer().look(direction, finished -> {
-                empty();
+                if (args.length == 2) {
+                    int slot = Integer.parseInt(args[1]);
+                    drop((short) slot);
+                } else {
+                    empty();
+                }
                 FishingBot.getInstance().getCurrentBot().getPlayer().look(yawBefore, pitchBefore, 8);
             });
             return;
@@ -40,14 +45,18 @@ public class EmptyCommand extends Command {
 
     private void empty() {
         for (short slotId = 9; slotId <= 44; slotId++) {
-            if (slotId == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
-                continue;
-            if (ItemUtils.isFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId)))
-                continue;
-            FishingBot.getInstance().getCurrentBot().getPlayer().dropStack(slotId, (short) (slotId - 8));
+            drop(slotId);
         }
         if (FishingBot.getInstance().getMainGUI() != null) {
             Platform.runLater(() -> FishingBot.getInstance().getMainGUIController().deleteAllData(null));
         }
+    }
+
+    private void drop(short slotId) {
+        if (slotId == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
+            return;
+        if (ItemUtils.isFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId)))
+            return;
+        FishingBot.getInstance().getCurrentBot().getPlayer().dropStack(slotId, (short) (slotId - 8));
     }
 }

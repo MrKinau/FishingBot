@@ -10,7 +10,9 @@ import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
@@ -239,6 +241,26 @@ public abstract class Packet {
             byte[] nbtData = NBTUtils.readNBT(input);
             return new Slot(true, itemId, itemCount, itemDamage, nbtData);
         }
+    }
+
+    public static MovingObjectPositionBlock readMovingObjectPosition(ByteArrayDataInputWrapper input) {
+        long blockPos = input.readLong();
+        PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.byOrdinal(readVarInt(input));
+        float dx = input.readFloat();
+        float dy = input.readFloat();
+        float dz = input.readFloat();
+        boolean flag = input.readBoolean();
+        return new MovingObjectPositionBlock(blockPos, blockFace, dx, dy, dz, flag);
+    }
+
+    public static void writeMovingObjectPosition(MovingObjectPositionBlock movingObjectPositionBlock, ByteArrayDataOutput output) {
+        output.writeLong(movingObjectPositionBlock.getBlockPos());
+        PacketOutBlockPlace.BlockFace blockFace = movingObjectPositionBlock.getDirection();
+        writeVarInt(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal(), output);
+        output.writeFloat(movingObjectPositionBlock.getDx());
+        output.writeFloat(movingObjectPositionBlock.getDy());
+        output.writeFloat(movingObjectPositionBlock.getDz());
+        output.writeBoolean(movingObjectPositionBlock.isFlag());
     }
 
 }

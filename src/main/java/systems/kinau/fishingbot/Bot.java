@@ -294,6 +294,7 @@ public class Bot {
         getCommandRegistry().registerCommand(new LookCommand());
         getCommandRegistry().registerCommand(new SummaryCommand());
         getCommandRegistry().registerCommand(new RightClickCommand());
+        getCommandRegistry().registerCommand(new SwapCommand());
     }
 
     private void connect() {

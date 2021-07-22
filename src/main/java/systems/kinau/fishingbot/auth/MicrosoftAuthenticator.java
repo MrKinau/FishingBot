@@ -1,5 +1,6 @@
 package systems.kinau.fishingbot.auth;
 
+import com.github.steveice10.mc.auth.data.GameProfile;
 import com.github.steveice10.mc.auth.exception.request.RequestException;
 import com.github.steveice10.mc.auth.service.MsaAuthenticationService;
 import systems.kinau.fishingbot.FishingBot;
@@ -19,7 +20,8 @@ public class MicrosoftAuthenticator implements IAuthenticator {
         try {
             authService.login();
             FishingBot.getI18n().info("auth-successful");
-            return Optional.of(new AuthData(authService.getAccessToken(), authService.getClientToken(), authService.getSelectedProfile().getIdAsString().replace("-", ""), authService.getUsername()));
+            GameProfile profile = authService.getSelectedProfile();
+            return Optional.of(new AuthData(authService.getAccessToken(), authService.getClientToken(), profile == null ? null : profile.getIdAsString().replace("-", ""), authService.getUsername()));
         } catch (RequestException e) {
             e.printStackTrace();
         }

@@ -30,42 +30,19 @@ public class PacketOutUseItem extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        switch (protocolId) {
-            case ProtocolConstants.MINECRAFT_1_8: {
-                out.writeLong(LocationUtils.toBlockPos(x, y, z));
-                out.writeByte(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal());
-                Packet.writeSlot(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem(), out);
-                out.writeByte(cursorX);
-                out.writeByte(cursorY);
-                out.writeByte(cursorZ);
-                new Thread(() -> {
-                    try { Thread.sleep(100); } catch (InterruptedException ignore) { }
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutArmAnimation());
-                }).start();
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_13_2:
-            case ProtocolConstants.MINECRAFT_1_13_1:
-            case ProtocolConstants.MINECRAFT_1_13:
-            case ProtocolConstants.MINECRAFT_1_12_2:
-            case ProtocolConstants.MINECRAFT_1_12_1:
-            case ProtocolConstants.MINECRAFT_1_12:
-            case ProtocolConstants.MINECRAFT_1_11_1:
-            case ProtocolConstants.MINECRAFT_1_11:
-            case ProtocolConstants.MINECRAFT_1_10:
-            case ProtocolConstants.MINECRAFT_1_9_4:
-            case ProtocolConstants.MINECRAFT_1_9_2:
-            case ProtocolConstants.MINECRAFT_1_9_1:
-            case ProtocolConstants.MINECRAFT_1_9:
-            case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1:
-            case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4:
-            default: {
-                out.writeByte(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal());       //main hand
-                break;
-            }
+        if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
+            out.writeLong(LocationUtils.toBlockPos(x, y, z));
+            out.writeByte(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal());
+            Packet.writeSlot(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem(), out);
+            out.writeByte(cursorX);
+            out.writeByte(cursorY);
+            out.writeByte(cursorZ);
+            new Thread(() -> {
+                try { Thread.sleep(100); } catch (InterruptedException ignore) { }
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutArmAnimation());
+            }).start();
+        } else {
+            out.writeByte(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal());
         }
     }
 

@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 public class PacketInSetSlot extends Packet {
@@ -26,6 +27,9 @@ public class PacketInSetSlot extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.windowId = in.readByte();
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_17_1) {
+            readVarInt(in); // revision
+        }
         this.slotId = in.readShort();
         this.slot = readSlot(in);
 

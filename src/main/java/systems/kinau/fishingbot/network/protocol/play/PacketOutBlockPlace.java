@@ -4,12 +4,14 @@ import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
+//TODO: This actually is the UseItemPacket in newer versions
 @AllArgsConstructor
 public class PacketOutBlockPlace extends Packet {
 
@@ -27,12 +29,8 @@ public class PacketOutBlockPlace extends Packet {
     public void write(ByteArrayDataOutput out, int protocolId) {
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_14) {
             writeVarInt(hand.ordinal(), out);
-            out.writeLong(LocationUtils.toBlockPos(x, y, z));
-            writeVarInt(blockFace.ordinal(), out);
-            out.writeFloat(cursorX);
-            out.writeFloat(cursorY);
-            out.writeFloat(cursorZ);
-            out.writeBoolean(insideBlock);
+            MovingObjectPositionBlock movObjPos = new MovingObjectPositionBlock(LocationUtils.toBlockPos(x, y, z), blockFace, cursorX, cursorY, cursorZ, insideBlock);
+            writeMovingObjectPosition(movObjPos, out);
         } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9) {
             out.writeLong(LocationUtils.toBlockPos(x, y, z));
             writeVarInt(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal(), out);
@@ -62,7 +60,13 @@ public class PacketOutBlockPlace extends Packet {
         SOUTH,
         WEST,
         EAST,
-        UNSET
+        UNSET;
+
+        public static BlockFace byOrdinal(int ordinal) {
+            if (ordinal == 255)
+                return UNSET;
+            return BlockFace.values()[ordinal];
+        }
     }
 
 }

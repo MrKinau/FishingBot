@@ -503,7 +503,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_4).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_16_3));
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_4).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_16_3));
 
-        //Minecraft 1.17-pre5
+        //Minecraft 1.17
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_17).registerPacket(0x00, PacketInSpawnObject.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_17).registerPacket(0x0E, PacketInDifficultySet.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_17).registerPacket(0x0F, PacketInChat.class);
@@ -535,6 +535,11 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_17).registerPacket(0x25, PacketOutHeldItemChange.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_17).registerPacket(0x2E, PacketOutBlockPlace.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_17).registerPacket(0x2F, PacketOutUseItem.class);
+
+        //Minecraft 1.17.1
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_17_1).copyOf(getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_17));
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_17_1).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_17));
+
 
         //Register protocol of latest for unknown versions
         if (!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getCurrentBot().getServerProtocol())) {

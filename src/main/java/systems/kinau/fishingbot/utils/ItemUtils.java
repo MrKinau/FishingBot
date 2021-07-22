@@ -112,9 +112,9 @@ public class ItemUtils {
 
     public static int getFishingRodValue(Slot slot) {
         if (!isFishingRod(slot))
-            return -1;
+            return -100;
         if (FishingBot.getInstance().getCurrentBot().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(slot) >= 63)
-            return -1;
+            return -100;
         List<Enchantment> enchantments = getEnchantments(slot);
         short luckOfTheSeaLevel = enchantments.stream()
                 .filter(enchantment -> enchantment.getEnchantmentType() == EnchantmentType.LUCK_OF_THE_SEA)
@@ -136,7 +136,7 @@ public class ItemUtils {
 
     public static int getBestFishingRod(Inventory inventory) {
         AtomicInteger currentBestSlotId = new AtomicInteger(-1);
-        AtomicInteger currentBestValue = new AtomicInteger(-1);
+        AtomicInteger currentBestValue = new AtomicInteger(-100);
         if (inventory == null)
             return -1;
         inventory.getContent().forEach((slotId, slot) -> {

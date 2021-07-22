@@ -7,6 +7,7 @@ import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.play.UpdateWindowItemsEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -26,8 +27,11 @@ public class PacketInWindowItems extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.windowId = in.readUnsignedByte();
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_17_1) {
+            readVarInt(in); // revision (whatever it is?) or arbitrary state id?
+        }
         this.slots = new ArrayList<>();
-        short count = in.readShort();
+        int count = readVarInt(in);
         for (int i = 0; i < count; i++) {
             this.slots.add(readSlot(in));
         }

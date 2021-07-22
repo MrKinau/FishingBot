@@ -227,6 +227,8 @@ public class Player implements Listener {
     }
 
     public void dropStack(short slot, short actionNumber) {
+        Map<Short, Slot> remainingSlots = new HashMap<>();
+        remainingSlots.put(slot, Slot.EMPTY);
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
                 new PacketOutClickWindow(
                         /* player inventory */ 0,
@@ -234,7 +236,8 @@ public class Player implements Listener {
                         /* drop entire stack */ (byte) 1,
                         /* action count starting at 1 */ actionNumber,
                         /* drop entire stack */ 4,
-                        /* empty slot */ Slot.EMPTY
+                        /* empty slot */ Slot.EMPTY,
+                        remainingSlots
                 )
         );
 
@@ -242,6 +245,9 @@ public class Player implements Listener {
     }
 
     public void swapToHotBar(int slotId, int hotBarButton) {
+        // This is not notchian behaviour, but it works
+        Map<Short, Slot> remainingSlots = new HashMap<>();
+        remainingSlots.put((short) slotId, Slot.EMPTY);
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
                 new PacketOutClickWindow(
                         /* player inventory */ 0,
@@ -249,18 +255,24 @@ public class Player implements Listener {
                         /* use hotBar Button */ (byte) hotBarButton,
                         /* action count starting at 1 */ (short) 1,
                         /* hotBar button mode */ 2,
-                        /* slot */ getInventory().getContent().get(slotId)
+                        /* slot */ getInventory().getContent().get(slotId),
+                        remainingSlots
                 )
         );
         try { Thread.sleep(20); } catch (InterruptedException ignore) { }
         closeInventory();
 
-        Slot slot = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId);
-        FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(hotBarButton + 36));
-        FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_17) {
+            Slot slot = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId);
+            FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(hotBarButton + 36));
+            FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
+        }
     }
 
     public void shiftToInventory(int slotId, Inventory inventory) {
+        // This is not notchian behaviour, but it works
+        Map<Short, Slot> remainingSlots = new HashMap<>();
+        remainingSlots.put((short) slotId, Slot.EMPTY);
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
                 new PacketOutClickWindow(
                         /* player inventory */ inventory.getWindowId(),
@@ -268,13 +280,13 @@ public class Player implements Listener {
                         /* use right click */ (byte) 0,
                         /* action count starting at 1 */ inventory.getActionCounter(),
                         /* shift click mode */ 1,
-                        /* slot */ getInventory().getContent().get(slotId)
+                        /* slot */ getInventory().getContent().get(slotId),
+                        remainingSlots
                 )
         );
         try { Thread.sleep(20); } catch (InterruptedException ignore) { }
 
         FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, Slot.EMPTY);
-
     }
 
     public boolean look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {

@@ -148,7 +148,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     public void addPossibleMotion(int eid, int motX, int motY, int motZ) {
         getPossibleCaughtItems().forEach(item -> {
-            if(item.getEid() == eid) {
+            if (item.getEid() == eid) {
                 item.setMotX(motX);
                 item.setMotY(motY);
                 item.setMotZ(motZ);
@@ -157,13 +157,13 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     private void getCaughtItem() {
-        if(getPossibleCaughtItems().size() < 1)
+        if (getPossibleCaughtItems().size() < 1)
             return;
         Item currentMax = getPossibleCaughtItems().get(0);
         int currentMaxMot = getMaxMot(currentMax);
         for (Item possibleCaughtItem : getPossibleCaughtItems()) {
             int mot = getMaxMot(possibleCaughtItem);
-            if(mot > currentMaxMot) {
+            if (mot > currentMaxMot) {
                 currentMax = possibleCaughtItem;
                 currentMaxMot = mot;
             }
@@ -252,19 +252,15 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
-    //TODO: Currently crashing the client in 1.17
     public boolean swapWithBestFishingRod() {
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_17) {
-            int bestSlot = ItemUtils.getBestFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getInventory());
-            if (bestSlot < 0)
-                return false;
-            if (bestSlot == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
-                return false;
-            int newSlot = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() - 36;
-            FishingBot.getInstance().getCurrentBot().getPlayer().swapToHotBar(bestSlot, newSlot);
-            return true;
-        }
-        return false;
+        int bestSlot = ItemUtils.getBestFishingRod(FishingBot.getInstance().getCurrentBot().getPlayer().getInventory());
+        if (bestSlot < 0)
+            return false;
+        if (bestSlot == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
+            return false;
+        int newSlot = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() - 36;
+        FishingBot.getInstance().getCurrentBot().getPlayer().swapToHotBar(bestSlot, newSlot);
+        return true;
     }
 
     public void finishedLooking() {
@@ -372,8 +368,9 @@ public class FishingModule extends Module implements Runnable, Listener {
         new Thread(() -> {
             try { Thread.sleep(100); } catch (InterruptedException ignore) { }
             // check current fishing rod value and swap if a better one is in inventory
-            if (ItemUtils.isFishingRod(slot))
+            if (ItemUtils.isFishingRod(slot)) {
                 swapWithBestFishingRod();
+            }
 
             if (isPaused())
                 return;
@@ -404,7 +401,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @EventHandler
     public void onSpawnObject(SpawnObjectEvent event) {
-        if(!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextBobberId())
+        if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextBobberId())
             return;
 
         if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != -1 && event.getObjectData() != FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())

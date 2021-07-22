@@ -11,6 +11,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
+import java.util.Map;
 
 @AllArgsConstructor
 public class PacketOutClickWindow extends Packet {
@@ -21,6 +22,7 @@ public class PacketOutClickWindow extends Packet {
     @Getter private short actionNumber;
     @Getter private int mode;
     @Getter private Slot item;
+    @Getter private Map<Short, Slot> remaining;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
@@ -33,11 +35,16 @@ public class PacketOutClickWindow extends Packet {
             writeSlot(item, out);
         } else {
             out.writeByte(windowId);
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_17_1)
+                writeVarInt(0, out); // revision
             out.writeShort(slot);
             out.writeByte(button);
             writeVarInt(mode, out);
-            //TODO: Not sure how to correctly handle this
-            writeVarInt(0, out); // affected items size
+            writeVarInt(remaining.size(), out);
+            for (Map.Entry<Short, Slot> remainingSlot : remaining.entrySet()) {
+                out.writeShort(remainingSlot.getKey());
+                writeSlot(remainingSlot.getValue(), out);
+            }
             writeSlot(item, out);
         }
     }
