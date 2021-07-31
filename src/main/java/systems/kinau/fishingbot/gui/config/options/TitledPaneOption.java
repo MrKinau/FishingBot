@@ -36,4 +36,11 @@ public class TitledPaneOption extends ConfigOption {
                 .findAny();
     }
 
+    @Override
+    public void updateValue() {
+        getContent().getChildren().stream()
+                .filter(node -> node instanceof ConfigOption)
+                .map(node -> (ConfigOption)node)
+                .forEach(ConfigOption::updateValue);
+    }
 }
