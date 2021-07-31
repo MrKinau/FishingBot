@@ -8,7 +8,8 @@ Minecraft 1.8 - 1.17.1 AFK Fishing bot
 
 ![img](https://screens.kinau.systems/928b8dda-e300-4dc4-b04b-d1798ca833d6.png)
 ## Download
-A list with all past releases can be found [here](https://github.com/MrKinau/FishingBot/releases)
+A list with all past releases can be found [here](https://github.com/MrKinau/FishingBot/releases).
+There's also a Docker image [available](docker).
 
 ## How to use
 Visit the Wiki to see detailed instructions ([here](https://github.com/MrKinau/FishingBot/wiki#how-do-i-use-the-bot)).
