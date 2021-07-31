@@ -69,3 +69,7 @@ run*/
 logs/
 config.json
 account.json
+
+# Docker Compose
+.env
+docker-compose.override.yml

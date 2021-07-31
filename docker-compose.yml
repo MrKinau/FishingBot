@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  fishing_bot:
+    build: .
+    environment:
+      # These values are only recognized when no config file exists / is persisted!
+      MC_MAIL: your@email.com
+      MC_PASSWORD: your_secret_password
+      MC_AUTH_SERVICE: MOJANG # Or MICROSOFT
+      # These are the default values.
+      # MC_SERVER: 127.0.0.1
+      # MC_PORT: 25565
+      # MC_PROTOCOL: AUTOMATIC
+      # MC_SPOOF_FORGE: "false"
+      # MC_ONLINE_MODE: "true"
+    volumes:
+      # to persist and edit the config file, uncomment the line below
+      # - ./config.json:/etc/fishingbot.json
+      - logs:/var/log/fishingbot/
+volumes:
+  logs:
