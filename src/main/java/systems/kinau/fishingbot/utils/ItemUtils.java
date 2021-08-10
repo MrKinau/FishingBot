@@ -65,7 +65,7 @@ public class ItemUtils {
                 List<CompoundTag> enchants = (List<CompoundTag>) root.get(key).getValue();
                 for (CompoundTag enchant : enchants) {
                     Optional<EnchantmentType> enchType;
-                    short level = (Short) enchant.getValue().get("lvl").getValue();
+                    short level = ((Number) enchant.getValue().get("lvl").getValue()).shortValue();
                     if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
                         String id = (String) enchant.getValue().get("id").getValue();
                         enchType = EnchantmentType.getFromName(id);
@@ -74,7 +74,7 @@ public class ItemUtils {
                             enchType.get().setFutureName(id);
                         }
                     } else {
-                        short id = (Short) enchant.getValue().get("id").getValue();
+                        short id = ((Number) enchant.getValue().get("id").getValue()).shortValue();
                         enchType = EnchantmentType.getFromId(Short.valueOf(id).intValue());
                         if (!enchType.isPresent()) {
                             enchType = Optional.of(EnchantmentType.FUTURE);
