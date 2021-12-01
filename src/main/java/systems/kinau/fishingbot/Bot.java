@@ -260,9 +260,11 @@ public class Bot {
         return (DiscordModule) getModuleManager().getLoadedModule(DiscordModule.class).orElse(null);
     }
 
-    public void start() {
+    public void start(CommandLine cmdLine) {
         if (isRunning() || isPreventStartup()) {
             FishingBot.getInstance().setCurrentBot(null);
+            if (cmdLine.hasOption("nogui"))
+                return;
             FishingBot.getInstance().getMainGUIController().updateStartStop();
             FishingBot.getInstance().getMainGUIController().enableStartStop();
             return;

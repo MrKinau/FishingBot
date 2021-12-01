@@ -79,7 +79,7 @@ public class FishingBot {
         Thread.currentThread().setName("mainThread");
         Bot bot = new Bot(cmdLine);
         bot.getEventManager().callEvent(new BotStartEvent());
-        bot.start();
+        bot.start(cmdLine);
     }
 
     public void stopBot(boolean preventReconnect) {
