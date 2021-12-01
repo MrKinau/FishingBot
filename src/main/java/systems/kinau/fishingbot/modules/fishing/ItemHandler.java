@@ -26,6 +26,8 @@ public class ItemHandler {
     public static Map<Integer, String> itemsMap_1_15 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_16 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_16_2 = new HashMap<>();
+    public static Map<Integer, String> itemsMap_1_17 = new HashMap<>();
+    public static Map<Integer, String> itemsMap_1_18 = new HashMap<>();
 
     public ItemHandler(int protocolId) {
         JSONObject root = null;
@@ -66,20 +68,27 @@ public class ItemHandler {
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_17:
-                default:
+                case ProtocolConstants.MINECRAFT_1_17_1: {
                     root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_17.json")));
-
                     break;
+                }
+                case ProtocolConstants.MINECRAFT_1_18:
+                default: {
+                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_18.json")));
+                    break;
+                }
+
             }
-        } catch (ParseException | IOException ignore) {}
+        } catch (ParseException | IOException ignore) {
+        }
 
         if (root == null)
             return;
         if (protocolId >= ProtocolConstants.MINECRAFT_1_14)
-            root = (JSONObject) ((JSONObject)root.get("minecraft:item")).get("entries");
+            root = (JSONObject) ((JSONObject) root.get("minecraft:item")).get("entries");
 
         root.forEach((key, value) -> {
-            getItemsMap(protocolId).put(((Long) ((JSONObject)value).get("protocol_id")).intValue(), (String)key);
+            getItemsMap(protocolId).put(((Long) ((JSONObject) value).get("protocol_id")).intValue(), (String) key);
         });
     }
 
@@ -101,15 +110,19 @@ public class ItemHandler {
             return itemsMap;
         } else if (protocol == ProtocolConstants.MINECRAFT_1_13)
             return itemsMap_1_13;
-        else if(protocol >= ProtocolConstants.MINECRAFT_1_13_1 && protocol <= ProtocolConstants.MINECRAFT_1_13_2)
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_13_1 && protocol <= ProtocolConstants.MINECRAFT_1_13_2)
             return itemsMap_1_13_1;
-        else if(protocol >= ProtocolConstants.MINECRAFT_1_14 && protocol <= ProtocolConstants.MINECRAFT_1_14_4)
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_14 && protocol <= ProtocolConstants.MINECRAFT_1_14_4)
             return itemsMap_1_14;
-        else if(protocol >= ProtocolConstants.MINECRAFT_1_15 && protocol <= ProtocolConstants.MINECRAFT_1_15_2)
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_15 && protocol <= ProtocolConstants.MINECRAFT_1_15_2)
             return itemsMap_1_15;
-        else if(protocol >= ProtocolConstants.MINECRAFT_1_16 && protocol <= ProtocolConstants.MINECRAFT_1_16_1)
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_16 && protocol <= ProtocolConstants.MINECRAFT_1_16_1)
             return itemsMap_1_16;
-        else
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_16_3 && protocol <= ProtocolConstants.MINECRAFT_1_16_4)
             return itemsMap_1_16_2;
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_17 && protocol <= ProtocolConstants.MINECRAFT_1_17_1)
+            return itemsMap_1_17;
+        else
+            return itemsMap_1_18;
     }
 }

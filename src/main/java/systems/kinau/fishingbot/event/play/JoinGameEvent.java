@@ -21,6 +21,7 @@ public class JoinGameEvent extends Event {
     @Getter private int difficulty;
     @Getter private int maxPlayers;
     @Getter private int viewDistance;
+    @Getter private int simulationDistance;
     @Getter private String levelType;
     @Getter private boolean reducedDebugInfo;
     @Getter private boolean enableRespawnScreen;

@@ -17,21 +17,38 @@ import systems.kinau.fishingbot.utils.NBTUtils;
 
 public class PacketInJoinGame extends Packet {
 
-    @Getter private int eid;
-    @Getter private int gamemode;
-    @Getter private String[] worldIdentifier;
-    @Getter private String dimension;
-    @Getter private String spawnWorld;
-    @Getter private long hashedSeed;
-    @Getter private int difficulty;
-    @Getter private int maxPlayers;
-    @Getter private int viewDistance;
-    @Getter private String levelType;
-    @Getter private boolean reducedDebugInfo;
-    @Getter private boolean enableRespawnScreen;
-    @Getter private boolean debug;
-    @Getter private boolean flat;
-    @Getter private boolean hardcore;
+    @Getter
+    private int eid;
+    @Getter
+    private int gamemode;
+    @Getter
+    private String[] worldIdentifier;
+    @Getter
+    private String dimension;
+    @Getter
+    private String spawnWorld;
+    @Getter
+    private long hashedSeed;
+    @Getter
+    private int difficulty;
+    @Getter
+    private int maxPlayers;
+    @Getter
+    private int viewDistance;
+    @Getter
+    private int simulationDistance;
+    @Getter
+    private String levelType;
+    @Getter
+    private boolean reducedDebugInfo;
+    @Getter
+    private boolean enableRespawnScreen;
+    @Getter
+    private boolean debug;
+    @Getter
+    private boolean flat;
+    @Getter
+    private boolean hardcore;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -77,7 +94,7 @@ public class PacketInJoinGame extends Packet {
             case ProtocolConstants.MINECRAFT_1_14_1:
             case ProtocolConstants.MINECRAFT_1_14_2:
             case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4:{
+            case ProtocolConstants.MINECRAFT_1_14_4: {
                 eid = in.readInt();                         // entity ID
                 gamemode = in.readUnsignedByte();           // gamemode
                 dimension = String.valueOf(in.readInt());   // dimension
@@ -126,7 +143,7 @@ public class PacketInJoinGame extends Packet {
             case ProtocolConstants.MINECRAFT_1_16_3:
             case ProtocolConstants.MINECRAFT_1_16_4:
             case ProtocolConstants.MINECRAFT_1_17:
-            default: {
+            case ProtocolConstants.MINECRAFT_1_17_1: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
                 gamemode = in.readUnsignedByte();           // current gamemode
@@ -147,11 +164,34 @@ public class PacketInJoinGame extends Packet {
                 flat = in.readBoolean();                    // flat world
                 break;
             }
+            case ProtocolConstants.MINECRAFT_1_18:
+            default: {
+                eid = in.readInt();                         // entity ID
+                hardcore = in.readBoolean();                // is hardcore
+                gamemode = in.readUnsignedByte();           // current gamemode
+                in.readUnsignedByte();                      // previous gamemode
+                int worldCount = readVarInt(in);            // count of worlds
+                worldIdentifier = new String[worldCount];   // identifier for all worlds
+                for (int i = 0; i < worldCount; i++)
+                    worldIdentifier[i] = readString(in);
+                NBTUtils.readNBT(in);                       // dimension codec (don't use, just skip it)
+                NBTUtils.readNBT(in);                       // spawn dimension
+                spawnWorld = readString(in);                // spawn world name
+                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+                maxPlayers = in.readUnsignedByte();         // maxPlayer
+                viewDistance = readVarInt(in);              // view distance
+                simulationDistance = readVarInt(in);        // simulation distance
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
+                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+                debug = in.readBoolean();                   // debug world
+                flat = in.readBoolean();                    // flat world
+                break;
+            }
         }
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(
                 new JoinGameEvent(eid, gamemode, worldIdentifier, dimension, spawnWorld,
-                        hashedSeed, difficulty, maxPlayers, viewDistance, levelType,
+                        hashedSeed, difficulty, maxPlayers, viewDistance, simulationDistance, levelType,
                         reducedDebugInfo, enableRespawnScreen, debug, flat));
     }
 }
