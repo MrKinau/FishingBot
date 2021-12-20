@@ -141,6 +141,9 @@ public class EjectionModule extends Module {
             player.closeInventory(window);
         }
 
+        if (chestEjectFunctions == null)
+            return;
+
         chestEjectFunctions.removeAll(fittingFunctions);
         if (!chestEjectFunctions.isEmpty())
             internalFillAdjacentChest(chestEjectFunctions.get(0));
