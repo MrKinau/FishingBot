@@ -9,6 +9,8 @@ import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.custom.PacketReceiveEvent;
+import systems.kinau.fishingbot.event.custom.PacketSendEvent;
 import systems.kinau.fishingbot.event.login.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.State;
@@ -29,13 +31,14 @@ public class LoginModule extends Module implements Listener {
 
     @Getter private String userName;
 
-    public LoginModule(String userName) {
-        this.userName = userName;
+    public LoginModule() {
+        this.userName = FishingBot.getInstance().getCurrentBot().getAuthData().getUsername();
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
     }
 
     @Override
     public void onEnable() {
+        if (FishingBot.getInstance().getCurrentBot().isProxyMode()) return;
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginStart(getUserName()));
     }
 
@@ -72,6 +75,31 @@ public class LoginModule extends Module implements Listener {
     }
 
     @EventHandler
+    public void onProxyReceivePackets(PacketReceiveEvent e) {
+        NetworkHandler networkHandler = FishingBot.getInstance().getCurrentBot().getNet();
+        if (e.getReceiver() != NetworkHandler.Participant.PROXY_CLIENT) return;
+        if (networkHandler.getState() == State.LOGIN) {
+            // Do not send Encryption Request to client
+            if (e.getRawPacket().getPacketId() == 0x01) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onProxySendPackets(PacketSendEvent e) {
+        NetworkHandler networkHandler = FishingBot.getInstance().getCurrentBot().getNet();
+        if (e.getSender() != NetworkHandler.Participant.PROXY_CLIENT) return;
+        if (networkHandler.getState() == State.LOGIN) {
+            // Send Login start with different user name
+            if (e.getRawPacket().getPacketId() == 0x00) {
+                e.setCancelled(true);
+                networkHandler.sendPacket(new PacketOutLoginStart(getUserName()));
+            }
+        }
+    }
+
+    @EventHandler
     public void onLoginDisconnect(LoginDisconnectEvent event) {
         FishingBot.getI18n().severe("module-login-failed", event.getErrorMessage());
         FishingBot.getInstance().getCurrentBot().setRunning(false);
@@ -85,6 +113,7 @@ public class LoginModule extends Module implements Listener {
 
     @EventHandler
     public void onLoginPluginRequest(LoginPluginRequestEvent event) {
+        if (FishingBot.getInstance().getCurrentBot().isProxyMode()) return;
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginPluginResponse(event.getMsgId(), false, null));
     }
 

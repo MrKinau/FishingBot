@@ -5,158 +5,171 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.kinau.fishingbot.gui.GUIController">
-  <MenuBar BorderPane.alignment="CENTER">
-    <menus>
-      <Menu mnemonicParsing="false" text="%ui-menu-file">
-        <items>
-          <MenuItem mnemonicParsing="false" onAction="#openConfigGUI" text="%ui-menu-file-settings" />
-          <MenuItem mnemonicParsing="false" onAction="#exit" text="%ui-menu-file-close" />
-        </items>
-      </Menu>
-      <Menu mnemonicParsing="false" text="%ui-menu-edit">
-        <items>
-          <MenuItem mnemonicParsing="false" onAction="#deleteAllData" text="%ui-menu-edit-delete" />
-          <MenuItem mnemonicParsing="false" onAction="#openConfig" text="%ui-menu-edit-open-config" />
-          <MenuItem mnemonicParsing="false" onAction="#openLog" text="%ui-menu-edit-open-log" />
-          <MenuItem mnemonicParsing="false" onAction="#openLogsDir" text="%ui-menu-edit-open-logdir" />
-        </items>
-      </Menu>
-      <Menu mnemonicParsing="false" text="%ui-menu-help">
-        <items>
-          <MenuItem mnemonicParsing="false" onAction="#github" text="%ui-menu-help-github" />
-          <MenuItem mnemonicParsing="false" onAction="#issues" text="%ui-menu-help-issues" />
-          <MenuItem mnemonicParsing="false" onAction="#discord" text="%ui-menu-help-discord" />
-          <MenuItem mnemonicParsing="false" onAction="#openAbout" text="%ui-menu-help-about" />
-        </items>
-      </Menu>
-    </menus>
-  </MenuBar>
-  <SplitPane dividerPositions="0.6" orientation="VERTICAL">
-    <TabPane minHeight="32.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-      <tabs>
-        <Tab fx:id="controlTab" text="%ui-tabs-controlpanel">
-          <content>
-            <BorderPane>
-                     <center>
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-                           <children>
-                             <Button fx:id="startStopButton" mnemonicParsing="false" onAction="#startStop" text="%ui-button-start">
-                               <font>
-                                 <Font size="24.0" />
-                               </font>
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </VBox.margin>
-                             </Button>
-                             <Button fx:id="configButton" mnemonicParsing="false" onAction="#openConfigGUI" text="%ui-menu-file-settings">
-                               <font>
-                                 <Font size="24.0" />
-                               </font>
-                               <VBox.margin>
-                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                               </VBox.margin>
-                             </Button>
-                             <Button fx:id="playPauseButton" disable="true" mnemonicParsing="false" onAction="#playPause" text="%ui-button-pause">
-                               <font>
-                                 <Font size="24.0" />
-                               </font>
-                               <VBox.margin>
-                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                               </VBox.margin>
-                             </Button>
-                           </children>
-                        </VBox>
-                     </center>
-                      <right>
-                        <VBox alignment="CENTER">
-                          <Label fx:id="usernamePreview" />
-                           <ImageView fx:id="skinPreview" fitHeight="0.0" fitWidth="0.0" pickOnBounds="true" preserveRatio="true" visible="false" />
-                           <BorderPane.margin>
-                              <Insets right="20.0" />
-                           </BorderPane.margin>
-                        </VBox>
-                      </right>
-            </BorderPane>
-          </content>
-        </Tab>
-        <Tab fx:id="lootTab" text="%ui-tabs-loot">
-          <content>
-            <TableView fx:id="lootTable" prefWidth="600.0">
-              <columns>
-                <TableColumn fx:id="lootItemColumn" prefWidth="530.0" text="%ui-tabs-loot-item" />
-                <TableColumn fx:id="lootCountColumn" prefWidth="60.0" text="%ui-tabs-loot-count" />
-              </columns>
-              <opaqueInsets>
-                <Insets />
-              </opaqueInsets>
-            </TableView>
-          </content>
-        </Tab>
-        <Tab text="%ui-tabs-enchantments">
-          <content>
-            <Accordion fx:id="enchantmentsAccordion">
-              <panes>
-                <TitledPane fx:id="booksPane" text="%ui-tabs-enchantments-books">
-                  <content>
-                    <TableView fx:id="booksTable">
-                      <columns>
-                        <TableColumn editable="false" prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
-                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
-                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
-                      </columns>
-                      <VBox.margin>
-                        <Insets bottom="10.0" />
-                      </VBox.margin>
-                    </TableView>
-                  </content>
-                </TitledPane>
-                <TitledPane text="%ui-tabs-enchantments-rods">
-                  <content>
-                    <TableView fx:id="rodsTable">
-                      <columns>
-                        <TableColumn prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
-                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
-                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
-                      </columns>
-                      <VBox.margin>
-                        <Insets bottom="10.0" />
-                      </VBox.margin>
-                    </TableView>
-                  </content>
-                </TitledPane>
-                <TitledPane text="%ui-tabs-enchantments-bows">
-                  <content>
-                    <TableView fx:id="bowsTable">
-                      <columns>
-                        <TableColumn prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
-                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
-                        <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
-                      </columns>
-                      <VBox.margin>
-                        <Insets bottom="10.0" />
-                      </VBox.margin>
-                    </TableView>
-                  </content>
-                </TitledPane>
-              </panes>
-            </Accordion>
-          </content>
-        </Tab>
-      </tabs>
-    </TabPane>
-    <VBox>
-      <TextArea fx:id="consoleTextArea" editable="false" maxHeight="Infinity" prefHeight="10000">
-        <VBox.margin>
-          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-        </VBox.margin>
-      </TextArea>
-      <AnchorPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" VBox.vgrow="NEVER">
-        <children>
-          <TextField fx:id="commandlineTextField" onAction="#commandlineSend" onKeyPressed="#consoleKeyPressed" prefHeight="25.0" prefWidth="540.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="53.0" AnchorPane.topAnchor="5.0" />
-          <Button layoutX="548.0" mnemonicParsing="false" onAction="#commandlineSend" text="%ui-console-send" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
-        </children>
-      </AnchorPane>
-    </VBox>
-  </SplitPane>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.kinau.fishingbot.gui.GUIController">
+    <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+            <Menu mnemonicParsing="false" text="%ui-menu-file">
+                <items>
+                    <MenuItem mnemonicParsing="false" onAction="#openConfigGUI" text="%ui-menu-file-settings" />
+                    <MenuItem mnemonicParsing="false" onAction="#exit" text="%ui-menu-file-close" />
+                </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="%ui-menu-edit">
+                <items>
+                    <MenuItem mnemonicParsing="false" onAction="#deleteAllData" text="%ui-menu-edit-delete" />
+                    <MenuItem mnemonicParsing="false" onAction="#openConfig" text="%ui-menu-edit-open-config" />
+                    <MenuItem mnemonicParsing="false" onAction="#openLog" text="%ui-menu-edit-open-log" />
+                    <MenuItem mnemonicParsing="false" onAction="#openLogsDir" text="%ui-menu-edit-open-logdir" />
+                </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="%ui-menu-help">
+                <items>
+                    <MenuItem mnemonicParsing="false" onAction="#github" text="%ui-menu-help-github" />
+                    <MenuItem mnemonicParsing="false" onAction="#issues" text="%ui-menu-help-issues" />
+                    <MenuItem mnemonicParsing="false" onAction="#discord" text="%ui-menu-help-discord" />
+                    <MenuItem mnemonicParsing="false" onAction="#openAbout" text="%ui-menu-help-about" />
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
+    <SplitPane dividerPositions="0.6" orientation="VERTICAL">
+        <TabPane minHeight="32.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab fx:id="controlTab" text="%ui-tabs-controlpanel">
+                    <content>
+                        <BorderPane>
+                            <center>
+                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                                    <children>
+                                        <HBox alignment="TOP_CENTER">
+                                            <VBox.margin>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </VBox.margin>
+                                            <Button fx:id="startStopButton" mnemonicParsing="false" onAction="#startStop" text="%ui-button-start">
+                                                <font>
+                                                    <Font size="24.0" />
+                                                </font>
+                                                <HBox.margin>
+                                                    <Insets right="10.0" />
+                                                </HBox.margin>
+                                            </Button>
+                                            <Button fx:id="startStopProxyButton" mnemonicParsing="false" onAction="#startStop" text="%ui-button-start-proxy">
+                                                <font>
+                                                    <Font size="24.0" />
+                                                </font>
+                                                <HBox.margin>
+                                                    <Insets left="10.0" />
+                                                </HBox.margin>
+                                            </Button>
+                                        </HBox>
+                                        <Button fx:id="configButton" mnemonicParsing="false" onAction="#openConfigGUI" text="%ui-menu-file-settings">
+                                            <font>
+                                                <Font size="24.0" />
+                                            </font>
+                                            <VBox.margin>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </VBox.margin>
+                                        </Button>
+                                        <Button fx:id="playPauseButton" disable="true" mnemonicParsing="false" onAction="#playPause" text="%ui-button-pause">
+                                            <font>
+                                                <Font size="24.0" />
+                                            </font>
+                                            <VBox.margin>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </VBox.margin>
+                                        </Button>
+                                    </children>
+                                </VBox>
+                            </center>
+                            <right>
+                                <VBox alignment="CENTER">
+                                    <Label fx:id="usernamePreview" />
+                                    <ImageView fx:id="skinPreview" fitHeight="0.0" fitWidth="0.0" pickOnBounds="true" preserveRatio="true" visible="false" />
+                                    <BorderPane.margin>
+                                        <Insets right="20.0" />
+                                    </BorderPane.margin>
+                                </VBox>
+                            </right>
+                        </BorderPane>
+                    </content>
+                </Tab>
+                <Tab fx:id="lootTab" text="%ui-tabs-loot">
+                    <content>
+                        <TableView fx:id="lootTable" prefWidth="600.0">
+                            <columns>
+                                <TableColumn fx:id="lootItemColumn" prefWidth="530.0" text="%ui-tabs-loot-item" />
+                                <TableColumn fx:id="lootCountColumn" prefWidth="60.0" text="%ui-tabs-loot-count" />
+                            </columns>
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                        </TableView>
+                    </content>
+                </Tab>
+                <Tab text="%ui-tabs-enchantments">
+                    <content>
+                        <Accordion fx:id="enchantmentsAccordion">
+                            <panes>
+                                <TitledPane fx:id="booksPane" text="%ui-tabs-enchantments-books">
+                                    <content>
+                                        <TableView fx:id="booksTable">
+                                            <columns>
+                                                <TableColumn editable="false" prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
+                                                <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
+                                                <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
+                                            </columns>
+                                            <VBox.margin>
+                                                <Insets bottom="10.0" />
+                                            </VBox.margin>
+                                        </TableView>
+                                    </content>
+                                </TitledPane>
+                                <TitledPane text="%ui-tabs-enchantments-rods">
+                                    <content>
+                                        <TableView fx:id="rodsTable">
+                                            <columns>
+                                                <TableColumn prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
+                                                <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
+                                                <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
+                                            </columns>
+                                            <VBox.margin>
+                                                <Insets bottom="10.0" />
+                                            </VBox.margin>
+                                        </TableView>
+                                    </content>
+                                </TitledPane>
+                                <TitledPane text="%ui-tabs-enchantments-bows">
+                                    <content>
+                                        <TableView fx:id="bowsTable">
+                                            <columns>
+                                                <TableColumn prefWidth="445.0" text="%ui-tabs-enchantments-enchantment" />
+                                                <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-level" />
+                                                <TableColumn prefWidth="60.0" text="%ui-tabs-enchantments-count" />
+                                            </columns>
+                                            <VBox.margin>
+                                                <Insets bottom="10.0" />
+                                            </VBox.margin>
+                                        </TableView>
+                                    </content>
+                                </TitledPane>
+                            </panes>
+                        </Accordion>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+        <VBox>
+            <TextArea fx:id="consoleTextArea" editable="false" maxHeight="Infinity" prefHeight="10000">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </TextArea>
+            <AnchorPane maxHeight="35.0" minHeight="35.0" prefHeight="35.0" VBox.vgrow="NEVER">
+                <children>
+                    <TextField fx:id="commandlineTextField" onAction="#commandlineSend" onKeyPressed="#consoleKeyPressed" prefHeight="25.0" prefWidth="540.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="53.0" AnchorPane.topAnchor="5.0" />
+                    <Button layoutX="548.0" mnemonicParsing="false" onAction="#commandlineSend" text="%ui-console-send" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                </children>
+            </AnchorPane>
+        </VBox>
+    </SplitPane>
 </VBox>

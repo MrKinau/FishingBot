@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.network.realms.Realm;
 import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -23,7 +24,7 @@ public class Dialogs {
         setupJFX();
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.NAME_AND_VERSION);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-header"));
             alert.setContentText(FishingBot.getI18n().t("dialog-credentials-content"));
@@ -56,7 +57,7 @@ public class Dialogs {
                 dialog.setHeaderText(FishingBot.getI18n().t("dialog-realms-select"));
             }
 
-            dialog.setTitle(FishingBot.PREFIX);
+            dialog.setTitle(FishingBot.NAME_AND_VERSION);
 
             Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(true);
@@ -86,7 +87,7 @@ public class Dialogs {
         setupJFX();
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.NO, ButtonType.YES);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.NAME_AND_VERSION);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-realms-tos-header"));
             alert.setContentText(FishingBot.getI18n().t("dialog-realms-tos-content", "https://www.minecraft.net/en-us/realms/terms"));
@@ -115,7 +116,7 @@ public class Dialogs {
     public static void showAboutWindow(Stage parent, Consumer<String> callBack) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.NAME_AND_VERSION);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-about-header"));
             FlowPane fp = new FlowPane();
@@ -143,7 +144,7 @@ public class Dialogs {
 
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.NAME_AND_VERSION);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-invalid-header"));
             FlowPane fp = new FlowPane();
@@ -163,5 +164,43 @@ public class Dialogs {
 
             alert.showAndWait();
         });
+    }
+
+    public static boolean showAcceptConnection(String ip) {
+        setupJFX();
+
+        AtomicReference<Boolean> dialogClicked = new AtomicReference<>(null);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.NO, ButtonType.YES);
+            alert.setTitle(FishingBot.NAME_AND_VERSION);
+
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-proxy-accept-connection-header"));
+            alert.setContentText(FishingBot.getI18n().t("dialog-proxy-accept-connection-content", ip));
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.setAlwaysOnTop(true);
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
+
+            Optional<ButtonType> buttonType = alert.showAndWait();
+            buttonType.ifPresent(buttonType1 -> dialogClicked.set(buttonType1 == ButtonType.YES));
+        });
+        // wait for click
+        while (dialogClicked.get() == null) {
+        }
+
+        return dialogClicked.get();
+    }
+
+    public static boolean showAcceptConnectionNoGui(String ip) {
+        Scanner s = new Scanner(System.in);
+
+        boolean accepted = false;
+        System.err.print(FishingBot.getI18n().t("dialog-proxy-accept-connection-content", ip) + ": (yes/No): ");
+        String entered = s.nextLine();
+        if (entered.equalsIgnoreCase("y") || entered.equalsIgnoreCase("yes")) {
+            accepted = true;
+        }
+
+        return accepted;
     }
 }

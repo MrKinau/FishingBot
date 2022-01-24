@@ -72,7 +72,7 @@ public class Player implements Listener {
             this.originYaw = yaw;
             this.originPitch = pitch;
         }
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9)
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9 && !FishingBot.getInstance().getCurrentBot().isProxyMode())
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
 
     }

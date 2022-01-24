@@ -21,6 +21,7 @@ public class Main {
         options.addOption("logsdir", true, "specifies where to save the logs");
         options.addOption("config", true, "specifies the path to the config");
         options.addOption("accountfile", true, "specifies the path to the account file where the accessToken is stored");
+        options.addOption("proxy", false, "specifies the bot to act as a proxy forwarding a minecraft session");
 
         // add nogui option if Desktop is not supported
         if (!Desktop.isDesktopSupported()) {
@@ -48,15 +49,20 @@ public class Main {
                             FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
                             FishingBot.getInstance().getCurrentBot().setRunning(false);
                         }
+                        if (FishingBot.getInstance().getProxyServer() != null) {
+                            FishingBot.getInstance().getProxyServer().shutdown();
+                        }
                         FishingBot.getScheduler().shutdownNow();
                     } catch (Throwable ex) {
                         ex.printStackTrace();
                         Dialogs.showJavaFXNotWorking();
                     }
                 }, "GUIThread").start();
-
             } else {
-                FishingBot.getInstance().startBot();
+                if (cmd.hasOption("proxy"))
+                    FishingBot.getInstance().startProxy();
+                else
+                    FishingBot.getInstance().startBot();
             }
         } catch (ParseException e) {
             e.printStackTrace();

@@ -22,7 +22,9 @@ public class HandshakeModule extends Module {
 
     @Override
     public void onEnable() {
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHandshake(serverName, serverPort));
+        // already sent in proxy connection
+        if (!FishingBot.getInstance().getCurrentBot().isProxyMode())
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHandshake(serverName, serverPort));
         FishingBot.getInstance().getCurrentBot().getNet().setState(State.LOGIN);
     }
 

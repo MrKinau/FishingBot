@@ -52,7 +52,8 @@ public class ClientDefaultsModule extends Module implements Listener {
             }
 
             //Start position updates
-            startPositionUpdate(FishingBot.getInstance().getCurrentBot().getNet());
+            if (!FishingBot.getInstance().getCurrentBot().isProxyMode())
+                startPositionUpdate(FishingBot.getInstance().getCurrentBot().getNet());
         }).start();
     }
 
@@ -64,16 +65,19 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onJoinGame(JoinGameEvent event) {
+        if (FishingBot.getInstance().getCurrentBot().isProxyMode()) return;
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientSettings());
     }
 
     @EventHandler
     public void onKeepAlive(KeepAliveEvent event) {
+        if (FishingBot.getInstance().getCurrentBot().isProxyMode()) return;
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutKeepAlive(event.getId()));
     }
 
     @EventHandler
     public void onUpdatePlayerList(UpdatePlayerListEvent event) {
+        if (FishingBot.getInstance().getCurrentBot().isProxyMode()) return;
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoDisconnect() && event.getPlayers().size() > FishingBot.getInstance().getCurrentBot().getConfig().getAutoDisconnectPlayersThreshold()) {
             FishingBot.getI18n().warning("network-server-is-full");
             FishingBot.getInstance().getCurrentBot().setWontConnect(true);
@@ -83,6 +87,7 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onConfirmTransaction(ConfirmTransactionEvent event) {
+        if (FishingBot.getInstance().getCurrentBot().isProxyMode()) return;
         if (!event.isAccepted())
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutConfirmTransaction(event.getWindowId(), event.getAction(), true));
     }

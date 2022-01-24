@@ -85,6 +85,10 @@ public class SettingsConfig implements Config {
     @Property(key = "start-text.enabled", description = "config-start-text-enabled") private boolean startTextEnabled = true;
     @Property(key = "start-text.text", description = "config-start-text-text") private List<String> startText = Arrays.asList("%prefix%Starting fishing", "/trigger Bot");
 
+    @Property(key = "proxy.port", description = "config-proxy-port") private int proxyPort = 25565;
+    @Property(key = "proxy.host", description = "config-proxy-host") private String proxyHost = "127.0.0.1";
+    @Property(key = "proxy.accept-connections", description = "config-proxy-accept-connections") private boolean acceptConnections = true;
+
     @Property(key = "misc.stucking-fix-enabled", description = "config-misc-stucking-fix-enabled") private boolean stuckingFixEnabled = true;
     @Property(key = "misc.prevent-rod-breaking", description = "config-misc-prevent-rod-breaking") private boolean preventRodBreaking = true;
     @Property(key = "misc.disable-rod-checking", description = "config-misc-disable-rod-checking") private boolean disableRodChecking = false;

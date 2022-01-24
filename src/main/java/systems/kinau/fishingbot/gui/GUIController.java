@@ -52,6 +52,7 @@ public class GUIController implements Listener {
     @FXML private TextField commandlineTextField;
     @FXML private Tab lootTab;
     @FXML private Button startStopButton;
+    @FXML private Button startStopProxyButton;
     @FXML private Button configButton;
     @FXML private Button playPauseButton;
     @FXML private ImageView skinPreview;
@@ -208,15 +209,28 @@ public class GUIController implements Listener {
     }
 
     public void startStop(Event e) {
-        if (FishingBot.getInstance().getCurrentBot() == null) {
-            startStopButton.setText(FishingBot.getI18n().t("ui-button-stop"));
-            playPauseButton.setDisable(false);
-            new Thread(() -> FishingBot.getInstance().startBot()).start();
+        if (FishingBot.getInstance().getCurrentBot() == null && FishingBot.getInstance().getProxyServer() == null) {
+            if (!e.getSource().equals(startStopProxyButton)) {
+                startStopButton.setText(FishingBot.getI18n().t("ui-button-stop"));
+                startStopProxyButton.setDisable(true);
+                playPauseButton.setDisable(false);
+                new Thread(() -> FishingBot.getInstance().startBot()).start();
+            } else {
+                startStopProxyButton.setText(FishingBot.getI18n().t("ui-button-stop-proxy"));
+                startStopButton.setDisable(true);
+                playPauseButton.setDisable(false);
+                new Thread(() -> FishingBot.getInstance().startProxy()).start();
+            }
         } else {
             startStopButton.setDisable(true);
+            startStopProxyButton.setDisable(true);
             playPauseButton.setDisable(true);
             startStopButton.setText(FishingBot.getI18n().t("ui-button-start"));
-            FishingBot.getInstance().stopBot(true);
+            startStopProxyButton.setText(FishingBot.getI18n().t("ui-button-start-proxy"));
+            if (e.getSource().equals(startStopProxyButton))
+                FishingBot.getInstance().stopProxy();
+            else
+                FishingBot.getInstance().stopBot(true);
         }
     }
 
@@ -225,11 +239,16 @@ public class GUIController implements Listener {
             if (FishingBot.getInstance().getCurrentBot() == null) {
                 startStopButton.setText(FishingBot.getI18n().t("ui-button-start"));
                 playPauseButton.setDisable(true);
-            } else {
-                startStopButton.setDisable(true);
+                startStopButton.setDisable(false);
+            } else
                 playPauseButton.setDisable(false);
-                startStopButton.setText(FishingBot.getI18n().t("ui-button-stop"));
-
+            if (FishingBot.getInstance().getProxyServer() == null) {
+                startStopProxyButton.setText(FishingBot.getI18n().t("ui-button-start-proxy"));
+                startStopProxyButton.setDisable(false);
+            }
+            if (FishingBot.getInstance().getCurrentBot() != null || FishingBot.getInstance().getProxyServer() != null) {
+                startStopButton.setDisable(true);
+                startStopProxyButton.setDisable(true);
             }
         });
     }
@@ -237,6 +256,7 @@ public class GUIController implements Listener {
     public void enableStartStop() {
         Platform.runLater(() -> {
             startStopButton.setDisable(false);
+            startStopProxyButton.setDisable(false);
         });
     }
 

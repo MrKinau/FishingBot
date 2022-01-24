@@ -9,6 +9,7 @@ import com.flowpowered.nbt.*;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
@@ -20,6 +21,7 @@ import systems.kinau.fishingbot.utils.NBTUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -261,6 +263,14 @@ public abstract class Packet {
         output.writeFloat(movingObjectPositionBlock.getDy());
         output.writeFloat(movingObjectPositionBlock.getDz());
         output.writeBoolean(movingObjectPositionBlock.isFlag());
+    }
+
+    public static void send(ByteArrayDataOutput buf, DataOutputStream out) throws IOException {
+        ByteArrayDataOutput sender = ByteStreams.newDataOutput();
+        Packet.writeVarInt(buf.toByteArray().length, sender);
+        sender.write(buf.toByteArray());
+        out.write(sender.toByteArray());
+        out.flush();
     }
 
 }

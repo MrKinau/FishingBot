@@ -5,6 +5,7 @@
 
 package systems.kinau.fishingbot.modules.fishing;
 
+import javafx.application.Platform;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
@@ -16,9 +17,12 @@ import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
+import systems.kinau.fishingbot.event.custom.PacketSendEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.Module;
+import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.protocol.State;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.utils.ItemUtils;
@@ -82,6 +86,10 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     public void stuck() {
+        stuck(true);
+    }
+
+    public void stuck(boolean sendPacket) {
         if (isPaused())
             return;
         if (isNoRodAvailable())
@@ -92,10 +100,13 @@ public class FishingModule extends Module implements Runnable, Listener {
         }
         setLastFish(System.currentTimeMillis());
         setTrackingNextBobberId(true);
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException ignore) { }
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+        if (sendPacket) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignore) {
+            }
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+        }
     }
 
     public void setPaused(boolean paused) {
@@ -205,7 +216,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
         else if (noisiness == AnnounceType.ALL)
             announce.accept(stringify(item));
-        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId()) && !FISH_IDS_1_16.contains(item.getItemId()))
+        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId()) && !FISH_IDS_1_16.contains(item.getItemId()) && !FISH_IDS_1_17.contains(item.getItemId()))
             announce.accept(stringify(item));
 
         if (item.getEnchantments().isEmpty())
@@ -426,6 +437,19 @@ public class FishingModule extends Module implements Runnable, Listener {
     public void onDestroy(DestroyEntitiesEvent event) {
         if (getCurrentBobber() != -1 && event.getEntityIds().contains(getCurrentBobber()))
             stuck();
+    }
+
+    @EventHandler
+    public void onProxyPauseFishing(PacketSendEvent event) {
+        if (event.getSender() != NetworkHandler.Participant.PROXY_CLIENT) return;
+        NetworkHandler networkHandler = FishingBot.getInstance().getCurrentBot().getNet();
+        if (networkHandler.getState() != State.PLAY) return;
+        if (event.getRawPacket().getPacketId() != networkHandler.getPlayRegistryOut().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).getId(PacketOutUseItem.class)) return;
+        this.paused = !isPaused();
+        stuck(false);
+        if (FishingBot.getInstance().getMainGUIController() != null) {
+            Platform.runLater(() -> FishingBot.getInstance().getMainGUIController().updatePlayPaused());
+        }
     }
 
     @Override

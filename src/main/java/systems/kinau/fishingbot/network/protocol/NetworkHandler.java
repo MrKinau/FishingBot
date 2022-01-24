@@ -7,12 +7,17 @@ package systems.kinau.fishingbot.network.protocol;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.custom.PacketReceiveEvent;
+import systems.kinau.fishingbot.event.custom.PacketSendEvent;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketOutHandshake;
 import systems.kinau.fishingbot.network.protocol.login.*;
 import systems.kinau.fishingbot.network.protocol.play.*;
+import systems.kinau.fishingbot.network.proxy.ServerProxyHandler;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
@@ -23,24 +28,28 @@ import java.util.HashMap;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+@Getter
 public class NetworkHandler {
 
-    @Getter private DataOutputStream out;
-    @Getter private DataInputStream in;
+    private DataOutputStream out, outClient;
+    private DataInputStream in, inClient;
+    private ServerProxyHandler proxyConnection;
 
-    @Getter @Setter private State state;
-    @Getter private PacketRegistry handshakeRegistry;
-    @Getter private PacketRegistry loginRegistryIn;
-    @Getter private PacketRegistry loginRegistryOut;
+    @Setter
+    private State state;
+    private PacketRegistry handshakeRegistry;
+    private PacketRegistry loginRegistryIn;
+    private PacketRegistry loginRegistryOut;
     //List of all PacketRegistries of all supported protocolIds
-    @Getter private HashMap<Integer, PacketRegistry> playRegistryIn;
-    @Getter private HashMap<Integer, PacketRegistry> playRegistryOut;
+    private HashMap<Integer, PacketRegistry> playRegistryIn;
+    private HashMap<Integer, PacketRegistry> playRegistryOut;
 
-    @Getter @Setter private int threshold = -1;
-    @Getter @Setter private PublicKey publicKey;
-    @Getter @Setter private SecretKey secretKey;
-    @Getter @Setter private boolean outputEncrypted;
-    @Getter @Setter private boolean inputBeingDecrypted;
+    @Setter
+    private int threshold = -1;
+    @Setter
+    private PublicKey publicKey;
+    @Setter
+    private SecretKey secretKey;
 
     public NetworkHandler() {
         try {
@@ -53,6 +62,17 @@ public class NetworkHandler {
             e.printStackTrace();
             FishingBot.getI18n().severe("bot-could-not-be-started", e.getMessage());
         }
+    }
+
+    public NetworkHandler(ServerProxyHandler proxyConnection) {
+        this.out = proxyConnection.getOutToServer();
+        this.outClient = proxyConnection.getOutToClient();
+        this.in = proxyConnection.getInFromServer();
+        this.inClient = proxyConnection.getInFromClient();
+        this.proxyConnection = proxyConnection;
+
+        this.state = State.HANDSHAKE;
+        initPacketRegistries();
     }
 
     private void initPacketRegistries() {
@@ -546,12 +566,22 @@ public class NetworkHandler {
 
         //Register protocol of latest for unknown versions
         if (!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getCurrentBot().getServerProtocol())) {
-           FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getCurrentBot().getServerProtocol());
+            FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getCurrentBot().getServerProtocol());
 
             getPlayRegistryIn().put(FishingBot.getInstance().getCurrentBot().getServerProtocol(), new PacketRegistry());
             getPlayRegistryOut().put(FishingBot.getInstance().getCurrentBot().getServerProtocol(), new PacketRegistry());
             getPlayRegistryIn().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).copyOf(getPlayRegistryIn().get(ProtocolConstants.getLatest()));
             getPlayRegistryOut().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).copyOf(getPlayRegistryOut().get(ProtocolConstants.getLatest()));
+        }
+    }
+
+    private synchronized void sendData(DataOutputStream out, byte[] data, String packet) {
+        try {
+            out.write(data);
+            out.flush();
+        } catch (IOException ex) {
+            FishingBot.getLog().severe("Error while trying to send: " + packet);
+            ex.printStackTrace();
         }
     }
 
@@ -588,68 +618,103 @@ public class NetworkHandler {
             ByteArrayDataOutput send2 = ByteStreams.newDataOutput();
             Packet.writeVarInt(send1.toByteArray().length, send2);
             send2.write(send1.toByteArray());
-            try {
-                out.write(send2.toByteArray());
-                out.flush();
-            } catch (IOException e) {
-                FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
-            }
+            sendData(out, send2.toByteArray(), packet.getClass().getSimpleName());
         } else {
             //Send packet (without threshold)
             ByteArrayDataOutput send = ByteStreams.newDataOutput();
             Packet.writeVarInt(buf.toByteArray().length, send);
             send.write(buf.toByteArray());
-            try {
-                out.write(send.toByteArray());
-                out.flush();
-            } catch (IOException e) {
-                FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
-                e.printStackTrace();
-            }
+            sendData(out, send.toByteArray(), packet.getClass().getSimpleName());
         }
         if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
             FishingBot.getLog().info("[" + getState().name().toUpperCase() + "]  C  >>> |S|: " + packet.getClass().getSimpleName());
     }
 
-    public void readData() throws IOException {
+    public void readDataFromServer() throws IOException {
+        ByteArrayDataOutput dataOutput = ByteStreams.newDataOutput();
+        RawPacket rawPacket;
         if (getThreshold() >= 0) {
             int plen1 = Packet.readVarInt(in);
             int[] dlens = Packet.readVarIntt(in);
             int dlen = dlens[0];
             int plen = plen1 - dlens[1];
+
+            Packet.writeVarInt(plen1, dataOutput);
+            Packet.writeVarInt(dlen, dataOutput);
             if (dlen == 0) {
-                readUncompressed(plen);
+                rawPacket = readUncompressed(plen, in, dataOutput);
             } else {
-                readCompressed(plen, dlen);
+                rawPacket = readCompressed(plen, dlen, in, dataOutput);
             }
         } else {
-            readUncompressed();
+            rawPacket = readUncompressed(in, dataOutput);
         }
+        PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(rawPacket, Participant.SERVER, Participant.PROXY_CLIENT, false);
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(packetReceiveEvent);
 
+        readClientBoundPacket(rawPacket.getLength(), rawPacket.getPacketId(), rawPacket.getData());
+        if (outClient != null && !packetReceiveEvent.isCancelled()) {
+            sendData(outClient, dataOutput.toByteArray(), "proxy client packet (" + rawPacket.getPacketId() + ")");
+        }
     }
 
-    private void readUncompressed() throws IOException {
-        int len1 = Packet.readVarInt(in);
-        int[] types = Packet.readVarIntt(in);
-        int type = types[0];
-        int len = len1 - types[1];
-        byte[] data = new byte[len];
-        in.readFully(data, 0, len);
-        readPacket(len, type, new ByteArrayDataInputWrapper(data));
+    public void readDataFromClient() throws IOException {
+        ByteArrayDataOutput dataOutput = ByteStreams.newDataOutput();
+        RawPacket rawPacket;
+        if (getThreshold() >= 0) {
+            int plen1 = Packet.readVarInt(inClient);
+            int[] dlens = Packet.readVarIntt(inClient);
+            int dlen = dlens[0];
+            int plen = plen1 - dlens[1];
+
+            Packet.writeVarInt(plen1, dataOutput);
+            Packet.writeVarInt(dlen, dataOutput);
+            if (dlen == 0) {
+                rawPacket = readUncompressed(plen, inClient, dataOutput);
+            } else {
+                rawPacket = readCompressed(plen, dlen, inClient, dataOutput);
+            }
+        } else {
+            rawPacket = readUncompressed(inClient, dataOutput);
+        }
+        PacketSendEvent packetSendEvent = new PacketSendEvent(rawPacket, Participant.PROXY_CLIENT, Participant.SERVER, false);
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(packetSendEvent);
+        if (packetSendEvent.isCancelled()) return;
+
+        if (out != null) {
+            sendData(out, dataOutput.toByteArray(), "proxy client packet (" + rawPacket.getPacketId() + ")");
+        }
     }
 
-    private void readUncompressed(int len) throws IOException {
+    private RawPacket readUncompressed(DataInputStream in, ByteArrayDataOutput dataOutput) throws IOException {
+        int fullLength = Packet.readVarInt(in);
+        int[] packetIdAndLen = Packet.readVarIntt(in);
+        int packetId = packetIdAndLen[0];
+        int len = fullLength - packetIdAndLen[1];
         byte[] data = new byte[len];
         in.readFully(data, 0, len);
+
+        Packet.writeVarInt(fullLength, dataOutput);
+        Packet.writeVarInt(packetId, dataOutput);
+        dataOutput.write(data, 0, len);
+
+        return new RawPacket(len, packetId, new ByteArrayDataInputWrapper(data));
+    }
+
+    private RawPacket readUncompressed(int len, DataInputStream stream, ByteArrayDataOutput dataOutput) throws IOException {
+        byte[] data = new byte[len];
+        stream.readFully(data, 0, len);
+        dataOutput.write(data, 0, len);
         ByteArrayDataInputWrapper bf = new ByteArrayDataInputWrapper(data);
         int type = Packet.readVarInt(bf);
-        readPacket(len, type, bf);
+        return new RawPacket(len, type, bf);
     }
 
-    private void readCompressed(int plen, int dlen) throws IOException {
+    private RawPacket readCompressed(int plen, int dlen, DataInputStream stream, ByteArrayDataOutput dataOutput) throws IOException {
         if (dlen >= getThreshold()) {
             byte[] data = new byte[plen];
-            in.readFully(data, 0, plen);
+            stream.readFully(data, 0, plen);
+            dataOutput.write(data, 0, plen);
             Inflater inflater = new Inflater();
             inflater.setInput(data);
             byte[] uncompressed = new byte[dlen];
@@ -663,13 +728,13 @@ public class NetworkHandler {
             }
             ByteArrayDataInputWrapper buf = new ByteArrayDataInputWrapper(uncompressed);
             int type = Packet.readVarInt(buf);
-            readPacket(dlen, type, buf);
+            return new RawPacket(dlen, type, buf);
         } else {
             throw new IOException("Data was smaller than threshold!");
         }
     }
 
-    private void readPacket(int len, int packetId, ByteArrayDataInputWrapper buf) throws IOException {
+    private void readClientBoundPacket(int len, int packetId, ByteArrayDataInputWrapper buf) throws IOException {
         Class<? extends Packet> clazz;
 
         switch (state) {
@@ -708,22 +773,41 @@ public class NetworkHandler {
     public void activateEncryption() {
         try {
             out.flush();
-            setOutputEncrypted(true);
+            if (outClient != null)
+                outClient.flush();
             BufferedOutputStream var1 = new BufferedOutputStream(CryptManager.encryptOuputStream(getSecretKey(), FishingBot.getInstance().getCurrentBot().getSocket().getOutputStream()), 5120);
             this.out = new DataOutputStream(var1);
+            if (proxyConnection != null)
+                proxyConnection.setOutToServer(out);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void decryptInputStream() {
-        setInputBeingDecrypted(true);
         try {
             InputStream var1;
             var1 = FishingBot.getInstance().getCurrentBot().getSocket().getInputStream();
             this.in = new DataInputStream(CryptManager.decryptInputStream(getSecretKey(), var1));
+            if (proxyConnection != null)
+                proxyConnection.setInFromServer(in);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @ToString
+    public class RawPacket {
+        private int length;
+        private int packetId;
+        private ByteArrayDataInputWrapper data;
+    }
+
+    public enum Participant {
+        SERVER,
+        SELF,
+        PROXY_CLIENT
     }
 }

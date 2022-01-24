@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.CustomPrintStream;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
+import systems.kinau.fishingbot.network.proxy.InternalServer;
 
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -23,6 +24,7 @@ import java.util.logging.Logger;
 public class FishingBot {
 
     @Getter @Setter private static I18n i18n;
+    public static String NAME_AND_VERSION;
     public static String PREFIX;
     @Getter private static FishingBot instance;
     @Getter public static Logger log = Logger.getLogger(Bot.class.getSimpleName());
@@ -32,6 +34,7 @@ public class FishingBot {
     private CommandLine cmdLine;
 
     @Getter @Setter private Bot currentBot;
+    @Getter @Setter private InternalServer proxyServer;
     @Getter @Setter private MainGUI mainGUI;
     @Getter @Setter private GUIController mainGUIController;
 
@@ -43,11 +46,12 @@ public class FishingBot {
         try {
             final Properties properties = new Properties();
             properties.load(this.getClass().getClassLoader().getResourceAsStream("fishingbot.properties"));
-            PREFIX = properties.getProperty("name") + " v" + properties.getProperty("version") + " - ";
+            NAME_AND_VERSION = properties.getProperty("name") + " v" + properties.getProperty("version");
         } catch (Exception ex) {
-            PREFIX = "FishingBot vUnknown - ";
+            NAME_AND_VERSION = "FishingBot vUnknown";
             ex.printStackTrace();
         }
+        PREFIX = NAME_AND_VERSION + " - ";
 
         // initialize Logger
         log.setLevel(Level.ALL);
@@ -77,9 +81,46 @@ public class FishingBot {
         if (getCurrentBot() != null)
             stopBot(true);
         Thread.currentThread().setName("mainThread");
-        Bot bot = new Bot(cmdLine);
+        Bot bot = new Bot(cmdLine, false);
         bot.getEventManager().callEvent(new BotStartEvent());
+        bot.ping();
         bot.start(cmdLine);
+    }
+
+    public void startProxy() {
+        if (getCurrentBot() != null)
+            stopBot(true);
+        Thread.currentThread().setName("mainThread");
+        proxyServer = new InternalServer(getConfig().getProxyPort(), getConfig().getProxyHost());
+        proxyServer.start();
+        proxyServer.onClientConnecting(serverProxyHandler -> {
+            if (getCurrentBot() != null)
+                stopBot(true);
+            Bot bot = new Bot(cmdLine, true);
+            bot.setServerProtocol(serverProxyHandler.getProtocolId());
+            bot.ping();
+            bot.getEventManager().callEvent(new BotStartEvent());
+        });
+        proxyServer.onClientConnected(serverProxyHandler -> {
+            FishingBot.getInstance().getCurrentBot().injectProxy(cmdLine, serverProxyHandler);
+        });
+        proxyServer.onClientDisconnected(handler -> {
+            if (getCurrentBot() != null) {
+                getCurrentBot().shutdownProxyConnection();
+            }
+        });
+    }
+
+    public void stopProxy() {
+        if (getProxyServer() == null)
+            return;
+        getProxyServer().shutdown();
+        this.proxyServer = null;
+        if (getCurrentBot() != null)
+            getCurrentBot().shutdownProxyConnection();
+        else if (getMainGUIController() != null) {
+            getMainGUIController().enableStartStop();
+        }
     }
 
     public void stopBot(boolean preventReconnect) {

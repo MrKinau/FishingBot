@@ -10,6 +10,7 @@ import com.google.common.io.ByteStreams;
 import lombok.AllArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import systems.kinau.fishingbot.Bot;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -20,7 +21,6 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
@@ -32,7 +32,6 @@ public class ServerPinger {
     private int serverPort;
 
     public void ping() {
-        FishingBot.getInstance().getCurrentBot().setServerProtocol(ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()));
         if (serverName == null || serverName.trim().isEmpty()) {
             FishingBot.getI18n().severe("network-invalid-server-address");
             FishingBot.getInstance().getCurrentBot().setRunning(false);
@@ -61,18 +60,18 @@ public class ServerPinger {
             buf.writeShort(serverPort);
             Packet.writeVarInt(1, buf);
 
-            send(buf, out);
+            Packet.send(buf, out);
 
             buf = ByteStreams.newDataOutput();
             Packet.writeVarInt(0, buf);
-            send(buf, out);
+            Packet.send(buf, out);
 
             //read Handshake 0x00 Response - Ping
 
             //TODO: Sometimes it's an int sometimes a varint? investigate how to fix the auto-version detection (e.g. based on getAvailable())
-            Packet.readVarInt(in); //ignore
+            int length = Packet.readVarInt(in); //ignore
 //            in.readInt(); //ignore
-            Packet.readVarInt(in); //id
+            int id = Packet.readVarInt(in); //id
 
 //            if (id != 2) {
             String pong = Packet.readString(in);
@@ -80,9 +79,10 @@ public class ServerPinger {
             long protocolId = (long) ((JSONObject)root.get("version")).get("protocol");
             long currPlayers = (long) ((JSONObject)root.get("players")).get("online");
 
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.AUTOMATIC)
-                FishingBot.getInstance().getCurrentBot().setServerProtocol(Long.valueOf(protocolId).intValue());
-            else if (protocolId != FishingBot.getInstance().getCurrentBot().getServerProtocol()) {
+            Bot bot = FishingBot.getInstance().getCurrentBot();
+            if (bot.getServerProtocol() == ProtocolConstants.AUTOMATIC)
+                bot.setServerProtocol(Long.valueOf(protocolId).intValue());
+            else if (!bot.isProxyMode() && protocolId != bot.getServerProtocol()) {
                 FishingBot.getI18n().warning("network-ping-differs-protocol",
                         "\"" + ProtocolConstants.getVersionString(Long.valueOf(protocolId).intValue()) + "\" (" + protocolId + ")",
                         "\"" + ProtocolConstants.getVersionString(FishingBot.getInstance().getCurrentBot().getServerProtocol()) + "\" (" + FishingBot.getInstance().getCurrentBot().getServerProtocol() + ")");
@@ -158,13 +158,5 @@ public class ServerPinger {
         } catch (Throwable var6) {
             return new String[]{serverHost, Integer.toString(25565)};
         }
-    }
-
-    private void send(ByteArrayDataOutput buf, DataOutputStream out) throws IOException {
-        ByteArrayDataOutput sender = ByteStreams.newDataOutput();
-        Packet.writeVarInt(buf.toByteArray().length, sender);
-        sender.write(buf.toByteArray());
-        out.write(sender.toByteArray());
-        out.flush();
     }
 }
