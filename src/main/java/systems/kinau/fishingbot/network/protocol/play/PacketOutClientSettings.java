@@ -65,10 +65,12 @@ public class PacketOutClientSettings extends Packet {
                 out.writeBoolean(true);     //support colors
                 out.writeByte(128);         //skin bitmask
                 writeVarInt(1, out);        //right = main hand
-                out.writeBoolean(true);     //Disable text filtering
+                out.writeBoolean(false);     //Disable text filtering
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_18:
+            case ProtocolConstants.MINECRAFT_1_18_2:
+            case ProtocolConstants.MINECRAFT_1_19:
             default: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
                 out.writeByte(1);           //render-distance
@@ -76,7 +78,7 @@ public class PacketOutClientSettings extends Packet {
                 out.writeBoolean(true);     //support colors
                 out.writeByte(128);         //skin bitmask
                 writeVarInt(1, out);        //right = main hand
-                out.writeBoolean(true);     //Disable text filtering
+                out.writeBoolean(false);     //Disable text filtering
                 out.writeBoolean(true);     //Allow server listings
                 break;
             }

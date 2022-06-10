@@ -42,7 +42,8 @@ public class PacketOutUseItem extends Packet {
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutArmAnimation());
             }).start();
         } else {
-            out.writeByte(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal());
+            writeVarInt(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal(), out);
+            writeVarInt(0, out); //sequence
         }
     }
 

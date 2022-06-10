@@ -11,17 +11,30 @@ import systems.kinau.fishingbot.bot.Inventory;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.enums.EnchantmentType;
 import systems.kinau.fishingbot.enums.MaterialMc18;
-import systems.kinau.fishingbot.modules.fishing.ItemHandler;
+import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ItemUtils {
+
+    private static int rodId;
+    private static Set<Integer> fishIds;
+    private static int enchantedBookId;
+
+    public static int getRodId(int protocolId) {
+        if (rodId > 0)
+            return rodId;
+
+        if (RegistryHandler.getItemsMap(protocolId).containsValue("minecraft:fishing_rod"))
+            return rodId = RegistryHandler.getItemsMap(protocolId).entrySet().stream()
+                    .filter(entry -> entry.getValue().equals("minecraft:fishing_rod"))
+                    .findAny().get().getKey();
+        return 563;
+    }
 
     public static boolean isFishingRod(Slot slot) {
         if (slot == null)
@@ -34,16 +47,33 @@ public class ItemUtils {
 
         if (protocol < ProtocolConstants.MINECRAFT_1_13)
             return MaterialMc18.getMaterial(slot.getItemId()) == MaterialMc18.FISHING_ROD;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_13_1)
-            return slot.getItemId() == 563;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_14)
-            return slot.getItemId() == 568;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_16)
-            return slot.getItemId() == 622;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_17)
-            return slot.getItemId() == 684;
         else
-            return slot.getItemId() == 797;
+            return getRodId(protocol) == slot.getItemId();
+    }
+
+    public static boolean isFish(int protocol, int itemId) {
+        if (protocol < ProtocolConstants.MINECRAFT_1_13)
+            return itemId == MaterialMc18.RAW_FISH.getId();
+        if (fishIds != null && !fishIds.isEmpty())
+            return fishIds.contains(itemId);
+        fishIds = new HashSet<>();
+        RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
+            if (name.equals("minecraft:cod") || name.equals("minecraft:salmon") || name.equals("minecraft:tropical_fish") || name.equals("minecraft:pufferfish"))
+                fishIds.add(id);
+        });
+        return fishIds.contains(itemId);
+    }
+
+    public static boolean isEnchantedBook(int protocol, int itemId) {
+        if (protocol < ProtocolConstants.MINECRAFT_1_13)
+            return itemId == MaterialMc18.ENCHANTED_BOOK.getId();
+        if (enchantedBookId > 0)
+            return enchantedBookId == itemId;
+        RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
+            if (name.equals("minecraft:enchanted_book"))
+                enchantedBookId = id;
+        });
+        return enchantedBookId == itemId;
     }
 
     public static List<Enchantment> getEnchantments(Slot slot) {
@@ -156,7 +186,7 @@ public class ItemUtils {
         if (version <= ProtocolConstants.MINECRAFT_1_12_2) {
             return MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
         } else {
-            return ItemHandler.getItemName(slot.getItemId(), version).replace("minecraft:", "");
+            return RegistryHandler.getItemName(slot.getItemId(), version).replace("minecraft:", "");
         }
     }
 }

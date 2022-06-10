@@ -59,7 +59,7 @@ public class PacketInPlayerListItem extends Packet {
                     FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PingChangeEvent(ping));
             } else if (action == 3) {
                 if (in.readBoolean()) // has display name
-                    readString(in); // dispaly name
+                    readString(in); // display name
             } else if (action == 4) {  //REMOVE
                 currPlayers.remove(uuid);
             }

@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @AllArgsConstructor
@@ -20,6 +21,9 @@ public class PacketOutChat extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(getMessage(), out);
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
+            out.writeLong(System.currentTimeMillis()); // timestamp
+        }
     }
 
     @Override

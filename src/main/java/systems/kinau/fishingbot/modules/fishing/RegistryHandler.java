@@ -15,10 +15,11 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ItemHandler {
+public class RegistryHandler {
 
     public static Map<Integer, String> itemsMap_1_13 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_13_1 = new HashMap<>();
@@ -28,8 +29,17 @@ public class ItemHandler {
     public static Map<Integer, String> itemsMap_1_16_2 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_17 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_18 = new HashMap<>();
+    public static Map<Integer, String> itemsMap_1_19 = new HashMap<>();
 
-    public ItemHandler(int protocolId) {
+    public static Map<String, Integer> entitiesMap_1_14 = new HashMap<>();
+    public static Map<String, Integer> entitiesMap_1_15 = new HashMap<>();
+    public static Map<String, Integer> entitiesMap_1_16 = new HashMap<>();
+    public static Map<String, Integer> entitiesMap_1_16_2 = new HashMap<>();
+    public static Map<String, Integer> entitiesMap_1_17 = new HashMap<>();
+    public static Map<String, Integer> entitiesMap_1_18 = new HashMap<>();
+    public static Map<String, Integer> entitiesMap_1_19 = new HashMap<>();
+
+    public RegistryHandler(int protocolId) {
         JSONObject root = null;
         try {
             switch (protocolId) {
@@ -73,27 +83,47 @@ public class ItemHandler {
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_18:
-                default: {
+                case ProtocolConstants.MINECRAFT_1_18_2: {
                     root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_18.json")));
                     break;
                 }
-
+                case ProtocolConstants.MINECRAFT_1_19:
+                default: {
+                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_19.json")));
+                    break;
+                }
             }
         } catch (ParseException | IOException ignore) {
         }
 
         if (root == null)
             return;
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_14)
-            root = (JSONObject) ((JSONObject) root.get("minecraft:item")).get("entries");
+        if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
+            root.forEach((key, value) -> {
+                getItemsMap(protocolId).put(((Long) ((JSONObject) value).get("protocol_id")).intValue(), (String) key);
+            });
+            return;
+        }
 
-        root.forEach((key, value) -> {
+        // items
+        JSONObject items = (JSONObject) ((JSONObject) root.get("minecraft:item")).get("entries");
+        items.forEach((key, value) -> {
             getItemsMap(protocolId).put(((Long) ((JSONObject) value).get("protocol_id")).intValue(), (String) key);
+        });
+
+        //entities
+        JSONObject entities = (JSONObject) ((JSONObject) root.get("minecraft:entity_type")).get("entries");
+        entities.forEach((key, value) -> {
+            getEntitiesMap(protocolId).put((String) key, ((Long) ((JSONObject) value).get("protocol_id")).intValue());
         });
     }
 
     public static String getItemName(int id, int protocol) {
         return getItemsMap(protocol).get(id);
+    }
+
+    public static int getEntityType(String entityName, int protocol) {
+        return getEntitiesMap(protocol).get(entityName);
     }
 
     public static String getImageUrl(Item item) {
@@ -122,7 +152,28 @@ public class ItemHandler {
             return itemsMap_1_16_2;
         else if (protocol >= ProtocolConstants.MINECRAFT_1_17 && protocol <= ProtocolConstants.MINECRAFT_1_17_1)
             return itemsMap_1_17;
-        else
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_18 && protocol <= ProtocolConstants.MINECRAFT_1_18_2)
             return itemsMap_1_18;
+        else
+            return itemsMap_1_19;
+    }
+
+    public static Map<String, Integer> getEntitiesMap(int protocol) {
+        if (protocol < ProtocolConstants.MINECRAFT_1_14)
+            return Collections.emptyMap();
+        else if (protocol <= ProtocolConstants.MINECRAFT_1_14_4)
+            return entitiesMap_1_14;
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_15 && protocol <= ProtocolConstants.MINECRAFT_1_15_2)
+            return entitiesMap_1_15;
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_16 && protocol <= ProtocolConstants.MINECRAFT_1_16_1)
+            return entitiesMap_1_16;
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_16_3 && protocol <= ProtocolConstants.MINECRAFT_1_16_4)
+            return entitiesMap_1_16_2;
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_17 && protocol <= ProtocolConstants.MINECRAFT_1_17_1)
+            return entitiesMap_1_17;
+        else if (protocol >= ProtocolConstants.MINECRAFT_1_18 && protocol <= ProtocolConstants.MINECRAFT_1_18_2)
+            return entitiesMap_1_18;
+        else
+            return entitiesMap_1_19;
     }
 }
