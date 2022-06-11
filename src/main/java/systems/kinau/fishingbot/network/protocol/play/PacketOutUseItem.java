@@ -43,7 +43,8 @@ public class PacketOutUseItem extends Packet {
             }).start();
         } else {
             writeVarInt(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal(), out);
-            writeVarInt(0, out); //sequence
+            if (protocolId >= ProtocolConstants.MINECRAFT_1_19)
+                writeVarInt(0, out); //sequence
         }
     }
 

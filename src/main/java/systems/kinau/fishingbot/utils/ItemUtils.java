@@ -21,18 +21,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ItemUtils {
 
-    private static int rodId;
-    private static Set<Integer> fishIds;
-    private static int enchantedBookId;
+    private static Map<Integer, Integer> rodId = new HashMap<>();
+    private static Map<Integer, Set<Integer>> fishIds = new HashMap<>();
+    private static Map<Integer, Integer> enchantedBookId = new HashMap<>();
 
     public static int getRodId(int protocolId) {
-        if (rodId > 0)
-            return rodId;
+        if (rodId.containsKey(protocolId))
+            return rodId.get(protocolId);
 
-        if (RegistryHandler.getItemsMap(protocolId).containsValue("minecraft:fishing_rod"))
-            return rodId = RegistryHandler.getItemsMap(protocolId).entrySet().stream()
+        if (RegistryHandler.getItemsMap(protocolId).containsValue("minecraft:fishing_rod")) {
+            rodId.put(protocolId, RegistryHandler.getItemsMap(protocolId).entrySet().stream()
                     .filter(entry -> entry.getValue().equals("minecraft:fishing_rod"))
-                    .findAny().get().getKey();
+                    .findAny().get().getKey());
+            return rodId.get(protocolId);
+        }
         return 563;
     }
 
@@ -54,26 +56,29 @@ public class ItemUtils {
     public static boolean isFish(int protocol, int itemId) {
         if (protocol < ProtocolConstants.MINECRAFT_1_13)
             return itemId == MaterialMc18.RAW_FISH.getId();
-        if (fishIds != null && !fishIds.isEmpty())
-            return fishIds.contains(itemId);
-        fishIds = new HashSet<>();
+        if (fishIds.containsKey(protocol))
+            return fishIds.get(protocol).contains(itemId);
+        Set<Integer> ids = new HashSet<>();
         RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
             if (name.equals("minecraft:cod") || name.equals("minecraft:salmon") || name.equals("minecraft:tropical_fish") || name.equals("minecraft:pufferfish"))
-                fishIds.add(id);
+                ids.add(id);
         });
-        return fishIds.contains(itemId);
+        fishIds.put(protocol, ids);
+        return ids.contains(itemId);
     }
 
     public static boolean isEnchantedBook(int protocol, int itemId) {
         if (protocol < ProtocolConstants.MINECRAFT_1_13)
             return itemId == MaterialMc18.ENCHANTED_BOOK.getId();
-        if (enchantedBookId > 0)
-            return enchantedBookId == itemId;
+        if (enchantedBookId.containsKey(protocol))
+            return enchantedBookId.get(protocol) == itemId;
+        AtomicInteger ebId = new AtomicInteger();
         RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
             if (name.equals("minecraft:enchanted_book"))
-                enchantedBookId = id;
+                ebId.set(id);
         });
-        return enchantedBookId == itemId;
+        enchantedBookId.put(protocol, ebId.get());
+        return ebId.get() == itemId;
     }
 
     public static List<Enchantment> getEnchantments(Slot slot) {

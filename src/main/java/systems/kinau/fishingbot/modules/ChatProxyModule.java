@@ -10,7 +10,6 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.modules.command.CommandExecutor;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +37,7 @@ public class ChatProxyModule extends Module implements Listener {
                         if (executed)
                             continue;
                     }
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(line));
+                    FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(line);
                 }
             } catch (IOException | InterruptedException ignored) { }
         });

@@ -19,7 +19,7 @@ import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.Module;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChatMessage;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.StringUtils;
@@ -184,13 +184,13 @@ public class FishingModule extends Module implements Runnable, Listener {
         //Print in mc chat (based on announcetype)
         logItem(currentMax,
                 FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeChat(),
-                (String str) -> FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(FishingBot.PREFIX + str)),
+                (String str) -> FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(FishingBot.PREFIX + str)),
                 (String str) -> {
                     // Delay the enchant messages to arrive after the item announcement
                     try {
                         Thread.sleep(200);
                     } catch (InterruptedException ignore) { }
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(str));
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(str));
                 });
 
         LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getEnchantments());

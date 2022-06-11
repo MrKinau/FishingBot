@@ -31,7 +31,7 @@ public class PacketInWindowItems extends Packet {
             readVarInt(in); // revision (whatever it is?) or arbitrary state id?
         }
         this.slots = new ArrayList<>();
-        int count = readVarInt(in);
+        int count = protocolId >= ProtocolConstants.MINECRAFT_1_17_1 ? readVarInt(in) : in.readShort();
         for (int i = 0; i < count; i++) {
             this.slots.add(readSlot(in));
         }

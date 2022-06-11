@@ -36,9 +36,15 @@ public class PacketOutBlockPlace extends Packet {
             out.writeLong(LocationUtils.toBlockPos(x, y, z));
             writeVarInt(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal(), out);
             writeVarInt(hand.ordinal(), out);
-            out.writeFloat(cursorX);
-            out.writeFloat(cursorY);
-            out.writeFloat(cursorZ);
+            if (protocolId >= ProtocolConstants.MINECRAFT_1_11) {
+                out.writeFloat(cursorX);
+                out.writeFloat(cursorY);
+                out.writeFloat(cursorZ);
+            } else {
+                out.writeByte((int) cursorX);
+                out.writeByte((int) cursorY);
+                out.writeByte((int) cursorZ);
+            }
         } else {
             System.err.println("Use PacketOutUseItem for 1.8");
         }
