@@ -27,7 +27,6 @@ import systems.kinau.fishingbot.event.custom.BotStartEvent;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.gui.config.ConfigGUI;
 import systems.kinau.fishingbot.modules.command.CommandExecutor;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
 import systems.kinau.fishingbot.utils.ImageUtils;
 
 import javax.annotation.Resources;
@@ -163,7 +162,7 @@ public class GUIController implements Listener {
             if (executed)
                 return;
         }
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(text));
+        FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(text);
     }
 
     private void openFile(String fileUrl) {

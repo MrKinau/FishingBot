@@ -19,25 +19,18 @@ import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.Module;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChat;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChatMessage;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-// TODO: Change fishing ids based on current version
 public class FishingModule extends Module implements Runnable, Listener {
 
-    private static final List<Integer> FISH_IDS_1_17 = Arrays.asList(801, 802, 803, 804);
-    private static final List<Integer> FISH_IDS_1_16 = Arrays.asList(687, 688, 689, 690);
-    private static final List<Integer> FISH_IDS_1_14 = Arrays.asList(625, 626, 627, 628);
-    private static final List<Integer> FISH_IDS_1_8 = Collections.singletonList(349);
-    private static final List<Integer> ENCHANTED_BOOKS_IDS = Arrays.asList(779, 780, 847, 848);
+    private static int BOBBER_ENTITY_TYPE;
 
     @Getter private List<Item> possibleCaughtItems = new CopyOnWriteArrayList<>();
 
@@ -58,6 +51,16 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     public FishingModule(LootHistory savedLootHistory) {
         this.lootHistory = savedLootHistory;
+        int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
+        if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
+            if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2)
+                BOBBER_ENTITY_TYPE = 90;
+            else
+                BOBBER_ENTITY_TYPE = 101;
+        } else
+            BOBBER_ENTITY_TYPE = RegistryHandler.getEntityType("minecraft:fishing_bobber", FishingBot.getInstance().getCurrentBot().getServerProtocol());
+        if (BOBBER_ENTITY_TYPE == 0)
+            BOBBER_ENTITY_TYPE = 90;
     }
 
     public void setTrackingNextEntityMeta(boolean trackingNextEntityMeta) {
@@ -181,13 +184,13 @@ public class FishingModule extends Module implements Runnable, Listener {
         //Print in mc chat (based on announcetype)
         logItem(currentMax,
                 FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeChat(),
-                (String str) -> FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(FishingBot.PREFIX + str)),
+                (String str) -> FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(FishingBot.PREFIX + str)),
                 (String str) -> {
                     // Delay the enchant messages to arrive after the item announcement
                     try {
                         Thread.sleep(200);
                     } catch (InterruptedException ignore) { }
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(str));
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(str));
                 });
 
         LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getEnchantments());
@@ -205,7 +208,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
         else if (noisiness == AnnounceType.ALL)
             announce.accept(stringify(item));
-        else if (noisiness == AnnounceType.ALL_BUT_FISH && !FISH_IDS_1_14.contains(item.getItemId()) && !FISH_IDS_1_8.contains(item.getItemId()) && !FISH_IDS_1_16.contains(item.getItemId()))
+        else if (noisiness == AnnounceType.ALL_BUT_FISH && !ItemUtils.isFish(FishingBot.getInstance().getCurrentBot().getServerProtocol(), item.getItemId()))
             announce.accept(stringify(item));
 
         if (item.getEnchantments().isEmpty())
@@ -213,9 +216,9 @@ public class FishingModule extends Module implements Runnable, Listener {
 
         if (noisiness == AnnounceType.ONLY_ENCHANTED)
             announce.accept(stringify(item));
-        else if (noisiness == AnnounceType.ONLY_BOOKS && ENCHANTED_BOOKS_IDS.contains(item.getItemId()))
+        else if (noisiness == AnnounceType.ONLY_BOOKS && ItemUtils.isEnchantedBook(FishingBot.getInstance().getCurrentBot().getServerProtocol(), item.getItemId()))
             announce.accept(stringify(item));
-        if (noisiness == AnnounceType.ONLY_BOOKS && !ENCHANTED_BOOKS_IDS.contains(item.getItemId()))
+        if (noisiness == AnnounceType.ONLY_BOOKS && !ItemUtils.isEnchantedBook(FishingBot.getInstance().getCurrentBot().getServerProtocol(), item.getItemId()))
             return;
 
         if (!item.getEnchantments().isEmpty()) {
@@ -400,24 +403,14 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     @EventHandler
-    public void onSpawnObject(SpawnObjectEvent event) {
+    public void onSpawnObject(SpawnEntityEvent event) {
         if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextBobberId())
             return;
 
         if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != -1 && event.getObjectData() != FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
             return;
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_13_2 && event.getType() == 90) {
-            reFish(event.getId());
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_14_4 && event.getType() == 101) {
-            reFish(event.getId());
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_15_2 && event.getType() == 102) {
-            reFish(event.getId());
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_16_1 && event.getType() == 106) {
-            reFish(event.getId());
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_16_4 && event.getType() == 107) {
-            reFish(event.getId());
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_17 && event.getType() == 112) {
+        if (event.getType() == BOBBER_ENTITY_TYPE) {
             reFish(event.getId());
         }
     }

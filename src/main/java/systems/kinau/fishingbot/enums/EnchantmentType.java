@@ -52,6 +52,7 @@ public enum EnchantmentType {
     PIERCING(-1, "piercing"),
     MENDING(70, "mending"),
     CURSE_OF_VANISHING(71, "vanishing_curse"),
+    SWIFT_SNEAK(-1, "swift_sneak"),
     FUTURE(-1);
 
     @Getter private List<String> names;

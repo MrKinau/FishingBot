@@ -18,18 +18,14 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
-import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.TextComponent;
 
-import java.util.UUID;
-
 @NoArgsConstructor
-public class PacketInChat extends Packet {
+public class PacketInChatSystem extends Packet {
 
     private final JSONParser PARSER = new JSONParser();
     @Getter private String text;
-    @Getter private UUID sender;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -48,10 +44,7 @@ public class PacketInChat extends Packet {
                 //Ignored
             }
 
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_16)
-                this.sender = readUUID(in);
-
-            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
+            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), null));
         } catch (Exception ignored) {
             //Ignored
         }

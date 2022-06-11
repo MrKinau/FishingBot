@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
@@ -33,6 +34,8 @@ public class PacketOutEncryptionResponse extends Packet {
         byte[] verifyToken = CryptManager.encryptData(getPublicKey(), getVerifyToken());
         writeVarInt(sharedSecret.length, out);
         out.write(sharedSecret);
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_19)
+            out.writeBoolean(true);
         writeVarInt(verifyToken.length, out);
         out.write(verifyToken);
     }

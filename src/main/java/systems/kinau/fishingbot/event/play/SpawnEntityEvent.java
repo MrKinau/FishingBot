@@ -10,10 +10,10 @@ import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
 @AllArgsConstructor
-public class SpawnObjectEvent extends Event {
+public class SpawnEntityEvent extends Event {
 
     @Getter private int id;
-    @Getter private byte type;
+    @Getter private int type;
     @Getter private int x;
     @Getter private int y;
     @Getter private int z;

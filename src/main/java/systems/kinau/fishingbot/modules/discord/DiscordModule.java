@@ -16,7 +16,7 @@ import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.modules.Module;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
-import systems.kinau.fishingbot.modules.fishing.ItemHandler;
+import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.utils.StringUtils;
 
 import java.text.NumberFormat;
@@ -142,7 +142,7 @@ public class DiscordModule extends Module implements Listener {
                         event.getItem(),
                         FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeDiscord(),
                         s -> getDiscord().dispatchEmbed("**" + finalItemName + "**", getColor(event.getItem()),
-                                ItemHandler.getImageUrl(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
+                                RegistryHandler.getImageUrl(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
                                 getFooter(), DISCORD_DETAILS),
                         s -> { });
             }).start();

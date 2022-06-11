@@ -83,7 +83,7 @@ public class Player implements Listener {
             if (FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeConsole() != AnnounceType.NONE)
                 FishingBot.getI18n().info("announce-level-up", String.valueOf(event.getLevel()));
             if (FishingBot.getInstance().getCurrentBot().getConfig().isAnnounceLvlUp() && !FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceLvlUpText().equalsIgnoreCase("false"))
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceLvlUpText().replace("%lvl%", String.valueOf(event.getLevel()))));
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceLvlUpText().replace("%lvl%", String.valueOf(event.getLevel()))));
         }
 
         this.levels = event.getLevel();
@@ -218,10 +218,15 @@ public class Player implements Listener {
         for (String line : message.split("\n")) {
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
                 for (String split : StringUtils.splitDescription(line)) {
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(split));
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(split));
                 }
+            } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_19) {
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(line));
             } else {
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChat(line));
+                if (line.startsWith("/"))
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(line.substring(1)));
+                else
+                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(line));
             }
         }
     }

@@ -25,7 +25,7 @@ import systems.kinau.fishingbot.modules.command.commands.*;
 import systems.kinau.fishingbot.modules.discord.DiscordModule;
 import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
-import systems.kinau.fishingbot.modules.fishing.ItemHandler;
+import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.modules.timer.TimerModule;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -332,6 +332,9 @@ public class Bot {
                 if (FishingBot.getInstance().getMainGUIController() != null && !getEventManager().isRegistered(FishingBot.getInstance().getMainGUIController()))
                     getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
 
+                // registry handler
+                new RegistryHandler(getServerProtocol());
+
                 // enable required modules
 
                 getModuleManager().enableModule(new HandshakeModule(serverName, port));
@@ -352,9 +355,8 @@ public class Bot {
                 if (getConfig().isTimerEnabled())
                     getModuleManager().enableModule(new TimerModule());
 
-                // init item handler & player
+                // init player
 
-                new ItemHandler(getServerProtocol());
                 this.player = new Player();
 
                 // add shutdown hook

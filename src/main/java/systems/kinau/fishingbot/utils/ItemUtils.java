@@ -11,17 +11,32 @@ import systems.kinau.fishingbot.bot.Inventory;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.enums.EnchantmentType;
 import systems.kinau.fishingbot.enums.MaterialMc18;
-import systems.kinau.fishingbot.modules.fishing.ItemHandler;
+import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ItemUtils {
+
+    private static Map<Integer, Integer> rodId = new HashMap<>();
+    private static Map<Integer, Set<Integer>> fishIds = new HashMap<>();
+    private static Map<Integer, Integer> enchantedBookId = new HashMap<>();
+
+    public static int getRodId(int protocolId) {
+        if (rodId.containsKey(protocolId))
+            return rodId.get(protocolId);
+
+        if (RegistryHandler.getItemsMap(protocolId).containsValue("minecraft:fishing_rod")) {
+            rodId.put(protocolId, RegistryHandler.getItemsMap(protocolId).entrySet().stream()
+                    .filter(entry -> entry.getValue().equals("minecraft:fishing_rod"))
+                    .findAny().get().getKey());
+            return rodId.get(protocolId);
+        }
+        return 563;
+    }
 
     public static boolean isFishingRod(Slot slot) {
         if (slot == null)
@@ -34,16 +49,36 @@ public class ItemUtils {
 
         if (protocol < ProtocolConstants.MINECRAFT_1_13)
             return MaterialMc18.getMaterial(slot.getItemId()) == MaterialMc18.FISHING_ROD;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_13_1)
-            return slot.getItemId() == 563;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_14)
-            return slot.getItemId() == 568;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_16)
-            return slot.getItemId() == 622;
-        else if (protocol < ProtocolConstants.MINECRAFT_1_17)
-            return slot.getItemId() == 684;
         else
-            return slot.getItemId() == 797;
+            return getRodId(protocol) == slot.getItemId();
+    }
+
+    public static boolean isFish(int protocol, int itemId) {
+        if (protocol < ProtocolConstants.MINECRAFT_1_13)
+            return itemId == MaterialMc18.RAW_FISH.getId();
+        if (fishIds.containsKey(protocol))
+            return fishIds.get(protocol).contains(itemId);
+        Set<Integer> ids = new HashSet<>();
+        RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
+            if (name.equals("minecraft:cod") || name.equals("minecraft:salmon") || name.equals("minecraft:tropical_fish") || name.equals("minecraft:pufferfish"))
+                ids.add(id);
+        });
+        fishIds.put(protocol, ids);
+        return ids.contains(itemId);
+    }
+
+    public static boolean isEnchantedBook(int protocol, int itemId) {
+        if (protocol < ProtocolConstants.MINECRAFT_1_13)
+            return itemId == MaterialMc18.ENCHANTED_BOOK.getId();
+        if (enchantedBookId.containsKey(protocol))
+            return enchantedBookId.get(protocol) == itemId;
+        AtomicInteger ebId = new AtomicInteger();
+        RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
+            if (name.equals("minecraft:enchanted_book"))
+                ebId.set(id);
+        });
+        enchantedBookId.put(protocol, ebId.get());
+        return ebId.get() == itemId;
     }
 
     public static List<Enchantment> getEnchantments(Slot slot) {
@@ -156,7 +191,7 @@ public class ItemUtils {
         if (version <= ProtocolConstants.MINECRAFT_1_12_2) {
             return MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
         } else {
-            return ItemHandler.getItemName(slot.getItemId(), version).replace("minecraft:", "");
+            return RegistryHandler.getItemName(slot.getItemId(), version).replace("minecraft:", "");
         }
     }
 }
