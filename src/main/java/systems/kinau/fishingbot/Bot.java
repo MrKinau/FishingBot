@@ -7,6 +7,7 @@ package systems.kinau.fishingbot;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.OneSixParamStorage;
 import org.apache.commons.cli.CommandLine;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
@@ -122,13 +123,17 @@ public class Bot {
         // log config location
         FishingBot.getI18n().info("config-loaded-from", new File(getConfig().getPath()).getAbsolutePath());
 
-        // error if credentials are default credentials
-        if (getConfig().getUserName().equals("my-minecraft@login.com")) {
-            FishingBot.getI18n().warning("credentials-not-set");
-            if (!cmdLine.hasOption("nogui"))
-                Dialogs.showCredentialsNotSet();
-            setPreventStartup(true);
-            return;
+        // Ignore invalid config if the OneSixLauncher is used
+        OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
+        if(oneSix == null) {
+            // error if credentials are default credentials
+            if (getConfig().getUserName().equals("my-minecraft@login.com")) {
+                FishingBot.getI18n().warning("credentials-not-set");
+                if (!cmdLine.hasOption("nogui"))
+                    Dialogs.showCredentialsNotSet();
+                setPreventStartup(true);
+                return;
+            }
         }
 
         // authenticate player if online-mode is set

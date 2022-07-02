@@ -6,14 +6,23 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import net.minecraft.OneSixParamStorage;
 import net.minecraft.client.util.Session.AccountType;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.LongSupplier;
 
 public class Main {
-    @SuppressWarnings("DuplicatedCode")
+    public static LongSupplier nanoTimeSupplier = System::nanoTime;
+
+    public static long getMeasuringTimeMs() {
+        return getMeasuringTimeNano() / 1000000L;
+    }
+
+    public static long getMeasuringTimeNano() {
+        return nanoTimeSupplier.getAsLong();
+    }
+
     public static void main(String[] args) {
         System.out.println("FishingBot Minecraft Launcher Integration");
 
@@ -24,7 +33,6 @@ public class Main {
         optionParser.accepts("disableChat");
         optionParser.accepts("fullscreen");
         optionParser.accepts("checkGlErrors");
-        OptionSpec<Void> optionSpec = optionParser.accepts("jfrProfile");
         OptionSpec<String> optionSpec2 = optionParser.accepts("server").withRequiredArg();
         OptionSpec<Integer> optionSpec3 = optionParser.accepts("port").withRequiredArg().ofType(Integer.class).defaultsTo(25565);
         OptionSpec<File> optionSpec4 = optionParser.accepts("gameDir").withRequiredArg().ofType(File.class).defaultsTo(new File("."));
@@ -34,7 +42,7 @@ public class Main {
         OptionSpec<Integer> optionSpec8 = optionParser.accepts("proxyPort").withRequiredArg().ofType(Integer.class).defaultsTo(8080);
         OptionSpec<String> optionSpec9 = optionParser.accepts("proxyUser").withRequiredArg();
         OptionSpec<String> optionSpec10 = optionParser.accepts("proxyPass").withRequiredArg();
-        OptionSpec<String> optionSpec11 = optionParser.accepts("username").withRequiredArg().defaultsTo("Player" + Util.getMeasuringTimeMs() % 1000L);
+        OptionSpec<String> optionSpec11 = optionParser.accepts("username").withRequiredArg().defaultsTo("Player" + getMeasuringTimeMs() % 1000L);
         OptionSpec<String> optionSpec12 = optionParser.accepts("uuid").withRequiredArg();
         OptionSpec<String> optionSpec13 = optionParser.accepts("xuid").withOptionalArg().defaultsTo("");
         OptionSpec<String> optionSpec14 = optionParser.accepts("clientId").withOptionalArg().defaultsTo("");
@@ -63,7 +71,7 @@ public class Main {
         Integer optionValue19 = getOption(optionSet, optionSpec19);
         Integer optionValue20 = getOption(optionSet, optionSpec20);
 
-        OneSixParamStorage oneSix = new OneSixParamStorage();
+        OneSixParamStorage oneSix = OneSixParamStorage.makeInstance();
         oneSix.setServer(getOption(optionSet, optionSpec2));
         oneSix.setPort(optionValue3 == null ? 25565 : optionValue3);
         oneSix.setGameDir(getOption(optionSet, optionSpec4));

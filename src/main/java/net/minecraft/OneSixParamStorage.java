@@ -33,8 +33,12 @@ public class OneSixParamStorage {
     @Getter @Setter String userType;
     @Getter @Setter String versionType;
 
-    public OneSixParamStorage() {
-        instance = this;
+    private OneSixParamStorage() {
+    }
+
+    public static OneSixParamStorage makeInstance() {
+        instance = new OneSixParamStorage();
+        return instance;
     }
 
     public static OneSixParamStorage getInstance() {
