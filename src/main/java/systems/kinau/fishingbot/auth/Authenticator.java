@@ -46,6 +46,8 @@ public class Authenticator {
         IAuthenticator authenticator = mjAuthenticator;
         if (authService == AuthService.MICROSOFT)
             authenticator = new MicrosoftAuthenticator();
+        if (authService == AuthService.ONESIX)
+            authenticator = new OneSixAuthenticator();
 
         Optional<AuthData> authData = authenticator.authenticate(userName, password);
         authData.ifPresent(data -> writeAccountFile(data.getAccessToken(), data.getClientToken(),
