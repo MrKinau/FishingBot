@@ -5,6 +5,7 @@
 
 package systems.kinau.fishingbot;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.cli.CommandLine;
@@ -20,6 +21,7 @@ import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
 import systems.kinau.fishingbot.modules.*;
 import systems.kinau.fishingbot.modules.command.ChatCommandModule;
+import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.modules.command.CommandRegistry;
 import systems.kinau.fishingbot.modules.command.commands.*;
 import systems.kinau.fishingbot.modules.discord.DiscordModule;
@@ -39,6 +41,8 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.FileHandler;
 
@@ -53,6 +57,7 @@ public class Bot {
     @Getter @Setter private int serverPort;
     @Getter @Setter private AuthData authData;
     @Getter @Setter private boolean wontConnect = false;
+    @Getter         private ExecutorService commandsThread;
 
     @Getter         private EventManager eventManager;
     @Getter         private CommandRegistry commandRegistry;
@@ -272,6 +277,20 @@ public class Bot {
         connect();
     }
 
+    public void runCommand(String command, boolean executeBotCommand) {
+        commandsThread.execute(() -> {
+            if (getNet() == null)
+                return;
+            if (executeBotCommand && command.startsWith("/")) {
+                boolean executed = FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(command, CommandExecutor.CONSOLE);
+                if (executed)
+                    return;
+            }
+
+            getPlayer().sendMessage(command);
+        });
+    }
+
     private boolean authenticate(File accountFile) {
         Authenticator authenticator = new Authenticator(accountFile);
         Optional<AuthData> authData = authenticator.authenticate(getConfig().getAuthService());
@@ -297,6 +316,8 @@ public class Bot {
         getCommandRegistry().registerCommand(new SummaryCommand());
         getCommandRegistry().registerCommand(new RightClickCommand());
         getCommandRegistry().registerCommand(new SwapCommand());
+        getCommandRegistry().registerCommand(new ClickInvCommand());
+        getCommandRegistry().registerCommand(new WaitCommand());
     }
 
     private void connect() {
@@ -324,6 +345,8 @@ public class Bot {
                 this.socket = new Socket(serverName, port);
 
                 this.net = new NetworkHandler();
+                this.commandsThread = Executors.newSingleThreadExecutor(
+                        new ThreadFactoryBuilder().setNameFormat("command-executor-thread-%d").build());
 
                 registerCommands();
                 if (FishingBot.getInstance().getMainGUIController() != null)
@@ -365,6 +388,8 @@ public class Bot {
                     try {
                         if (socket != null && !socket.isClosed())
                             socket.close();
+                        if (commandsThread != null && !commandsThread.isTerminated())
+                            commandsThread.shutdownNow();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -394,6 +419,7 @@ public class Bot {
 
                 if (getPlayer() != null)
                     getEventManager().unregisterListener(getPlayer());
+                commandsThread.shutdownNow();
                 getEventManager().getRegisteredListener().clear();
                 getEventManager().getClassToInstanceMapping().clear();
                 if (getFishingModule() != null)

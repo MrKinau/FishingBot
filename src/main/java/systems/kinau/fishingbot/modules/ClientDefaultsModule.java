@@ -47,7 +47,7 @@ public class ClientDefaultsModule extends Module implements Listener {
             //Send start texts
             if (FishingBot.getInstance().getCurrentBot().getConfig().isStartTextEnabled()) {
                 FishingBot.getInstance().getCurrentBot().getConfig().getStartText().forEach(s -> {
-                    FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(s);
+                    FishingBot.getInstance().getCurrentBot().runCommand(s, true);
                 });
             }
 
@@ -85,6 +85,11 @@ public class ClientDefaultsModule extends Module implements Listener {
     public void onConfirmTransaction(ConfirmTransactionEvent event) {
         if (!event.isAccepted())
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutConfirmTransaction(event.getWindowId(), event.getAction(), true));
+    }
+
+    @EventHandler
+    public void onOpenWindow(OpenWindowEvent e) {
+        FishingBot.getI18n().info("log-inventory-opened", e.getTitle());
     }
 
     private void startPositionUpdate(NetworkHandler networkHandler) {

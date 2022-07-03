@@ -166,7 +166,7 @@ public class Player implements Listener {
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandBeforeDeathEnabled()) {
             if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeDeath() && !isSentLowHealth()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandBeforeDeath()) {
-                    sendMessage(command);
+                    FishingBot.getInstance().getCurrentBot().runCommand(command, true);
                 }
                 setSentLowHealth(true);
             } else if (isSentLowHealth() && event.getHealth() > FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeDeath())
@@ -191,7 +191,7 @@ public class Player implements Listener {
             } catch (InterruptedException ignore) { }
             if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandOnRespawnEnabled()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandOnRespawn()) {
-                    sendMessage(command);
+                    FishingBot.getInstance().getCurrentBot().runCommand(command, true);
                 }
             }
         }).start();
