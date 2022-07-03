@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.OneSixParamStorage;
 import org.json.simple.JSONArray;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.gui.config.options.*;
@@ -24,7 +25,6 @@ import systems.kinau.fishingbot.io.config.Property;
 import systems.kinau.fishingbot.io.config.PropertyProcessor;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
-import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.modules.timer.Timer;
 import systems.kinau.fishingbot.utils.ConvertUtils;
 import systems.kinau.fishingbot.utils.ReflectionUtils;
@@ -127,6 +127,8 @@ public class ConfigGUI {
                 continue;
             if (key.isEmpty())
                 throw new AnnotationFormatError("Property Annotation needs key");
+            if (key.startsWith("account.") && OneSixParamStorage.getInstance() != null)
+                continue;
 
             if (field.getName().equals("defaultProtocol")) {
                 addConfigOption(key, new VersionConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString()));

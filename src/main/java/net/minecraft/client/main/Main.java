@@ -105,7 +105,8 @@ public class Main {
         try {
             return optionSet.valueOf(optionSpec);
         } catch (Throwable var5) {
-            if (optionSpec instanceof ArgumentAcceptingOptionSpec<T> argumentAcceptingOptionSpec) {
+            if (optionSpec instanceof ArgumentAcceptingOptionSpec) {
+                ArgumentAcceptingOptionSpec<T> argumentAcceptingOptionSpec = (ArgumentAcceptingOptionSpec<T>) optionSpec;
                 List<T> list = argumentAcceptingOptionSpec.defaultValues();
                 if (!list.isEmpty()) {
                     return list.get(0);

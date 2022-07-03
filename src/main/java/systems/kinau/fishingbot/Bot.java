@@ -130,7 +130,7 @@ public class Bot {
 
         // Ignore invalid config if the OneSixLauncher is used
         OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
-        if(oneSix == null) {
+        if (oneSix == null) {
             // error if credentials are default credentials
             if (getConfig().getUserName().equals("my-minecraft@login.com")) {
                 FishingBot.getI18n().warning("credentials-not-set");

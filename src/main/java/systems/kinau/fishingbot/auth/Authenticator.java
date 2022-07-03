@@ -24,9 +24,9 @@ public class Authenticator {
     public Optional<AuthData> authenticate(AuthService authService) {
         // Automatically change auth service if OneSixLauncher is available
         OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
-        if(oneSix != null) {
+        if (oneSix != null) {
             FishingBot.getI18n().info("auth-change-onesix");
-            authService = AuthService.ONESIX;
+            return new OneSixAuthenticator().authenticate(null, null);
         }
 
         MojangAuthenticator mjAuthenticator = new MojangAuthenticator(accountFile);
@@ -54,8 +54,6 @@ public class Authenticator {
         IAuthenticator authenticator = mjAuthenticator;
         if (authService == AuthService.MICROSOFT)
             authenticator = new MicrosoftAuthenticator();
-        if (authService == AuthService.ONESIX)
-            authenticator = new OneSixAuthenticator();
 
         Optional<AuthData> authData = authenticator.authenticate(userName, password);
         authData.ifPresent(data -> writeAccountFile(data.getAccessToken(), data.getClientToken(),
