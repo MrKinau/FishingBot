@@ -36,7 +36,7 @@ public class TimerModule extends Module {
                     }
                     if (FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(command, CommandExecutor.UNSET))
                         continue;
-                    FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(command);
+                    FishingBot.getInstance().getCurrentBot().runCommand(command, true);
                 }
             }, timer.getUnits(), timer.getUnits(), timer.getTimeUnit()));
         });
