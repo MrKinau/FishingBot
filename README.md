@@ -70,7 +70,7 @@ A list of all commands can be found in the wiki ([here](https://github.com/MrKin
 - 1.19
 
 ## Discord
-To follow the project. Get support. Request features or bugs you can join my Discord: https://discord.gg/xHpCDYf
+To follow the project, get support or request features or bugs you can join my Discord: https://discord.gg/xHpCDYf
 
 ## Contribution
 You are free to create a fork, or a pull request to participate. You also can report bugs or request a new feature in the [issues](https://github.com/MrKinau/FishingBot/issues) tab or on my [Discord](https://discord.gg/xHpCDYf) (I will answer them as soon as possible)
