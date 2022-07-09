@@ -4,10 +4,6 @@ package systems.kinau.fishingbot.gui.config.options;
 import javafx.scene.control.Label;
 
 public class EmptyConfigOption extends ConfigOption {
-    public EmptyConfigOption(String key, String description, Object value) {
-        super(key, description, null);
-    }
-
     public EmptyConfigOption(String key, String description) {
         super(key, description, null);
         Label emptyLabel = new Label(description);
