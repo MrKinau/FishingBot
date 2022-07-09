@@ -128,17 +128,15 @@ public class Bot {
         // log config location
         FishingBot.getI18n().info("config-loaded-from", new File(getConfig().getPath()).getAbsolutePath());
 
-        // Ignore invalid config if the OneSixLauncher is used
+        // Error if credentials are default credentials
+        // but ignore if the OneSixLauncher is used
         OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
-        if (oneSix == null) {
-            // error if credentials are default credentials
-            if (getConfig().getUserName().equals("my-minecraft@login.com")) {
-                FishingBot.getI18n().warning("credentials-not-set");
-                if (!cmdLine.hasOption("nogui"))
-                    Dialogs.showCredentialsNotSet();
-                setPreventStartup(true);
-                return;
-            }
+        if (oneSix == null && getConfig().getUserName().equals("my-minecraft@login.com")) {
+            FishingBot.getI18n().warning("credentials-not-set");
+            if (!cmdLine.hasOption("nogui"))
+                Dialogs.showCredentialsNotSet();
+            setPreventStartup(true);
+            return;
         }
 
         // authenticate player if online-mode is set

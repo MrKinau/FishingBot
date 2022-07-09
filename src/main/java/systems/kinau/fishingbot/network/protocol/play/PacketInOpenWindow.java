@@ -18,7 +18,9 @@ import java.io.IOException;
 public class PacketInOpenWindow extends Packet {
 
     @Getter
-    private int windowId, windowType;
+    private int windowId;
+    @Getter
+    private int windowType;
     @Getter
     private String title;
 
