@@ -13,7 +13,9 @@ import systems.kinau.fishingbot.event.Event;
 public class OpenWindowEvent extends Event {
 
     @Getter
-    private int windowId, windowType;
+    private int windowId;
+    @Getter
+    private int windowType;
     @Getter
     private String title;
 }

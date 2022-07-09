@@ -1,5 +1,6 @@
 package systems.kinau.fishingbot.auth;
 
+import net.minecraft.OneSixParamStorage;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
@@ -21,6 +22,13 @@ public class Authenticator {
     }
 
     public Optional<AuthData> authenticate(AuthService authService) {
+        // Automatically change auth service if OneSixLauncher is available
+        OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
+        if (oneSix != null) {
+            FishingBot.getI18n().info("auth-change-onesix");
+            return new OneSixAuthenticator().authenticate(null, null);
+        }
+
         MojangAuthenticator mjAuthenticator = new MojangAuthenticator(accountFile);
         String userName = FishingBot.getInstance().getCurrentBot().getConfig().getUserName();
         String password = FishingBot.getInstance().getCurrentBot().getConfig().getPassword();
