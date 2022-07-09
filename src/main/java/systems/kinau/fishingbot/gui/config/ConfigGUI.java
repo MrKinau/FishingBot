@@ -114,6 +114,10 @@ public class ConfigGUI {
     public void createConfigElements(Stage window) {
         SettingsConfig config = FishingBot.getInstance().getConfig();
 
+        boolean usingOneSix = OneSixParamStorage.getInstance() != null;
+        if (usingOneSix)
+            addConfigOption("account.onesix", new EmptyConfigOption("account.onesix", FishingBot.getI18n().t("config-account-onesix")));
+
         List<Field> fields = ReflectionUtils.getAllFields(config);
         for (Field field : fields) {
             if (!field.isAnnotationPresent(Property.class))
@@ -127,35 +131,35 @@ public class ConfigGUI {
                 continue;
             if (key.isEmpty())
                 throw new AnnotationFormatError("Property Annotation needs key");
-            if (key.startsWith("account.") && OneSixParamStorage.getInstance() != null)
+            if (key.startsWith("account.") && usingOneSix)
                 continue;
 
             if (field.getName().equals("defaultProtocol")) {
                 addConfigOption(key, new VersionConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString()));
             } else if (field.getName().equals("realmId")) {
-                addConfigOption(key, new RealmConfigOption(key, FishingBot.getI18n().t(description), (long)ReflectionUtils.getField(field, config), this));
+                addConfigOption(key, new RealmConfigOption(key, FishingBot.getI18n().t(description), (long) ReflectionUtils.getField(field, config), this));
             } else if (field.getType().isAssignableFrom(boolean.class)) {
-                addConfigOption(key, new BooleanConfigOption(key, FishingBot.getI18n().t(description), (boolean)ReflectionUtils.getField(field, config)));
+                addConfigOption(key, new BooleanConfigOption(key, FishingBot.getI18n().t(description), (boolean) ReflectionUtils.getField(field, config)));
             } else if (field.getType().isAssignableFrom(String.class)) {
                 addConfigOption(key, new StringConfigOption(key, FishingBot.getI18n().t(description), (String) ReflectionUtils.getField(field, config), field.getName().contains("password")));
             } else if (field.getType().isAssignableFrom(int.class)) {
                 addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), (int) ReflectionUtils.getField(field, config)));
             } else if (field.getType().isAssignableFrom(float.class)) {
-                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Float.valueOf((float)ReflectionUtils.getField(field, config)).intValue()));
+                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Float.valueOf((float) ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isAssignableFrom(double.class)) {
-                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Double.valueOf((double)ReflectionUtils.getField(field, config)).intValue()));
+                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Double.valueOf((double) ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isAssignableFrom(long.class)) {
-                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Long.valueOf((long)ReflectionUtils.getField(field, config)).intValue()));
+                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Long.valueOf((long) ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isEnum()) {
                 Enum currEnum = (Enum) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), (Enum[]) currEnum.getDeclaringClass().getEnumConstants()));
-            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(String.class)) {
+            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].equals(String.class)) {
                 List<String> content = (List<String>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new StringArrayConfigOption(key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
-            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(Timer.class)) {
+            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].equals(Timer.class)) {
                 List<Timer> content = (List<Timer>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new TimersConfigOption(key, FishingBot.getI18n().t(description), content, window));
-            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0].equals(EjectionRule.class)) {
+            } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].equals(EjectionRule.class)) {
                 List<EjectionRule> content = (List<EjectionRule>) ReflectionUtils.getField(field, config);
                 addConfigOption(key, new EjectionRulesOption(key, FishingBot.getI18n().t(description), content, window));
             }
@@ -178,10 +182,10 @@ public class ConfigGUI {
             } else if (lastSubCatPane != null && lastSubCatPane.contains(currPath.toString())) {
                 lastSubCatPane = (TitledPaneOption) lastSubCatPane.get(currPath.toString()).get();
             } else if (lastSubCatPane == null) {
-                configOptions.put(category, new ActivateableTitledPaneOption(currPath.toString(), configOption.getDescription(), new VBox(5), (boolean)configOption.getValue()));
+                configOptions.put(category, new ActivateableTitledPaneOption(currPath.toString(), configOption.getDescription(), new VBox(5), (boolean) configOption.getValue()));
                 return;
             } else {
-                lastSubCatPane.getContent().getChildren().add(new ActivateableTitledPaneOption(currPath.toString(), configOption.getDescription(), new VBox(5), (boolean)configOption.getValue()));
+                lastSubCatPane.getContent().getChildren().add(new ActivateableTitledPaneOption(currPath.toString(), configOption.getDescription(), new VBox(5), (boolean) configOption.getValue()));
                 return;
             }
             currPath.append(".");
@@ -252,8 +256,10 @@ public class ConfigGUI {
 
     @AllArgsConstructor
     class ConfigCategory {
-        @Getter private String key;
-        @Getter private String translation;
+        @Getter
+        private String key;
+        @Getter
+        private String translation;
 
         @Override
         public String toString() {
