@@ -5,6 +5,10 @@
 
 package systems.kinau.fishingbot.network.utils;
 
+import com.google.common.hash.Hashing;
+import com.google.common.hash.HashingOutputStream;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.CipherKeyGenerator;
 import org.bouncycastle.crypto.KeyGenerationParameters;
@@ -15,16 +19,25 @@ import org.bouncycastle.crypto.modes.CFBBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.auth.AuthData;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 //code borrowed from minecraft's encryptor
 public class CryptManager {
@@ -181,5 +194,78 @@ public class CryptManager {
 
     public static InputStream decryptInputStream(SecretKey par0SecretKey, InputStream par1InputStream) {
         return new CipherInputStream(par1InputStream, createBufferedBlockCipher(false, par0SecretKey));
+    }
+
+    public static byte[] sign(AuthData.ProfileKeys keys, Consumer<Signature> signatureConsumer) {
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSA");
+            signature.initSign(keys.getPrivateKey());
+            Objects.requireNonNull(signature);
+            signatureConsumer.accept(signature);
+            return signature.sign();
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static MessageSignature signChatMessage(AuthData.ProfileKeys keys, UUID signer, String message) {
+        String component = "{\"text\":\"" + message + "\"}";
+        long salt = new Random().nextLong();
+        Instant timestamp = Instant.now();
+
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1) {
+            byte[] messageHeader = new byte[16];
+            ByteBuffer.wrap(messageHeader).order(ByteOrder.BIG_ENDIAN).putLong(signer.getMostSignificantBits()).putLong(signer.getLeastSignificantBits());
+
+            HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha256(), new OutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+                }
+            });
+
+            try {
+                DataOutputStream dataOutputStream = new DataOutputStream(hashingOutputStream);
+                dataOutputStream.writeLong(salt);
+                dataOutputStream.writeLong(timestamp.getEpochSecond());
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(dataOutputStream, StandardCharsets.UTF_8);
+                outputStreamWriter.write(message);
+                outputStreamWriter.flush();
+                dataOutputStream.write(70);
+            } catch (IOException var4) {
+            }
+
+            byte[] messageBody = hashingOutputStream.hash().asBytes();
+            return new MessageSignature(sign(keys, signature -> {
+                try {
+                    signature.update(messageHeader);
+                    signature.update(messageBody);
+                } catch (SignatureException e) {
+                    e.printStackTrace();
+                }
+            }), salt, timestamp);
+        } else {
+            byte[] bs = new byte[32];
+            ByteBuffer byteBuffer = ByteBuffer.wrap(bs).order(ByteOrder.BIG_ENDIAN);
+            byteBuffer.putLong(salt);
+            byteBuffer.putLong(signer.getMostSignificantBits()).putLong(signer.getLeastSignificantBits());
+            byteBuffer.putLong(timestamp.getEpochSecond());
+            return new MessageSignature(sign(keys, signature -> {
+                try {
+                    signature.update(bs);
+                    signature.update(component.getBytes(StandardCharsets.UTF_8));
+                } catch (SignatureException e) {
+                    e.printStackTrace();
+                }
+            }), salt, timestamp);
+        }
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class MessageSignature {
+        private final byte[] signature;
+        private final long salt;
+        private final Instant timestamp;
     }
 }

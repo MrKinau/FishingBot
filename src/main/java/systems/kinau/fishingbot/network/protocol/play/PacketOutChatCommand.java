@@ -21,9 +21,9 @@ public class PacketOutChatCommand extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(getCommand(), out);
-        out.writeLong(System.currentTimeMillis());  // timestamp
-
         // this is most likely very illegal, but it seems like the server does not care about the signature
+
+        out.writeLong(System.currentTimeMillis());  // timestamp
         out.writeLong(System.currentTimeMillis());  // arg sig salt
         writeVarInt(0, out);                  // arg sig map
         out.writeBoolean(false);                 // signed preview

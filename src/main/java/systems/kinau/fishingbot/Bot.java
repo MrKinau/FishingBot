@@ -30,11 +30,11 @@ import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
 import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.modules.timer.TimerModule;
+import systems.kinau.fishingbot.network.mojangapi.MojangAPI;
+import systems.kinau.fishingbot.network.mojangapi.Realm;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.realms.Realm;
-import systems.kinau.fishingbot.network.realms.RealmsAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -164,12 +164,13 @@ public class Bot {
         String ip = getConfig().getServerIP();
         int port = getConfig().getServerPort();
 
-        //Check rather to connect to realm
+        MojangAPI mojangAPI = new MojangAPI(getAuthData());
+
+        // Check rather to connect to realm
         if (getConfig().getRealmId() != -1) {
-            RealmsAPI realmsAPI = new RealmsAPI(getAuthData());
             if (getConfig().getRealmId() == 0) {
-                List<Realm> possibleRealms = realmsAPI.getPossibleWorlds();
-                realmsAPI.printRealms(possibleRealms);
+                List<Realm> possibleRealms = mojangAPI.getPossibleWorlds();
+                mojangAPI.printRealms(possibleRealms);
                 FishingBot.getI18n().info("realms-id-not-set");
                 if (!cmdLine.hasOption("nogui")) {
                     AtomicBoolean dialogClicked = new AtomicBoolean(false);
@@ -183,7 +184,7 @@ public class Bot {
                         dialogClicked.set(true);
                     });
 
-                    // wait in this thread until the dialog is answered
+                    // Wait in this thread until the dialog is answered
                     while (!dialogClicked.get()) {
                         try {
                             Thread.sleep(50);
@@ -198,7 +199,7 @@ public class Bot {
                 }
             }
             if (getConfig().isRealmAcceptTos())
-                realmsAPI.agreeTos();
+                mojangAPI.agreeTos();
             else {
                 if (!cmdLine.hasOption("nogui")) {
                     AtomicBoolean dialogClicked = new AtomicBoolean(false);
@@ -212,7 +213,7 @@ public class Bot {
                         dialogClicked.set(true);
                     });
 
-                    // wait in this thread until the dialog is answered
+                    // Wait in this thread until the dialog is answered
                     while (!dialogClicked.get()) {
                         try {
                             Thread.sleep(50);
@@ -231,7 +232,7 @@ public class Bot {
 
             String ipAndPort = null;
             for (int i = 0; i < 5; i++) {
-                ipAndPort = realmsAPI.getServerIP(getConfig().getRealmId());
+                ipAndPort = mojangAPI.getServerIP(getConfig().getRealmId());
                 if (ipAndPort == null) {
                     FishingBot.getI18n().info("realms-determining-address", String.valueOf(i + 1));
                     try {
@@ -250,10 +251,15 @@ public class Bot {
             port = Integer.parseInt(ipAndPort.split(":")[1]);
         }
 
-        //Ping server
+        // Ping server
         FishingBot.getI18n().info("server-pinging", ip, String.valueOf(port), getConfig().getDefaultProtocol());
         ServerPinger sp = new ServerPinger(ip, port);
         sp.ping();
+
+        // Obtain keys for chat signing
+        if (getConfig().isOnlineMode()) {
+            mojangAPI.obtainCertificates();
+        }
     }
 
     public FishingModule getFishingModule() {

@@ -3,7 +3,7 @@
  * 2019/10/2
  */
 
-package systems.kinau.fishingbot.network.realms;
+package systems.kinau.fishingbot.network.mojangapi;
 
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpHeaders;
@@ -24,16 +24,31 @@ import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
-public class RealmsAPI {
+public class MojangAPI {
 
     private final String REALMS_ENDPOINT = "https://pc.realms.minecraft.net";
+    private final String MOJANG_ENDPOINT = "https://api.minecraftservices.com";
 
-    private HttpClient client;
+    private final HttpClient client;
+    private final AuthData authData;
 
-    public RealmsAPI(AuthData authData) {
+    public MojangAPI(AuthData authData) {
+        this.authData = authData;
         BasicCookieStore cookies = new BasicCookieStore();
 
         BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), authData.getProfile()));
@@ -55,6 +70,69 @@ public class RealmsAPI {
         client = HttpClientBuilder.create()
                 .setDefaultCookieStore(cookies)
                 .build();
+    }
+
+    public void obtainCertificates() {
+        HttpUriRequest request = RequestBuilder.post()
+                .setUri(MOJANG_ENDPOINT + "/player/certificates")
+                .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + authData.getAccessToken())
+                .build();
+
+        try {
+            HttpResponse answer = client.execute(request);
+            if (answer.getStatusLine().getStatusCode() != 200) {
+                FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, answer.getStatusLine().toString());
+                return;
+            }
+            JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
+
+            if (responseJson == null || !responseJson.containsKey("keyPair")) {
+                FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, answer.getStatusLine().toString());
+                return;
+            }
+
+            JSONObject keyPair = (JSONObject) responseJson.get("keyPair");
+            String pubKeyContent = keyPair.get("publicKey").toString()
+                    .replace("\n", "")
+                    .replace("\\n", "")
+                    .replace("-----BEGIN RSA PUBLIC KEY-----", "")
+                    .replace("-----END RSA PUBLIC KEY-----", "");
+            String privKeyContent = keyPair.get("privateKey").toString()
+                    .replace("\n", "")
+                    .replace("\\n", "")
+                    .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+                    .replace("-----END RSA PRIVATE KEY-----", "");
+            String pubKeySig = responseJson.get(
+                    FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1
+                            ? "publicKeySignatureV2"
+                            : "publicKeySignature").toString();
+
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+
+            PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privKeyContent));
+            PrivateKey privKey = kf.generatePrivate(keySpecPKCS8);
+
+            X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(pubKeyContent));
+            RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
+
+            String expirationContent = responseJson.get("expiresAt").toString();
+            TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT.parse(expirationContent);
+            Instant instant = Instant.from(temporalAccessor);
+            Date expiresAt = Date.from(instant);
+
+            if (privKey == null || pubKey == null) {
+                FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, "private key or public key null");
+                return;
+            }
+
+            authData.setProfileKeys(new AuthData.ProfileKeys(pubKey, pubKeySig, privKey, expiresAt.getTime()));
+
+            FishingBot.getI18n().info("retrieved-keys");
+        } catch (IOException | ParseException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+            FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, e.getMessage());
+        }
     }
 
     public List<Realm> getPossibleWorlds() {
@@ -88,7 +166,7 @@ public class RealmsAPI {
         }
         return joinableRealms;
     }
-    
+
     public void printRealms(List<Realm> realms) {
         if (realms.isEmpty()) {
             FishingBot.getI18n().info("realms-no-realms");

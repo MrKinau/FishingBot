@@ -5,16 +5,30 @@
 
 package systems.kinau.fishingbot.auth;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
-@AllArgsConstructor
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
+@RequiredArgsConstructor
 @ToString
 public class AuthData {
 
-    @Getter private String accessToken;
-    @Getter private String clientToken;
-    @Getter private String profile;
-    @Getter private String username;
+    @Getter private final String accessToken;
+    @Getter private final String clientToken;
+    @Getter private final String profile;
+    @Getter private final String username;
+    @Getter @Setter private ProfileKeys profileKeys;
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class ProfileKeys {
+        private final PublicKey publicKey;
+        private final String publicKeySignature;
+        private final PrivateKey privateKey;
+        private final long expiresAt;
+    }
 }

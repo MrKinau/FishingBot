@@ -7,7 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.network.realms.Realm;
+import systems.kinau.fishingbot.network.mojangapi.Realm;
 
 import javax.swing.*;
 import java.util.List;

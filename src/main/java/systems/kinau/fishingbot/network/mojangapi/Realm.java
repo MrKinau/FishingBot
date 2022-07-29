@@ -1,4 +1,4 @@
-package systems.kinau.fishingbot.network.realms;
+package systems.kinau.fishingbot.network.mojangapi;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
