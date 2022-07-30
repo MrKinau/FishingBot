@@ -17,12 +17,14 @@ import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
+import systems.kinau.fishingbot.network.utils.CryptManager;
 import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.LocationUtils;
 import systems.kinau.fishingbot.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -48,6 +50,7 @@ public class Player implements Listener {
     @Getter @Setter private Slot heldItem;
     @Getter @Setter private Inventory inventory;
     @Getter         private final Map<Integer, Inventory> openedInventories = new HashMap<>();
+    @Getter @Setter private Optional<CryptManager.MessageSignature> lastUsedSignature = Optional.empty();
 
     @Getter @Setter private UUID uuid;
 

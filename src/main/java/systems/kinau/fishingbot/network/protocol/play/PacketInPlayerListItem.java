@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.event.play.PingChangeEvent;
 import systems.kinau.fishingbot.event.play.UpdatePlayerListEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -49,6 +50,15 @@ public class PacketInPlayerListItem extends Packet {
                 int ping = readVarInt(in);
                 if (in.readBoolean()) // has display name
                     readString(in); // display name
+                if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
+                    if (in.readBoolean()) {
+                        in.readLong(); // expiration
+                        int size = readVarInt(in); // pubkey length
+                        in.readFully(new byte[size]); // pubkey
+                        size = readVarInt(in); // sig length
+                        in.readFully(new byte[size]); // sig
+                    }
+                }
                 if (uuid.equals(FishingBot.getInstance().getCurrentBot().getPlayer().getUuid()))
                     FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PingChangeEvent(ping));
             } else if (action == 1) {

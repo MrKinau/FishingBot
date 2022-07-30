@@ -16,6 +16,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -50,6 +51,8 @@ public class PacketOutChatMessage extends Packet {
                 writeVarInt(signature.getSignature().length, out);
                 out.write(signature.getSignature());
                 out.writeBoolean(false);
+
+                FishingBot.getInstance().getCurrentBot().getPlayer().setLastUsedSignature(Optional.of(signature));
             }
 
             if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {

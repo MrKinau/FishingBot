@@ -35,6 +35,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -221,6 +222,7 @@ public class CryptManager {
             HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha256(), new OutputStream() {
                 @Override
                 public void write(int b) throws IOException {
+                    // empty
                 }
             });
 
@@ -238,6 +240,9 @@ public class CryptManager {
             byte[] messageBody = hashingOutputStream.hash().asBytes();
             return new MessageSignature(sign(keys, signature -> {
                 try {
+                    Optional<MessageSignature> prevSignature = FishingBot.getInstance().getCurrentBot().getPlayer().getLastUsedSignature();
+                    if (prevSignature.isPresent())
+                        signature.update(prevSignature.get().getSignature());
                     signature.update(messageHeader);
                     signature.update(messageBody);
                 } catch (SignatureException e) {

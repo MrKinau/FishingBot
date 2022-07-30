@@ -18,6 +18,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.TextComponent;
 
@@ -37,21 +38,25 @@ public class PacketInChatPlayer extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        this.text = readString(in);
-        try {
-            JSONObject object = (JSONObject) PARSER.parse(text);
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
 
+        } else {
+            this.text = readString(in);
             try {
-                this.text = TextComponent.toPlainText(object);
+                JSONObject object = (JSONObject) PARSER.parse(text);
+
+                try {
+                    this.text = TextComponent.toPlainText(object);
+                } catch (Exception ignored) {
+                    //Ignored
+                }
+
+                //TODO: Handle this correctly. This packet represents the normal chat packet up to 1.18.2 and the vanilla server player chat packet in 1.19 and higher
+
+                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
             } catch (Exception ignored) {
                 //Ignored
             }
-
-            //TODO: Handle this correctly. This packet represents the normal chat packet up to 1.18.2 and the vanilla server player chat packet in 1.19 and higher
-
-            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
-        } catch (Exception ignored) {
-            //Ignored
         }
     }
 }

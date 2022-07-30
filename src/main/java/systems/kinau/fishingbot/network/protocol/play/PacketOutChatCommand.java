@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @AllArgsConstructor
@@ -22,11 +23,16 @@ public class PacketOutChatCommand extends Packet {
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(getCommand(), out);
         // this is most likely very illegal, but it seems like the server does not care about the signature
+        // UPDATE: It's not working in a signed context (only no argument commands work)
 
         out.writeLong(System.currentTimeMillis());  // timestamp
         out.writeLong(System.currentTimeMillis());  // arg sig salt
         writeVarInt(0, out);                  // arg sig map
         out.writeBoolean(false);                 // signed preview
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
+            writeVarInt(0, out);              // acknowledgements lastSeen (LastSeenMessageList.write(buf))
+            out.writeBoolean(false);             // acknowledgements lastReceived (Optional<LastSeenMessageList.Entry>)
+        }
     }
 
     @Override
