@@ -35,7 +35,7 @@ public class PacketOutChatMessage extends Packet {
                         .replaceFirst(
                                 "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
                         ));
-            } catch (IllegalArgumentException ignore) {}
+            } catch (Exception ignore) {}
 
             if (keys == null || signer == null) {
                 out.writeLong(System.currentTimeMillis());  // timestamp
