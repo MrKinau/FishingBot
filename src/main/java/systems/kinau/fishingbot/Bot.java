@@ -428,7 +428,8 @@ public class Bot {
 
                 if (getPlayer() != null)
                     getEventManager().unregisterListener(getPlayer());
-                commandsThread.shutdownNow();
+                if (commandsThread != null && !commandsThread.isShutdown())
+                    commandsThread.shutdownNow();
                 getEventManager().getRegisteredListener().clear();
                 getEventManager().getClassToInstanceMapping().clear();
                 if (getFishingModule() != null)

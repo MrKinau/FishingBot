@@ -54,7 +54,7 @@ public class SettingsConfig implements Config {
     @Property(key = "auto.auto-eject.rules", description = "config-auto-auto-eject") private List<EjectionRule> autoLootEjectionRules = Arrays.asList(
             new EjectionRule("fish", LocationUtils.Direction.WEST, Arrays.asList("cod", "salmon", "pufferfish", "tropical_fish"), EjectionRule.EjectionType.DROP),
             new EjectionRule("treasure", LocationUtils.Direction.EAST, Arrays.asList("bow", "enchanted_book", "name_tag", "nautilus_shell", "saddle"), EjectionRule.EjectionType.DROP),
-            new EjectionRule("junk", LocationUtils.Direction.SOUTH, Arrays.asList("lily_pad", "bowl", "leather", "leather_boots", "rotten_flesh", "stick", "string", "potion", "bone", "ink_sac", "tripwire_hook"), EjectionRule.EjectionType.DROP));
+            new EjectionRule("junk", LocationUtils.Direction.SOUTH, Arrays.asList("lily_pad", "bowl", "leather", "leather_boots", "rotten_flesh", "stick", "string", "potion", "bone", "ink_sac", "tripwire_hook", "bamboo"), EjectionRule.EjectionType.DROP));
 
     @Property(key = "auto.timer.enabled", description = "config-auto-timer") private boolean timerEnabled = false;
     @Property(key = "auto.timer.timers", description = "config-auto-timers") private List<Timer> timers = Collections.singletonList(new Timer("test", 5, TimeUnit.MINUTES, Collections.singletonList("Every five minutes")));
