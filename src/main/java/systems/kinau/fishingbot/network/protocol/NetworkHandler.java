@@ -626,7 +626,7 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x12, PacketOutKeepAlive.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x14, PacketOutPosition.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x15, PacketOutPosLook.class);
-        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x1D, PacketOutEntityAction.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x1E, PacketOutEntityAction.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x28, PacketOutHeldItemChange.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x31, PacketOutBlockPlace.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x32, PacketOutUseItem.class);
