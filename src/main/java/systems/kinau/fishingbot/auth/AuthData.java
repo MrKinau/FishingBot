@@ -18,7 +18,6 @@ import java.security.PublicKey;
 public class AuthData {
 
     @Getter private final String accessToken;
-    @Getter private final String clientToken;
     @Getter private final String profile;
     @Getter private final String username;
     @Getter @Setter private ProfileKeys profileKeys;

@@ -6,13 +6,15 @@ import systems.kinau.fishingbot.FishingBot;
 import java.util.Optional;
 
 public class OneSixAuthenticator implements IAuthenticator {
+
     @Override
-    public Optional<AuthData> authenticate(String loginName, String password) {
+    public Optional<AuthData> authenticate() {
         FishingBot.getI18n().info("auth-using-onesix");
         OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
         if (oneSix != null) {
-            return Optional.of(new AuthData(oneSix.getAccessToken(), "", oneSix.getUuid(), oneSix.getUsername()));
+            return Optional.of(new AuthData(oneSix.getAccessToken(), oneSix.getUuid(), oneSix.getUsername()));
         }
         return Optional.empty();
     }
+
 }

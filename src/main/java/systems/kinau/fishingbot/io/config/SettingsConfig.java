@@ -7,7 +7,6 @@ package systems.kinau.fishingbot.io.config;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import systems.kinau.fishingbot.auth.AuthService;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
@@ -59,9 +58,7 @@ public class SettingsConfig implements Config {
     @Property(key = "auto.timer.enabled", description = "config-auto-timer") private boolean timerEnabled = false;
     @Property(key = "auto.timer.timers", description = "config-auto-timers") private List<Timer> timers = Collections.singletonList(new Timer("test", 5, TimeUnit.MINUTES, Collections.singletonList("Every five minutes")));
 
-    @Property(key = "account.mail", description = "config-account-mail") private String userName = "my-minecraft@login.com";
-    @Property(key = "account.password", description = "config-account-password") private String password = "CHANGEME";
-    @Property(key = "account.auth-service", description = "config-account-auth-service") private AuthService authService = AuthService.MOJANG;
+    @Property(key = "account.mail", description = "config-account-mail") private String userName = "FishingBot";
 
     @Property(key = "logs.log-count", description = "config-logs-log-count") private int logCount = 15;
     @Property(key = "logs.log-packets", description = "config-logs-log-packets") private boolean logPackets = false;

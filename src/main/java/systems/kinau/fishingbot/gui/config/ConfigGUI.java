@@ -113,10 +113,12 @@ public class ConfigGUI {
 
     public void createConfigElements(Stage window) {
         SettingsConfig config = FishingBot.getInstance().getConfig();
-
         boolean usingOneSix = OneSixParamStorage.getInstance() != null;
+
         if (usingOneSix)
             addConfigOption("account.onesix", new EmptyConfigOption("account.onesix", FishingBot.getI18n().t("config-account-onesix")));
+        else
+            addConfigOption("account.microsoft", new EmptyConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-microsoft")));
 
         List<Field> fields = ReflectionUtils.getAllFields(config);
         for (Field field : fields) {

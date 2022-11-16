@@ -8,7 +8,6 @@ package systems.kinau.fishingbot;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.OneSixParamStorage;
 import org.apache.commons.cli.CommandLine;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.auth.Authenticator;
@@ -72,7 +71,6 @@ public class Bot {
     @Getter @Setter private FishingModule fishingModule;
 
     @Getter         private File logsFolder = new File("logs");
-    @Getter         private File accountFile = new File("account.json");
 
     public Bot(CommandLine cmdLine) {
         FishingBot.getInstance().setCurrentBot(this);
@@ -106,10 +104,6 @@ public class Bot {
             }
         }
 
-        if (cmdLine.hasOption("accountfile")) {
-            this.accountFile = new File(cmdLine.getOptionValue("accountfile"));
-        }
-
         // set logger file handler
         try {
             FileHandler fh;
@@ -128,20 +122,10 @@ public class Bot {
         // log config location
         FishingBot.getI18n().info("config-loaded-from", new File(getConfig().getPath()).getAbsolutePath());
 
-        // Error if credentials are default credentials
-        // but ignore if the OneSixLauncher is used
-        OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
-        if (oneSix == null && getConfig().getUserName().equals("my-minecraft@login.com")) {
-            FishingBot.getI18n().warning("credentials-not-set");
-            if (!cmdLine.hasOption("nogui"))
-                Dialogs.showCredentialsNotSet();
-            setPreventStartup(true);
-            return;
-        }
-
         // authenticate player if online-mode is set
         if (getConfig().isOnlineMode()) {
-            boolean authSuccessful = authenticate(accountFile);
+            boolean authSuccessful = authenticate();
+
             if (!authSuccessful) {
                 setPreventStartup(true);
                 FishingBot.getI18n().severe("credentials-invalid");
@@ -151,7 +135,7 @@ public class Bot {
             }
         } else {
             FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
-            this.authData = new AuthData(null, null, null, getConfig().getUserName());
+            this.authData = new AuthData(null, null, getConfig().getUserName());
         }
 
         if (!cmdLine.hasOption("nogui")) {
@@ -300,16 +284,17 @@ public class Bot {
         });
     }
 
-    private boolean authenticate(File accountFile) {
-        Authenticator authenticator = new Authenticator(accountFile);
-        Optional<AuthData> authData = authenticator.authenticate(getConfig().getAuthService());
+    private boolean authenticate() {
+        Authenticator authenticator = new Authenticator();
+        Optional<AuthData> authData = authenticator.authenticate();
 
         if (!authData.isPresent()) {
-            setAuthData(new AuthData(null, null, null, getConfig().getUserName()));
+            setAuthData(new AuthData(null, null, getConfig().getUserName()));
             return false;
         }
 
         setAuthData(authData.get());
+
         return true;
     }
 
@@ -448,10 +433,10 @@ public class Bot {
 
                 if (getAuthData() == null) {
                     if (getConfig().isOnlineMode())
-                        authenticate(accountFile);
+                        authenticate();
                     else {
                         FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
-                        authData = new AuthData(null, null, null, getConfig().getUserName());
+                        authData = new AuthData(null, null, getConfig().getUserName());
                     }
                 }
             }
