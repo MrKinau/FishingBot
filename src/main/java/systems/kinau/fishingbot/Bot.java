@@ -58,6 +58,7 @@ public class Bot {
     @Getter @Setter private AuthData authData;
     @Getter @Setter private boolean wontConnect = false;
     @Getter         private ExecutorService commandsThread;
+    @Getter         private boolean noGui;
 
     @Getter         private EventManager eventManager;
     @Getter         private CommandRegistry commandRegistry;
@@ -76,6 +77,8 @@ public class Bot {
         FishingBot.getInstance().setCurrentBot(this);
         this.eventManager = new EventManager();
         this.moduleManager = new ModuleManager();
+        this.noGui = cmdLine.hasOption("nogui");
+
         if (!cmdLine.hasOption("nogui"))
             getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
 

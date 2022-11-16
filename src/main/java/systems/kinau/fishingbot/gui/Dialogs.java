@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
@@ -18,23 +19,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Dialogs {
-
-    public static void showCredentialsNotSet() {
-        setupJFX();
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle(FishingBot.PREFIX);
-
-            alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-header"));
-            alert.setContentText(FishingBot.getI18n().t("dialog-credentials-content"));
-
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.setAlwaysOnTop(true);
-            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
-
-            alert.showAndWait();
-        });
-    }
 
     public static void showJavaFXNotWorking() {
         JOptionPane.showConfirmDialog(new JFrame(), "JavaFX seems to be not working properly on your computer!\nPlease look at the log.\n\n" +
@@ -164,4 +148,29 @@ public class Dialogs {
             alert.showAndWait();
         });
     }
+
+    public static void showAuthorizationRequest(String code, String url) {
+        setupJFX();
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle(FishingBot.PREFIX);
+
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-authorization-header"));
+            FlowPane flowPane = new FlowPane();
+
+            TextArea textArea = new TextArea(FishingBot.getI18n().t("auth-create-refresh-token", code, url));
+            textArea.setEditable(false);
+            textArea.setWrapText(true);
+            flowPane.getChildren().add(textArea);
+
+            alert.getDialogPane().contentProperty().set(flowPane);
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
+
+            alert.show();
+        });
+    }
+
 }

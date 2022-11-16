@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.auth.msa.*;
+import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.utils.reflect.MethodAccessor;
 import systems.kinau.fishingbot.utils.reflect.Reflect;
 
@@ -42,6 +43,10 @@ public class MicrosoftAuthenticator implements IAuthenticator {
                 FishingBot.getLog().warning(line);
             }
             FishingBot.getLog().warning(" ");
+
+            if (!FishingBot.getInstance().getCurrentBot().isNoGui()) {
+                Dialogs.showAuthorizationRequest(callback.getUserCode(), callback.getVerificationUrl());
+            }
 
             refreshToken = RefreshTokenCallback.await(callback, CLIENT_ID);
         }
