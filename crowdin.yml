@@ -1,0 +1,3 @@
+files:
+  - source: /**/lang/fb.properties
+    translation: /%original_path%/fb_%two_letters_code%.%file_extension%
