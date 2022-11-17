@@ -103,7 +103,7 @@ public class Dialogs {
         }
     }
 
-    public static void showAboutWindow(Stage parent, Consumer<String> callBack) {
+    public static void showAboutWindow(Stage parent) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle(FishingBot.TITLE);
@@ -116,7 +116,7 @@ public class Dialogs {
 
             link.setOnAction(event -> {
                 alert.close();
-                callBack.accept("https://faithful.team/");
+                GUIController.openWebpage("https://faithful.team/");
             });
 
             alert.getDialogPane().contentProperty().set(fp);
@@ -129,7 +129,7 @@ public class Dialogs {
         });
     }
 
-    public static void showCredentialsInvalid(Consumer<String> callBack) {
+    public static void showCredentialsInvalid() {
         setupJFX();
 
         Platform.runLater(() -> {
@@ -144,7 +144,7 @@ public class Dialogs {
 
             link.setOnAction(event -> {
                 alert.close();
-                callBack.accept("https://github.com/MrKinau/FishingBot/wiki/Troubleshooting");
+                GUIController.openWebpage("https://github.com/MrKinau/FishingBot/wiki/Troubleshooting");
             });
 
             alert.getDialogPane().contentProperty().set(fp);
@@ -176,7 +176,7 @@ public class Dialogs {
 
             Hyperlink link = new Hyperlink(url);
             link.setOnAction(event -> {
-                new Thread(() -> GUIController.openWebpage(url), "openMSPage").start();
+                GUIController.openWebpage(url);
             });
 
             TextField codeText = new TextField(code);

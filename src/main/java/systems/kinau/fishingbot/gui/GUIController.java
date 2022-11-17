@@ -160,21 +160,25 @@ public class GUIController implements Listener {
 
     private void openFile(String fileUrl) {
         if (Desktop.isDesktopSupported()) {
-            try {
-                Desktop.getDesktop().open(new File(fileUrl));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            new Thread(() -> {
+                try {
+                    Desktop.getDesktop().open(new File(fileUrl));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }, "openFile").start();
         }
     }
 
     public static void openWebpage(String url) {
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            try {
-                Desktop.getDesktop().browse(new URI(url));
-            } catch (IOException | URISyntaxException ioException) {
-                ioException.printStackTrace();
-            }
+            new Thread(() -> {
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }, "openWebPage").start();
         }
     }
 
@@ -238,7 +242,7 @@ public class GUIController implements Listener {
     }
 
     public void openAbout(Event e) {
-        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow(), GUIController::openWebpage);
+        Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow());
     }
 
     public void setImage(String uuid) {

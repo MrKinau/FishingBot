@@ -15,7 +15,6 @@ import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.event.EventManager;
 import systems.kinau.fishingbot.gui.Dialogs;
-import systems.kinau.fishingbot.gui.GUIController;
 import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
@@ -134,7 +133,7 @@ public class Bot {
                 if (!isPreventStartup()) {
                     FishingBot.getI18n().severe("credentials-invalid");
                     if (!cmdLine.hasOption("nogui")) {
-                        Dialogs.showCredentialsInvalid(GUIController::openWebpage);
+                        Dialogs.showCredentialsInvalid();
                     }
                 }
                 setPreventStartup(true);
