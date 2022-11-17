@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.gui.config;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -19,7 +20,6 @@ import lombok.Getter;
 import net.minecraft.OneSixParamStorage;
 import org.json.simple.JSONArray;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.auth.MicrosoftAuthenticator;
 import systems.kinau.fishingbot.gui.config.options.*;
 import systems.kinau.fishingbot.io.config.ConvertException;
 import systems.kinau.fishingbot.io.config.Property;
@@ -31,9 +31,11 @@ import systems.kinau.fishingbot.utils.ConvertUtils;
 import systems.kinau.fishingbot.utils.ReflectionUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -120,9 +122,15 @@ public class ConfigGUI {
             addConfigOption("account.onesix", new EmptyConfigOption("account.onesix", FishingBot.getI18n().t("config-account-onesix")));
         else {
             addConfigOption("account.microsoft", new EmptyConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-microsoft")));
-            boolean refreshTokenExists = MicrosoftAuthenticator.getRefreshTokenFile().exists();
-            //TODO: Delete refreshToken file
-            addConfigOption("account.microsoft", new ButtonConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-logout"), refreshTokenExists));
+            boolean refreshTokenExists = FishingBot.getInstance().getRefreshTokenFile().exists();
+            addConfigOption("account.microsoft", new ButtonConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-logout"), refreshTokenExists, event -> {
+                try {
+                    Files.delete(FishingBot.getInstance().getRefreshTokenFile().toPath());
+                    ((Node) event.getSource()).setDisable(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }));
         }
 
         List<Field> fields = ReflectionUtils.getAllFields(config);

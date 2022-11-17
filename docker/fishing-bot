@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 if [ $# -eq 0 ]; then
-  java -jar /usr/lib/fishingbot/FishingBot.jar -nogui -logsdir /var/log/fishingbot/ -config /etc/fishingbot.json
+  java -jar /usr/lib/fishingbot/FishingBot.jar -nogui -logsdir /var/log/fishingbot/ -config /usr/lib/fishingbot/data/config.json -refreshToken /usr/lib/fishingbot/data/refreshToken
 else
   java -jar /usr/lib/fishingbot/FishingBot.jar "$@"
 fi

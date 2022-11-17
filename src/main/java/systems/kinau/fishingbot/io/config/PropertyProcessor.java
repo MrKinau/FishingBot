@@ -32,7 +32,8 @@ public class PropertyProcessor {
         }
 
         if (!file.exists()) {
-            file.createNewFile();
+            if (!parentDir.exists())
+                parentDir.mkdirs();
             saveConfig(config, file);
             return;
         }

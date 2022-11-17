@@ -13,6 +13,7 @@ import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.CustomPrintStream;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
 
+import java.io.File;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,6 +31,7 @@ public class FishingBot {
     @Getter private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
     @Getter private SettingsConfig config;
+    @Getter private File refreshTokenFile;
     private CommandLine cmdLine;
 
     @Getter @Setter private Bot currentBot;
@@ -73,6 +75,17 @@ public class FishingBot {
             this.config = new SettingsConfig("config.json");
 
         i18n = new I18n(config.getLanguage(), PREFIX);
+
+        // refresh token file
+        if (cmdLine.hasOption("refreshToken")) {
+            this.refreshTokenFile = new File(cmdLine.getOptionValue("refreshToken"));
+            File refreshTokenDir = refreshTokenFile.getParentFile();
+            if (!refreshTokenDir.exists()) {
+                refreshTokenDir.mkdirs();
+            }
+        } else {
+            this.refreshTokenFile = new File("refreshToken");
+        }
     }
 
     public void startBot() {

@@ -20,7 +20,8 @@ public class Main {
         options.addOption("help", false, "shows help message");
         options.addOption("logsdir", true, "specifies where to save the logs");
         options.addOption("config", true, "specifies the path to the config");
-        options.addOption("accountfile", true, "specifies the path to the account file where the accessToken is stored");
+        options.addOption("refreshToken", "accountfile", true, "specifies the path to the refreshToken which is used to login to Microsoft");
+        options.addOption("onlyCreateConfig", false, "shut down the bot after the config is created");
 
         // add nogui option if Desktop is not supported
         if (!Desktop.isDesktopSupported()) {
@@ -38,6 +39,9 @@ public class Main {
             }
 
             new FishingBot(cmd);
+
+            if (cmd.hasOption("onlyCreateConfig"))
+                return;
 
             if (!cmd.hasOption("nogui")) {
                 String[] finalArgs = args;

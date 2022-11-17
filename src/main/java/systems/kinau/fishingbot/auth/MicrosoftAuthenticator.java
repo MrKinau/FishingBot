@@ -39,59 +39,66 @@ public class MicrosoftAuthenticator implements IAuthenticator {
         String refreshToken = readRefreshToken();
         CompletableFuture<Alert> authDialog = null;
 
-        if (refreshToken == null) {
-            DeviceTokenCallback callback = DeviceTokenGenerator.createDeviceToken(CLIENT_ID);
+        try {
+            if (refreshToken == null) {
+                DeviceTokenCallback callback = DeviceTokenGenerator.createDeviceToken(CLIENT_ID);
 
-            if (callback == null) {
+                if (callback == null) {
+                    FishingBot.getI18n().severe("auth-could-not-get-refresh-token");
+                    return Optional.empty();
+                }
+
+                FishingBot.getLog().warning(" ");
+                FishingBot.getLog().warning(" ");
+                for (String line : FishingBot.getI18n().t("auth-create-refresh-token", callback.getUserCode(), callback.getVerificationUrl()).split("\n")) {
+                    FishingBot.getLog().warning(line);
+                }
+                FishingBot.getLog().warning(" ");
+
+                if (!FishingBot.getInstance().getCurrentBot().isNoGui()) {
+                    authDialog = Dialogs.showAuthorizationRequest(callback.getUserCode(), callback.getVerificationUrl());
+                }
+
+                refreshToken = RefreshTokenCallback.await(callback, CLIENT_ID);
+            } else {
+                FishingBot.getI18n().info("auth-found-refresh-token", FishingBot.getInstance().getRefreshTokenFile().getAbsolutePath());
+            }
+
+            if (refreshToken == null) {
                 FishingBot.getI18n().severe("auth-could-not-get-refresh-token");
+                closeDialog(authDialog);
                 return Optional.empty();
             }
 
-            FishingBot.getLog().warning(" ");
-            FishingBot.getLog().warning(" ");
-            for (String line : FishingBot.getI18n().t("auth-create-refresh-token", callback.getUserCode(), callback.getVerificationUrl()).split("\n")) {
-                FishingBot.getLog().warning(line);
-            }
-            FishingBot.getLog().warning(" ");
+            setDialogProgress(authDialog, 0.1);
 
-            if (!FishingBot.getInstance().getCurrentBot().isNoGui()) {
-                authDialog = Dialogs.showAuthorizationRequest(callback.getUserCode(), callback.getVerificationUrl());
+            try {
+                Files.write(refreshToken, FishingBot.getInstance().getRefreshTokenFile(), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            refreshToken = RefreshTokenCallback.await(callback, CLIENT_ID);
-        }
+            AuthenticationService authService = new MsaAuthenticationService(CLIENT_ID, refreshToken);
+            setDialogProgress(authDialog, 0.2);
+            AccessTokenCallback callback = AccessTokenGenerator.createAccessToken(refreshToken, CLIENT_ID);
 
-        if (refreshToken == null) {
-            FishingBot.getI18n().severe("auth-could-not-get-refresh-token");
+            if (callback == null) {
+                FishingBot.getI18n().severe("auth-could-not-get-access-token");
+                closeDialog(authDialog);
+                return Optional.empty();
+            }
+            setDialogProgress(authDialog, 0.5);
+            JsonObject object = GSON.toJsonTree(LOGIN_RESPONSE_ACCESSOR.invoke(authService, "d=" + callback.getAccessToken())).getAsJsonObject();
+            authService.setAccessToken(object.get("access_token").getAsString());
+            setDialogProgress(authDialog, 0.9);
+            MicrosoftAuthenticator.GET_PROFILE_ACCESSOR.invoke(authService);
             closeDialog(authDialog);
-            return Optional.empty();
-        }
-
-        setDialogProgress(authDialog, 0.1);
-
-        try {
-            Files.write(refreshToken, new File("refreshToken"), StandardCharsets.UTF_8);
-        } catch (IOException e) {
+            return Optional.of(new AuthData(authService.getAccessToken(), authService.getSelectedProfile().getIdAsString(), authService.getSelectedProfile().getName()));
+        } catch (Throwable e) {
             e.printStackTrace();
-        }
-
-        AuthenticationService authService = new MsaAuthenticationService(CLIENT_ID, refreshToken);
-        setDialogProgress(authDialog, 0.2);
-        AccessTokenCallback callback = AccessTokenGenerator.createAccessToken(refreshToken, CLIENT_ID);
-
-        if (callback == null) {
-            FishingBot.getI18n().severe("auth-could-not-get-access-token");
             closeDialog(authDialog);
             return Optional.empty();
         }
-        setDialogProgress(authDialog, 0.5);
-        JsonObject object = GSON.toJsonTree(LOGIN_RESPONSE_ACCESSOR.invoke(authService, "d=" + callback.getAccessToken())).getAsJsonObject();
-        authService.setAccessToken(object.get("access_token").getAsString());
-        setDialogProgress(authDialog, 0.9);
-        MicrosoftAuthenticator.GET_PROFILE_ACCESSOR.invoke(authService);
-        closeDialog(authDialog);
-
-        return Optional.of(new AuthData(authService.getAccessToken(), authService.getSelectedProfile().getIdAsString(), authService.getSelectedProfile().getName()));
     }
 
     private void setDialogProgress(CompletableFuture<Alert> authDialog, double progress) {
@@ -124,7 +131,7 @@ public class MicrosoftAuthenticator implements IAuthenticator {
     }
 
     private String readRefreshToken() {
-        File file = getRefreshTokenFile();
+        File file = FishingBot.getInstance().getRefreshTokenFile();
         
         if (!file.exists()) {
             return null;
@@ -139,8 +146,4 @@ public class MicrosoftAuthenticator implements IAuthenticator {
         return null;
     }
 
-    public static File getRefreshTokenFile() {
-        return new File("refreshToken");
-    }
-    
 }

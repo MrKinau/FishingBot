@@ -102,6 +102,7 @@ public class Bot {
                     FishingBot.getI18n().severe("log-failed-creating-folder");
                     FishingBot.getInstance().getCurrentBot().setRunning(false);
                     FishingBot.getInstance().getCurrentBot().setWontConnect(true);
+                    FishingBot.getInstance().getCurrentBot().setPreventStartup(true);
                     return;
                 }
             }

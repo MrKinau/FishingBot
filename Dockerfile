@@ -11,7 +11,6 @@ RUN apk add bash jq
 ENV MC_SERVER=127.0.0.1
 ENV MC_PORT=25565
 ENV MC_PROTOCOL=AUTOMATIC
-ENV MC_SPOOF_FORGE=false
 ENV MC_ONLINE_MODE=true
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["fishing-bot"]
