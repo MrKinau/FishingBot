@@ -19,6 +19,7 @@ import lombok.Getter;
 import net.minecraft.OneSixParamStorage;
 import org.json.simple.JSONArray;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.auth.MicrosoftAuthenticator;
 import systems.kinau.fishingbot.gui.config.options.*;
 import systems.kinau.fishingbot.io.config.ConvertException;
 import systems.kinau.fishingbot.io.config.Property;
@@ -117,8 +118,12 @@ public class ConfigGUI {
 
         if (usingOneSix)
             addConfigOption("account.onesix", new EmptyConfigOption("account.onesix", FishingBot.getI18n().t("config-account-onesix")));
-        else
+        else {
             addConfigOption("account.microsoft", new EmptyConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-microsoft")));
+            boolean refreshTokenExists = MicrosoftAuthenticator.getRefreshTokenFile().exists();
+            //TODO: Delete refreshToken file
+            addConfigOption("account.microsoft", new ButtonConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-logout"), refreshTokenExists));
+        }
 
         List<Field> fields = ReflectionUtils.getAllFields(config);
         for (Field field : fields) {

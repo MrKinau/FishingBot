@@ -24,6 +24,7 @@ public class FishingBot {
 
     @Getter @Setter private static I18n i18n;
     public static String PREFIX;
+    public static String TITLE;
     @Getter private static FishingBot instance;
     @Getter public static Logger log = Logger.getLogger(Bot.class.getSimpleName());
     @Getter private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -48,6 +49,7 @@ public class FishingBot {
             PREFIX = "FishingBot vUnknown - ";
             ex.printStackTrace();
         }
+        TITLE = PREFIX.substring(0, PREFIX.length() - 3);
 
         // initialize Logger
         log.setLevel(Level.ALL);
@@ -59,7 +61,7 @@ public class FishingBot {
         CustomPrintStream.enableForPackage("systems.kinau.fishingbot", getLog());
 
         // start message
-        getLog().info("Using " + PREFIX.substring(0, PREFIX.length() - 3));
+        getLog().info("Using " + TITLE);
 
         // i18n pre init
 
@@ -89,6 +91,14 @@ public class FishingBot {
         // TODO: Send Disconnect Packet
         getCurrentBot().setPreventReconnect(preventReconnect);
         getCurrentBot().setRunning(false);
+        getCurrentBot().setPreventStartup(true);
+        FishingBot.getInstance().interruptMainThread();
+    }
+
+    public void interruptMainThread() {
+        Thread.getAllStackTraces().keySet().stream()
+                .filter(thread -> thread.getName().equals("mainThread"))
+                .forEach(Thread::interrupt);
     }
 
 }

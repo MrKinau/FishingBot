@@ -2,17 +2,23 @@ package systems.kinau.fishingbot.gui;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.mojangapi.Realm;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -40,7 +46,7 @@ public class Dialogs {
                 dialog.setHeaderText(FishingBot.getI18n().t("dialog-realms-select"));
             }
 
-            dialog.setTitle(FishingBot.PREFIX);
+            dialog.setTitle(FishingBot.TITLE);
 
             Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(true);
@@ -70,7 +76,7 @@ public class Dialogs {
         setupJFX();
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.NO, ButtonType.YES);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.TITLE);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-realms-tos-header"));
             alert.setContentText(FishingBot.getI18n().t("dialog-realms-tos-content", "https://www.minecraft.net/en-us/realms/terms"));
@@ -99,7 +105,7 @@ public class Dialogs {
     public static void showAboutWindow(Stage parent, Consumer<String> callBack) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.TITLE);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-about-header"));
             FlowPane fp = new FlowPane();
@@ -127,7 +133,7 @@ public class Dialogs {
 
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.TITLE);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-invalid-header"));
             FlowPane fp = new FlowPane();
@@ -149,28 +155,68 @@ public class Dialogs {
         });
     }
 
-    public static void showAuthorizationRequest(String code, String url) {
+    public static CompletableFuture<Alert> showAuthorizationRequest(String code, String url) {
         setupJFX();
 
+        CompletableFuture<Alert> future = new CompletableFuture<>();
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle(FishingBot.PREFIX);
+            alert.setTitle(FishingBot.TITLE);
+            alert.getButtonTypes().setAll(ButtonType.CANCEL);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-authorization-header"));
             FlowPane flowPane = new FlowPane();
 
-            TextArea textArea = new TextArea(FishingBot.getI18n().t("auth-create-refresh-token", code, url));
-            textArea.setEditable(false);
-            textArea.setWrapText(true);
-            flowPane.getChildren().add(textArea);
+            List<Text> texts = new ArrayList<>();
+            String rawMsg = FishingBot.getI18n().t("auth-create-refresh-token", "%s", "%s");
+            for (String s : rawMsg.split("%s")) {
+                texts.add(new Text(s));
+            }
+
+            Hyperlink link = new Hyperlink(url);
+            link.setOnAction(event -> {
+                new Thread(() -> GUIController.openWebpage(url), "openMSPage").start();
+            });
+
+            TextField codeText = new TextField(code);
+            codeText.setEditable(false);
+            codeText.setPrefWidth(95);
+            codeText.setAlignment(Pos.CENTER);
+
+            TextFlow flow = new TextFlow();
+            if (texts.size() >= 1)
+                flow.getChildren().add(texts.get(0));
+            flow.getChildren().add(codeText);
+            if (texts.size() >= 2)
+                flow.getChildren().add(texts.get(1));
+            flow.getChildren().add(link);
+            if (texts.size() >= 3)
+                flow.getChildren().add(texts.get(2));
+
+            VBox spacer = new VBox();
+            spacer.setMinHeight(80);
+
+            ProgressBar progressBar = new ProgressBar();
+            progressBar.setPrefWidth(810);
+
+            flowPane.getChildren().addAll(flow, spacer, progressBar);
 
             alert.getDialogPane().contentProperty().set(flowPane);
 
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
 
-            alert.show();
+            future.complete(alert);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get().getButtonData().isCancelButton()) {
+                    FishingBot.getInstance().getCurrentBot().setPreventStartup(true);
+                    FishingBot.getInstance().interruptMainThread();
+                    FishingBot.getLog().info("Authentication canceled!");
+                }
+            }
         });
+        return future;
     }
 
 }

@@ -34,6 +34,7 @@ public class DeviceTokenGenerator {
             HttpResponse response = CLIENT.execute(request);
 
             if (response.getStatusLine().getStatusCode() != 200) {
+                EntityUtils.consumeQuietly(response.getEntity());
                 throw new RuntimeException("Could not request device token: " + response.getStatusLine().getReasonPhrase());
             }
 

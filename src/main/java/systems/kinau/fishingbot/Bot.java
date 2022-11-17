@@ -130,11 +130,14 @@ public class Bot {
             boolean authSuccessful = authenticate();
 
             if (!authSuccessful) {
-                setPreventStartup(true);
-                FishingBot.getI18n().severe("credentials-invalid");
-                if (!cmdLine.hasOption("nogui")) {
-                    Dialogs.showCredentialsInvalid(GUIController::openWebpage);
+                if (!isPreventStartup()) {
+                    FishingBot.getI18n().severe("credentials-invalid");
+                    if (!cmdLine.hasOption("nogui")) {
+                        Dialogs.showCredentialsInvalid(GUIController::openWebpage);
+                    }
                 }
+                setPreventStartup(true);
+                return;
             }
         } else {
             FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());

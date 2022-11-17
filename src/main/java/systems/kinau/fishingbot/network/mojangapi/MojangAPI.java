@@ -82,6 +82,7 @@ public class MojangAPI {
         try {
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() != 200) {
+                EntityUtils.consumeQuietly(answer.getEntity());
                 FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, answer.getStatusLine().toString());
                 return;
             }
@@ -145,6 +146,7 @@ public class MojangAPI {
         try {
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() != 200) {
+                EntityUtils.consumeQuietly(answer.getEntity());
                 FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT, answer.getStatusLine().toString());
                 return joinableRealms;
             }
@@ -194,6 +196,7 @@ public class MojangAPI {
                 return;
             } else
                 FishingBot.getI18n().info("realms-accepted-tos");
+            EntityUtils.consumeQuietly(answer.getEntity());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -208,6 +211,7 @@ public class MojangAPI {
         try {
             HttpResponse answer = client.execute(request);
             if (answer.getStatusLine().getStatusCode() != 200) {
+                EntityUtils.consumeQuietly(answer.getEntity());
                 FishingBot.getI18n().severe("realms-could-not-determine-address", REALMS_ENDPOINT, answer.getStatusLine());
                 return null;
             }

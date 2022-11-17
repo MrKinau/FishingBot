@@ -42,4 +42,8 @@ public class MainGUI extends Application {
         FishingBot.getInstance().setMainGUIController(loader.getController());
     }
 
+    @Override
+    public void stop() throws Exception {
+        FishingBot.getInstance().interruptMainThread();
+    }
 }

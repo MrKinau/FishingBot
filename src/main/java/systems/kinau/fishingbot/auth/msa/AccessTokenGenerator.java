@@ -40,6 +40,12 @@ public class AccessTokenGenerator {
 
         try {
             HttpResponse response = CLIENT.execute(request);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                EntityUtils.consumeQuietly(response.getEntity());
+                throw new RuntimeException("Could not request access token: " + response.getStatusLine().getReasonPhrase());
+            }
+
             JsonObject object = new JsonParser().parse(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8)).getAsJsonObject();
 
             if (object.has("error")) {

@@ -33,10 +33,13 @@ public class RefreshTokenCallback {
             FishingBot.getLog().info(refreshToken.get().getValue());
             refreshToken.set(get(callback, clientId));
 
+            if (FishingBot.getInstance().getCurrentBot().isPreventStartup())
+                break;
+
             try {
                 Thread.sleep(TimeUnit.SECONDS.toMillis(callback.getInterval()));
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                break;
             }
         }
 
@@ -52,7 +55,7 @@ public class RefreshTokenCallback {
         } else if (pair.getKey() == RefreshTokenResult.EXPIRED_TOKEN) {
             throw new IllegalStateException("User did not authorize in time");
         } else {
-            throw new IllegalStateException("Should not reach here");
+            return null;
         }
     }
 
