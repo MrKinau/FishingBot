@@ -59,7 +59,17 @@ public class MicrosoftAuthenticator implements IAuthenticator {
                     authDialog = Dialogs.showAuthorizationRequest(callback.getUserCode(), callback.getVerificationUrl());
                 }
 
-                refreshToken = RefreshTokenCallback.await(callback, CLIENT_ID);
+                try {
+                    refreshToken = RefreshTokenCallback.await(callback, CLIENT_ID);
+                } catch (ObtainTokenException ex) {
+                    ex.printStackTrace();
+                    closeDialog(authDialog);
+                    if (!FishingBot.getInstance().getCurrentBot().isNoGui()) {
+                        Dialogs.showAuthFailed(ex.getReason());
+                    }
+                    FishingBot.getInstance().getCurrentBot().setPreventStartup(true);
+                    return Optional.empty();
+                }
             } else {
                 FishingBot.getI18n().info("auth-found-refresh-token", FishingBot.getInstance().getRefreshTokenFile().getAbsolutePath());
             }

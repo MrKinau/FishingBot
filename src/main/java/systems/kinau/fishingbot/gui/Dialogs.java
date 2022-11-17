@@ -12,6 +12,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.auth.msa.RefreshTokenResult;
 import systems.kinau.fishingbot.network.mojangapi.Realm;
 
 import javax.swing.*;
@@ -219,4 +220,27 @@ public class Dialogs {
         return future;
     }
 
+    public static void showAuthFailed(RefreshTokenResult reason) {
+        setupJFX();
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setTitle(FishingBot.TITLE);
+
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-authorization-failed-header"));
+            FlowPane flowPane = new FlowPane();
+
+            String msg = FishingBot.getI18n().t("auth-failed-" + reason.name().replace("_", "-").toLowerCase());
+            Text text = new Text(msg);
+
+            flowPane.getChildren().add(text);
+
+            alert.getDialogPane().contentProperty().set(flowPane);
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
+
+            alert.show();
+        });
+    }
 }

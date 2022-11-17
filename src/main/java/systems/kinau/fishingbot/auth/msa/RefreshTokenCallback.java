@@ -26,7 +26,7 @@ public class RefreshTokenCallback {
 
     private static final HttpClient CLIENT = HttpClientBuilder.create().build();
 
-    public static String await(DeviceTokenCallback callback, String clientId) {
+    public static String await(DeviceTokenCallback callback, String clientId) throws ObtainTokenException {
         AtomicReference<Pair<RefreshTokenResult, String>> refreshToken = new AtomicReference<>(get(callback, clientId));
 
         while (refreshToken.get().getKey() == RefreshTokenResult.AUTHORIZATION_PENDING) {
@@ -50,10 +50,8 @@ public class RefreshTokenCallback {
             return pair.getValue();
         }
 
-        if (pair.getKey() == RefreshTokenResult.AUTHORIZATION_DECLINED) {
-            throw new IllegalStateException("User declined permissions");
-        } else if (pair.getKey() == RefreshTokenResult.EXPIRED_TOKEN) {
-            throw new IllegalStateException("User did not authorize in time");
+        if (pair.getKey() == RefreshTokenResult.AUTHORIZATION_DECLINED || pair.getKey() == RefreshTokenResult.EXPIRED_TOKEN) {
+            throw new ObtainTokenException(pair.getKey());
         } else {
             return null;
         }
