@@ -80,7 +80,7 @@ public class FishingBot {
         if (cmdLine.hasOption("refreshToken")) {
             this.refreshTokenFile = new File(cmdLine.getOptionValue("refreshToken"));
             File refreshTokenDir = refreshTokenFile.getParentFile();
-            if (!refreshTokenDir.exists()) {
+            if (refreshTokenDir != null && !refreshTokenDir.exists()) {
                 refreshTokenDir.mkdirs();
             }
         } else {

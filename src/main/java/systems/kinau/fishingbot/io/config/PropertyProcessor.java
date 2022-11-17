@@ -32,7 +32,7 @@ public class PropertyProcessor {
         }
 
         if (!file.exists()) {
-            if (!parentDir.exists())
+            if (parentDir != null && !parentDir.exists())
                 parentDir.mkdirs();
             saveConfig(config, file);
             return;
