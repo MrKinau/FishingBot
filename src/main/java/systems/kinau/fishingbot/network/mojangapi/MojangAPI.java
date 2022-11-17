@@ -77,6 +77,7 @@ public class MojangAPI {
                 .setUri(MOJANG_ENDPOINT + "/player/certificates")
                 .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + authData.getAccessToken())
+                .setHeader(HttpHeaders.CONTENT_LENGTH, "0")
                 .build();
 
         try {
