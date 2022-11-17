@@ -1,1 +1,3 @@
-files: []
+files:
+  - source: src/main/resources/lang/fb.properties
+    translation: src/main/resources/lang/fb_%two_letters_code%.properties
