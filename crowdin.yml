@@ -1,3 +1,7 @@
-files:
-  - source: /**/lang/fb.properties
-    translation: /%original_path%/fb_%two_letters_code%.%file_extension%
+"files": [
+  {
+    "source": "/**/lang/fb.properties",
+    "translation": ""/%original_path%/fb_%two_letters_code%.%file_extension%",
+    "escape_quotes": 1
+  }
+]

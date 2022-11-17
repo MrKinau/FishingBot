@@ -34,7 +34,7 @@ public class I18n {
             properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties"), StandardCharsets.UTF_8));
             this.locales = new HashMap(properties);
             properties = new Properties();
-            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb.properties"), StandardCharsets.UTF_8));
+            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_en.properties"), StandardCharsets.UTF_8));
             this.fallbackLocales = new HashMap(properties);
             this.bundle = ResourceBundle.getBundle("lang/fb", language.getLocale(), new UTF8Control());
 
