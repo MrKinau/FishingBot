@@ -19,6 +19,7 @@ import java.util.ResourceBundle;
 public class I18n {
 
     private Map<String, String> locales = new HashMap<>();
+    private Map<String, String> fallbackLocales = new HashMap<>();
     private final String prefix;
     @Getter private ResourceBundle bundle;
 
@@ -32,6 +33,9 @@ public class I18n {
             Properties properties = new Properties();
             properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties"), StandardCharsets.UTF_8));
             this.locales = new HashMap(properties);
+            properties = new Properties();
+            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb.properties"), StandardCharsets.UTF_8));
+            this.fallbackLocales = new HashMap(properties);
             this.bundle = ResourceBundle.getBundle("lang/fb", language.getLocale(), new UTF8Control());
 
             if (!silent)
@@ -45,6 +49,8 @@ public class I18n {
 
     public String t(String key, Object... args) {
         String value = locales.get(key);
+        if (value == null)
+            value = fallbackLocales.get(key);
         return value == null ? "N/A" : MessageFormat.format(value, args).replace("%prefix%", prefix);
     }
 
