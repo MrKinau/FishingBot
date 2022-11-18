@@ -18,9 +18,13 @@ import java.security.PublicKey;
 public class AuthData {
 
     @Getter private final String accessToken;
-    @Getter private final String profile;
+    @Getter private final String uuid;
     @Getter private final String username;
     @Getter @Setter private ProfileKeys profileKeys;
+
+    public String getUUIDWithoutDashes() {
+        return uuid.replace("-", "");
+    }
 
     @RequiredArgsConstructor
     @Getter

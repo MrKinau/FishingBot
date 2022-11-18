@@ -12,7 +12,10 @@ public class OneSixAuthenticator implements IAuthenticator {
         FishingBot.getI18n().info("auth-using-onesix");
         OneSixParamStorage oneSix = OneSixParamStorage.getInstance();
         if (oneSix != null) {
-            return Optional.of(new AuthData(oneSix.getAccessToken(), oneSix.getUuid(), oneSix.getUsername()));
+            String uuid = oneSix.getUuid().replaceFirst(
+                    "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
+            );
+            return Optional.of(new AuthData(oneSix.getAccessToken(), uuid, oneSix.getUsername()));
         }
         return Optional.empty();
     }

@@ -42,6 +42,13 @@ public class ServerPinger {
 
         updateWithSRV();
 
+        if (FishingBot.getInstance().getConfig().getRealmId() >= 0) {
+            FishingBot.getI18n().severe("network-could-not-ping", serverName);
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.AUTOMATIC)
+                FishingBot.getInstance().getCurrentBot().setServerProtocol(ProtocolConstants.getLatest());
+            return;
+        }
+
         try {
 
             Socket socket = new Socket(serverName, serverPort);

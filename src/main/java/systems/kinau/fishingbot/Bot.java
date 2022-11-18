@@ -145,7 +145,7 @@ public class Bot {
         }
 
         if (!cmdLine.hasOption("nogui")) {
-            FishingBot.getInstance().getMainGUIController().setImage(authData.getProfile());
+            FishingBot.getInstance().getMainGUIController().setImage(authData.getUuid());
             FishingBot.getInstance().getMainGUIController().setAccountName(authData.getUsername());
         }
 
@@ -154,7 +154,10 @@ public class Bot {
         String ip = getConfig().getServerIP();
         int port = getConfig().getServerPort();
 
-        MojangAPI mojangAPI = new MojangAPI(getAuthData());
+        int assumedProtocolIdForMJAPI = ProtocolConstants.getProtocolId(getConfig().getDefaultProtocol());
+        if (assumedProtocolIdForMJAPI == ProtocolConstants.AUTOMATIC)
+            assumedProtocolIdForMJAPI = ProtocolConstants.getLatest();
+        MojangAPI mojangAPI = new MojangAPI(getAuthData(), assumedProtocolIdForMJAPI);
 
         // Check rather to connect to realm
         if (getConfig().getRealmId() != -1) {

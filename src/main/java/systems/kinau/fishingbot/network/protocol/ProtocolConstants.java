@@ -123,6 +123,15 @@ public class ProtocolConstants {
         }
     }
 
+    public static String getExactVersionString(int protocolId) {
+        switch (protocolId) {
+            case MINECRAFT_1_16_4: return "1.16.5";
+            case MINECRAFT_1_18: return "1.18.1";
+            case MINECRAFT_1_19_1: return "1.19.2";
+            default: return getVersionString(protocolId);
+        }
+    }
+
     public static int getProtocolId(String versionString) {
         switch (versionString) {
             case "AUTOMATIC": return AUTOMATIC;

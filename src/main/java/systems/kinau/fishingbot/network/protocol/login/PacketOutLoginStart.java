@@ -43,10 +43,7 @@ public class PacketOutLoginStart extends Packet {
             if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
                 UUID uuid = null;
                 try {
-                    uuid = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getProfile()
-                            .replaceFirst(
-                                    "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
-                            ));
+                    uuid = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getUuid());
                 } catch (Exception ignore) {
                 }
                 out.writeBoolean(uuid != null);

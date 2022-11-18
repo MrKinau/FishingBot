@@ -47,13 +47,13 @@ public class MojangAPI {
     private final HttpClient client;
     private final AuthData authData;
 
-    public MojangAPI(AuthData authData) {
+    public MojangAPI(AuthData authData, int protocolId) {
         this.authData = authData;
         BasicCookieStore cookies = new BasicCookieStore();
 
-        BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), authData.getProfile()));
+        BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), authData.getUUIDWithoutDashes()));
         BasicClientCookie userCookie = new BasicClientCookie("user", authData.getUsername());
-        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getVersionString(FishingBot.getInstance().getCurrentBot().getServerProtocol()));
+        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getExactVersionString(protocolId));
 
         sidCookie.setDomain(".pc.realms.minecraft.net");
         userCookie.setDomain(".pc.realms.minecraft.net");
@@ -153,6 +153,7 @@ public class MojangAPI {
             }
             JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
             JSONArray servers = (JSONArray) responseJson.get("servers");
+            System.out.println(responseJson);
             if (servers.size() == 0)
                 return joinableRealms;
 

@@ -31,10 +31,7 @@ public class PacketOutChatMessage extends Packet {
             AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
             UUID signer = null;
             try {
-                signer = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getProfile()
-                        .replaceFirst(
-                                "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"
-                        ));
+                signer = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getUuid());
             } catch (Exception ignore) {}
 
             if (keys == null || signer == null) {
