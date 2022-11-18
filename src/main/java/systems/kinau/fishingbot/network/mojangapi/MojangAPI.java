@@ -153,7 +153,6 @@ public class MojangAPI {
             }
             JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
             JSONArray servers = (JSONArray) responseJson.get("servers");
-            System.out.println(responseJson);
             if (servers.size() == 0)
                 return joinableRealms;
 
