@@ -70,7 +70,7 @@ public class Bot {
 
     @Getter @Setter private FishingModule fishingModule;
 
-    @Getter         private File logsFolder = new File("logs");
+    @Getter         private File logsFolder = new File(FishingBot.getExecutionDirectory(), "logs");
 
     public Bot(CommandLine cmdLine) {
         FishingBot.getInstance().setCurrentBot(this);
@@ -86,7 +86,7 @@ public class Bot {
         if (cmdLine.hasOption("config"))
             this.config = new SettingsConfig(cmdLine.getOptionValue("config"));
         else
-            this.config = new SettingsConfig("config.json");
+            this.config = new SettingsConfig(new File(FishingBot.getExecutionDirectory(), "config.json").getAbsolutePath());
 
         // update i18n
 

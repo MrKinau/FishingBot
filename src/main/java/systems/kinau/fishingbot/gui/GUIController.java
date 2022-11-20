@@ -99,7 +99,7 @@ public class GUIController implements Listener {
     public void openConfig(Event e) {
         String file;
         if (FishingBot.getInstance().getCurrentBot() == null)
-            file = new File("config.json").getPath();
+            file = new File(FishingBot.getExecutionDirectory(), "config.json").getPath();
         else
             file = FishingBot.getInstance().getCurrentBot().getConfig().getPath();
         openFile(file);
@@ -108,7 +108,7 @@ public class GUIController implements Listener {
     public void openLogsDir(Event e) {
         String file;
         if (FishingBot.getInstance().getCurrentBot() == null)
-            file = new File("logs/").getPath();
+            file = new File(FishingBot.getExecutionDirectory(), "logs/").getPath();
         else
             file = FishingBot.getInstance().getCurrentBot().getLogsFolder().getPath();
         openFile(file);
@@ -117,7 +117,7 @@ public class GUIController implements Listener {
     public void openLog(Event e) {
         String file;
         if (FishingBot.getInstance().getCurrentBot() == null)
-            file = new File("logs/log0.log").getPath();
+            file = new File(FishingBot.getExecutionDirectory(), "logs/log0.log").getPath();
         else
             file = FishingBot.getInstance().getCurrentBot().getLogsFolder().getPath() + "/log0.log";
         openFile(file);

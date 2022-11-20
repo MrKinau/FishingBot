@@ -7,6 +7,7 @@ import joptsimple.OptionSpec;
 import net.minecraft.OneSixParamStorage;
 import net.minecraft.client.util.Session.AccountType;
 import org.jetbrains.annotations.Nullable;
+import systems.kinau.fishingbot.FishingBot;
 
 import java.io.File;
 import java.util.List;
@@ -35,7 +36,7 @@ public class Main {
         optionParser.accepts("checkGlErrors");
         OptionSpec<String> optionSpec2 = optionParser.accepts("server").withRequiredArg();
         OptionSpec<Integer> optionSpec3 = optionParser.accepts("port").withRequiredArg().ofType(Integer.class).defaultsTo(25565);
-        OptionSpec<File> optionSpec4 = optionParser.accepts("gameDir").withRequiredArg().ofType(File.class).defaultsTo(new File("."));
+        OptionSpec<File> optionSpec4 = optionParser.accepts("gameDir").withRequiredArg().ofType(File.class).defaultsTo(FishingBot.getExecutionDirectory());
         OptionSpec<File> optionSpec5 = optionParser.accepts("assetsDir").withRequiredArg().ofType(File.class);
         OptionSpec<File> optionSpec6 = optionParser.accepts("resourcePackDir").withRequiredArg().ofType(File.class);
         OptionSpec<String> optionSpec7 = optionParser.accepts("proxyHost").withRequiredArg();

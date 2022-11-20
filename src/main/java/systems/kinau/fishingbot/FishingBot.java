@@ -72,7 +72,7 @@ public class FishingBot {
         if (cmdLine.hasOption("config"))
             this.config = new SettingsConfig(cmdLine.getOptionValue("config"));
         else
-            this.config = new SettingsConfig("config.json");
+            this.config = new SettingsConfig(new File(FishingBot.getExecutionDirectory(), "config.json").getAbsolutePath());
 
         i18n = new I18n(config.getLanguage(), PREFIX);
 
@@ -84,7 +84,7 @@ public class FishingBot {
                 refreshTokenDir.mkdirs();
             }
         } else {
-            this.refreshTokenFile = new File("refreshToken");
+            this.refreshTokenFile = new File(FishingBot.getExecutionDirectory(), "refreshToken");
         }
     }
 
@@ -112,6 +112,13 @@ public class FishingBot {
         Thread.getAllStackTraces().keySet().stream()
                 .filter(thread -> thread.getName().equals("mainThread"))
                 .forEach(Thread::interrupt);
+    }
+
+    public static File getExecutionDirectory() {
+        File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+        if (jarFile.getParentFile() == null)
+            return new File("");
+        return jarFile.getParentFile();
     }
 
 }
