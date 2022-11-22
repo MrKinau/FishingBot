@@ -11,7 +11,7 @@ import java.util.Comparator;
 public class SummaryCommand extends Command {
 
     public SummaryCommand() {
-        super("summary", FishingBot.getI18n().t("command-summary-desc"), "summarize", "stats", "caught", "loot");
+        super("summary", FishingBot.getI18n().t("command-summary-desc"), "summarize", "stats", "statistics", "caught", "loot");
     }
 
     @Override
@@ -20,6 +20,15 @@ public class SummaryCommand extends Command {
             return;
         if (FishingBot.getInstance().getCurrentBot().getFishingModule() == null)
             return;
+        boolean clearAfterwards = false;
+        if (args.length >= 1) {
+            if (args[0].equalsIgnoreCase("clear"))
+                clearAfterwards = true;
+            else {
+                sendMessage("/summary [clear]", executor);
+                return;
+            }
+        }
         LootHistory lootHistory = FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory();
         if (lootHistory.getItems().isEmpty()) {
             sendMessage(executor, "command-summary-empty");
@@ -32,6 +41,9 @@ public class SummaryCommand extends Command {
 
         if (FishingBot.getInstance().getCurrentBot().getDiscordModule() != null)
             FishingBot.getInstance().getCurrentBot().getDiscordModule().sendSummary(lootHistory);
+
+        if (clearAfterwards)
+            lootHistory.getItems().clear();
     }
 
 }

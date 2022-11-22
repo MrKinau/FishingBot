@@ -77,5 +77,7 @@ To follow the project, get support or request features or bugs you can join my D
 ## Contribution
 You are free to create a fork, or a pull request to participate. You also can report bugs or request a new feature in the [issues](https://github.com/MrKinau/FishingBot/issues) tab or on my [Discord](https://discord.gg/xHpCDYf) (I will answer them as soon as possible)
 
+If you want to help translating this project into your mother language, we appreciate any help. Just signup at Crowdin and start translating the [project](https://crowdin.com/project/fishingbot).
+
 ## Credits
 Thanks to [Torchbot](https://github.com/woder/TorchBot) for a code base. I've just stolen the half project lol.
