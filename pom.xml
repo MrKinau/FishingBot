@@ -30,6 +30,11 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>minecraft-libraries</id>
+            <name>Minecraft Libraries</name>
+            <url>https://libraries.minecraft.net</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -94,6 +99,11 @@
             <groupId>com.github.GeyserMC</groupId>
             <artifactId>MCAuthLib</artifactId>
             <version>0c27f2b643</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>brigadier</artifactId>
+            <version>1.0.18</version>
         </dependency>
 
         <!-- ONESIX -->

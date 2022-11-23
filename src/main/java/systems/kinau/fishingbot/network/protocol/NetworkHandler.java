@@ -598,6 +598,7 @@ public class NetworkHandler {
         //Minecraft 1.19.1
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x00, PacketInSpawnEntity.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x0B, PacketInDifficultySet.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x0F, PacketInCommands.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x10, PacketInWindowClose.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x11, PacketInWindowItems.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x13, PacketInSetSlot.class);
