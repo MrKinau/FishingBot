@@ -18,6 +18,7 @@ import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.command.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.brigardier.argument.MessageArgumentType;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
@@ -249,13 +250,13 @@ public class Player implements Listener {
 
         CommandContextBuilder<CommandExecutor> context = mcCommandDispatcher.parse(command, CommandExecutor.UNSET).getContext();
         Map<String, Pair<ArgumentType<?>, ParsedArgument<CommandExecutor, ?>>> arguments = CommandUtils.getArguments(context);
-        boolean containsSignableArguments = arguments.values().stream().anyMatch(argument -> argument.getKey() instanceof PacketInCommands.MessageArgumentType);
+        boolean containsSignableArguments = arguments.values().stream().anyMatch(argument -> argument.getKey() instanceof MessageArgumentType);
         if (!containsSignableArguments) {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
             return;
         }
         List<CryptManager.SignableArgument> signableArguments = arguments.entrySet().stream()
-                .filter(entry -> entry.getValue().getKey() instanceof PacketInCommands.MessageArgumentType)
+                .filter(entry -> entry.getValue().getKey() instanceof MessageArgumentType)
                 .map(entry -> new CryptManager.SignableArgument(entry.getKey(), entry.getValue().getValue().getResult().toString()))
                 .collect(Collectors.toList());
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command, signableArguments));

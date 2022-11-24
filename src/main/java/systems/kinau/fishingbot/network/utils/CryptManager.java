@@ -213,8 +213,7 @@ public class CryptManager {
         Instant timestamp = Instant.now();
 
         List<ArgumentSignature> signatures = arguments.stream().map(signableArgument -> {
-            String component = "{\"text\":\"" + signableArgument.getArgumentValue() + "\"}";
-            MessageSignature signature = signMessage(keys, signer, signableArgument.getArgumentValue(), component, salt, timestamp);
+            MessageSignature signature = signMessage(keys, signer, signableArgument.getArgumentValue(), salt, timestamp);
             return new ArgumentSignature(signableArgument.getArgumentName(), signature.getSignature());
         }).collect(Collectors.toList());
 
@@ -224,11 +223,11 @@ public class CryptManager {
     public static MessageSignature signChatMessage(AuthData.ProfileKeys keys, UUID signer, String message) {
         long salt = new Random().nextLong();
         Instant timestamp = Instant.now();
-        String component = "{\"text\":\"" + message + "\"}";
-        return signMessage(keys, signer, message, component, salt, timestamp);
+        return signMessage(keys, signer, message, salt, timestamp);
     }
 
-    private static MessageSignature signMessage(AuthData.ProfileKeys keys, UUID signer, String message, String component, long salt, Instant timestamp) {
+    private static MessageSignature signMessage(AuthData.ProfileKeys keys, UUID signer, String message, long salt, Instant timestamp) {
+        String component = "{\"text\":\"" + message + "\"}";
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1) {
             byte[] messageHeader = new byte[16];
             ByteBuffer.wrap(messageHeader).order(ByteOrder.BIG_ENDIAN).putLong(signer.getMostSignificantBits()).putLong(signer.getLeastSignificantBits());
