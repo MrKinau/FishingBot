@@ -1,6 +1,5 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
-import com.google.common.collect.Sets;
 import com.google.common.io.ByteArrayDataOutput;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.StringReader;
@@ -8,16 +7,15 @@ import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.mojang.brigadier.context.CommandContextBuilder;
-import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.event.play.CommandsRegisteredEvent;
 import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -26,13 +24,14 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @NoArgsConstructor
 public class PacketInCommands extends Packet {
 
+    @Getter
+    private CommandDispatcher<CommandExecutor> commandDispatcher;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
@@ -48,53 +47,8 @@ public class PacketInCommands extends Packet {
         int rootIndex = readVarInt(in);
 
         RootCommandNode<CommandExecutor> rootNode = (RootCommandNode<CommandExecutor>) new CommandTree(nodes).getNode(rootIndex);
-        CommandDispatcher<CommandExecutor> dispatcher = new CommandDispatcher<>(rootNode);
-
-        CommandContextBuilder<CommandExecutor> context = dispatcher.parse("tell MrKinau hi, I just joined the game!", CommandExecutor.CONSOLE).getContext();
-        context.getChild().getArguments().forEach((s, argument) -> {
-            if (argument.getResult() == null){
-                System.out.println(s);
-                return;
-            }
-            System.out.println(s + " » " + argument.getResult());
-        });
-
-        for (ParsedCommandNode<CommandExecutor> parsedCommandNode : context.getNodes()) {
-            System.out.println(parsedCommandNode);
-            CommandNode<CommandExecutor> parsedArgument = parsedCommandNode.getNode();
-            System.out.println(parsedArgument);
-            if (parsedArgument instanceof ArgumentCommandNode) {
-                ArgumentCommandNode<CommandExecutor, ?> argumentCommandNode = (ArgumentCommandNode<CommandExecutor, ?>) parsedArgument;
-                com.mojang.brigadier.arguments.ArgumentType<?> var7 = argumentCommandNode.getType();
-                System.out.println(parsedArgument.getName() + " » " + var7.getClass().getSimpleName());
-            }
-        }
-
-    }
-
-    private <T> Set<com.mojang.brigadier.arguments.ArgumentType<?>> findUsedArgumentTypes(CommandNode<T> rootNode) {
-        Set<CommandNode<T>> set = Sets.newIdentityHashSet();
-        Set<com.mojang.brigadier.arguments.ArgumentType<?>> set2 = Sets.newHashSet();
-        findUsedArgumentTypes(rootNode, set2, set);
-        return set2;
-    }
-
-    private <T> void findUsedArgumentTypes(CommandNode<T> node, Set<com.mojang.brigadier.arguments.ArgumentType<?>> usedArgumentTypes, Set<CommandNode<T>> visitedNodes) {
-        if (visitedNodes.add(node)) {
-            if (node instanceof ArgumentCommandNode) {
-                ArgumentCommandNode<?, ?> argumentCommandNode = (ArgumentCommandNode)node;
-                usedArgumentTypes.add(argumentCommandNode.getType());
-            }
-
-            node.getChildren().forEach((child) -> {
-                findUsedArgumentTypes(child, usedArgumentTypes, visitedNodes);
-            });
-            CommandNode<T> commandNode = node.getRedirect();
-            if (commandNode != null) {
-                findUsedArgumentTypes(commandNode, usedArgumentTypes, visitedNodes);
-            }
-
-        }
+        this.commandDispatcher = new CommandDispatcher<>(rootNode);
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new CommandsRegisteredEvent(commandDispatcher));
     }
 
     private CommandNodeData readCommandNode(ByteArrayDataInputWrapper in) {
@@ -168,12 +122,7 @@ public class PacketInCommands extends Packet {
                     break;
                 }
                 case 18: {
-                    argumentType = new BasicArgumentType<>(parserId, () -> (com.mojang.brigadier.arguments.ArgumentType<String>) reader -> {
-                        StringBuilder builder = new StringBuilder();
-                        while (reader.canRead())
-                            builder.append(reader.read());
-                        return builder.toString();
-                    });
+                    argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
                     break;
                 }
                 case 6:
@@ -251,13 +200,13 @@ public class PacketInCommands extends Packet {
     }
 
     @AllArgsConstructor
-    abstract class SuggestableNode {
+    public static abstract class SuggestableNode {
         protected String name;
 
         public abstract ArgumentBuilder<CommandExecutor, ?> createArgumentBuilder();
     }
 
-    class LiteralNode extends SuggestableNode {
+    public static class LiteralNode extends SuggestableNode {
         public LiteralNode(String name) {
             super(name);
         }
@@ -269,27 +218,13 @@ public class PacketInCommands extends Packet {
     }
 
     @RequiredArgsConstructor
-    abstract class ArgumentType<T extends com.mojang.brigadier.arguments.ArgumentType<?>> {
+    public static abstract class ArgumentType<T extends com.mojang.brigadier.arguments.ArgumentType<?>> {
         private final int id;
 
         public abstract T createType();
     }
 
-    class RangeArgumentType<T extends com.mojang.brigadier.arguments.ArgumentType<?>, D> extends BasicArgumentType<T> {
-        private final byte flags;
-        private final D min;
-        private final D max;
-
-        public RangeArgumentType(int id, byte flags, D min, D max, Supplier<T> supplier) {
-            super(id, supplier);
-            this.flags = flags;
-            this.min = min;
-            this.max = max;
-        }
-
-    }
-
-    class BasicArgumentType<T extends com.mojang.brigadier.arguments.ArgumentType<?>> extends ArgumentType<T> {
+    public static class BasicArgumentType<T extends com.mojang.brigadier.arguments.ArgumentType<?>> extends ArgumentType<T> {
 
         protected Supplier<T> supplier;
 
@@ -304,7 +239,33 @@ public class PacketInCommands extends Packet {
         }
     }
 
-    class UnimplementedArgumentType implements com.mojang.brigadier.arguments.ArgumentType<Object> {
+    public static class MessageArgumentType implements com.mojang.brigadier.arguments.ArgumentType<String> {
+
+        @Override
+        public String parse(StringReader reader) throws CommandSyntaxException {
+            StringBuilder builder = new StringBuilder();
+            while (reader.canRead())
+                builder.append(reader.read());
+            return builder.toString();
+        }
+    }
+
+    public static class RangeArgumentType<T extends com.mojang.brigadier.arguments.ArgumentType<?>, D> extends BasicArgumentType<T> {
+        private final byte flags;
+        private final D min;
+        private final D max;
+
+        public RangeArgumentType(int id, byte flags, D min, D max, Supplier<T> supplier) {
+            super(id, supplier);
+            this.flags = flags;
+            this.min = min;
+            this.max = max;
+        }
+
+    }
+
+
+    public static class UnimplementedArgumentType implements com.mojang.brigadier.arguments.ArgumentType<Object> {
 
         @Getter
         private int id;
@@ -326,14 +287,12 @@ public class PacketInCommands extends Packet {
         @Override
         public Object parse(StringReader reader) throws CommandSyntaxException {
             this.reader.accept(reader);
-            System.out.println("parsed UnimplementedArgumentType: " + id);
             return null;
         }
 
-
     }
 
-    class ArgumentNode<T extends com.mojang.brigadier.arguments.ArgumentType<?>> extends SuggestableNode {
+    public static class ArgumentNode<T extends com.mojang.brigadier.arguments.ArgumentType<?>> extends SuggestableNode {
         private ArgumentType<T> argumentType;
         private String identifier;
 

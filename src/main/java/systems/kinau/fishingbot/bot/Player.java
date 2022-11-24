@@ -5,6 +5,10 @@
 
 package systems.kinau.fishingbot.bot;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.context.CommandContextBuilder;
+import com.mojang.brigadier.context.ParsedArgument;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
@@ -13,21 +17,18 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.*;
+import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
 import systems.kinau.fishingbot.network.utils.CryptManager;
-import systems.kinau.fishingbot.utils.ItemUtils;
-import systems.kinau.fishingbot.utils.LocationUtils;
-import systems.kinau.fishingbot.utils.StringUtils;
+import systems.kinau.fishingbot.utils.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Player implements Listener {
 
@@ -51,6 +52,7 @@ public class Player implements Listener {
     @Getter @Setter private Inventory inventory;
     @Getter         private final Map<Integer, Inventory> openedInventories = new HashMap<>();
     @Getter @Setter private Optional<CryptManager.MessageSignature> lastUsedSignature = Optional.empty();
+    @Getter @Setter private CommandDispatcher<CommandExecutor> mcCommandDispatcher;
 
     @Getter @Setter private UUID uuid;
 
@@ -205,6 +207,11 @@ public class Player implements Listener {
         setLastPing(event.getPing());
     }
 
+    @EventHandler
+    public void onCommandsRegistered(CommandsRegisteredEvent event) {
+        setMcCommandDispatcher(event.getCommandDispatcher());
+    }
+
     public void respawn() {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientStatus(PacketOutClientStatus.Action.PERFORM_RESPAWN));
 
@@ -227,11 +234,31 @@ public class Player implements Listener {
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(line));
             } else {
                 if (line.startsWith("/"))
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(line.substring(1)));
+                    executeChatCommand(line.substring(1));
                 else
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(line));
             }
         }
+    }
+
+    private void executeChatCommand(String command) {
+        if (mcCommandDispatcher == null) {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
+            return;
+        }
+
+        CommandContextBuilder<CommandExecutor> context = mcCommandDispatcher.parse(command, CommandExecutor.UNSET).getContext();
+        Map<String, Pair<ArgumentType<?>, ParsedArgument<CommandExecutor, ?>>> arguments = CommandUtils.getArguments(context);
+        boolean containsSignableArguments = arguments.values().stream().anyMatch(argument -> argument.getKey() instanceof PacketInCommands.MessageArgumentType);
+        if (!containsSignableArguments) {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
+            return;
+        }
+        List<CryptManager.SignableArgument> signableArguments = arguments.entrySet().stream()
+                .filter(entry -> entry.getValue().getKey() instanceof PacketInCommands.MessageArgumentType)
+                .map(entry -> new CryptManager.SignableArgument(entry.getKey(), entry.getValue().getValue().getResult().toString()))
+                .collect(Collectors.toList());
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command, signableArguments));
     }
 
     public void dropStack(short slot, short actionNumber) {

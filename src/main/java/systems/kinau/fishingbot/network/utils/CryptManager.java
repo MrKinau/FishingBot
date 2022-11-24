@@ -34,11 +34,9 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 //code borrowed from minecraft's encryptor
 public class CryptManager {
@@ -210,11 +208,27 @@ public class CryptManager {
         return null;
     }
 
-    public static MessageSignature signChatMessage(AuthData.ProfileKeys keys, UUID signer, String message) {
-        String component = "{\"text\":\"" + message + "\"}";
+    public static ArgumentSignatures signCommandArguments(AuthData.ProfileKeys keys, UUID signer, List<SignableArgument> arguments) {
         long salt = new Random().nextLong();
         Instant timestamp = Instant.now();
 
+        List<ArgumentSignature> signatures = arguments.stream().map(signableArgument -> {
+            String component = "{\"text\":\"" + signableArgument.getArgumentValue() + "\"}";
+            MessageSignature signature = signMessage(keys, signer, signableArgument.getArgumentValue(), component, salt, timestamp);
+            return new ArgumentSignature(signableArgument.getArgumentName(), signature.getSignature());
+        }).collect(Collectors.toList());
+
+        return new ArgumentSignatures(signatures, salt, timestamp);
+    }
+
+    public static MessageSignature signChatMessage(AuthData.ProfileKeys keys, UUID signer, String message) {
+        long salt = new Random().nextLong();
+        Instant timestamp = Instant.now();
+        String component = "{\"text\":\"" + message + "\"}";
+        return signMessage(keys, signer, message, component, salt, timestamp);
+    }
+
+    private static MessageSignature signMessage(AuthData.ProfileKeys keys, UUID signer, String message, String component, long salt, Instant timestamp) {
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1) {
             byte[] messageHeader = new byte[16];
             ByteBuffer.wrap(messageHeader).order(ByteOrder.BIG_ENDIAN).putLong(signer.getMostSignificantBits()).putLong(signer.getLeastSignificantBits());
@@ -272,5 +286,27 @@ public class CryptManager {
         private final byte[] signature;
         private final long salt;
         private final Instant timestamp;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class ArgumentSignature {
+        private final String name;
+        private final byte[] signature;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class ArgumentSignatures {
+        private final List<ArgumentSignature> argumentSignatures;
+        private final long salt;
+        private final Instant timestamp;
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class SignableArgument {
+        private final String argumentName;
+        private final String argumentValue;
     }
 }
