@@ -10,6 +10,7 @@ import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.modules.Module;
+import systems.kinau.fishingbot.modules.command.executor.PlayerCommandExecutor;
 
 public class ChatCommandModule extends Module implements Listener {
 
@@ -41,7 +42,8 @@ public class ChatCommandModule extends Module implements Listener {
             if (Character.isWhitespace(fullCommand.charAt(0)))
                 fullCommand = fullCommand.substring(1);
 
-            FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(fullCommand, CommandExecutor.OTHER_PLAYER);
+            // TODO: Add private msg player
+            FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(fullCommand, new PlayerCommandExecutor("MrKinau"));
         }
     }
 }

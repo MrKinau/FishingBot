@@ -3,6 +3,7 @@ package systems.kinau.fishingbot.modules.timer;
 import systems.kinau.fishingbot.Bot;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.modules.Module;
+import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class TimerModule extends Module {
                     Bot bot = FishingBot.getInstance().getCurrentBot();
                     if (bot == null)
                         continue;
-                    bot.runCommand(command, true);
+                    bot.runCommand(command, true, new ConsoleCommandExecutor());
                 }
             }, timer.getUnits(), timer.getUnits(), timer.getTimeUnit()));
         });

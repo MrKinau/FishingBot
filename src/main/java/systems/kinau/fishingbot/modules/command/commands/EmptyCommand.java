@@ -3,7 +3,7 @@ package systems.kinau.fishingbot.modules.command.commands;
 import javafx.application.Platform;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.modules.command.Command;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.LocationUtils;
 

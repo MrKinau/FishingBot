@@ -26,6 +26,7 @@ import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.BotStartEvent;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
 import systems.kinau.fishingbot.gui.config.ConfigGUI;
+import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.utils.ImageUtils;
 
 import javax.annotation.Resources;
@@ -155,7 +156,7 @@ public class GUIController implements Listener {
 
     private void runCommand(String text) {
         if (FishingBot.getInstance().getCurrentBot() == null) return;
-        FishingBot.getInstance().getCurrentBot().runCommand(text, true);
+        FishingBot.getInstance().getCurrentBot().runCommand(text, true, new ConsoleCommandExecutor());
     }
 
     private void openFile(String fileUrl) {

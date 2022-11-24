@@ -20,9 +20,8 @@ import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
 import systems.kinau.fishingbot.modules.*;
 import systems.kinau.fishingbot.modules.command.ChatCommandModule;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.modules.command.CommandRegistry;
-import systems.kinau.fishingbot.modules.command.commands.*;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.modules.discord.DiscordModule;
 import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
@@ -281,17 +280,17 @@ public class Bot {
         connect();
     }
 
-    public void runCommand(String command, boolean executeBotCommand) {
+    public void runCommand(String command, boolean executeBotCommand, CommandExecutor commandExecutor) {
         commandsThread.execute(() -> {
             if (getNet() == null)
                 return;
             if (executeBotCommand && command.startsWith("/")) {
-                boolean executed = FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(command, CommandExecutor.CONSOLE);
+                boolean executed = FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(command, commandExecutor);
                 if (executed)
                     return;
             }
 
-            getPlayer().sendMessage(command);
+            getPlayer().sendMessage(command, commandExecutor);
         });
     }
 
@@ -311,18 +310,7 @@ public class Bot {
 
     private void registerCommands() {
         this.commandRegistry = new CommandRegistry();
-        getCommandRegistry().registerCommand(new HelpCommand());
-        getCommandRegistry().registerCommand(new LevelCommand());
-        getCommandRegistry().registerCommand(new EmptyCommand());
-        getCommandRegistry().registerCommand(new ByeCommand());
-        getCommandRegistry().registerCommand(new StuckCommand());
-        getCommandRegistry().registerCommand(new DropRodCommand());
-        getCommandRegistry().registerCommand(new LookCommand());
-        getCommandRegistry().registerCommand(new SummaryCommand());
-        getCommandRegistry().registerCommand(new RightClickCommand());
-        getCommandRegistry().registerCommand(new SwapCommand());
-        getCommandRegistry().registerCommand(new ClickInvCommand());
-        getCommandRegistry().registerCommand(new WaitCommand());
+        commandRegistry.registerBotCommands();
     }
 
     private void connect() {

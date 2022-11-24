@@ -12,13 +12,13 @@ import com.mojang.brigadier.context.ParsedArgument;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.bot.actions.BotAction;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
 import systems.kinau.fishingbot.event.play.*;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.modules.command.brigardier.argument.MessageArgumentType;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
@@ -172,7 +172,7 @@ public class Player implements Listener {
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandBeforeDeathEnabled()) {
             if (event.getHealth() < getHealth() && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeDeath() && !isSentLowHealth()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandBeforeDeath()) {
-                    FishingBot.getInstance().getCurrentBot().runCommand(command, true);
+                    FishingBot.getInstance().getCurrentBot().runCommand(command, true, new ConsoleCommandExecutor());
                 }
                 setSentLowHealth(true);
             } else if (isSentLowHealth() && event.getHealth() > FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeDeath())
@@ -197,7 +197,7 @@ public class Player implements Listener {
             } catch (InterruptedException ignore) { }
             if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoCommandOnRespawnEnabled()) {
                 for (String command : FishingBot.getInstance().getCurrentBot().getConfig().getAutoCommandOnRespawn()) {
-                    FishingBot.getInstance().getCurrentBot().runCommand(command, true);
+                    FishingBot.getInstance().getCurrentBot().runCommand(command, true, new ConsoleCommandExecutor());
                 }
             }
         }).start();
@@ -224,7 +224,7 @@ public class Player implements Listener {
         }
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(String message, CommandExecutor commandExecutor) {
         message = message.replace("%prefix%", FishingBot.PREFIX);
         for (String line : message.split("\n")) {
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
@@ -235,20 +235,20 @@ public class Player implements Listener {
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(line));
             } else {
                 if (line.startsWith("/"))
-                    executeChatCommand(line.substring(1));
+                    executeChatCommand(line.substring(1), commandExecutor);
                 else
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(line));
             }
         }
     }
 
-    private void executeChatCommand(String command) {
+    private void executeChatCommand(String command, CommandExecutor commandExecutor) {
         if (mcCommandDispatcher == null) {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
             return;
         }
 
-        CommandContextBuilder<CommandExecutor> context = mcCommandDispatcher.parse(command, CommandExecutor.UNSET).getContext();
+        CommandContextBuilder<CommandExecutor> context = mcCommandDispatcher.parse(command, commandExecutor).getContext();
         Map<String, Pair<ArgumentType<?>, ParsedArgument<CommandExecutor, ?>>> arguments = CommandUtils.getArguments(context);
         boolean containsSignableArguments = arguments.values().stream().anyMatch(argument -> argument.getKey() instanceof MessageArgumentType);
         if (!containsSignableArguments) {
@@ -428,9 +428,5 @@ public class Player implements Listener {
 
     public void use() {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
-    }
-
-    public boolean executeBotAction(BotAction botAction) {
-        return botAction.execute(FishingBot.getInstance().getCurrentBot());
     }
 }

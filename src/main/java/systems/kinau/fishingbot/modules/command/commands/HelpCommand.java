@@ -2,7 +2,7 @@ package systems.kinau.fishingbot.modules.command.commands;
 
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.modules.command.Command;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 
 public class HelpCommand extends Command {
 
@@ -12,11 +12,11 @@ public class HelpCommand extends Command {
 
     @Override
     public void onCommand(String label, String[] args, CommandExecutor executor) {
-        FishingBot.getInstance().getCurrentBot().getCommandRegistry().getRegisteredCommands().forEach(command -> {
-            if (executor == CommandExecutor.OTHER_PLAYER)
-                sendMessage(executor, "command-help-other-player", command.getLabel(), command.getDescription());
-            else if (executor == CommandExecutor.CONSOLE)
-                sendMessage(executor, "command-help-console", command.getLabel(), command.getDescription());
-        });
+//        FishingBot.getInstance().getCurrentBot().getCommandRegistry().getRegisteredCommands().forEach(command -> {
+//            if (executor.getType() == CommandExecutionType.OTHER_PLAYER)
+//                sendMessage(executor, "command-help-other-player", command.getLabel(), command.getDescription());
+//            else if (executor.getType() == CommandExecutionType.CONSOLE)
+//                sendMessage(executor, "command-help-console", command.getLabel(), command.getDescription());
+//        });
     }
 }

@@ -2,7 +2,7 @@ package systems.kinau.fishingbot.modules.command.commands;
 
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.modules.command.Command;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 
 public class LevelCommand extends Command {
 

@@ -3,7 +3,7 @@ package systems.kinau.fishingbot.modules.command.brigardier.node;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 
 @AllArgsConstructor
 @Getter
