@@ -157,10 +157,12 @@ public class Bot {
         int assumedProtocolIdForMJAPI = ProtocolConstants.getProtocolId(getConfig().getDefaultProtocol());
         if (assumedProtocolIdForMJAPI == ProtocolConstants.AUTOMATIC)
             assumedProtocolIdForMJAPI = ProtocolConstants.getLatest();
-        MojangAPI mojangAPI = new MojangAPI(getAuthData(), assumedProtocolIdForMJAPI);
+        MojangAPI mojangAPI = null;
+        if (getConfig().isOnlineMode())
+            mojangAPI = new MojangAPI(getAuthData(), assumedProtocolIdForMJAPI);
 
         // Check rather to connect to realm
-        if (getConfig().getRealmId() != -1) {
+        if (getConfig().getRealmId() != -1 && mojangAPI != null) {
             if (getConfig().getRealmId() == 0) {
                 List<Realm> possibleRealms = mojangAPI.getPossibleWorlds();
                 mojangAPI.printRealms(possibleRealms);
@@ -250,7 +252,7 @@ public class Bot {
         sp.ping();
 
         // Obtain keys for chat signing
-        if (getConfig().isOnlineMode()) {
+        if (mojangAPI != null) {
             mojangAPI.obtainCertificates();
         }
     }

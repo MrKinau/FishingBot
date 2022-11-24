@@ -23,6 +23,7 @@ public class AuthData {
     @Getter @Setter private ProfileKeys profileKeys;
 
     public String getUUIDWithoutDashes() {
+        if (uuid == null) return null;
         return uuid.replace("-", "");
     }
 
