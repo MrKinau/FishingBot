@@ -29,7 +29,7 @@ public class CommandClickInv extends BrigardierCommand {
                                 .executes(getExecutor()))
                         .executes(getExecutor()))
                 .executes(context -> {
-                    context.getSource().sendMessage("/" + context.getInput() + " <slot> [left|right]");
+                    context.getSource().sendMessage(getSyntax(context));
                     return 0;
                 });
     }
@@ -74,5 +74,10 @@ public class CommandClickInv extends BrigardierCommand {
             }
             return 0;
         };
+    }
+
+    @Override
+    public String getSyntax(String label) {
+        return FishingBot.getI18n().t("command-clickinv-syntax", label);
     }
 }

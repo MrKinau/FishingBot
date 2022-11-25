@@ -61,6 +61,11 @@ public class CommandDropRod extends BrigardierCommand {
         };
     }
 
+    @Override
+    public String getSyntax(String label) {
+        return FishingBot.getI18n().t("command-droprod-syntax", label);
+    }
+
     public enum Filter {
         ALL,
         SELECTED,
