@@ -632,6 +632,48 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x31, PacketOutBlockPlace.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_1).registerPacket(0x32, PacketOutUseItem.class);
 
+        //Minecraft 1.19.3
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x00, PacketInSpawnEntity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0B, PacketInDifficultySet.class);
+        // TODO: Not working
+//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0E, PacketInCommands.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0F, PacketInWindowClose.class);
+        // TODO: Not working
+//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x10, PacketInWindowItems.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x12, PacketInSetSlot.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x17, PacketInDisconnect.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x1F, PacketInKeepAlive.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x24, PacketInJoinGame.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x2C, PacketInOpenWindow.class);
+        // TODO: Not working
+//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x31, PacketInChatPlayer.class);
+        // TODO: Not working
+//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x35, PacketInPlayerListItem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x38, PacketInPlayerPosLook.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x49, PacketInHeldItemChange.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x4F, PacketInEntityMetadata.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x50, PacketInEntityVelocity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x52, PacketInSetExperience.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x53, PacketInUpdateHealth.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x60, PacketInChatSystem.class);
+
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x00, PacketOutTeleportConfirm.class);
+        // TODO: Not working
+//        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x04, PacketOutChatCommand.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x05, PacketOutChatMessage.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x06, PacketOutClientStatus.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x07, PacketOutClientSettings.class);
+//        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x07, PacketOutConfirmTransaction.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0A, PacketOutClickWindow.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0B, PacketOutCloseInventory.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x11, PacketOutKeepAlive.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x13, PacketOutPosition.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x14, PacketOutPosLook.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x1D, PacketOutEntityAction.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x28, PacketOutHeldItemChange.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x31, PacketOutBlockPlace.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x32, PacketOutUseItem.class);
+
         //Register protocol of latest for unknown versions
         if (!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getCurrentBot().getServerProtocol())) {
            FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getCurrentBot().getServerProtocol());

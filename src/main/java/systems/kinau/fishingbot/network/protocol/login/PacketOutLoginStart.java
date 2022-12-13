@@ -29,16 +29,18 @@ public class PacketOutLoginStart extends Packet {
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(userName, out);
         if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
-            AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
-            out.writeBoolean(keys != null);
-            if (keys != null) {
-                out.writeLong(keys.getExpiresAt());
-                byte[] pubKey = keys.getPublicKey().getEncoded();
-                writeVarInt(pubKey.length, out);
-                out.write(pubKey);
-                byte[] signature = ByteBuffer.wrap(Base64.getDecoder().decode(keys.getPublicKeySignature())).array();
-                writeVarInt(signature.length, out);
-                out.write(signature);
+            if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+                AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
+                out.writeBoolean(keys != null);
+                if (keys != null) {
+                    out.writeLong(keys.getExpiresAt());
+                    byte[] pubKey = keys.getPublicKey().getEncoded();
+                    writeVarInt(pubKey.length, out);
+                    out.write(pubKey);
+                    byte[] signature = ByteBuffer.wrap(Base64.getDecoder().decode(keys.getPublicKeySignature())).array();
+                    writeVarInt(signature.length, out);
+                    out.write(signature);
+                }
             }
             if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
                 UUID uuid = null;

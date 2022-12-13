@@ -27,7 +27,7 @@ public class PacketOutChatMessage extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(getMessage(), out);
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_19 && protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
             AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
             UUID signer = null;
             try {
@@ -55,6 +55,36 @@ public class PacketOutChatMessage extends Packet {
             if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
                 writeVarInt(0, out);
                 out.writeBoolean(false);
+            }
+        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
+            AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
+            UUID signer = null;
+            try {
+                signer = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getUuid());
+            } catch (Exception ignore) {}
+
+
+            if (keys == null || signer == null) {
+                out.writeLong(System.currentTimeMillis());  // timestamp
+                // this is most likely very illegal, but it seems like the server does not care about the signature
+                out.writeLong(System.currentTimeMillis());  // sig pair long
+                out.writeBoolean(false);                 // no sig present
+                writeVarInt(0, out);                  // lastSeen sigs offset?
+                out.writeByte(0);                        // bitset?
+                out.writeByte(0);
+                out.writeByte(0);
+            } else {
+                CryptManager.MessageSignature signature = CryptManager.signChatMessage(keys, signer, message);
+                out.writeLong(signature.getTimestamp().toEpochMilli());
+                out.writeLong(signature.getSalt());
+                out.writeBoolean(true);
+                out.write(signature.getSignature());
+                writeVarInt(0, out);                  // lastSeen sigs offset?
+                out.writeByte(0);                        // bitset?
+                out.writeByte(0);
+                out.writeByte(0);
+                // TODO: Not working
+                FishingBot.getInstance().getCurrentBot().getPlayer().setLastUsedSignature(Optional.of(signature));
             }
         }
     }
