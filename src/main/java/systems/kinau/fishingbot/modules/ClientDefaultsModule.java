@@ -7,15 +7,16 @@ package systems.kinau.fishingbot.modules;
 
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutClientSettings;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutKeepAlive;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.protocol.play.*;
+
+import java.util.UUID;
 
 public class ClientDefaultsModule extends Module implements Listener {
 
@@ -36,6 +37,15 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onSetDifficulty(DifficultySetEvent event) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() > ProtocolConstants.MINECRAFT_1_19_1) {
+            AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
+            UUID signer = null;
+            try {
+                signer = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getUuid());
+            } catch (Exception ignore) {}
+            if (signer != null)
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatSessionUpdate(keys, signer));
+        }
         if (isJoined())
             return;
         this.joined = true;
