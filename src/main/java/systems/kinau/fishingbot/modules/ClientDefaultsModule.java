@@ -16,12 +16,15 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class ClientDefaultsModule extends Module implements Listener {
 
     @Getter private Thread positionThread;
     @Getter private boolean joined;
+    @Getter private Set<UUID> onlinePlayers = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -70,10 +73,12 @@ public class ClientDefaultsModule extends Module implements Listener {
     public void onDisconnect(DisconnectEvent event) {
         FishingBot.getI18n().info("module-client-disconnected", event.getDisconnectMessage());
         FishingBot.getInstance().getCurrentBot().setRunning(false);
+        onlinePlayers.clear();
     }
 
     @EventHandler
     public void onJoinGame(JoinGameEvent event) {
+        onlinePlayers.clear();
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientSettings());
     }
 
@@ -84,7 +89,21 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onUpdatePlayerList(UpdatePlayerListEvent event) {
-        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoDisconnect() && event.getPlayers().size() > FishingBot.getInstance().getCurrentBot().getConfig().getAutoDisconnectPlayersThreshold()) {
+        switch (event.getAction()) {
+            case REPLACE: {
+                onlinePlayers = event.getPlayers();
+                break;
+            }
+            case ADD: {
+                onlinePlayers.addAll(event.getPlayers());
+                break;
+            }
+            case REMOVE: {
+                onlinePlayers.removeAll(event.getPlayers());
+                break;
+            }
+        }
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoDisconnect() && onlinePlayers.size() > FishingBot.getInstance().getCurrentBot().getConfig().getAutoDisconnectPlayersThreshold()) {
             FishingBot.getI18n().warning("network-server-is-full");
             FishingBot.getInstance().getCurrentBot().setWontConnect(true);
             FishingBot.getInstance().getCurrentBot().setRunning(false);

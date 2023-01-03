@@ -15,6 +15,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
+import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,10 +45,15 @@ public class PacketOutChatCommand extends Packet {
             out.writeLong(System.currentTimeMillis());  // timestamp
             out.writeLong(System.currentTimeMillis());  // arg sig salt
             writeVarInt(0, out);                  // arg sig map
-            out.writeBoolean(false);                 // signed preview
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
-                writeVarInt(0, out);              // acknowledgements lastSeen (LastSeenMessageList.write(buf))
-                out.writeBoolean(false);             // acknowledgements lastReceived (Optional<LastSeenMessageList.Entry>)
+            if (protocolId < ProtocolConstants.MINECRAFT_1_19_3) {
+                out.writeBoolean(false);                 // signed preview
+                if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
+                    writeVarInt(0, out);              // acknowledgements lastSeen (LastSeenMessageList.write(buf))
+                    out.writeBoolean(false);             // acknowledgements lastReceived (Optional<LastSeenMessageList.Entry>)
+                }
+            } else {
+                writeVarInt(0, out); // offset
+                writeFixedBitSet(new BitSet(), 20, out);
             }
         } else {
             UUID signer = null;

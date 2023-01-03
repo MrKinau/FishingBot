@@ -16,6 +16,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
+import java.util.BitSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,9 +71,7 @@ public class PacketOutChatMessage extends Packet {
                 out.writeLong(System.currentTimeMillis());  // sig pair long
                 out.writeBoolean(false);                 // no sig present
                 writeVarInt(0, out);                  // lastSeen sigs offset?
-                out.writeByte(0);                        // bitset?
-                out.writeByte(0);
-                out.writeByte(0);
+                writeFixedBitSet(new BitSet(), 20, out);
             } else {
                 CryptManager.MessageSignature signature = CryptManager.signChatMessage(keys, signer, message);
                 out.writeLong(signature.getTimestamp().toEpochMilli());
@@ -80,10 +79,7 @@ public class PacketOutChatMessage extends Packet {
                 out.writeBoolean(true);
                 out.write(signature.getSignature());
                 writeVarInt(0, out);                  // lastSeen sigs offset?
-                out.writeByte(0);                        // bitset?
-                out.writeByte(0);
-                out.writeByte(0);
-                // TODO: Not working
+                writeFixedBitSet(new BitSet(), 20, out);
                 FishingBot.getInstance().getCurrentBot().getPlayer().setLastUsedSignature(Optional.of(signature));
             }
         }

@@ -15,5 +15,12 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UpdatePlayerListEvent extends Event {
 
+    @Getter private Action action;
     @Getter private Set<UUID> players;
+
+    public static enum Action {
+        REPLACE,
+        ADD,
+        REMOVE
+    }
 }

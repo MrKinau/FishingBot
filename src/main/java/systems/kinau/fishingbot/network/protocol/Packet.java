@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.network.protocol;
 import com.flowpowered.nbt.*;
 import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.base.Charsets;
+import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
@@ -21,6 +22,9 @@ import systems.kinau.fishingbot.utils.NBTUtils;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.EnumSet;
 import java.util.UUID;
 
 public abstract class Packet {
@@ -94,7 +98,7 @@ public abstract class Packet {
         }
     }
 
-    protected UUID readUUID(ByteArrayDataInputWrapper input) {
+    public static UUID readUUID(ByteArrayDataInputWrapper input) {
         return new UUID(input.readLong(), input.readLong());
     }
 
@@ -141,6 +145,32 @@ public abstract class Packet {
 
         int[] result = {i,b};
         return result;
+    }
+
+    public static void writeVarLong(long value, ByteArrayDataOutput output) {
+        while ((value & -128L) != 0L) {
+            output.writeByte((int) (value & 127L) | 128);
+            value >>>= 7;
+        }
+
+        output.writeByte((int) value);
+    }
+
+    public static long readVarLong(ByteArrayDataInput input) {
+        long i = 0L;
+        int j = 0;
+
+        byte b0;
+
+        do {
+            b0 = input.readByte();
+            i |= (long) (b0 & 127) << j++ * 7;
+            if (j > 10) {
+                throw new RuntimeException("VarLong too big");
+            }
+        } while ((b0 & 128) == 128);
+
+        return i;
     }
 
     public static String readString(DataInputStream in) {
@@ -261,6 +291,35 @@ public abstract class Packet {
         output.writeFloat(movingObjectPositionBlock.getDy());
         output.writeFloat(movingObjectPositionBlock.getDz());
         output.writeBoolean(movingObjectPositionBlock.isFlag());
+    }
+
+    public static <E extends Enum<E>> EnumSet<E> readEnumSet(Class<E> type, ByteArrayDataInput input) {
+        E[] ae = type.getEnumConstants();
+        BitSet bitset = readFixedBitSet(ae.length, input);
+        EnumSet<E> enumset = EnumSet.noneOf(type);
+
+        for (int i = 0; i < ae.length; ++i) {
+            if (bitset.get(i)) {
+                enumset.add(ae[i]);
+            }
+        }
+
+        return enumset;
+    }
+
+    public static BitSet readFixedBitSet(int size, ByteArrayDataInput input) {
+        byte[] abyte = new byte[-Math.floorDiv(-size, 8)];
+
+        input.readFully(abyte);
+        return BitSet.valueOf(abyte);
+    }
+
+    public static void writeFixedBitSet(BitSet bitSet, int size, ByteArrayDataOutput output) {
+        if (bitSet.length() <= size) {
+            byte[] abyte = bitSet.toByteArray();
+
+            output.write(Arrays.copyOf(abyte, -Math.floorDiv(-size, 8)));
+        }
     }
 
 }

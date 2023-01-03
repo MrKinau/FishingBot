@@ -63,35 +63,156 @@ public class PacketInEntityMetadata extends Packet {
 
             int type = in.readByte();
 
-            switch (protocolID) {
-                case ProtocolConstants.MINECRAFT_1_12_2:
-                case ProtocolConstants.MINECRAFT_1_12_1:
-                case ProtocolConstants.MINECRAFT_1_12:
-                case ProtocolConstants.MINECRAFT_1_11_1:
-                case ProtocolConstants.MINECRAFT_1_11:
-                case ProtocolConstants.MINECRAFT_1_10:
-                case ProtocolConstants.MINECRAFT_1_9_4:
-                case ProtocolConstants.MINECRAFT_1_9_2:
-                case ProtocolConstants.MINECRAFT_1_9_1:
-                case ProtocolConstants.MINECRAFT_1_9: {
-                    readWatchableObjects19(in, networkHandler, eid, type);
-                    break;
+            if (protocolID <= ProtocolConstants.MINECRAFT_1_12_2)
+                readWatchableObjects19(in, networkHandler, eid, type);
+            else if (protocolID <= ProtocolConstants.MINECRAFT_1_13_1)
+                readWatchableObjects113(in, networkHandler, eid, type);
+            else if (protocolID <= ProtocolConstants.MINECRAFT_1_19_1)
+                readWatchableObjects114(in, networkHandler, eid, type);
+            else
+                readWatchableObjects1193(in, networkHandler, eid, type);
+        }
+    }
+
+    private void readWatchableObjects1193(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+        switch (type) {
+            case 0: {
+                in.readByte();
+                break;
+            }
+            case 1: {
+                readVarInt(in);
+                break;
+            }
+            case 2: {
+                readVarLong(in);
+            }
+            case 3: {
+                float health = in.readFloat();
+                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(eid, health, -1, -1));
+                return;
+            }
+            case 4: {
+                readString(in);
+                break;
+            }
+            case 5: {
+                readString(in);
+                break;
+            }
+            case 6: {
+                boolean present = in.readBoolean();
+                if (present) {
+                    readString(in);
                 }
-                case ProtocolConstants.MINECRAFT_1_13_1:
-                case ProtocolConstants.MINECRAFT_1_13: {
-                    readWatchableObjects113(in, networkHandler, eid, type);
-                    break;
+                break;
+            }
+            case 7: {
+                Slot slot = readSlot(in);
+                if (!slot.isPresent())
+                    return;
+                List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
+                String name = ItemUtils.getItemName(slot);
+                FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                return;
+            }
+            case 8: {
+                in.readBoolean();
+                break;
+            }
+            case 9: {
+                in.readFloat();
+                in.readFloat();
+                in.readFloat();
+                break;
+            }
+            case 10: {
+                in.readLong();
+                break;
+            }
+            case 11: {
+                boolean present = in.readBoolean();
+                if (present) {
+                    in.readLong();
                 }
-                case ProtocolConstants.MINECRAFT_1_13_2:
-                case ProtocolConstants.MINECRAFT_1_14:
-                case ProtocolConstants.MINECRAFT_1_14_1:
-                case ProtocolConstants.MINECRAFT_1_14_2:
-                case ProtocolConstants.MINECRAFT_1_14_3:
-                case ProtocolConstants.MINECRAFT_1_14_4:
-                default: {
-                    readWatchableObjects114(in, networkHandler, eid, type);
-                    break;
+                break;
+            }
+            case 12: {
+                readVarInt(in);
+                break;
+            }
+            case 13: {
+                boolean present = in.readBoolean();
+                if (present) {
+                    readUUID(in);
                 }
+                break;
+            }
+            case 14: {
+                readVarInt(in);
+                break;
+            }
+            case 15: {
+                in.readFully(new byte[in.getAvailable()]);
+                break;
+            }
+            case 16: {
+                int id = readVarInt(in);
+                switch (id) {
+                    case 20:
+                    case 3: {
+                        readVarInt(in);
+                        break;
+                    }
+                    case 11: {
+                        in.readFloat();
+                        in.readFloat();
+                        in.readFloat();
+                        in.readFloat();
+                        break;
+                    }
+                    case 27: {
+                        boolean present = in.readBoolean();
+                        if (!present)
+                            break;
+                        readVarInt(in);
+                        in.readByte();
+                        in.readFully(new byte[in.getAvailable()]);
+                        break;
+                    }
+                }
+                break;
+            }
+            case 17: {
+                readVarInt(in);
+                readVarInt(in);
+                readVarInt(in);
+                break;
+            }
+            case 18: {
+                readVarInt(in);
+                break;
+            }
+            case 19: {
+                readVarInt(in);
+                break;
+            }
+            case 20: {
+                readVarInt(in);
+                break;
+            }
+            case 21: {
+                readVarInt(in);
+                break;
+            }
+            case 22: {
+                readString(in);
+                in.readLong();
+                break;
+            }
+            case 23: {
+                readVarInt(in);
+                break;
             }
         }
     }
