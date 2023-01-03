@@ -111,8 +111,8 @@ public class PacketInPlayerListItem extends Packet {
             if (in.readBoolean()) {
                 readUUID(in);
                 in.readLong(); // expiresAt
-                in.skipBytes(512); // public key
-                in.skipBytes(4096); // public key signature
+                in.skipBytes(readVarInt(in)); // public key
+                in.skipBytes(readVarInt(in)); // public key signature
             }
         }),
         UPDATE_GAME_MODE(Packet::readVarInt),
