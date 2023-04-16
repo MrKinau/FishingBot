@@ -25,6 +25,8 @@ public class MainGUI extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fishingbot.fxml"), FishingBot.getI18n().getBundle());
         Parent root = loader.load();
+        root.getStylesheets().add("mainstyle.css");
+        
         stage.setTitle("FishingBot");
         stage.getIcons().add(new Image(MainGUI.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
         stage.setScene(new Scene(root, 600, 500));

@@ -1,0 +1,3 @@
+#consoleTextArea, #commandlineTextField {
+    -fx-font-family: 'monospaced';
+}
