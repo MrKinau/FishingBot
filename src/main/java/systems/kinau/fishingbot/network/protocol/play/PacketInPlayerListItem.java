@@ -84,7 +84,7 @@ public class PacketInPlayerListItem extends Packet {
             int count = readVarInt(in);
             for (int i = 0; i < count; i++) {
                 UUID uuid = readUUID(in);
-                for(Action action : actions) {
+                for (Action action : actions) {
                     if (action == Action.ADD_PLAYER)
                         addedPlayers.add(uuid);
                     action.reader.read(in);

@@ -43,7 +43,7 @@ public abstract class Packet {
         buf.write(b);
     }
 
-    protected static String readString(ByteArrayDataInputWrapper buf) {
+    public static String readString(ByteArrayDataInputWrapper buf) {
         int len = readVarInt(buf);
         if (len > Short.MAX_VALUE) {
             throw new OverflowPacketException(String.format("Cannot receive string longer than Short.MAX_VALUE (got %s characters)", len));
