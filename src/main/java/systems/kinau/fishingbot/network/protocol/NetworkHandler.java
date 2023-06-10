@@ -718,6 +718,32 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x31, PacketOutBlockPlace.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x32, PacketOutUseItem.class);
 
+        // Minecraft 1.20
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x01, PacketInSpawnEntity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x0C, PacketInDifficultySet.class);
+        // TODO: PacketInCommands not working (1.19.3)
+//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x0E, PacketInCommands.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x11, PacketInWindowClose.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x12, PacketInWindowItems.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x14, PacketInSetSlot.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x1A, PacketInDisconnect.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x23, PacketInKeepAlive.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x28, PacketInJoinGame.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x30, PacketInOpenWindow.class);
+        // TODO: PacketInChatPlayer not working (1.19.3)
+//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x31, PacketInChatPlayer.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x39, PacketInPlayerListItemRemove.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x3A, PacketInPlayerListItem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x3C, PacketInPlayerPosLook.class); //TODO: MISSING BOOLEAN
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x4D, PacketInHeldItemChange.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x52, PacketInEntityMetadata.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x54, PacketInEntityVelocity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x56, PacketInSetExperience.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x57, PacketInUpdateHealth.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x64, PacketInChatSystem.class);
+
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4));
+
         //Register protocol of latest for unknown versions
         if (!ProtocolConstants.SUPPORTED_VERSION_IDS.contains(FishingBot.getInstance().getCurrentBot().getServerProtocol())) {
            FishingBot.getI18n().severe("network-not-supported-server-version", FishingBot.getInstance().getCurrentBot().getServerProtocol());

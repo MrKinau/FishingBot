@@ -15,40 +15,26 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.NBTUtils;
 
+@Getter
 public class PacketInJoinGame extends Packet {
 
-    @Getter
     private int eid;
-    @Getter
     private int gamemode;
-    @Getter
     private String[] worldIdentifier;
-    @Getter
     private String dimension;
-    @Getter
     private String spawnWorld;
-    @Getter
     private long hashedSeed;
-    @Getter
     private int difficulty;
-    @Getter
     private int maxPlayers;
-    @Getter
     private int viewDistance;
-    @Getter
     private int simulationDistance;
-    @Getter
     private String levelType;
-    @Getter
     private boolean reducedDebugInfo;
-    @Getter
     private boolean enableRespawnScreen;
-    @Getter
     private boolean debug;
-    @Getter
     private boolean flat;
-    @Getter
     private boolean hardcore;
+    private int portalCooldown;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -165,7 +151,7 @@ public class PacketInJoinGame extends Packet {
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_18:
-            case ProtocolConstants.MINECRAFT_1_18_2:  {
+            case ProtocolConstants.MINECRAFT_1_18_2: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
                 gamemode = in.readUnsignedByte();           // current gamemode
@@ -188,6 +174,35 @@ public class PacketInJoinGame extends Packet {
                 break;
             }
             case ProtocolConstants.MINECRAFT_1_19:
+            case ProtocolConstants.MINECRAFT_1_19_1:
+            case ProtocolConstants.MINECRAFT_1_19_3:
+            case ProtocolConstants.MINECRAFT_1_19_4: {
+                eid = in.readInt();                         // entity ID
+                hardcore = in.readBoolean();                // is hardcore
+                gamemode = in.readUnsignedByte();           // current gamemode
+                in.readUnsignedByte();                      // previous gamemode
+                int worldCount = readVarInt(in);            // count of worlds
+                worldIdentifier = new String[worldCount];   // identifier for all worlds
+                for (int i = 0; i < worldCount; i++)
+                    worldIdentifier[i] = readString(in);
+                NBTUtils.readNBT(in);                       // registry codec
+                readString(in);                             // dimension type
+                spawnWorld = readString(in);                // dimension name
+                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+                maxPlayers = readVarInt(in);                // maxPlayer
+                viewDistance = readVarInt(in);              // view distance
+                simulationDistance = readVarInt(in);        // simulation distance
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
+                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+                debug = in.readBoolean();                   // debug world
+                flat = in.readBoolean();                    // flat world
+                if (in.readBoolean()) {                     // has last death location
+                    readString(in);                         // last death dimension
+                    in.readLong();                          // last death position
+                }
+                break;
+            }
+            case ProtocolConstants.MINECRAFT_1_20:
             default: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
@@ -212,6 +227,7 @@ public class PacketInJoinGame extends Packet {
                     readString(in);                         // last death dimension
                     in.readLong();                          // last death position
                 }
+                portalCooldown = readVarInt(in);
                 break;
             }
         }
