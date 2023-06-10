@@ -2,6 +2,8 @@ package systems.kinau.fishingbot.modules.command;
 
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutionType;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,11 +24,11 @@ public abstract class Command {
 
     public abstract void onCommand(String label, String[] args, CommandExecutor executor);
 
-    public void sendMessage(String message, CommandExecutor executor) {
-        if (executor == CommandExecutor.CONSOLE)
+    public void sendMessage(String message, CommandExecutor commandExecutor) {
+        if (commandExecutor.getType() == CommandExecutionType.CONSOLE)
             FishingBot.getLog().info(message);
         else
-            FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(message);
+            FishingBot.getInstance().getCurrentBot().getPlayer().sendMessage(message, commandExecutor);
     }
 
     public void sendMessage(CommandExecutor executor, String key, Object... args) {

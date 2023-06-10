@@ -3,8 +3,8 @@ package systems.kinau.fishingbot.modules.command.brigardier.node;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import lombok.Getter;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
 import systems.kinau.fishingbot.modules.command.brigardier.argument.IdentifiableArgumentType;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 
 @Getter
 public class ArgumentNode<T extends com.mojang.brigadier.arguments.ArgumentType<?>> extends Node {

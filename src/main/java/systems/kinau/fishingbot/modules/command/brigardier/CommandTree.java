@@ -3,7 +3,7 @@ package systems.kinau.fishingbot.modules.command.brigardier;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 
 import java.util.ArrayList;
 import java.util.List;

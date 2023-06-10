@@ -9,6 +9,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.play.ChatEvent;
+import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class ChatProxyModule extends Module implements Listener {
                     }
                     line = scanner.readLine();
                     if (FishingBot.getInstance().getCurrentBot() == null) return;
-                    FishingBot.getInstance().getCurrentBot().runCommand(line, true);
+                    FishingBot.getInstance().getCurrentBot().runCommand(line, true, new ConsoleCommandExecutor());
                 }
             } catch (IOException | InterruptedException ignored) { }
         });

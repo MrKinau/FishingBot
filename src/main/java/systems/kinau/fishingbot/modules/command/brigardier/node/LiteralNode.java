@@ -2,7 +2,7 @@ package systems.kinau.fishingbot.modules.command.brigardier.node;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import systems.kinau.fishingbot.modules.command.CommandExecutor;
+import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 
 public class LiteralNode extends Node {
 
