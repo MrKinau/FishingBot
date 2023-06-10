@@ -36,10 +36,13 @@ public class CommandLook extends BrigardierCommand {
             CommandExecutor source = context.getSource();
             float yaw = context.getArgument("yaw", Float.class);
             float pitch = context.getArgument("pitch", Float.class);
-            int speed = FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed();
-            Integer speedInput = context.getArgument("speed", Integer.class);
-            if (speedInput != null)
-                speed = speedInput;
+            int speed;
+            try {
+                speed = context.getArgument("speed", Integer.class);
+            } catch (IllegalArgumentException ex) {
+                speed = FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed();
+            }
+
             FishingBot.getInstance().getCurrentBot().getPlayer().look(yaw, pitch, speed, finished -> {
                 source.sendTranslatedMessages("command-look-executed", yaw, pitch);
             });

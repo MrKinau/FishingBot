@@ -7,6 +7,8 @@ package systems.kinau.fishingbot.network.utils;
 
 import com.google.common.hash.Hashing;
 import com.google.common.hash.HashingOutputStream;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -226,11 +228,37 @@ public class CryptManager {
         return signMessage(keys, signer, message, salt, timestamp);
     }
 
+    private static byte[] uuidToByteArray(UUID uuid) {
+        byte[] bs = new byte[16];
+        ByteBuffer.wrap(bs).order(ByteOrder.BIG_ENDIAN).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits());
+        return bs;
+    }
+
     private static MessageSignature signMessage(AuthData.ProfileKeys keys, UUID signer, String message, long salt, Instant timestamp) {
         String component = "{\"text\":\"" + message + "\"}";
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1) {
-            byte[] messageHeader = new byte[16];
-            ByteBuffer.wrap(messageHeader).order(ByteOrder.BIG_ENDIAN).putLong(signer.getMostSignificantBits()).putLong(signer.getLeastSignificantBits());
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_3) {
+            return new MessageSignature(sign(keys, signature -> {
+                try {
+                    signature.update(Ints.toByteArray(1));
+
+                    // MessageLink
+                    signature.update(uuidToByteArray(signer)); // sender
+                    signature.update(uuidToByteArray(keys.getChatSessionId())); // session id
+                    signature.update(Ints.toByteArray(FishingBot.getInstance().getCurrentBot().getPlayer().incrementChatSessionIndex())); // MessageLink index
+
+                    // Message Body
+                    signature.update(Longs.toByteArray(salt));
+                    signature.update(Longs.toByteArray(timestamp.getEpochSecond()));
+                    byte[] bs = message.getBytes(StandardCharsets.UTF_8);
+                    signature.update(Ints.toByteArray(bs.length));
+                    signature.update(bs);
+                    signature.update(Ints.toByteArray(0)); // lastSeenMessages
+                } catch (SignatureException e) {
+                    e.printStackTrace();
+                }
+            }), salt, timestamp);
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1) {
+            byte[] messageHeader = uuidToByteArray(signer);
 
             HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha256(), new OutputStream() {
                 @Override

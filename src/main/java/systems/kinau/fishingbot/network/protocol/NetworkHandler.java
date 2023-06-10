@@ -635,8 +635,7 @@ public class NetworkHandler {
         //Minecraft 1.19.3
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x00, PacketInSpawnEntity.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0B, PacketInDifficultySet.class);
-        // TODO: PacketInCommands not working (1.19.3)
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0E, PacketInCommands.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0E, PacketInCommands.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x0F, PacketInWindowClose.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x10, PacketInWindowItems.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x12, PacketInSetSlot.class);
@@ -644,8 +643,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x1F, PacketInKeepAlive.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x24, PacketInJoinGame.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x2C, PacketInOpenWindow.class);
-        // TODO: PacketInChatPlayer not working (1.19.3)
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x31, PacketInChatPlayer.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x31, PacketInChatPlayer.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x35, PacketInPlayerListItemRemove.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x36, PacketInPlayerListItem.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x38, PacketInPlayerPosLook.class);
@@ -657,9 +655,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x60, PacketInChatSystem.class);
 
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x00, PacketOutTeleportConfirm.class);
-        // TODO: Command argument signing (1.19.3)
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x04, PacketOutChatCommand.class);
-        // TODO: Chat signing (1.19.3)
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x05, PacketOutChatMessage.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x06, PacketOutClientStatus.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_3).registerPacket(0x07, PacketOutClientSettings.class);
@@ -678,8 +674,7 @@ public class NetworkHandler {
         //Minecraft 1.19.4
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x01, PacketInSpawnEntity.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x0C, PacketInDifficultySet.class);
-        // TODO: PacketInCommands not working (1.19.3)
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x0E, PacketInCommands.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x10, PacketInCommands.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x11, PacketInWindowClose.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x12, PacketInWindowItems.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x14, PacketInSetSlot.class);
@@ -687,11 +682,10 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x23, PacketInKeepAlive.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x28, PacketInJoinGame.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x30, PacketInOpenWindow.class);
-        // TODO: PacketInChatPlayer not working (1.19.3)
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x31, PacketInChatPlayer.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x35, PacketInChatPlayer.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x39, PacketInPlayerListItemRemove.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x3A, PacketInPlayerListItem.class);
-        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x3C, PacketInPlayerPosLook.class); //TODO: MISSING BOOLEAN
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x3C, PacketInPlayerPosLook.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x4D, PacketInHeldItemChange.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x52, PacketInEntityMetadata.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x54, PacketInEntityVelocity.class);
@@ -700,9 +694,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x64, PacketInChatSystem.class);
 
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x00, PacketOutTeleportConfirm.class);
-        // TODO: Command argument signing (1.19.3)
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x04, PacketOutChatCommand.class);
-        // TODO: Chat signing (1.19.3)
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x05, PacketOutChatMessage.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x06, PacketOutChatSessionUpdate.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4).registerPacket(0x07, PacketOutClientStatus.class);
@@ -721,8 +713,7 @@ public class NetworkHandler {
         // Minecraft 1.20
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x01, PacketInSpawnEntity.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x0C, PacketInDifficultySet.class);
-        // TODO: PacketInCommands not working (1.19.3)
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x0E, PacketInCommands.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x10, PacketInCommands.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x11, PacketInWindowClose.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x12, PacketInWindowItems.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x14, PacketInSetSlot.class);
@@ -730,11 +721,10 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x23, PacketInKeepAlive.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x28, PacketInJoinGame.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x30, PacketInOpenWindow.class);
-        // TODO: PacketInChatPlayer not working (1.19.3)
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x31, PacketInChatPlayer.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x35, PacketInChatPlayer.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x39, PacketInPlayerListItemRemove.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x3A, PacketInPlayerListItem.class);
-        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x3C, PacketInPlayerPosLook.class); //TODO: MISSING BOOLEAN
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x3C, PacketInPlayerPosLook.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x4D, PacketInHeldItemChange.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x52, PacketInEntityMetadata.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20).registerPacket(0x54, PacketInEntityVelocity.class);
@@ -757,12 +747,6 @@ public class NetworkHandler {
 
     public void sendPacket(Packet packet) {
         ByteArrayDataOutput buf = ByteStreams.newDataOutput();
-
-        //TODO: Remove if chat signing and command argument signing is working
-        if (FishingBot.getInstance().getCurrentBot() != null && FishingBot.getInstance().getCurrentBot().getConfig().isOnlineMode()) {
-            if (packet instanceof PacketOutChatMessage || packet instanceof PacketOutChatCommand)
-                return;
-        }
 
         //Add Packet ID from serverProtocol-specific PacketRegistry
         switch (getState()) {

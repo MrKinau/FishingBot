@@ -28,10 +28,11 @@ public class CommandRightClick extends BrigardierCommand {
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+                            FishingBot.getInstance().getCurrentBot().getPlayer().use();
                             return 0;
                         }))
                 .executes(context -> {
-                    context.getSource().sendMessage(getSyntax(context));
+                    FishingBot.getInstance().getCurrentBot().getPlayer().use();
                     return 0;
                 });
     }

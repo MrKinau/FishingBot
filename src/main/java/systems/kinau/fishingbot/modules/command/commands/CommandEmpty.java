@@ -31,8 +31,14 @@ public class CommandEmpty extends BrigardierCommand {
             CommandExecutor source = context.getSource();
             source.sendTranslatedMessages("command-empty");
 
-            String directionStr = context.getArgument("direction", String.class);
-            Integer slot = context.getArgument("slot", Integer.class);
+            String directionStr = null;
+            try {
+                directionStr = context.getArgument("direction", String.class);
+            } catch (IllegalArgumentException ignore) {}
+            Integer slot = null;
+            try {
+                slot = context.getArgument("slot", Integer.class);
+            } catch (IllegalArgumentException ignore) {}
 
             if (directionStr != null) {
                 LocationUtils.Direction direction;
@@ -45,9 +51,10 @@ public class CommandEmpty extends BrigardierCommand {
 
                 float yawBefore = FishingBot.getInstance().getCurrentBot().getPlayer().getYaw();
                 float pitchBefore = FishingBot.getInstance().getCurrentBot().getPlayer().getPitch();
+                Integer finalSlot = slot;
                 FishingBot.getInstance().getCurrentBot().getPlayer().look(direction, finished -> {
-                    if (slot != null) {
-                        drop(slot.shortValue());
+                    if (finalSlot != null) {
+                        drop(finalSlot.shortValue());
                     } else {
                         empty();
                     }

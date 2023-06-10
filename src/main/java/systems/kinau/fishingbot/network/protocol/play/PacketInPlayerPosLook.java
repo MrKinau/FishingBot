@@ -16,14 +16,15 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @NoArgsConstructor
+@Getter
 public class PacketInPlayerPosLook extends Packet {
 
-    @Getter private double x;
-    @Getter private double y;
-    @Getter private double z;
-    @Getter private float yaw;
-    @Getter private float pitch;
-    @Getter private int teleportId;
+    private double x;
+    private double y;
+    private double z;
+    private float yaw;
+    private float pitch;
+    private int teleportId;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -37,13 +38,13 @@ public class PacketInPlayerPosLook extends Packet {
         double z = in.readDouble();
         float yaw = in.readFloat();
         float pitch = in.readFloat();
-        if(in.readByte() == 0) {
+        if (in.readByte() == 0) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.yaw = yaw;
             this.pitch = pitch;
-            if(protocolId >= ProtocolConstants.MINECRAFT_1_9) {
+            if (protocolId >= ProtocolConstants.MINECRAFT_1_9) {
                 this.teleportId = readVarInt(in); //tID
             }
             if (protocolId >= ProtocolConstants.MINECRAFT_1_17 && protocolId <= ProtocolConstants.MINECRAFT_1_19_3) {

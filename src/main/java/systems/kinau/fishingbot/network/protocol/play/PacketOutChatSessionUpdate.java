@@ -12,7 +12,6 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Base64;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,13 +19,12 @@ import java.util.UUID;
 public class PacketOutChatSessionUpdate extends Packet {
 
     private AuthData.ProfileKeys keys;
-    private UUID signer;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        if (signer == null) return;
-        out.writeLong(signer.getMostSignificantBits());
-        out.writeLong(signer.getLeastSignificantBits());
+        if (keys == null) return;
+        out.writeLong(keys.getChatSessionId().getMostSignificantBits());
+        out.writeLong(keys.getChatSessionId().getLeastSignificantBits());
         out.writeLong(keys.getExpiresAt());
         byte[] pubKey = keys.getPublicKey().getEncoded();
         writeVarInt(pubKey.length, out);

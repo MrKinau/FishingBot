@@ -68,17 +68,22 @@ public class PacketOutChatCommand extends Packet {
             for (int i = 0; i < signatures.getArgumentSignatures().size(); i++) {
                 CryptManager.ArgumentSignature signature = signatures.getArgumentSignatures().get(i);
                 writeString(signature.getName(), out);
-                writeVarInt(signature.getSignature().length, out);
+                if (protocolId < ProtocolConstants.MINECRAFT_1_19_3)
+                    writeVarInt(signature.getSignature().length, out);
                 out.write(signature.getSignature());
                 if (i == signatures.getArgumentSignatures().size() - 1)
                     FishingBot.getInstance().getCurrentBot().getPlayer().setLastUsedSignature(Optional.of(
                             new CryptManager.MessageSignature(signature.getSignature(), signatures.getSalt(), signatures.getTimestamp())
                     ));
             }
-            out.writeBoolean(false);
+            if (protocolId < ProtocolConstants.MINECRAFT_1_19_3)
+                out.writeBoolean(false);
             if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
                 writeVarInt(0, out);
-                out.writeBoolean(false);
+                if (protocolId < ProtocolConstants.MINECRAFT_1_19_3)
+                    out.writeBoolean(false);
+                else
+                    writeFixedBitSet(new BitSet(), 20, out);
             }
         }
     }

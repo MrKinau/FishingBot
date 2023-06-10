@@ -43,12 +43,7 @@ public class ClientDefaultsModule extends Module implements Listener {
     public void onSetDifficulty(DifficultySetEvent event) {
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() > ProtocolConstants.MINECRAFT_1_19_1) {
             AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
-            UUID signer = null;
-            try {
-                signer = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getUuid());
-            } catch (Exception ignore) {}
-            if (signer != null)
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatSessionUpdate(keys, signer));
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatSessionUpdate(keys));
         }
         if (isJoined())
             return;

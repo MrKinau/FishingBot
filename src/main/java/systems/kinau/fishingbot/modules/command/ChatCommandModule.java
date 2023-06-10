@@ -43,7 +43,7 @@ public class ChatCommandModule extends Module implements Listener {
                 fullCommand = fullCommand.substring(1);
 
             // TODO: Add private msg player
-            FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(fullCommand, new PlayerCommandExecutor("MrKinau"));
+            FishingBot.getInstance().getCurrentBot().getCommandRegistry().dispatchCommand(fullCommand, new PlayerCommandExecutor());
         }
     }
 }

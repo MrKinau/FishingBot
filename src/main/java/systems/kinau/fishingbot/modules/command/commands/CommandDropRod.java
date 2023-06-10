@@ -28,7 +28,11 @@ public class CommandDropRod extends BrigardierCommand {
             CommandExecutor source = context.getSource();
             Filter filter = Filter.ALL_BUT_SELECTED;
 
-            String filterStr = context.getArgument("filter", String.class);
+            String filterStr = null;
+            try {
+                filterStr = context.getArgument("filter", String.class);
+            } catch (IllegalArgumentException ignore) {}
+
             if (filterStr != null) {
                 try {
                     filter = Filter.valueOf(filterStr.replace(" ", "_").toUpperCase());

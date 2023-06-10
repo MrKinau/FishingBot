@@ -53,6 +53,7 @@ public class Player implements Listener {
     @Getter @Setter private Inventory inventory;
     @Getter         private final Map<Integer, Inventory> openedInventories = new HashMap<>();
     @Getter @Setter private Optional<CryptManager.MessageSignature> lastUsedSignature = Optional.empty();
+    @Getter         private int chatSessionIndex = 0;
     @Getter @Setter private CommandDispatcher<CommandExecutor> mcCommandDispatcher;
 
     @Getter @Setter private UUID uuid;
@@ -428,5 +429,9 @@ public class Player implements Listener {
 
     public void use() {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+    }
+
+    public int incrementChatSessionIndex() {
+        return this.chatSessionIndex++;
     }
 }

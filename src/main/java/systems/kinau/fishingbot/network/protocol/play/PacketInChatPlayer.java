@@ -42,24 +42,41 @@ public class PacketInChatPlayer extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
             try {
+                if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
+                    readUUID(in); // sender
+                    readVarInt(in); // index
+                }
                 if (in.readBoolean()) {
+                    if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
+                        in.skipBytes(256);
+                    } else {
+                        int sigLength = readVarInt(in);
+                        in.skipBytes(sigLength);
+                    }
+                }
+                if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+                    readUUID(in);
                     int sigLength = readVarInt(in);
                     in.skipBytes(sigLength);
                 }
-                readUUID(in);
-                int sigLength = readVarInt(in);
-                in.skipBytes(sigLength);
                 String actualMessage = readString(in); //plain
-                if (in.readBoolean())
+                if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1 && in.readBoolean())
                     readString(in);
                 in.readLong();
                 in.readLong();
                 int prevMsgs = readVarInt(in);
                 for (int i = 0; i < prevMsgs; i++) {
-                    readUUID(in);
-                    int prevMsgSig = readVarInt(in);
-                    in.skipBytes(prevMsgSig);
+                    if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+                        readUUID(in);
+                        int prevMsgSig = readVarInt(in);
+                        in.skipBytes(prevMsgSig);
+                    } else {
+                        int index = readVarInt(in);
+                        if (index == 0)
+                            in.skipBytes(256);
+                    }
                 }
+                // unsigned content
                 if (in.readBoolean())
                     readString(in);
                 int filterMask = readVarInt(in);
@@ -68,9 +85,11 @@ public class PacketInChatPlayer extends Packet {
                     for (int i = 0; i < bitSetLength; i++)
                         in.readLong();
                 }
-                readVarInt(in);
+                readVarInt(in); // chat type
                 String userName = readChatComponent(in);
                 this.text = "<" + userName + "> " + actualMessage;
+                if (in.readBoolean())
+                    readString(in);
                 FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
                 return;
             } catch (Throwable e) {

@@ -44,7 +44,10 @@ public class CommandClickInv extends BrigardierCommand {
                 return 0;
             }
 
-            String buttonStr = context.getArgument("button", String.class);
+            String buttonStr = null;
+            try {
+                buttonStr = context.getArgument("button", String.class);
+            } catch (IllegalArgumentException ignore) {}
             byte button = buttonStr == null || !buttonStr.equals("right") ? (byte) 0 : 1;
 
             short slot = (short) (context.getArgument("slot", Integer.class) - 1);

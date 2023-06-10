@@ -12,6 +12,7 @@ import lombok.ToString;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @ToString
@@ -34,5 +35,6 @@ public class AuthData {
         private final String publicKeySignature;
         private final PrivateKey privateKey;
         private final long expiresAt;
+        private final UUID chatSessionId = UUID.randomUUID();
     }
 }
