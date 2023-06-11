@@ -70,9 +70,9 @@ A list of all commands can be found in the wiki ([here](https://github.com/MrKin
 - 1.19
 - 1.19.1
 - 1.19.2
-- 1.19.3 (except chat in online mode)
-- 1.19.4 (except chat in online mode)
-- 1.20 (except chat in online mode)
+- 1.19.3
+- 1.19.4
+- 1.20
 
 ## Discord
 To follow the project, get support or request features or bugs you can join my Discord: https://discord.gg/xHpCDYf
