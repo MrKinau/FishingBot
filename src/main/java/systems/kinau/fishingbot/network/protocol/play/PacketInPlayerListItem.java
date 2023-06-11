@@ -96,7 +96,7 @@ public class PacketInPlayerListItem extends Packet {
     }
 
     enum Action {
-        ADD_PLAYER((in) -> {
+        ADD_PLAYER(in -> {
             readString(in);
             int propCount = readVarInt(in);
             for (int j = 0; j < propCount; j++) {
@@ -107,7 +107,7 @@ public class PacketInPlayerListItem extends Packet {
                 }
             }
         }),
-        INITIALIZE_CHAT((in) -> {
+        INITIALIZE_CHAT(in -> {
             if (in.readBoolean()) {
                 readUUID(in);
                 in.readLong(); // expiresAt
@@ -118,7 +118,10 @@ public class PacketInPlayerListItem extends Packet {
         UPDATE_GAME_MODE(Packet::readVarInt),
         UPDATE_LISTED(ByteArrayDataInputWrapper::readBoolean),
         UPDATE_LATENCY(Packet::readVarInt),
-        UPDATE_DISPLAY_NAME(Packet::readString);
+        UPDATE_DISPLAY_NAME(in -> {
+            if (in.readBoolean())
+                readString(in);
+        });
 
         final Action.Reader reader;
 
