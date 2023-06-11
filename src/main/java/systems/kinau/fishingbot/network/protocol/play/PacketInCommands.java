@@ -126,9 +126,15 @@ public class PacketInCommands extends Packet {
                     byte propFlags = in.readByte();
                     break;
                 }
+                case 41:
+                case 42:
                 case 43:
                 case 44: {
                     String identifier = readString(in);
+                    break;
+                }
+                case 40: {
+                    int time = in.readInt();
                     break;
                 }
             }
