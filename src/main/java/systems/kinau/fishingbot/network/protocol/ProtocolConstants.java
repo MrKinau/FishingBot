@@ -127,7 +127,7 @@ public class ProtocolConstants {
             case MINECRAFT_1_19_1: return "1.19.1 / 1.19.2";
             case MINECRAFT_1_19_3: return "1.19.3";
             case MINECRAFT_1_19_4: return "1.19.4";
-            case MINECRAFT_1_20: return "1.20";
+            case MINECRAFT_1_20: return "1.20 / 1.20.1";
             default: return "Unknown version";
         }
     }
@@ -137,6 +137,7 @@ public class ProtocolConstants {
             case MINECRAFT_1_16_4: return "1.16.5";
             case MINECRAFT_1_18: return "1.18.1";
             case MINECRAFT_1_19_1: return "1.19.2";
+            case MINECRAFT_1_20: return "1.20.1";
             default: return getVersionString(protocolId);
         }
     }
@@ -184,7 +185,9 @@ public class ProtocolConstants {
             case "1.19.1 / 1.19.2": return MINECRAFT_1_19_1;
             case "1.19.3": return MINECRAFT_1_19_3;
             case "1.19.4": return MINECRAFT_1_19_4;
-            case "1.20": return MINECRAFT_1_20;
+            case "1.20":
+            case "1.20.1":
+            case "1.20 / 1.20.1": return MINECRAFT_1_20;
             default: return MINECRAFT_1_8;
         }
     }
