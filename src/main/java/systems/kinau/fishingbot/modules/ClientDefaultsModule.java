@@ -41,7 +41,7 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onSetDifficulty(DifficultySetEvent event) {
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() > ProtocolConstants.MINECRAFT_1_19_1) {
+        if (FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys() != null && FishingBot.getInstance().getCurrentBot().getServerProtocol() > ProtocolConstants.MINECRAFT_1_19_1) {
             AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatSessionUpdate(keys));
         }
