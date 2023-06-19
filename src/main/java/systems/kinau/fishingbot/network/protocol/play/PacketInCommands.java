@@ -38,26 +38,35 @@ public class PacketInCommands extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         int count = readVarInt(in);
         List<CommandNodeData> nodes = new ArrayList<>();
-        for (int i = 0; i < count; i++)
-            nodes.add(readCommandNode(in));
-        int rootIndex = readVarInt(in);
+        try {
+            for (int i = 0; i < count; i++) {
+                CommandNodeData data = readCommandNode(in);
+                if (data != null)
+                    nodes.add(data);
+            }
+            int rootIndex = readVarInt(in);
 
         RootCommandNode<CommandExecutor> rootNode = (RootCommandNode<CommandExecutor>) new CommandTree(nodes).getNode(rootIndex);
         this.commandDispatcher = new CommandDispatcher<>(rootNode);
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new CommandsRegisteredEvent(commandDispatcher));
+        } catch (Exception ignore) {}
     }
 
     private CommandNodeData readCommandNode(ByteArrayDataInputWrapper in) {
-        byte flags = in.readByte();
-        int count = readVarInt(in);
-        if (count > in.getAvailable()) return null;
-        int[] children = new int[count];
-        for (int i = 0; i < children.length; i++) {
-            children[i] = readVarInt(in);
+        try {
+            byte flags = in.readByte();
+            int count = readVarInt(in);
+            if (count > in.getAvailable()) return null;
+            int[] children = new int[count];
+            for (int i = 0; i < children.length; i++) {
+                children[i] = readVarInt(in);
+            }
+            int redirectNode = ((flags & 0x08) != 0) ? readVarInt(in) : 0;
+            Node node = readArgumentBuilder(in, flags);
+            return new CommandNodeData(node, flags, redirectNode, children);
+        } catch (Exception ex) {
+            return null;
         }
-        int redirectNode = ((flags & 0x08) != 0) ? readVarInt(in) : 0;
-        Node node = readArgumentBuilder(in, flags);
-        return new CommandNodeData(node, flags, redirectNode, children);
     }
 
     private Node readArgumentBuilder(ByteArrayDataInputWrapper in, byte flags) {
