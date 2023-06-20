@@ -138,11 +138,7 @@ public class RegistryHandler {
     }
 
     public static String getItemName(int id, int protocol) {
-        try {
-            return getItemsMap(protocol).get(id);
-        } catch (NullPointerException ignore) {
-            return "Modded Item";
-        }
+        return getItemsMap(protocol).getOrDefault(id, "Modded Item");
     }
 
     public static int getEntityType(String entityName, int protocol) {
