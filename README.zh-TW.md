@@ -1,3 +1,7 @@
+# README.md
+[English](README.md) 
+[繁体中文](readme/README.zh_TW.md) 
+
 Minecraft 1.8 - 1.20.1 自動釣魚Bot
 =============
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/22e2d15847fb4deaaed97efc3b755ebd)](https://www.codacy.com/gh/MrKinau/FishingBot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MrKinau/FishingBot&amp;utm_campaign=Badge_Grade)
