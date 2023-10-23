@@ -5,6 +5,18 @@
 
 package systems.kinau.fishingbot.modules.fishing;
 
-public enum  AnnounceType {
-    ALL, ALL_BUT_FISH, ONLY_ENCHANTED, ONLY_BOOKS, NONE
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import systems.kinau.fishingbot.gui.config.DisplayNameProvider;
+
+@AllArgsConstructor
+@Getter
+public enum AnnounceType implements DisplayNameProvider {
+    ALL("Everything"),
+    ALL_BUT_FISH("Everything Except Fish"),
+    ONLY_ENCHANTED("Only Enchanted Items"),
+    ONLY_BOOKS("Only Enchanted Books"),
+    NONE("Nothing");
+
+    private final String displayName;
 }
