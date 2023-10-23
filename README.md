@@ -1,3 +1,7 @@
+# README.md
+- en [English](README.md)
+- zh_TW [繁体中文](readme/README.zh_TW.md)
+
 Minecraft 1.8 - 1.20.1 AFK Fishing bot
 =============
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/22e2d15847fb4deaaed97efc3b755ebd)](https://www.codacy.com/gh/MrKinau/FishingBot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MrKinau/FishingBot&amp;utm_campaign=Badge_Grade)
