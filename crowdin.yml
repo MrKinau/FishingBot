@@ -1,4 +1,4 @@
 files:
-  - source: /**/lang/fb_en-EN.properties
+  - source: /**/lang/fb_en_EN.properties
     translation: /%original_path%/fb_%locale_with_underscore%.%file_extension%
     escape_quotes: 1
