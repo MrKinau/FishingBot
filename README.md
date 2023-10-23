@@ -1,6 +1,6 @@
 # README.md
-[![English](README.md)]
-[![繁体中文](readme/README.zh_TW.md)]
+[English](README.md) 
+[繁体中文](readme/README.zh_TW.md) 
 
 Minecraft 1.8 - 1.20.1 AFK Fishing bot
 =============
