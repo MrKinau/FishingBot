@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.auth.msa;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -75,7 +76,7 @@ public class RefreshTokenCallback {
                 String errorMessage = object.get("error_description").getAsString();
                 errorMessage = errorMessage.split("\r")[0];
 
-                return Pair.of(RefreshTokenResult.valueOf(object.get("error").getAsString().toUpperCase()), errorMessage);
+                return Pair.of(RefreshTokenResult.valueOf(StringUtils.stripAccents(object.get("error").getAsString().toUpperCase())), errorMessage);
             }
 
             return Pair.of(RefreshTokenResult.AUTHORIZATION_SUCCEEDED, object.get("refresh_token").getAsString());
