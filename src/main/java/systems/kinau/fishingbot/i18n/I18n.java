@@ -34,7 +34,7 @@ public class I18n {
             properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_" + language.getLanguageCode() + ".properties"), StandardCharsets.UTF_8));
             this.locales = new HashMap(properties);
             properties = new Properties();
-            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_en.properties"), StandardCharsets.UTF_8));
+            properties.load(new InputStreamReader(I18n.class.getResourceAsStream("/lang/fb_en_EN.properties"), StandardCharsets.UTF_8));
             this.fallbackLocales = new HashMap(properties);
             this.bundle = ResourceBundle.getBundle("lang/fb", language.getLocale(), new UTF8Control());
 
@@ -42,7 +42,7 @@ public class I18n {
                 FishingBot.getLog().info("Using language: " + language + " @ /lang/fb_" + language.getLanguageCode() + ".properties");
         } catch (Exception e) {
             FishingBot.getLog().severe("Failed loading language " + language.name() + ": /lang/fb_" + language.getLanguageCode() + ".properties");
-            FishingBot.getLog().severe("Falling back to default langauge ENGLISH");
+            FishingBot.getLog().severe("Falling back to default language ENGLISH");
             e.printStackTrace();
         }
     }

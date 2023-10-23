@@ -6,6 +6,8 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import lombok.Getter;
+import systems.kinau.fishingbot.gui.config.DisplayNameConverter;
+import systems.kinau.fishingbot.gui.config.DisplayNameProvider;
 
 import java.util.Arrays;
 
@@ -22,6 +24,9 @@ public class EnumConfigOption extends ConfigOption {
         this.data = data;
         Label nameLabel = new Label(description);
         ChoiceBox choiceBox = new ChoiceBox(FXCollections.observableArrayList(Arrays.asList(data)));
+        if (data[0] instanceof DisplayNameProvider) {
+            choiceBox.setConverter(new DisplayNameConverter());
+        }
         choiceBox.getSelectionModel().select(getValue());
         choiceBox.setOnAction(event -> setValue(choiceBox.getSelectionModel().getSelectedItem()));
         if (onClick != null)

@@ -1,6 +1,7 @@
 package systems.kinau.fishingbot.utils;
 
 import lombok.Getter;
+import systems.kinau.fishingbot.gui.config.DisplayNameProvider;
 
 public class LocationUtils {
 
@@ -29,23 +30,26 @@ public class LocationUtils {
         return ((long) (x & 0x3FFFFFF) << 38) | ((long) (z & 0x3FFFFFF) << 12) | (y & 0xFFF);
     }
 
-    public enum Direction {
-        NORTH(180.0F),
-        EAST(-90.0F),
-        SOUTH(0.0F),
-        WEST(90.0F),
-        DOWN(Float.MIN_VALUE, 90.0F);
+    @Getter
+    public enum Direction implements DisplayNameProvider {
+        NORTH(180.0F, "North"),
+        EAST(-90.0F, "East"),
+        SOUTH(0.0F, "South"),
+        WEST(90.0F, "West"),
+        DOWN(Float.MIN_VALUE, 90.0F, "Down");
 
-        @Getter private float yaw = Float.MIN_VALUE;
-        @Getter private float pitch = Float.MIN_VALUE;
+        private float yaw = Float.MIN_VALUE;
+        private float pitch = Float.MIN_VALUE;
+        private String displayName;
 
-        Direction(float yaw, float pitch) {
+        Direction(float yaw, float pitch, String displayName) {
             this.yaw = yaw;
             this.pitch = pitch;
         }
 
-        Direction(float yaw) {
+        Direction(float yaw, String displayName) {
             this.yaw = yaw;
+            this.displayName = displayName;
         }
     }
 

@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.i18n;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import systems.kinau.fishingbot.gui.config.DisplayNameProvider;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -13,21 +14,23 @@ import java.util.Locale;
  */
 @AllArgsConstructor
 @Getter
-public enum Language {
+public enum Language implements DisplayNameProvider {
 
-    CHINESE(new Locale("zh", "CN")),
-    ENGLISH(new Locale("en", "EN")),
-    FRENCH(new Locale("fr", "FR")),
-    GERMAN(new Locale("de", "DE")),
-    ITALIAN(new Locale("it", "IT")),
-    POLISH(new Locale("pl", "PL")),
-    RUSSIAN(new Locale("ru", "RU")),
-    SPANISH(new Locale("es", "ES"));
+    CHINESE_SIMPLIFIED(new Locale("zh", "CN"), "Chinese Simplified"),
+    CHINESE_TRADITIONAL(new Locale("zh", "TW"), "Chinese Traditional"),
+    ENGLISH(new Locale("en", "EN"), "English"),
+    FRENCH(new Locale("fr", "FR"), "French"),
+    GERMAN(new Locale("de", "DE"), "German"),
+    ITALIAN(new Locale("it", "IT"), "Italian"),
+    POLISH(new Locale("pl", "PL"), "Polish"),
+    RUSSIAN(new Locale("ru", "RU"), "Russian"),
+    SPANISH(new Locale("es", "ES"), "Spanish");
 
     private final Locale locale;
+    private final String displayName;
 
     public String getLanguageCode() {
-        return locale.getLanguage();
+        return locale.toLanguageTag().replace("-", "_");
     }
 
     public static Language getByLocale(Locale locale) {
