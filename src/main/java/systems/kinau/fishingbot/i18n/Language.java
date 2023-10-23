@@ -30,7 +30,7 @@ public enum Language implements DisplayNameProvider {
     private final String displayName;
 
     public String getLanguageCode() {
-        return locale.getLanguage();
+        return locale.toLanguageTag().replace("-", "_");
     }
 
     public static Language getByLocale(Locale locale) {
