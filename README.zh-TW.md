@@ -1,6 +1,6 @@
 # README.md
 [English](README.md) 
-[繁体中文](readme/README.zh_TW.md) 
+[繁体中文](readme/README.zh-TW.md) 
 
 Minecraft 1.8 - 1.20.1 自動釣魚Bot
 =============
