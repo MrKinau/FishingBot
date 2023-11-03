@@ -120,42 +120,75 @@
         </dependency>
 
         <!-- JAVAFX -->
+        <!-- TODO Change back to JavaFX 16-ea+7, to support Java 8 -->
+        <!-- Win -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>16-ea+7</version>
+            <version>17-ea+8</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>16-ea+7</version>
+            <version>17-ea+8</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>16-ea+7</version>
+            <version>17-ea+8</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>16-ea+7</version>
+            <version>17-ea+8</version>
             <classifier>win</classifier>
         </dependency>
+
+        <!-- Linux -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>16-ea+7</version>
+            <version>17-ea+8</version>
             <classifier>linux</classifier>
         </dependency>
+
+        <!-- Mac -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>16-ea+7</version>
+            <version>17-ea+8</version>
             <classifier>mac</classifier>
         </dependency>
+
+        <!-- Mac Arm (Apple Silicon) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>17-ea+8</version>
+            <classifier>mac-aarch64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>17-ea+8</version>
+            <classifier>mac-aarch64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>17-ea+8</version>
+            <classifier>mac-aarch64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>17-ea+8</version>
+            <classifier>mac-aarch64</classifier>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>

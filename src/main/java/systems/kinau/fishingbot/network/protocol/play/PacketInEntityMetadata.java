@@ -21,13 +21,13 @@ import systems.kinau.fishingbot.utils.ItemUtils;
 
 import java.util.List;
 
-//TODO: Add as event, yes this code is ugly...
+// TODO: Add as event, yes this code is ugly...
 @NoArgsConstructor
 public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //Only incoming packet
+        // Only incoming packet
     }
 
     @Override

@@ -3,7 +3,7 @@
  * 2019/5/5
  */
 
-package systems.kinau.fishingbot.network.protocol.play;
+package systems.kinau.fishingbot.network.protocol.common;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class PacketInKeepAlive extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //Only incoming packet
+        // Only incoming packet
     }
 
     @Override

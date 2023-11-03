@@ -40,7 +40,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-//code borrowed from minecraft's encryptor
+// code borrowed from minecraft's encryptor
 public class CryptManager {
     /**
      * ISO_8859_1

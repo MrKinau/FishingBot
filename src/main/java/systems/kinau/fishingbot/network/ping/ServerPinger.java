@@ -55,7 +55,7 @@ public class ServerPinger {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             DataInputStream in = new DataInputStream(socket.getInputStream());
 
-            //send Handshake 0x00 - PING
+            // send Handshake 0x00 - PING
 
             int pingProtocol = (ProtocolConstants.getProtocolId(FishingBot.getInstance().getCurrentBot().getConfig().getDefaultProtocol()));
             if (pingProtocol == ProtocolConstants.AUTOMATIC)
@@ -74,9 +74,9 @@ public class ServerPinger {
             Packet.writeVarInt(0, buf);
             send(buf, out);
 
-            //read Handshake 0x00 Response - Ping
+            // read Handshake 0x00 Response - Ping
 
-            //TODO: Sometimes it's an int sometimes a varint? investigate how to fix the auto-version detection (e.g. based on getAvailable())
+            // TODO: Sometimes it's an int sometimes a varint? investigate how to fix the auto-version detection (e.g. based on getAvailable())
             Packet.readVarInt(in); //ignore
 //            in.readInt(); //ignore
             Packet.readVarInt(in); //id
@@ -132,7 +132,7 @@ public class ServerPinger {
     }
 
     public void updateWithSRV() {
-        //Getting SRV Record - changing data to correct ones
+        // Getting SRV Record - changing data to correct ones
         if (serverPort == 25565 || serverPort < 1) {
             String[] serverData = getServerAddress(serverName);
             if (!serverData[0].equalsIgnoreCase(serverName))

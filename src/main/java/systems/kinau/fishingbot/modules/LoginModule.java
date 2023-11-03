@@ -9,13 +9,19 @@ import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.configuration.ConfigurationFinishEvent;
+import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
 import systems.kinau.fishingbot.event.login.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.State;
+import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutEncryptionResponse;
+import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginAcknowledge;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginPluginResponse;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginStart;
 import systems.kinau.fishingbot.network.utils.CryptManager;
+import systems.kinau.fishingbot.utils.UUIDUtils;
 
 import javax.crypto.SecretKey;
 import java.io.BufferedReader;
@@ -48,10 +54,10 @@ public class LoginModule extends Module implements Listener {
     public void onEncryptionRequest(EncryptionRequestEvent event) {
         NetworkHandler networkHandler = FishingBot.getInstance().getCurrentBot().getNet();
 
-        //Set public key
+        // Set public key
         networkHandler.setPublicKey(event.getPublicKey());
 
-        //Generate & Set secret key
+        // Generate & Set secret key
         SecretKey secretKey = CryptManager.createNewSharedKey();
         networkHandler.setSecretKey(secretKey);
 
@@ -64,7 +70,7 @@ public class LoginModule extends Module implements Listener {
 
         String var5 = new BigInteger(serverIdHash).toString(16);
         sendSessionRequest(FishingBot.getInstance().getCurrentBot().getAuthData().getUsername(),
-                "token:" + FishingBot.getInstance().getCurrentBot().getAuthData().getAccessToken() + ":" + FishingBot.getInstance().getCurrentBot().getAuthData().getUUIDWithoutDashes(), var5);
+                "token:" + FishingBot.getInstance().getCurrentBot().getAuthData().getAccessToken() + ":" + UUIDUtils.withoutDashes(FishingBot.getInstance().getCurrentBot().getAuthData().getUuid()), var5);
 
         networkHandler.sendPacket(new PacketOutEncryptionResponse(event.getServerId(), event.getPublicKey(), event.getVerifyToken(), secretKey));
         networkHandler.activateEncryption();
@@ -91,8 +97,20 @@ public class LoginModule extends Module implements Listener {
     @EventHandler
     public void onLoginSuccess(LoginSuccessEvent event) {
         FishingBot.getI18n().info("module-login-successful", event.getUserName(), event.getUuid().toString());
-        FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_20_2) {
+            FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
+        } else {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginAcknowledge());
+            FishingBot.getInstance().getCurrentBot().getNet().setState(State.CONFIGURATION);
+            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ConfigurationStartEvent());
+        }
         FishingBot.getInstance().getCurrentBot().getPlayer().setUuid(event.getUuid());
+    }
+
+    @EventHandler
+    public void onConfigurationFinish(ConfigurationFinishEvent event) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutFinishConfiguration());
+        FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
     }
 
     private String sendSessionRequest(String user, String session, String serverid) {

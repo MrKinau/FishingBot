@@ -10,7 +10,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
-//TODO: This actually is the UseItemPacket in newer versions
+// TODO: This actually is the UseItemPacket in newer versions
 @AllArgsConstructor
 public class PacketOutBlockPlace extends Packet {
 

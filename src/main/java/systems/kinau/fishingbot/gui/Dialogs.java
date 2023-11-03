@@ -27,11 +27,6 @@ import java.util.stream.Collectors;
 
 public class Dialogs {
 
-    public static void showJavaFXNotWorking() {
-        JOptionPane.showConfirmDialog(new JFrame(), "JavaFX seems to be not working properly on your computer!\nPlease look at the log.\n\n" +
-                "You can still use the bot in headless (nogui) mode using the start argument -nogui.", "FishingBot", JOptionPane.DEFAULT_OPTION);
-    }
-
     public static void showRealmsWorlds(List<Realm> possibleRealms, Consumer<Realm> callback) {
         setupJFX();
         List<String> realmNames = possibleRealms.stream().map(realm -> realm.getName() + " by " + realm.getOwner()).collect(Collectors.toList());

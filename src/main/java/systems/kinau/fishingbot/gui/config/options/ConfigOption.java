@@ -21,6 +21,6 @@ public abstract class ConfigOption extends HBox {
     }
 
     public void updateValue() {
-        //may be implemented by nodes
+        // may be implemented by nodes
     }
 }

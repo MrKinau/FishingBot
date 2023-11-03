@@ -22,6 +22,7 @@ import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.utils.UUIDUtils;
 
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -51,7 +52,7 @@ public class MojangAPI {
         this.authData = authData;
         BasicCookieStore cookies = new BasicCookieStore();
 
-        BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), authData.getUUIDWithoutDashes()));
+        BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), UUIDUtils.withoutDashes(authData.getUuid())));
         BasicClientCookie userCookie = new BasicClientCookie("user", authData.getUsername());
         BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getExactVersionString(protocolId));
 

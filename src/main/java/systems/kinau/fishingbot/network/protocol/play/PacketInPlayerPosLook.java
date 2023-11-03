@@ -28,7 +28,7 @@ public class PacketInPlayerPosLook extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //Only incoming packet
+        // Only incoming packet
     }
 
     @Override

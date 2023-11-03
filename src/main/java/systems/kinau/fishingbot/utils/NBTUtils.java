@@ -4,7 +4,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.nio.charset.StandardCharsets;
 
-//TODO: Replace with any NBT API
+// TODO: Replace with any NBT API
 public class NBTUtils {
 
     public static byte[] readNBT(ByteArrayDataInputWrapper in) {

@@ -36,7 +36,7 @@ public class DiscordModule extends Module implements Listener {
     @Override
     public void onEnable() {
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
-        //Activate Discord web hook
+        // Activate Discord web hook
         if(FishingBot.getInstance().getCurrentBot().getConfig().isWebHookEnabled() && !FishingBot.getInstance().getCurrentBot().getConfig().getWebHook().equalsIgnoreCase("false")
                 && !FishingBot.getInstance().getCurrentBot().getConfig().getWebHook().equals("YOURWEBHOOK"))
             this.discord = new DiscordMessageDispatcher(FishingBot.getInstance().getCurrentBot().getConfig().getWebHook());

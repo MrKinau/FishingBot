@@ -48,6 +48,7 @@ public class ProtocolConstants {
     public static final int MINECRAFT_1_19_3 = 761;
     public static final int MINECRAFT_1_19_4 = 762;
     public static final int MINECRAFT_1_20 = 763;
+    public static final int MINECRAFT_1_20_2 = 764;
 
     public static final List<Integer> SUPPORTED_VERSION_IDS = Arrays.asList(
             ProtocolConstants.AUTOMATIC,
@@ -86,7 +87,8 @@ public class ProtocolConstants {
             ProtocolConstants.MINECRAFT_1_19_1,
             ProtocolConstants.MINECRAFT_1_19_3,
             ProtocolConstants.MINECRAFT_1_19_4,
-            ProtocolConstants.MINECRAFT_1_20
+            ProtocolConstants.MINECRAFT_1_20,
+            ProtocolConstants.MINECRAFT_1_20_2
     );
 
     public static String getVersionString(int protocolId) {
@@ -128,6 +130,7 @@ public class ProtocolConstants {
             case MINECRAFT_1_19_3: return "1.19.3";
             case MINECRAFT_1_19_4: return "1.19.4";
             case MINECRAFT_1_20: return "1.20 / 1.20.1";
+            case MINECRAFT_1_20_2: return "1.20.2";
             default: return "Unknown version";
         }
     }
@@ -188,6 +191,7 @@ public class ProtocolConstants {
             case "1.20":
             case "1.20.1":
             case "1.20 / 1.20.1": return MINECRAFT_1_20;
+            case "1.20.2": return MINECRAFT_1_20_2;
             default: return MINECRAFT_1_8;
         }
     }

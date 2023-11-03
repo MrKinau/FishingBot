@@ -8,7 +8,7 @@ package systems.kinau.fishingbot.network.utils;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
-//Credits for this go to Lukasz Baran who made this wrapper class; can be found here http://stackoverflow.com/questions/9378862/alternative-to-com-google-common-io-ByteArrayDataInputWrapper
+// Credits for this go to Lukasz Baran who made this wrapper class; can be found here http://stackoverflow.com/questions/9378862/alternative-to-com-google-common-io-ByteArrayDataInputWrapper
 public class ByteArrayDataInputWrapper implements ByteArrayDataInput {
 
     private static final int INT_LENGTH = 4;
