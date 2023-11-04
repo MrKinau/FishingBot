@@ -575,7 +575,7 @@ public class PacketInEntityMetadata extends Packet {
 
                     case 5: {
                         Slot slot = readSlot(in);
-                        String name = MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
+                        String name = MaterialMc18.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
                         List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                         FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 

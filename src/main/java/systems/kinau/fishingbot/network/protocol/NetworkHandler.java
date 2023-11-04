@@ -754,8 +754,8 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x0B, PacketInDifficultySet.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x11, PacketInCommands.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x12, PacketInWindowClose.class);
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x13, PacketInWindowItems.class); //TODO: Add NBT Changes from 1.20.2
-//        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x15, PacketInSetSlot.class);     //TODO: Add NBT Changes from 1.20.2
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x13, PacketInWindowItems.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x15, PacketInSetSlot.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x1B, PacketInDisconnect.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x24, PacketInKeepAlive.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x29, PacketInJoinGame.class);

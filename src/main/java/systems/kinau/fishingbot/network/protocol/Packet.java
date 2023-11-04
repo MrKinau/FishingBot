@@ -5,8 +5,6 @@
 
 package systems.kinau.fishingbot.network.protocol;
 
-import com.flowpowered.nbt.*;
-import com.flowpowered.nbt.stream.NBTInputStream;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
@@ -17,15 +15,14 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
-import systems.kinau.fishingbot.utils.NBTUtils;
+import systems.kinau.fishingbot.utils.nbt.CompoundTag;
+import systems.kinau.fishingbot.utils.nbt.IntTag;
+import systems.kinau.fishingbot.utils.nbt.NBTTag;
+import systems.kinau.fishingbot.utils.nbt.Tag;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.EnumSet;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class Packet {
 
@@ -201,7 +198,7 @@ public abstract class Packet {
             if (slot.isPresent()) {
                 writeVarInt(slot.getItemId(), output);
                 output.writeByte(slot.getItemCount());
-                output.write(slot.getNbtData());
+                output.write(slot.getNbtData().getData());
             }
         } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
             if (!slot.isPresent()) {
@@ -210,7 +207,7 @@ public abstract class Packet {
             }
             output.writeShort(slot.getItemId());
             output.writeByte(slot.getItemCount());
-            output.write(slot.getNbtData());
+            output.write(slot.getNbtData().getData());
         } else {
             if (!slot.isPresent()) {
                 output.writeShort(-1);
@@ -219,7 +216,7 @@ public abstract class Packet {
             output.writeShort(slot.getItemId());
             output.writeByte(slot.getItemCount());
             output.writeShort(slot.getItemDamage());
-            output.write(slot.getNbtData());
+            output.write(slot.getNbtData().getData());
         }
     }
 
@@ -229,19 +226,14 @@ public abstract class Packet {
             if (present) {
                 int itemId = readVarInt(input);
                 byte itemCount = input.readByte();
-                byte[] nbtData = NBTUtils.readNBT(input);
+                NBTTag tag = new NBTTag(input, FishingBot.getInstance().getCurrentBot().getServerProtocol());
                 int damage = -1;
-                try {
-                    NBTInputStream nbtStream = new NBTInputStream(new ByteArrayInputStream(nbtData.clone()), false);
-                    Tag tag = nbtStream.readTag();
-                    if (tag.getType() == TagType.TAG_COMPOUND) {
-                        CompoundMap tagMap = ((CompoundTag)tag).getValue();
-                        if (tagMap.containsKey("Damage"))
-                            damage = ((IntTag)tagMap.get("Damage")).getValue();
-                    }
-                } catch (IOException e) {
+                if (tag.getTag() instanceof CompoundTag) {
+                    damage = Optional.ofNullable(((CompoundTag)tag.getTag()).get("Damage", IntTag.class))
+                            .map(Tag::getValue)
+                            .orElse(-1);
                 }
-                return new Slot(true, itemId, itemCount, (short) damage, nbtData);
+                return new Slot(true, itemId, itemCount, damage, tag);
             } else
                 return Slot.EMPTY;
         } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
@@ -249,27 +241,22 @@ public abstract class Packet {
             if (itemId == -1)
                 return Slot.EMPTY;
             byte itemCount = input.readByte();
-            byte[] nbtData = NBTUtils.readNBT(input);
+            NBTTag tag = new NBTTag(input, FishingBot.getInstance().getCurrentBot().getServerProtocol());
             int damage = -1;
-            try {
-                NBTInputStream nbtStream = new NBTInputStream(new ByteArrayInputStream(nbtData.clone()), false);
-                Tag tag = nbtStream.readTag();
-                if (tag.getType() == TagType.TAG_COMPOUND) {
-                    CompoundMap tagMap = ((CompoundTag)tag).getValue();
-                    if (tagMap.containsKey("Damage"))
-                        damage = ((IntTag)tagMap.get("Damage")).getValue();
-                }
-            } catch (IOException e) {
+            if (tag.getTag() instanceof CompoundTag) {
+                damage = Optional.ofNullable(((CompoundTag)tag.getTag()).get("Damage", IntTag.class))
+                        .map(Tag::getValue)
+                        .orElse(-1);
             }
-            return new Slot(true, itemId, itemCount, (short) damage, nbtData);
+            return new Slot(true, itemId, itemCount, damage, tag);
         } else {
             int itemId = input.readShort();
             if (itemId == -1)
                 return Slot.EMPTY;
             byte itemCount = input.readByte();
             short itemDamage = input.readShort();
-            byte[] nbtData = NBTUtils.readNBT(input);
-            return new Slot(true, itemId, itemCount, itemDamage, nbtData);
+            NBTTag tag = new NBTTag(input, FishingBot.getInstance().getCurrentBot().getServerProtocol());
+            return new Slot(true, itemId, itemCount, itemDamage, tag);
         }
     }
 
