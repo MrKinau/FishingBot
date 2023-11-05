@@ -35,7 +35,7 @@ public class PacketInChatPlayer extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //Only incoming packet
+        // Only incoming packet
     }
 
     @Override
@@ -108,12 +108,12 @@ public class PacketInChatPlayer extends Packet {
             try {
                 text = TextComponent.toPlainText(object);
             } catch (Exception ignored) {
-                //Ignored
+                // Ignored
             }
 
-            //TODO: Handle this correctly. This packet represents the normal chat packet up to 1.18.2 and the vanilla server player chat packet in 1.19 and higher
+            // TODO: Handle this correctly. This packet represents the normal chat packet up to 1.18.2 and the vanilla server player chat packet in 1.19 and higher
         } catch (Exception ignored) {
-            //Ignored
+            // Ignored
         }
         return text;
     }

@@ -1,10 +1,5 @@
 package systems.kinau.fishingbot.utils;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.Tag;
-import com.flowpowered.nbt.TagType;
-import com.flowpowered.nbt.stream.NBTInputStream;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.bot.Inventory;
@@ -13,17 +8,17 @@ import systems.kinau.fishingbot.enums.EnchantmentType;
 import systems.kinau.fishingbot.enums.MaterialMc18;
 import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.utils.nbt.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class ItemUtils {
 
-    private static Map<Integer, Integer> rodId = new HashMap<>();
-    private static Map<Integer, Set<Integer>> fishIds = new HashMap<>();
-    private static Map<Integer, Integer> enchantedBookId = new HashMap<>();
+    private static final Map<Integer, Integer> rodId = new HashMap<>();
+    private static final Map<Integer, Set<Integer>> fishIds = new HashMap<>();
+    private static final Map<Integer, Integer> enchantedBookId = new HashMap<>();
 
     public static int getRodId(int protocolId) {
         if (rodId.containsKey(protocolId))
@@ -83,66 +78,49 @@ public class ItemUtils {
 
     public static List<Enchantment> getEnchantments(Slot slot) {
         List<Enchantment> enchantmentList = new ArrayList<>();
-        try {
-            NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(slot.getNbtData().clone()), false);
-            Tag tag = nbtInputStream.readTag();
-            if (tag.getType() == TagType.TAG_COMPOUND) {
-                CompoundMap root = (CompoundMap) tag.getValue();
-                String key = null;
-                if (root.containsKey("StoredEnchantments"))
-                    key = "StoredEnchantments";
-                else if (root.containsKey("ench"))
-                    key = "ench";
-                else if (root.containsKey("Enchantments"))
-                    key = "Enchantments";
-                else
-                    return enchantmentList;
-                List<CompoundTag> enchants = (List<CompoundTag>) root.get(key).getValue();
-                for (CompoundTag enchant : enchants) {
-                    Optional<EnchantmentType> enchType;
-                    short level = ((Number) enchant.getValue().get("lvl").getValue()).shortValue();
-                    if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
-                        String id = (String) enchant.getValue().get("id").getValue();
-                        enchType = EnchantmentType.getFromName(id);
-                        if (!enchType.isPresent()) {
-                            enchType = Optional.of(EnchantmentType.FUTURE);
-                            enchType.get().setFutureName(id);
-                        }
-                    } else {
-                        short id = ((Number) enchant.getValue().get("id").getValue()).shortValue();
-                        enchType = EnchantmentType.getFromId(Short.valueOf(id).intValue());
-                        if (!enchType.isPresent()) {
-                            enchType = Optional.of(EnchantmentType.FUTURE);
-                            enchType.get().setFutureName("ID: " + id);
-                        }
-                    }
-                    enchType.ifPresent(enchantmentType -> enchantmentList.add(new Enchantment(enchantmentType, level)));
+        Tag<?> rootTag = slot.getNbtData().getTag();
+        if (!(rootTag instanceof CompoundTag)) return enchantmentList;
+        CompoundTag root = (CompoundTag) rootTag;
+        String key;
+        if (root.containsKey("StoredEnchantments"))
+            key = "StoredEnchantments";
+        else if (root.containsKey("ench"))
+            key = "ench";
+        else if (root.containsKey("Enchantments"))
+            key = "Enchantments";
+        else
+            return enchantmentList;
+        List<CompoundTag> enchants = root.get(key, ListTag.class).getValue().stream()
+                .filter(tag -> tag instanceof CompoundTag)
+                .map(tag -> (CompoundTag) tag)
+                .collect(Collectors.toList());
+        for (CompoundTag enchant : enchants) {
+            Optional<EnchantmentType> enchType;
+            short level = enchant.get("lvl", ShortTag.class).getValue();
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+                String id = enchant.get("id", StringTag.class).getValue();
+                enchType = EnchantmentType.getFromName(id);
+                if (!enchType.isPresent()) {
+                    enchType = Optional.of(EnchantmentType.FUTURE);
+                    enchType.get().setFutureName(id);
+                }
+            } else {
+                short id = enchant.get("id", ShortTag.class).getValue();
+                enchType = EnchantmentType.getFromId(Short.valueOf(id).intValue());
+                if (!enchType.isPresent()) {
+                    enchType = Optional.of(EnchantmentType.FUTURE);
+                    enchType.get().setFutureName("ID: " + id);
                 }
             }
-        } catch (IOException ignored) { }
+            enchType.ifPresent(enchantmentType -> enchantmentList.add(new Enchantment(enchantmentType, level)));
+        }
         return enchantmentList;
     }
 
     public static int getDamage(Slot slot) {
         if (slot == null)
             return -1;
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_13)
-            return slot.getItemDamage();
-        try {
-            NBTInputStream nbtInputStream = new NBTInputStream(new ByteArrayInputStream(slot.getNbtData().clone()), false);
-            Tag tag = nbtInputStream.readTag();
-            if (tag.getType() == TagType.TAG_COMPOUND) {
-                CompoundMap root = (CompoundMap) tag.getValue();
-                Tag dmgTag = root.get("Damage");
-                if (dmgTag.getType() == TagType.TAG_INT)
-                    return (int)dmgTag.getValue();
-                else if (dmgTag.getType() == TagType.TAG_SHORT)
-                    return (short)dmgTag.getValue();
-                else
-                    return -1;
-            }
-        } catch (Exception ignored) { }
-        return -1;
+        return slot.getItemDamage();
     }
 
     public static int getFishingRodValue(Slot slot) {
@@ -189,7 +167,7 @@ public class ItemUtils {
             return "N/A";
         int version = FishingBot.getInstance().getCurrentBot().getServerProtocol();
         if (version <= ProtocolConstants.MINECRAFT_1_12_2) {
-            return MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
+            return MaterialMc18.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
         } else {
             return RegistryHandler.getItemName(slot.getItemId(), version).replace("minecraft:", "");
         }

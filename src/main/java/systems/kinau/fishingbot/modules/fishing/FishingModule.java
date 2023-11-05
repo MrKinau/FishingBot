@@ -172,16 +172,16 @@ public class FishingModule extends Module implements Runnable, Listener {
             }
         }
 
-        //Clear mem
+        // Clear mem
         getPossibleCaughtItems().clear();
 
-        //Print to console (based on announcetype)
+        // Print to console (based on announcetype)
         logItem(currentMax,
                 FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeConsole(),
                 FishingBot.getLog()::info,
                 FishingBot.getLog()::info);
 
-        //Print in mc chat (based on announcetype)
+        // Print in mc chat (based on announcetype)
         logItem(currentMax,
                 FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeChat(),
                 (String str) -> FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(FishingBot.PREFIX + str)),
@@ -303,7 +303,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
-    //TODO: Caught detection may be much easier with the Is Caught field in EntityMetadataPacket (since MC-1.16)
+    // TODO: Caught detection may be much easier with the Is Caught field in EntityMetadataPacket (since MC-1.16)
     @EventHandler
     public void onEntityVelocity(EntityVelocityEvent event) {
         addPossibleMotion(event.getEid(), event.getX(), event.getY(), event.getZ());

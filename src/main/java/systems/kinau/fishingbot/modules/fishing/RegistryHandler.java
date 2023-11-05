@@ -107,6 +107,7 @@ public class RegistryHandler {
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_20:
+                case ProtocolConstants.MINECRAFT_1_20_2:
                 default: {
                     root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20.json")));
                     break;
@@ -130,7 +131,7 @@ public class RegistryHandler {
             getItemsMap(protocolId).put(((Long) ((JSONObject) value).get("protocol_id")).intValue(), (String) key);
         });
 
-        //entities
+        // entities
         JSONObject entities = (JSONObject) ((JSONObject) root.get("minecraft:entity_type")).get("entries");
         entities.forEach((key, value) -> {
             getEntitiesMap(protocolId).put((String) key, ((Long) ((JSONObject) value).get("protocol_id")).intValue());

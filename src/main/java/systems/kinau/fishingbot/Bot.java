@@ -32,6 +32,7 @@ import systems.kinau.fishingbot.network.mojangapi.Realm;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.utils.UUIDUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -140,7 +141,7 @@ public class Bot {
             }
         } else {
             FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
-            this.authData = new AuthData(null, null, getConfig().getUserName());
+            this.authData = new AuthData(null, UUIDUtils.createOfflineUUIDString(getConfig().getUserName()), getConfig().getUserName());
         }
 
         if (!cmdLine.hasOption("nogui")) {
@@ -299,7 +300,7 @@ public class Bot {
         Optional<AuthData> authData = authenticator.authenticate();
 
         if (!authData.isPresent()) {
-            setAuthData(new AuthData(null, null, getConfig().getUserName()));
+            setAuthData(new AuthData(null, UUIDUtils.createOfflineUUIDString(getConfig().getUserName()), getConfig().getUserName()));
             return false;
         }
 
@@ -435,7 +436,7 @@ public class Bot {
                         authenticate();
                     else {
                         FishingBot.getI18n().info("credentials-using-offline-mode", getConfig().getUserName());
-                        authData = new AuthData(null, null, getConfig().getUserName());
+                        authData = new AuthData(null, UUIDUtils.createOfflineUUIDString(getConfig().getUserName()), getConfig().getUserName());
                     }
                 }
             }

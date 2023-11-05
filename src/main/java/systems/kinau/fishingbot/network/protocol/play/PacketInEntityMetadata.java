@@ -21,13 +21,13 @@ import systems.kinau.fishingbot.utils.ItemUtils;
 
 import java.util.List;
 
-//TODO: Add as event, yes this code is ugly...
+// TODO: Add as event, yes this code is ugly...
 @NoArgsConstructor
 public class PacketInEntityMetadata extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //Only incoming packet
+        // Only incoming packet
     }
 
     @Override
@@ -575,7 +575,7 @@ public class PacketInEntityMetadata extends Packet {
 
                     case 5: {
                         Slot slot = readSlot(in);
-                        String name = MaterialMc18.getMaterialName(slot.getItemId(), slot.getItemDamage());
+                        String name = MaterialMc18.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
                         List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                         FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
 

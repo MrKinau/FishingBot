@@ -15,7 +15,11 @@ import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.play.*;
+import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
+import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -53,14 +57,14 @@ public class ClientDefaultsModule extends Module implements Listener {
                 Thread.sleep(1500);
             } catch (InterruptedException ignore) { }
 
-            //Send start texts
+            // Send start texts
             if (FishingBot.getInstance().getCurrentBot().getConfig().isStartTextEnabled()) {
                 FishingBot.getInstance().getCurrentBot().getConfig().getStartText().forEach(s -> {
                     FishingBot.getInstance().getCurrentBot().runCommand(s, true, new ConsoleCommandExecutor());
                 });
             }
 
-            //Start position updates
+            // Start position updates
             startPositionUpdate(FishingBot.getInstance().getCurrentBot().getNet());
         }).start();
     }

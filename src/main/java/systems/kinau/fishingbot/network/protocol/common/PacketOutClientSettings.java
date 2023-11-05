@@ -3,7 +3,7 @@
  * 2019/5/5
  */
 
-package systems.kinau.fishingbot.network.protocol.play;
+package systems.kinau.fishingbot.network.protocol.common;
 
 import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -71,6 +71,11 @@ public class PacketOutClientSettings extends Packet {
             case ProtocolConstants.MINECRAFT_1_18:
             case ProtocolConstants.MINECRAFT_1_18_2:
             case ProtocolConstants.MINECRAFT_1_19:
+            case ProtocolConstants.MINECRAFT_1_19_1:
+            case ProtocolConstants.MINECRAFT_1_19_3:
+            case ProtocolConstants.MINECRAFT_1_19_4:
+            case ProtocolConstants.MINECRAFT_1_20:
+            case ProtocolConstants.MINECRAFT_1_20_2:
             default: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
                 out.writeByte(1);           //render-distance

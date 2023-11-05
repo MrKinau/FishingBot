@@ -6,5 +6,5 @@
 package systems.kinau.fishingbot.network.protocol;
 
 public enum State {
-    HANDSHAKE, LOGIN, PLAY
+    HANDSHAKE, LOGIN, CONFIGURATION, PLAY
 }

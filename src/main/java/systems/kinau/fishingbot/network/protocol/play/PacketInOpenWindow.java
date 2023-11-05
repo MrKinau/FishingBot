@@ -26,7 +26,7 @@ public class PacketInOpenWindow extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        //Only incoming packet
+        // Only incoming packet
     }
 
     @Override

@@ -29,7 +29,7 @@ public class PacketInChatSystem extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        //Only incoming packet
+        // Only incoming packet
     }
 
     @Override
@@ -41,12 +41,12 @@ public class PacketInChatSystem extends Packet {
             try {
                 this.text = TextComponent.toPlainText(object);
             } catch (Exception ignored) {
-                //Ignored
+                // Ignored
             }
 
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), null));
         } catch (Exception ignored) {
-            //Ignored
+            // Ignored
         }
     }
 }

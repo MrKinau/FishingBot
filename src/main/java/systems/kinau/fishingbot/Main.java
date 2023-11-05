@@ -6,8 +6,8 @@
 package systems.kinau.fishingbot;
 
 import org.apache.commons.cli.*;
-import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.gui.MainGUI;
+import systems.kinau.fishingbot.gui.SwingDialogs;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -47,6 +47,7 @@ public class Main {
                 String[] finalArgs = args;
                 new Thread(() -> {
                     try {
+//                        throw new IllegalArgumentException("lol");
                         new MainGUI(finalArgs);
                         if (FishingBot.getInstance().getCurrentBot() != null) {
                             FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
@@ -55,7 +56,7 @@ public class Main {
                         FishingBot.getScheduler().shutdownNow();
                     } catch (Throwable ex) {
                         ex.printStackTrace();
-                        Dialogs.showJavaFXNotWorking();
+                        SwingDialogs.showJavaFXNotWorking(ex);
                     }
                 }, "GUIThread").start();
 
