@@ -10,10 +10,7 @@ import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.network.protocol.common.PacketInDisconnect;
-import systems.kinau.fishingbot.network.protocol.common.PacketInKeepAlive;
-import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
-import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
+import systems.kinau.fishingbot.network.protocol.common.*;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketOutHandshake;
@@ -93,8 +90,12 @@ public class NetworkHandler {
         getLoginRegistryOut().registerPacket(0x03, PacketOutLoginAcknowledge.class); // since 1.20.2 (switches to configuration state)
 
         getConfigurationRegistryIn().registerPacket(0x02, PacketInFinishConfiguration.class);
+        getConfigurationRegistryIn().registerPacket(0x03, PacketInKeepAlive.class);
+        getConfigurationRegistryIn().registerPacket(0x06, PacketInResourcePack.class);
 
         getConfigurationRegistryOut().registerPacket(0x02, PacketOutFinishConfiguration.class);
+        getConfigurationRegistryOut().registerPacket(0x03, PacketOutKeepAlive.class);
+        getConfigurationRegistryOut().registerPacket(0x05, PacketOutResourcePackResponse.class);
 
         // Minecraft 1.8.X
 
@@ -764,6 +765,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x3B, PacketInPlayerListItemRemove.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x3C, PacketInPlayerListItem.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x3E, PacketInPlayerPosLook.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x42, PacketInResourcePack.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x4F, PacketInHeldItemChange.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x54, PacketInEntityMetadata.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x56, PacketInEntityVelocity.class);
@@ -784,6 +786,7 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x16, PacketOutPosition.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x17, PacketOutPosLook.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x21, PacketOutEntityAction.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x27, PacketOutResourcePackResponse.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x2B, PacketOutHeldItemChange.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x34, PacketOutBlockPlace.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x35, PacketOutUseItem.class);

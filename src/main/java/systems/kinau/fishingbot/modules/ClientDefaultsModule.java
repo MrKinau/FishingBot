@@ -11,12 +11,15 @@ import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.common.KeepAliveEvent;
+import systems.kinau.fishingbot.event.common.ResourcePackEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
+import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
@@ -85,6 +88,12 @@ public class ClientDefaultsModule extends Module implements Listener {
     @EventHandler
     public void onKeepAlive(KeepAliveEvent event) {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutKeepAlive(event.getId()));
+    }
+
+    @EventHandler
+    public void onResourcePack(ResourcePackEvent event) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(PacketOutResourcePackResponse.Result.ACCEPTED));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(PacketOutResourcePackResponse.Result.SUCCESSFULLY_LOADED));
     }
 
     @EventHandler

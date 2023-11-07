@@ -3,7 +3,7 @@
  * 2019/10/18
  */
 
-package systems.kinau.fishingbot.event.play;
+package systems.kinau.fishingbot.event.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

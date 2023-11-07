@@ -424,7 +424,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
-            if (System.currentTimeMillis() - getLastFish() > 60000) {
+            if (isJoined() && System.currentTimeMillis() - getLastFish() > 60000) {
                 setLastFish(System.currentTimeMillis());
                 if (isNoRodAvailable())
                     continue;

@@ -9,7 +9,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.event.play.KeepAliveEvent;
+import systems.kinau.fishingbot.event.common.KeepAliveEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
