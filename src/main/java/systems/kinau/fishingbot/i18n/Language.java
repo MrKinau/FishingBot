@@ -24,7 +24,8 @@ public enum Language implements DisplayNameProvider {
     ITALIAN(new Locale("it", "IT"), "Italian"),
     POLISH(new Locale("pl", "PL"), "Polish"),
     RUSSIAN(new Locale("ru", "RU"), "Russian"),
-    SPANISH(new Locale("es", "ES"), "Spanish");
+    SPANISH(new Locale("es", "ES"), "Spanish"),
+    UKRAINIAN(new Locale("uk", "UA"), "Ukrainian");
 
     private final Locale locale;
     private final String displayName;
