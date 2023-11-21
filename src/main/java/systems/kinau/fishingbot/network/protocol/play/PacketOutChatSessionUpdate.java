@@ -23,8 +23,7 @@ public class PacketOutChatSessionUpdate extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
         if (keys == null) return;
-        out.writeLong(keys.getChatSessionId().getMostSignificantBits());
-        out.writeLong(keys.getChatSessionId().getLeastSignificantBits());
+        writeUUID(keys.getChatSessionId(), out);
         out.writeLong(keys.getExpiresAt());
         byte[] pubKey = keys.getPublicKey().getEncoded();
         writeVarInt(pubKey.length, out);

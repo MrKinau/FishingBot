@@ -5,17 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PacketOutResourcePackResponse extends Packet {
 
+    @Getter private UUID uuid;
     @Getter private Result result;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_1)
+            writeUUID(uuid, out);
         writeVarInt(result.ordinal(), out);
     }
 
@@ -28,6 +33,9 @@ public class PacketOutResourcePackResponse extends Packet {
         SUCCESSFULLY_LOADED,
         DECLINED,
         FAILED_DOWNLOAD,
-        ACCEPTED
+        ACCEPTED,
+        INVALID_URL,
+        FAILED_RELOAD,
+        DISCARDED
     }
 }

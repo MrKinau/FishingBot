@@ -92,8 +92,8 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onResourcePack(ResourcePackEvent event) {
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(PacketOutResourcePackResponse.Result.ACCEPTED));
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(PacketOutResourcePackResponse.Result.SUCCESSFULLY_LOADED));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(event.getUuid(), PacketOutResourcePackResponse.Result.ACCEPTED));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(event.getUuid(), PacketOutResourcePackResponse.Result.SUCCESSFULLY_LOADED));
     }
 
     @EventHandler

@@ -95,6 +95,11 @@ public abstract class Packet {
         }
     }
 
+    public static void writeUUID(UUID uuid, ByteArrayDataOutput output) {
+        output.writeLong(uuid.getMostSignificantBits());
+        output.writeLong(uuid.getLeastSignificantBits());
+    }
+
     public static UUID readUUID(ByteArrayDataInputWrapper input) {
         return new UUID(input.readLong(), input.readLong());
     }

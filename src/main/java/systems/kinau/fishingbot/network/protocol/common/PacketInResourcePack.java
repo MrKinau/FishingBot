@@ -7,13 +7,16 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.common.ResourcePackEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @NoArgsConstructor
 public class PacketInResourcePack extends Packet {
 
+    @Getter private UUID uuid;
     @Getter private String url;
     @Getter private String hash;
     @Getter private boolean forced;
@@ -26,11 +29,13 @@ public class PacketInResourcePack extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_1)
+            this.uuid = readUUID(in);
         this.url = readString(in);
         this.hash = readString(in);
         this.forced = in.readBoolean();
         if (in.readBoolean())
             this.prompt = readString(in);
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ResourcePackEvent(url, hash, forced, prompt));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ResourcePackEvent(uuid, url, hash, forced, prompt));
     }
 }

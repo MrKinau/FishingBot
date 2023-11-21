@@ -35,9 +35,8 @@ public class NetworkHandler {
     @Getter private PacketRegistry handshakeRegistry;
     @Getter private PacketRegistry loginRegistryIn;
     @Getter private PacketRegistry loginRegistryOut;
-    @Getter private PacketRegistry configurationRegistryIn;
-    @Getter private PacketRegistry configurationRegistryOut;
-    // List of all PacketRegistries of all supported protocolIds
+    @Getter private HashMap<Integer, PacketRegistry> configurationRegistryIn;
+    @Getter private HashMap<Integer, PacketRegistry> configurationRegistryOut;
     @Getter private HashMap<Integer, PacketRegistry> playRegistryIn;
     @Getter private HashMap<Integer, PacketRegistry> playRegistryOut;
 
@@ -64,12 +63,14 @@ public class NetworkHandler {
         this.handshakeRegistry = new PacketRegistry();
         this.loginRegistryIn = new PacketRegistry();
         this.loginRegistryOut = new PacketRegistry();
-        this.configurationRegistryIn = new PacketRegistry();
-        this.configurationRegistryOut = new PacketRegistry();
+        this.configurationRegistryIn = new HashMap<>();
+        this.configurationRegistryOut = new HashMap<>();
         this.playRegistryIn = new HashMap<>();
         this.playRegistryOut = new HashMap<>();
 
         ProtocolConstants.SUPPORTED_VERSION_IDS.forEach(protId -> {
+            configurationRegistryIn.put(protId, new PacketRegistry());
+            configurationRegistryOut.put(protId, new PacketRegistry());
             playRegistryIn.put(protId, new PacketRegistry());
             playRegistryOut.put(protId, new PacketRegistry());
         });
@@ -88,14 +89,6 @@ public class NetworkHandler {
         getLoginRegistryOut().registerPacket(0x01, PacketOutEncryptionResponse.class);
         getLoginRegistryOut().registerPacket(0x02, PacketOutLoginPluginResponse.class);
         getLoginRegistryOut().registerPacket(0x03, PacketOutLoginAcknowledge.class); // since 1.20.2 (switches to configuration state)
-
-        getConfigurationRegistryIn().registerPacket(0x02, PacketInFinishConfiguration.class);
-        getConfigurationRegistryIn().registerPacket(0x03, PacketInKeepAlive.class);
-        getConfigurationRegistryIn().registerPacket(0x06, PacketInResourcePack.class);
-
-        getConfigurationRegistryOut().registerPacket(0x02, PacketOutFinishConfiguration.class);
-        getConfigurationRegistryOut().registerPacket(0x03, PacketOutKeepAlive.class);
-        getConfigurationRegistryOut().registerPacket(0x05, PacketOutResourcePackResponse.class);
 
         // Minecraft 1.8.X
 
@@ -751,6 +744,14 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20).copyOf(getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_19_4));
 
         // Minecraft 1.20.2
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x02, PacketInFinishConfiguration.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x03, PacketInKeepAlive.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x06, PacketInResourcePack.class);
+
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x02, PacketOutFinishConfiguration.class);
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x03, PacketOutKeepAlive.class);
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x05, PacketOutResourcePackResponse.class);
+
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x01, PacketInSpawnEntity.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x0B, PacketInDifficultySet.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x11, PacketInCommands.class);
@@ -792,6 +793,12 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x35, PacketOutUseItem.class);
 
         // Minecraft 1.20.3
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_3_PRE_1).registerPacket(0x02, PacketInFinishConfiguration.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_3_PRE_1).registerPacket(0x03, PacketInKeepAlive.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_3_PRE_1).registerPacket(0x07, PacketInResourcePack.class);
+
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_3_PRE_1).copyOf(getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2));
+
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_3_PRE_1).registerPacket(0x01, PacketInSpawnEntity.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_3_PRE_1).registerPacket(0x0B, PacketInDifficultySet.class);
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_3_PRE_1).registerPacket(0x11, PacketInCommands.class);
@@ -859,7 +866,7 @@ public class NetworkHandler {
                 Packet.writeVarInt(getPlayRegistryOut().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).getId(packet.getClass()), buf);
                 break;
             case CONFIGURATION:
-                Packet.writeVarInt(getConfigurationRegistryOut().getId(packet.getClass()), buf);
+                Packet.writeVarInt(getConfigurationRegistryOut().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).getId(packet.getClass()), buf);
                 break;
             default:
                 return;
@@ -975,7 +982,7 @@ public class NetworkHandler {
                 clazz = getPlayRegistryIn().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).getPacket(packetId);
                 break;
             case CONFIGURATION:
-                clazz = getConfigurationRegistryIn().getPacket(packetId);
+                clazz = getConfigurationRegistryIn().get(FishingBot.getInstance().getCurrentBot().getServerProtocol()).getPacket(packetId);
                 break;
             default:
                 break;
