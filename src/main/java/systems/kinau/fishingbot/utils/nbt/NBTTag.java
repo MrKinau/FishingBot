@@ -4,13 +4,39 @@ import lombok.Getter;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.zip.GZIPInputStream;
+
 @Getter
 public class NBTTag {
 
-    private final Tag<?> tag;
-    private final byte[] data;
+    private Tag<?> tag;
+    private byte[] data;
 
     public NBTTag(ByteArrayDataInputWrapper in, int protocol) {
+        readUncompressed(in, protocol);
+    }
+
+    public NBTTag(GZIPInputStream gzipInputStream, int protocol) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            byte[] buffer = new byte[1024];
+
+            int len;
+            while ((len = gzipInputStream.read(buffer)) > 0) {
+                out.write(buffer, 0, len);
+            }
+        } finally {
+            gzipInputStream.close();
+            out.close();
+        }
+
+        ByteArrayDataInputWrapper data = new ByteArrayDataInputWrapper(out.toByteArray());
+        readUncompressed(data, protocol);
+    }
+
+    private void readUncompressed(ByteArrayDataInputWrapper in, int protocol) {
         ByteArrayDataInputWrapper clone = in.clone();
         int startAvailable = in.getAvailable();
         byte type = in.readByte();
