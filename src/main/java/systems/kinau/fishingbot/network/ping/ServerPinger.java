@@ -97,7 +97,6 @@ public class ServerPinger {
             String description = "Unknown";
             try {
                 try {
-                    //TODO: Chat Components send as NBT since 1.20.3
                     if (protocolId > ProtocolConstants.MINECRAFT_1_8)
                         description = ChatComponentUtils.toPlainText(root.getAsJsonObject("description"));
                     else
