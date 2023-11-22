@@ -5,23 +5,24 @@
 
 package systems.kinau.fishingbot.utils;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
+// TODO This is garbage
 public class TextComponent {
 
-    public static String toPlainText(JSONObject object) throws IllegalStateException {
+    public static String toPlainText(JsonObject object) throws IllegalStateException {
         StringBuilder messageBuilder = new StringBuilder();
 
-        if (object.containsKey("with"))  {
-            JSONArray array = (JSONArray) object.get("with");
+        if (object.has("with"))  {
+            JsonArray array = object.getAsJsonArray("with");
             for (Object o : array) {
                 messageBuilder = new StringBuilder(getText(o, messageBuilder) + " ");
             }
-            if (object.containsKey("translate") && object.get("translate").toString().equals("multiplayer.player.joined"))
-                return messageBuilder.toString() + "joined the game";
-            if (object.containsKey("translate") && object.get("translate").toString().equals("multiplayer.player.left"))
-                return messageBuilder.toString() + "left the game";
+            if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.joined"))
+                return messageBuilder + "joined the game";
+            if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.left"))
+                return messageBuilder + "left the game";
             return messageBuilder.toString();
         } else {
             return getText(object, messageBuilder);
@@ -29,31 +30,31 @@ public class TextComponent {
     }
 
     private static String getText(Object object, StringBuilder messageBuilder) {
-        if (!(object instanceof JSONObject)) {
+        if (!(object instanceof JsonObject)) {
             messageBuilder.append(object.toString());
             return messageBuilder.toString();
         }
 
-        JSONObject jObject = (JSONObject) object;
+        JsonObject jObject = (JsonObject) object;
 
-        if (jObject.containsKey("text")) {
-            String text = (String) jObject.get("text");
+        if (jObject.has("text")) {
+            String text = jObject.get("text").getAsString();
             if (!text.isEmpty()) messageBuilder.append(text);
         }
 
-        if (jObject.containsKey("extra") && jObject.get("extra") instanceof JSONArray) {
-            JSONArray extras = (JSONArray) jObject.get("extra");
+        if (jObject.has("extra") && jObject.get("extra").isJsonArray()) {
+            JsonArray extras = jObject.getAsJsonArray("extra");
 
             for (int i = 0; i < extras.size(); i++) {
-                if (extras.get(i) instanceof JSONObject) {
-                    JSONObject extraObject = (JSONObject) extras.get(i);
+                if (extras.get(i).isJsonObject()) {
+                    JsonObject extraObject = extras.get(i).getAsJsonObject();
 
-                    if (extraObject.containsKey("text")) {
-                        String text = (String) extraObject.get("text");
+                    if (extraObject.has("text")) {
+                        String text = extraObject.get("text").getAsString();
                         if (!text.isEmpty()) messageBuilder.append(text);
                     }
                 } else {
-                    messageBuilder.append(extras.get(i).toString());
+                    messageBuilder.append(extras.get(i).getAsString());
                 }
             }
         }

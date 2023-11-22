@@ -4,9 +4,8 @@
  */
 package systems.kinau.fishingbot.utils;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.*;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
@@ -17,11 +16,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class ConvertUtils {
 
-    public static Object convert(String value, Class type, Type genericType) {
+    private static final Gson GSON = new Gson();
+
+    public static Object fromConfigValue(String value, Class type, Type genericType) {
         if(type.isAssignableFrom(String.class)) {
             return value;
         } else if(type.isAssignableFrom(double.class)) {
@@ -69,42 +69,14 @@ public class ConvertUtils {
             }
         } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(EjectionRule.class)) {
             try {
-                List<EjectionRule> rules = new ArrayList<>();
-                JSONArray array = (JSONArray) new JSONParser().parse(value);
-                array.forEach(o -> {
-                    try {
-                        JSONObject obj = (JSONObject) new JSONParser().parse(o.toString());
-                        String name = obj.get("name").toString();
-                        LocationUtils.Direction direction = LocationUtils.Direction.valueOf((String) obj.get("direction"));
-                        EjectionRule.EjectionType ejectionType = EjectionRule.EjectionType.valueOf((String) obj.get("ejectionType"));
-                        JSONArray allowList = (JSONArray) new JSONParser().parse(obj.get("allowList").toString());
-                        rules.add(new EjectionRule(name, direction, new ArrayList<String>(allowList), ejectionType));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-                return rules;
+                return GSON.<List<EjectionRule>>fromJson(value, new TypeToken<List<EjectionRule>>(){}.getType());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;
             }
         } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(Timer.class)) {
             try {
-                List<Timer> timers = new ArrayList<>();
-                JSONArray array = (JSONArray) new JSONParser().parse(value);
-                array.forEach(o -> {
-                    try {
-                        JSONObject obj = (JSONObject) new JSONParser().parse(o.toString());
-                        String name = obj.get("name").toString();
-                        int units = Integer.valueOf(obj.get("units").toString());
-                        TimeUnit timeUnit = TimeUnit.valueOf((String) obj.get("timeUnit"));
-                        JSONArray command = (JSONArray) new JSONParser().parse(obj.get("commands").toString());
-                        timers.add(new Timer(name, units, timeUnit, new ArrayList<String>(command)));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-                return timers;
+                return GSON.<List<Timer>>fromJson(value, new TypeToken<List<Timer>>(){}.getType());
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;
@@ -112,13 +84,39 @@ public class ConvertUtils {
         } else if (type.isAssignableFrom(List.class)) {
             // should be string list
             try {
-                JSONArray array = (JSONArray) new JSONParser().parse(value);
-                return new ArrayList<>(array);
+                JsonArray array = new JsonParser().parse(value).getAsJsonArray();
+                List<String> list = new ArrayList<>();
+                array.forEach(jsonElement -> {
+                    if (jsonElement.isJsonPrimitive())
+                        list.add(jsonElement.getAsString());
+                });
+                return list;
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
         }
         return null;
+    }
+
+    public static void toConfigValue(JsonObject object, String key, Object value, Type genericType) {
+        if (value instanceof Number) {
+            Number number = (Number) value;
+            object.addProperty(key, number);
+        } else if (value instanceof String) {
+            String string = (String) value;
+            object.addProperty(key, string);
+        } else if (value instanceof Boolean) {
+            Boolean bool = (Boolean) value;
+            object.addProperty(key, bool);
+        } else if (value instanceof Character) {
+            Character character = (Character) value;
+            object.addProperty(key, character);
+        } else if (value instanceof JsonElement) {
+            JsonElement jsonElement = (JsonElement) value;
+            object.add(key, jsonElement);
+        } else {
+            object.add(key, GSON.toJsonTree(value));
+        }
     }
 }

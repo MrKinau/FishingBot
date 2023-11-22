@@ -5,14 +5,13 @@
 
 package systems.kinau.fishingbot.modules.fishing;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.enums.MaterialMc18;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,16 +47,16 @@ public class RegistryHandler {
     public static Map<String, Integer> entitiesMap_1_20_3 = new HashMap<>();
 
     public RegistryHandler(int protocolId) {
-        JSONObject root = null;
+        JsonObject root = null;
         try {
             switch (protocolId) {
                 case ProtocolConstants.MINECRAFT_1_13: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_13_1:
                 case ProtocolConstants.MINECRAFT_1_13_2: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13_1.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_13_1.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_14:
@@ -65,82 +64,83 @@ public class RegistryHandler {
                 case ProtocolConstants.MINECRAFT_1_14_2:
                 case ProtocolConstants.MINECRAFT_1_14_3:
                 case ProtocolConstants.MINECRAFT_1_14_4: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_14.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_14.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_15:
                 case ProtocolConstants.MINECRAFT_1_15_1:
                 case ProtocolConstants.MINECRAFT_1_15_2: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_15.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_15.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_16:
                 case ProtocolConstants.MINECRAFT_1_16_1: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_16.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_16.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_16_2:
                 case ProtocolConstants.MINECRAFT_1_16_3:
                 case ProtocolConstants.MINECRAFT_1_16_4: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_16_2.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_16_2.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_17:
                 case ProtocolConstants.MINECRAFT_1_17_1: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_17.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_17.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_18:
                 case ProtocolConstants.MINECRAFT_1_18_2: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_18.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_18.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_19:
                 case ProtocolConstants.MINECRAFT_1_19_1: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_19.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_19.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_19_3: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_19_3.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_19_3.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_19_4: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_19_4.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_19_4.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_20:
                 case ProtocolConstants.MINECRAFT_1_20_2: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20.json"))).getAsJsonObject();
                     break;
                 }
                 case ProtocolConstants.MINECRAFT_1_20_3_PRE_1:
                 default: {
-                    root = (JSONObject) new JSONParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20_3.json")));
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20_3.json"))).getAsJsonObject();
                     break;
                 }
             }
-        } catch (ParseException | IOException ignore) {
+        } catch (JsonParseException ignore) {
         }
 
         if (root == null)
             return;
+        JsonObject finalRoot = root;
         if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
-            root.forEach((key, value) -> {
-                getItemsMap(protocolId).put(((Long) ((JSONObject) value).get("protocol_id")).intValue(), (String) key);
+            finalRoot.keySet().forEach(key -> {
+                getItemsMap(protocolId).put(finalRoot.getAsJsonObject(key).get("protocol_id").getAsInt(), key);
             });
             return;
         }
 
         // items
-        JSONObject items = (JSONObject) ((JSONObject) root.get("minecraft:item")).get("entries");
-        items.forEach((key, value) -> {
-            getItemsMap(protocolId).put(((Long) ((JSONObject) value).get("protocol_id")).intValue(), (String) key);
+        JsonObject items = finalRoot.getAsJsonObject("minecraft:item").getAsJsonObject("entries");
+        items.keySet().forEach(key -> {
+            getItemsMap(protocolId).put(items.getAsJsonObject(key).get("protocol_id").getAsInt(), key);
         });
 
         // entities
-        JSONObject entities = (JSONObject) ((JSONObject) root.get("minecraft:entity_type")).get("entries");
-        entities.forEach((key, value) -> {
-            getEntitiesMap(protocolId).put((String) key, ((Long) ((JSONObject) value).get("protocol_id")).intValue());
+        JsonObject entities = finalRoot.getAsJsonObject("minecraft:entity_type").getAsJsonObject("entries");
+        entities.keySet().forEach(key -> {
+            getEntitiesMap(protocolId).put(key, entities.getAsJsonObject(key).get("protocol_id").getAsInt());
         });
     }
 

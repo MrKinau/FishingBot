@@ -7,9 +7,9 @@ package systems.kinau.fishingbot.network.ping;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -83,9 +83,9 @@ public class ServerPinger {
 
 //            if (id != 2) {
             String pong = Packet.readString(in);
-            JSONObject root = (JSONObject) new JSONParser().parse(pong);
-            long protocolId = (long) ((JSONObject)root.get("version")).get("protocol");
-            long currPlayers = (long) ((JSONObject)root.get("players")).get("online");
+            JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
+            long protocolId = root.getAsJsonObject("version").get("protocol").getAsLong();
+            long currPlayers = root.getAsJsonObject("players").get("online").getAsLong();
 
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.AUTOMATIC)
                 FishingBot.getInstance().getCurrentBot().setServerProtocol(Long.valueOf(protocolId).intValue());
@@ -97,12 +97,13 @@ public class ServerPinger {
             String description = "Unknown";
             try {
                 try {
+                    //TODO: Chat Components send as NBT since 1.20.3
                     if (protocolId > ProtocolConstants.MINECRAFT_1_8)
-                        description = (String) ((JSONObject)root.get("description")).get("text");
+                        description = root.getAsJsonObject("description").getAsJsonPrimitive("text").getAsString();
                     else
-                        description = (String) root.get("description");
+                        description = root.getAsJsonPrimitive("description").getAsString();
                 } catch (UnsupportedOperationException ex) {
-                    description = TextComponent.toPlainText(((JSONObject)root.get("description")));
+                    description = TextComponent.toPlainText(root.getAsJsonObject("description"));
                 }
             } catch (UnsupportedOperationException ignored) {
             } finally {

@@ -1,5 +1,7 @@
 package systems.kinau.fishingbot.gui.config.options;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
@@ -8,8 +10,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.modules.timer.Timer;
 
@@ -79,7 +79,7 @@ public class TimersConfigOption extends ConfigOption {
     }
 
     private String createValue() {
-        JSONArray rootArray = new JSONArray();
+        JsonArray rootArray = new JsonArray();
         for (EditableTimer timer : timers) {
             // update values
             if (timer.getUnitsConfigOption() != null)
@@ -89,14 +89,16 @@ public class TimersConfigOption extends ConfigOption {
             if (timer.getCommandsConfigOption() != null)
                 timer.getTimer().setCommands(Arrays.asList((String[]) timer.getCommandsConfigOption().getValue()));
 
-            JSONObject timerObj = new JSONObject();
-            timerObj.put("name", timer.getTimer().getName());
-            timerObj.put("units", timer.getTimer().getUnits());
-            timerObj.put("timeUnit", timer.getTimer().getTimeUnit().name());
-            timerObj.put("commands", timer.getTimer().getCommands());
+            JsonObject timerObj = new JsonObject();
+            timerObj.addProperty("name", timer.getTimer().getName());
+            timerObj.addProperty("units", timer.getTimer().getUnits());
+            timerObj.addProperty("timeUnit", timer.getTimer().getTimeUnit().name());
+            JsonArray commands = new JsonArray();
+            timer.getTimer().getCommands().forEach(commands::add);
+            timerObj.add("commands", commands);
             rootArray.add(timerObj);
         }
-        return rootArray.toJSONString();
+        return rootArray.toString();
     }
 
     private EditableTimer getTimer(String name) {

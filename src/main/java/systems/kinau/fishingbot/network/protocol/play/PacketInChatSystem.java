@@ -10,10 +10,10 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -24,7 +24,7 @@ import systems.kinau.fishingbot.utils.TextComponent;
 @NoArgsConstructor
 public class PacketInChatSystem extends Packet {
 
-    private final JSONParser PARSER = new JSONParser();
+    private final JsonParser PARSER = new JsonParser();
     @Getter private String text;
 
     @Override
@@ -36,7 +36,7 @@ public class PacketInChatSystem extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.text = readString(in);
         try {
-            JSONObject object = (JSONObject) PARSER.parse(text);
+            JsonObject object = PARSER.parse(text).getAsJsonObject();
 
             try {
                 this.text = TextComponent.toPlainText(object);
