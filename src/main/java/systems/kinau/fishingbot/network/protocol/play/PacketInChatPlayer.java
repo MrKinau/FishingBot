@@ -19,6 +19,7 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
+import systems.kinau.fishingbot.utils.ChatComponentUtils;
 
 import java.util.UUID;
 
@@ -87,12 +88,14 @@ public class PacketInChatPlayer extends Packet {
                     for (int i = 0; i < bitSetLength; i++)
                         in.readLong();
                 }
-                readVarInt(in); // chat type
+                int chatType = readVarInt(in); // chat type
                 String userName = readChatComponent(in, protocolId);
-                this.text = "<" + userName + "> " + actualMessage;
+                String targetName = "";
                 // target name
                 if (in.readBoolean())
-                    readChatComponent(in, protocolId);
+                    targetName = readChatComponent(in, protocolId);
+                this.text = ChatComponentUtils.sillyTransformWithChatType(chatType, userName, targetName, actualMessage);
+
                 if (text != null)
                     FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
             } catch (Throwable e) {

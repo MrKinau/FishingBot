@@ -61,6 +61,24 @@ public class ChatComponentUtils {
                 }
             }
         }
+
+        if (messageBuilder.toString().trim().isEmpty() && jObject.has("translate"))
+            messageBuilder.append(jObject.get("translate").getAsString());
         return messageBuilder.toString();
+    }
+
+    // If chat types changed in registry, this is not working
+    public static String sillyTransformWithChatType(int chatType, String senderName, String recipientName, String message) {
+        if (chatType == 1) {
+            return "* " + senderName + " " + message;
+        } else if (chatType == 2) {
+            return senderName + " whispers to you: " + message;
+        } else if (chatType == 3) {
+            return "You whisper to " + recipientName + ": " + message;
+        } else if (chatType == 4) {
+            return "[" + senderName + "] " + message;
+        } else {
+            return "<" + senderName + "> " + message;
+        }
     }
 }

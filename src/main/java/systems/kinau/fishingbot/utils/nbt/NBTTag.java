@@ -49,4 +49,9 @@ public class NBTTag {
         this.data = new byte[bytes];
         clone.readBytes(data);
     }
+
+    @Override
+    public String toString() {
+        return getTag().toString();
+    }
 }
