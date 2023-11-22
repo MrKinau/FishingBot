@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.utils.TextComponent;
+import systems.kinau.fishingbot.utils.ChatComponentUtils;
 
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -99,15 +99,15 @@ public class ServerPinger {
                 try {
                     //TODO: Chat Components send as NBT since 1.20.3
                     if (protocolId > ProtocolConstants.MINECRAFT_1_8)
-                        description = root.getAsJsonObject("description").getAsJsonPrimitive("text").getAsString();
+                        description = ChatComponentUtils.toPlainText(root.getAsJsonObject("description"));
                     else
                         description = root.getAsJsonPrimitive("description").getAsString();
-                } catch (UnsupportedOperationException ex) {
-                    description = TextComponent.toPlainText(root.getAsJsonObject("description"));
+                } catch (Exception ex) {
+                    description = root.get("description").toString();
                 }
-            } catch (UnsupportedOperationException ignored) {
+            } catch (Exception ignored) {
             } finally {
-                if (description.trim().isEmpty())
+                if (description == null || description.trim().isEmpty())
                     description = "Unknown";
             }
 

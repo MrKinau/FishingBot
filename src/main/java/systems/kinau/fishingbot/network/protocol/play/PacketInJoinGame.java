@@ -13,7 +13,6 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.utils.nbt.NBTTag;
 
 @Getter
 public class PacketInJoinGame extends Packet {
@@ -113,7 +112,7 @@ public class PacketInJoinGame extends Packet {
                 worldIdentifier = new String[worldCount];   // identifier for all worlds
                 for (int i = 0; i < worldCount; i++)
                     worldIdentifier[i] = readString(in);
-                new NBTTag(in, protocolId);                 // dimension codec (dont use, just skip it)
+                readNBT(in, protocolId);                    // dimension codec (dont use, just skip it)
                 dimension = readString(in);                 // dimension
                 spawnWorld = readString(in);                // spawn world name
                 hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
@@ -138,8 +137,8 @@ public class PacketInJoinGame extends Packet {
                 worldIdentifier = new String[worldCount];   // identifier for all worlds
                 for (int i = 0; i < worldCount; i++)
                     worldIdentifier[i] = readString(in);
-                new NBTTag(in, protocolId);                 // dimension codec (dont use, just skip it)
-                new NBTTag(in, protocolId);                 // spawn dimension
+                readNBT(in, protocolId);                    // dimension codec (dont use, just skip it)
+                readNBT(in, protocolId);                    // spawn dimension
                 spawnWorld = readString(in);                // spawn world name
                 hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
                 maxPlayers = in.readUnsignedByte();         // maxPlayer
@@ -160,8 +159,8 @@ public class PacketInJoinGame extends Packet {
                 worldIdentifier = new String[worldCount];   // identifier for all worlds
                 for (int i = 0; i < worldCount; i++)
                     worldIdentifier[i] = readString(in);
-                new NBTTag(in, protocolId);                 // dimension codec (dont use, just skip it)
-                new NBTTag(in, protocolId);                 // spawn dimension
+                readNBT(in, protocolId);                    // dimension codec (dont use, just skip it)
+                readNBT(in, protocolId);                    // spawn dimension
                 spawnWorld = readString(in);                // spawn world name
                 hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
                 maxPlayers = in.readUnsignedByte();         // maxPlayer
@@ -185,7 +184,7 @@ public class PacketInJoinGame extends Packet {
                 worldIdentifier = new String[worldCount];   // identifier for all worlds
                 for (int i = 0; i < worldCount; i++)
                     worldIdentifier[i] = readString(in);
-                new NBTTag(in, protocolId);                 // registry codec
+                readNBT(in, protocolId);                    // registry codec
                 readString(in);                             // dimension type
                 spawnWorld = readString(in);                // dimension name
                 hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
@@ -211,7 +210,7 @@ public class PacketInJoinGame extends Packet {
                 worldIdentifier = new String[worldCount];   // identifier for all worlds
                 for (int i = 0; i < worldCount; i++)
                     worldIdentifier[i] = readString(in);
-                new NBTTag(in, protocolId);                 // registry codec
+                readNBT(in, protocolId);                    // registry codec
                 readString(in);                             // dimension type
                 spawnWorld = readString(in);                // dimension name
                 hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed

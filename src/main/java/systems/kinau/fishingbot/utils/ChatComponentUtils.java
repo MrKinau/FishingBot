@@ -9,24 +9,27 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 // TODO This is garbage
-public class TextComponent {
+public class ChatComponentUtils {
 
-    public static String toPlainText(JsonObject object) throws IllegalStateException {
+    public static String toPlainText(JsonObject object) {
         StringBuilder messageBuilder = new StringBuilder();
 
-        if (object.has("with"))  {
-            JsonArray array = object.getAsJsonArray("with");
-            for (Object o : array) {
-                messageBuilder = new StringBuilder(getText(o, messageBuilder) + " ");
+        try {
+            if (object.has("with")) {
+                JsonArray array = object.getAsJsonArray("with");
+                for (Object o : array) {
+                    messageBuilder = new StringBuilder(getText(o, messageBuilder) + " ");
+                }
+                if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.joined"))
+                    return messageBuilder + "joined the game";
+                if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.left"))
+                    return messageBuilder + "left the game";
+                return messageBuilder.toString();
+            } else {
+                return getText(object, messageBuilder);
             }
-            if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.joined"))
-                return messageBuilder + "joined the game";
-            if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.left"))
-                return messageBuilder + "left the game";
-            return messageBuilder.toString();
-        } else {
-            return getText(object, messageBuilder);
-        }
+        } catch (Exception ignore) {}
+        return null;
     }
 
     private static String getText(Object object, StringBuilder messageBuilder) {

@@ -35,7 +35,7 @@ public class PacketInResourcePack extends Packet {
         this.hash = readString(in);
         this.forced = in.readBoolean();
         if (in.readBoolean())
-            this.prompt = readString(in);
+            this.prompt = readChatComponent(in, protocolId);
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ResourcePackEvent(uuid, url, hash, forced, prompt));
     }
 }

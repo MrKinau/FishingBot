@@ -8,23 +8,24 @@ package systems.kinau.fishingbot.network.protocol;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
-import systems.kinau.fishingbot.FishingBot;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
-import systems.kinau.fishingbot.utils.nbt.CompoundTag;
-import systems.kinau.fishingbot.utils.nbt.IntTag;
-import systems.kinau.fishingbot.utils.nbt.NBTTag;
-import systems.kinau.fishingbot.utils.nbt.Tag;
+import systems.kinau.fishingbot.utils.ChatComponentUtils;
+import systems.kinau.fishingbot.utils.nbt.*;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.*;
 
 public abstract class Packet {
+
+    private static final JsonParser PARSER = new JsonParser();
 
     public abstract void write(ByteArrayDataOutput out, int protocolId) throws IOException;
 
@@ -197,22 +198,48 @@ public abstract class Packet {
         return s;
     }
 
-    public static void writeSlot(Slot slot, ByteArrayDataOutput output) {
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
+    public static NBTTag readNBT(ByteArrayDataInputWrapper input, int protocolId) {
+        return new NBTTag(input, protocolId);
+    }
+
+    public static void writeNBT(NBTTag tag, ByteArrayDataOutput output) {
+        output.write(tag.getData());
+    }
+
+    public static String readChatComponent(ByteArrayDataInputWrapper input, int protocolId) {
+        JsonObject chatComponent = null;
+        try {
+            if (protocolId < ProtocolConstants.MINECRAFT_1_20_3_PRE_1) {
+                String text = readString(input);
+                chatComponent = PARSER.parse(text).getAsJsonObject();
+            } else {
+                NBTTag nbt = readNBT(input, protocolId);
+                if (nbt.getTag() instanceof StringTag)
+                    return ((StringTag) nbt.getTag()).getValue();
+                chatComponent = nbt.getTag().toJson().getAsJsonObject();
+            }
+        } catch (Exception ignored) {
+            // Ignored
+        }
+        return ChatComponentUtils.toPlainText(chatComponent);
+    }
+
+    public static void writeSlot(Slot slot, ByteArrayDataOutput output, int protocolId) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
             output.writeBoolean(slot.isPresent());
             if (slot.isPresent()) {
                 writeVarInt(slot.getItemId(), output);
                 output.writeByte(slot.getItemCount());
-                output.write(slot.getNbtData().getData());
+                writeNBT(slot.getNbtData(), output);
             }
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13) {
             if (!slot.isPresent()) {
                 output.writeShort(-1);
                 return;
             }
             output.writeShort(slot.getItemId());
             output.writeByte(slot.getItemCount());
-            output.write(slot.getNbtData().getData());
+            writeNBT(slot.getNbtData(), output);
         } else {
             if (!slot.isPresent()) {
                 output.writeShort(-1);
@@ -221,17 +248,17 @@ public abstract class Packet {
             output.writeShort(slot.getItemId());
             output.writeByte(slot.getItemCount());
             output.writeShort(slot.getItemDamage());
-            output.write(slot.getNbtData().getData());
+            writeNBT(slot.getNbtData(), output);
         }
     }
 
-    public static Slot readSlot(ByteArrayDataInputWrapper input) {
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13_2) {
+    public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
             boolean present = input.readBoolean();
             if (present) {
                 int itemId = readVarInt(input);
                 byte itemCount = input.readByte();
-                NBTTag tag = new NBTTag(input, FishingBot.getInstance().getCurrentBot().getServerProtocol());
+                NBTTag tag = new NBTTag(input, protocolId);
                 int damage = -1;
                 if (tag.getTag() instanceof CompoundTag) {
                     damage = Optional.ofNullable(((CompoundTag)tag.getTag()).get("Damage", IntTag.class))
@@ -241,12 +268,12 @@ public abstract class Packet {
                 return new Slot(true, itemId, itemCount, damage, tag);
             } else
                 return Slot.EMPTY;
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
+        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13) {
             int itemId = input.readShort();
             if (itemId == -1)
                 return Slot.EMPTY;
             byte itemCount = input.readByte();
-            NBTTag tag = new NBTTag(input, FishingBot.getInstance().getCurrentBot().getServerProtocol());
+            NBTTag tag = new NBTTag(input, protocolId);
             int damage = -1;
             if (tag.getTag() instanceof CompoundTag) {
                 damage = Optional.ofNullable(((CompoundTag)tag.getTag()).get("Damage", IntTag.class))
@@ -260,7 +287,7 @@ public abstract class Packet {
                 return Slot.EMPTY;
             byte itemCount = input.readByte();
             short itemDamage = input.readShort();
-            NBTTag tag = new NBTTag(input, FishingBot.getInstance().getCurrentBot().getServerProtocol());
+            NBTTag tag = new NBTTag(input, protocolId);
             return new Slot(true, itemId, itemCount, itemDamage, tag);
         }
     }

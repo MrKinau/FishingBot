@@ -34,12 +34,12 @@ public class PacketInOpenWindow extends Packet {
         if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2) {
             this.windowId = in.readUnsignedByte();
             this.windowType = readString(in).hashCode();
-            this.title = readString(in);
+            this.title = readChatComponent(in, protocolId);
             in.readUnsignedByte(); // slots
         } else {
             this.windowId = readVarInt(in);
             this.windowType = readVarInt(in);
-            this.title = readString(in);
+            this.title = readChatComponent(in, protocolId);
         }
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new OpenWindowEvent(windowId, windowType, title));

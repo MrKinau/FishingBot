@@ -33,7 +33,7 @@ public class PacketOutUseItem extends Packet {
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             out.writeLong(LocationUtils.toBlockPos(x, y, z));
             out.writeByte(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal());
-            Packet.writeSlot(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem(), out);
+            Packet.writeSlot(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem(), out, protocolId);
             out.writeByte(cursorX);
             out.writeByte(cursorY);
             out.writeByte(cursorZ);

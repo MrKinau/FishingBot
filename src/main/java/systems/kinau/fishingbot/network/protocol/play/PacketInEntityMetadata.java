@@ -41,7 +41,7 @@ public class PacketInEntityMetadata extends Packet {
             if (FishingBot.getInstance().getCurrentBot().getFishingModule().containsPossibleItem(eid) && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
                 return;
             if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
-                readWatchableObjects18(in, networkHandler, eid);
+                readWatchableObjects18(in, networkHandler, eid, protocolId);
             } else {
                 defaultLoop(protocolId, in, networkHandler, eid);
             }
@@ -64,17 +64,18 @@ public class PacketInEntityMetadata extends Packet {
             int type = in.readByte();
 
             if (protocolID <= ProtocolConstants.MINECRAFT_1_12_2)
-                readWatchableObjects19(in, networkHandler, eid, type);
+                readWatchableObjects19(in, networkHandler, eid, type, protocolID);
             else if (protocolID <= ProtocolConstants.MINECRAFT_1_13_1)
-                readWatchableObjects113(in, networkHandler, eid, type);
+                readWatchableObjects113(in, networkHandler, eid, type, protocolID);
             else if (protocolID <= ProtocolConstants.MINECRAFT_1_19_1)
-                readWatchableObjects114(in, networkHandler, eid, type);
+                readWatchableObjects114(in, networkHandler, eid, type, protocolID);
             else
-                readWatchableObjects1193(in, networkHandler, eid, type);
+                readWatchableObjects1193(in, networkHandler, eid, type, protocolID);
         }
     }
 
-    private void readWatchableObjects1193(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+    //TODO: Completely outdated for modern game versions beyond 1.19.3
+    private void readWatchableObjects1193(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type, int protocolId) {
         switch (type) {
             case 0: {
                 in.readByte();
@@ -97,18 +98,18 @@ public class PacketInEntityMetadata extends Packet {
                 break;
             }
             case 5: {
-                readString(in);
+                readChatComponent(in, protocolId);
                 break;
             }
             case 6: {
                 boolean present = in.readBoolean();
                 if (present) {
-                    readString(in);
+                    readChatComponent(in, protocolId);
                 }
                 break;
             }
             case 7: {
-                Slot slot = readSlot(in);
+                Slot slot = readSlot(in, protocolId);
                 if (!slot.isPresent())
                     return;
                 List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
@@ -217,7 +218,7 @@ public class PacketInEntityMetadata extends Packet {
         }
     }
 
-    private void readWatchableObjects114(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+    private void readWatchableObjects114(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type, int protocolId) {
         switch (type) {
             case 0: {
                 in.readByte();
@@ -248,7 +249,7 @@ public class PacketInEntityMetadata extends Packet {
                 break;
             }
             case 6: {
-                Slot slot = readSlot(in);
+                Slot slot = readSlot(in, protocolId);
                 if (!slot.isPresent())
                     return;
                 List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
@@ -340,7 +341,7 @@ public class PacketInEntityMetadata extends Packet {
         }
     }
 
-    private void readWatchableObjects113(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+    private void readWatchableObjects113(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type, int protocolId) {
         try {
             switch (type) {
                 case 0: {
@@ -369,7 +370,7 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 6: {
-                    Slot slot = readSlot(in);
+                    Slot slot = readSlot(in, protocolId);
                     if (!slot.isPresent())
                         return;
 
@@ -466,7 +467,7 @@ public class PacketInEntityMetadata extends Packet {
         } catch (Exception ignored) { }
     }
 
-    private void readWatchableObjects19(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type) {
+    private void readWatchableObjects19(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int type, int protocolId) {
         try {
             switch (type) {
                 case 0: {
@@ -491,7 +492,7 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 5: {
-                    Slot slot = readSlot(in);
+                    Slot slot = readSlot(in, protocolId);
                     if (!slot.isPresent())
                         return;
                     String name = ItemUtils.getItemName(slot);
@@ -539,7 +540,7 @@ public class PacketInEntityMetadata extends Packet {
         } catch (Exception ignored) { }
     }
 
-    private void readWatchableObjects18(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid) {
+    private void readWatchableObjects18(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int eid, int protocolId) {
         while (true) {
             if (in.getAvailable() == 0)
                 break;
@@ -574,7 +575,7 @@ public class PacketInEntityMetadata extends Packet {
                     }
 
                     case 5: {
-                        Slot slot = readSlot(in);
+                        Slot slot = readSlot(in, protocolId);
                         String name = MaterialMc18.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
                         List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                         FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
