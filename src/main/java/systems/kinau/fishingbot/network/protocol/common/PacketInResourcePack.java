@@ -29,7 +29,7 @@ public class PacketInResourcePack extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_1)
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
             this.uuid = readUUID(in);
         this.url = readString(in);
         this.hash = readString(in);

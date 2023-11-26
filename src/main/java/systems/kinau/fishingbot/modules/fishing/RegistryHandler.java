@@ -112,7 +112,7 @@ public class RegistryHandler {
                     root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20.json"))).getAsJsonObject();
                     break;
                 }
-                case ProtocolConstants.MINECRAFT_1_20_3_PRE_1:
+                case ProtocolConstants.MINECRAFT_1_20_3_PRE_2:
                 default: {
                     root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20_3.json"))).getAsJsonObject();
                     break;
