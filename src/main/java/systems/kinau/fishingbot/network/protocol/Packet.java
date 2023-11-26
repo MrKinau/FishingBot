@@ -258,7 +258,7 @@ public abstract class Packet {
             if (present) {
                 int itemId = readVarInt(input);
                 byte itemCount = input.readByte();
-                NBTTag tag = new NBTTag(input, protocolId);
+                NBTTag tag = readNBT(input, protocolId);
                 int damage = -1;
                 if (tag.getTag() instanceof CompoundTag) {
                     damage = Optional.ofNullable(((CompoundTag)tag.getTag()).get("Damage", IntTag.class))
@@ -273,7 +273,7 @@ public abstract class Packet {
             if (itemId == -1)
                 return Slot.EMPTY;
             byte itemCount = input.readByte();
-            NBTTag tag = new NBTTag(input, protocolId);
+            NBTTag tag = readNBT(input, protocolId);
             int damage = -1;
             if (tag.getTag() instanceof CompoundTag) {
                 damage = Optional.ofNullable(((CompoundTag)tag.getTag()).get("Damage", IntTag.class))
@@ -287,7 +287,7 @@ public abstract class Packet {
                 return Slot.EMPTY;
             byte itemCount = input.readByte();
             short itemDamage = input.readShort();
-            NBTTag tag = new NBTTag(input, protocolId);
+            NBTTag tag = readNBT(input, protocolId);
             return new Slot(true, itemId, itemCount, itemDamage, tag);
         }
     }
