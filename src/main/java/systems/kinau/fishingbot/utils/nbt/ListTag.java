@@ -1,5 +1,7 @@
 package systems.kinau.fishingbot.utils.nbt;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.ArrayList;
@@ -25,5 +27,13 @@ public class ListTag extends Tag<List<? extends Tag<?>>> {
         for (Tag<?> tag : getValue())
             sb.append("\n").append(tag.toString(tabs + 1));
         return sb.toString();
+    }
+
+    @Override
+    public JsonElement toJson() {
+        JsonArray array = new JsonArray();
+        if (getValue() == null) return array;
+        getValue().forEach(tag -> array.add(tag.toJson()));
+        return array;
     }
 }

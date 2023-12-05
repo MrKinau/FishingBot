@@ -32,7 +32,7 @@ public class PacketOutClickWindow extends Packet {
             out.writeByte(button);
             out.writeShort(actionNumber);
             writeVarInt(mode, out);
-            writeSlot(item, out);
+            writeSlot(item, out, protocolId);
         } else {
             out.writeByte(windowId);
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_17_1)
@@ -43,9 +43,9 @@ public class PacketOutClickWindow extends Packet {
             writeVarInt(remaining.size(), out);
             for (Map.Entry<Short, Slot> remainingSlot : remaining.entrySet()) {
                 out.writeShort(remainingSlot.getKey());
-                writeSlot(remainingSlot.getValue(), out);
+                writeSlot(remainingSlot.getValue(), out, protocolId);
             }
-            writeSlot(item, out);
+            writeSlot(item, out, protocolId);
         }
     }
 

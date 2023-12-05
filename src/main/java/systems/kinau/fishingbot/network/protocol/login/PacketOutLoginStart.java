@@ -51,8 +51,7 @@ public class PacketOutLoginStart extends Packet {
                 if (protocolId < ProtocolConstants.MINECRAFT_1_20_2)
                     out.writeBoolean(uuid != null);
                 if (uuid != null) {
-                    out.writeLong(uuid.getMostSignificantBits());
-                    out.writeLong(uuid.getLeastSignificantBits());
+                    writeUUID(uuid, out);
                 }
             }
         }

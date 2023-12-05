@@ -5,6 +5,10 @@
 
 package systems.kinau.fishingbot.network.mojangapi;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -15,10 +19,6 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -88,20 +88,20 @@ public class MojangAPI {
                 FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, answer.getStatusLine().toString());
                 return;
             }
-            JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
+            JsonObject responseJson = new JsonParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8)).getAsJsonObject();
 
-            if (responseJson == null || !responseJson.containsKey("keyPair")) {
+            if (responseJson == null || !responseJson.has("keyPair")) {
                 FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, answer.getStatusLine().toString());
                 return;
             }
 
-            JSONObject keyPair = (JSONObject) responseJson.get("keyPair");
-            String pubKeyContent = keyPair.get("publicKey").toString()
+            JsonObject keyPair = responseJson.getAsJsonObject("keyPair");
+            String pubKeyContent = keyPair.get("publicKey").getAsString()
                     .replace("\n", "")
                     .replace("\\n", "")
                     .replace("-----BEGIN RSA PUBLIC KEY-----", "")
                     .replace("-----END RSA PUBLIC KEY-----", "");
-            String privKeyContent = keyPair.get("privateKey").toString()
+            String privKeyContent = keyPair.get("privateKey").getAsString()
                     .replace("\n", "")
                     .replace("\\n", "")
                     .replace("-----BEGIN RSA PRIVATE KEY-----", "")
@@ -109,7 +109,7 @@ public class MojangAPI {
             String pubKeySig = responseJson.get(
                     FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1
                             ? "publicKeySignatureV2"
-                            : "publicKeySignature").toString();
+                            : "publicKeySignature").getAsString();
 
             KeyFactory kf = KeyFactory.getInstance("RSA");
 
@@ -119,7 +119,7 @@ public class MojangAPI {
             X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(pubKeyContent));
             RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
 
-            String expirationContent = responseJson.get("expiresAt").toString();
+            String expirationContent = responseJson.get("expiresAt").getAsString();
             TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_INSTANT.parse(expirationContent);
             Instant instant = Instant.from(temporalAccessor);
             Date expiresAt = Date.from(instant);
@@ -132,7 +132,7 @@ public class MojangAPI {
             authData.setProfileKeys(new AuthData.ProfileKeys(pubKey, pubKeySig, privKey, expiresAt.getTime()));
 
             FishingBot.getI18n().info("retrieved-keys");
-        } catch (IOException | ParseException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (IOException | JsonParseException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
             FishingBot.getI18n().severe("could-not-get-keys", MOJANG_ENDPOINT, e.getMessage());
         }
@@ -152,19 +152,20 @@ public class MojangAPI {
                 FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT, answer.getStatusLine().toString());
                 return joinableRealms;
             }
-            JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
-            JSONArray servers = (JSONArray) responseJson.get("servers");
+            JsonObject responseJson = new JsonParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8)).getAsJsonObject();
+            JsonArray servers = responseJson.getAsJsonArray("servers");
             if (servers.size() == 0)
                 return joinableRealms;
 
             servers.forEach(server -> {
-                long id = (long) ((JSONObject) server).get("id");
-                String owner = (String) ((JSONObject) server).get("owner");
-                String name = (String) ((JSONObject) server).get("name");
-                String motd = (String) ((JSONObject) server).get("motd");
+                JsonObject serverObj = server.getAsJsonObject();
+                long id = serverObj.get("id").getAsLong();
+                String owner = serverObj.get("owner").getAsString();
+                String name = serverObj.get("name").getAsString();
+                String motd = serverObj.get("motd").getAsString();
                 joinableRealms.add(new Realm(id, name, owner, motd));
             });
-        } catch (IOException | ParseException e) {
+        } catch (IOException | JsonParseException e) {
             e.printStackTrace();
             FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT, e.getMessage());
         }
@@ -217,10 +218,10 @@ public class MojangAPI {
                 FishingBot.getI18n().severe("realms-could-not-determine-address", REALMS_ENDPOINT, answer.getStatusLine());
                 return null;
             }
-            JSONObject responseJson = (JSONObject) new JSONParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8));
-            FishingBot.getI18n().info("realms-connecting-to", responseJson.toJSONString());
-            return (String) responseJson.get("address");
-        } catch (IOException | ParseException e) {
+            JsonObject responseJson = new JsonParser().parse(EntityUtils.toString(answer.getEntity(), Charsets.UTF_8)).getAsJsonObject();
+            FishingBot.getI18n().info("realms-connecting-to", responseJson.toString());
+            return responseJson.get("address").getAsString();
+        } catch (IOException | JsonParseException e) {
             e.printStackTrace();
             FishingBot.getI18n().severe("realms-could-not-connect-to-endpoint", REALMS_ENDPOINT, e.getMessage());
         }

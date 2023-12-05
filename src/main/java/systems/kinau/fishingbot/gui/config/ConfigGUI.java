@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.gui.config;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.gson.JsonArray;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -18,7 +19,6 @@ import javafx.stage.WindowEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.OneSixParamStorage;
-import org.json.simple.JSONArray;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.gui.config.options.*;
 import systems.kinau.fishingbot.io.config.ConvertException;
@@ -254,12 +254,12 @@ public class ConfigGUI {
             configOption.ifPresent(option -> {
                 String value = option.getValue().toString();
                 if (option instanceof StringArrayConfigOption) {
-                    JSONArray jsonArray = new JSONArray();
+                    JsonArray jsonArray = new JsonArray();
                     if (option.getValue() != null && option.getValue().getClass().isArray() && option.getValue() instanceof String[])
-                        jsonArray.addAll(Arrays.asList((String[]) option.getValue()));
-                    value = jsonArray.toJSONString();
+                        Arrays.asList((String[]) option.getValue()).forEach(jsonArray::add);
+                    value = jsonArray.toString();
                 }
-                Object typedValue = ConvertUtils.convert(value, field.getType(), field.getGenericType());
+                Object typedValue = ConvertUtils.fromConfigValue(value, field.getType(), field.getGenericType());
                 if (typedValue == null)
                     throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
                 ReflectionUtils.setField(field, config, typedValue);

@@ -10,24 +10,23 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
+import com.google.gson.JsonParser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.ChatEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.utils.TextComponent;
+import systems.kinau.fishingbot.utils.ChatComponentUtils;
 
 import java.util.UUID;
 
 @NoArgsConstructor
 public class PacketInChatPlayer extends Packet {
 
-    private final JSONParser PARSER = new JSONParser();
+    private final JsonParser PARSER = new JsonParser();
     @Getter
     private String text;
     @Getter
@@ -40,7 +39,11 @@ public class PacketInChatPlayer extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
+        if (protocolId < ProtocolConstants.MINECRAFT_1_19) {
+            this.text = readChatComponent(in, protocolId);
+            if (text != null)
+                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
+        } else {
             try {
                 if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
                     readUUID(in); // sender
@@ -78,43 +81,26 @@ public class PacketInChatPlayer extends Packet {
                 }
                 // unsigned content
                 if (in.readBoolean())
-                    readString(in);
+                    readChatComponent(in, protocolId);
                 int filterMask = readVarInt(in);
                 if (filterMask == 2) {
                     int bitSetLength = readVarInt(in);
                     for (int i = 0; i < bitSetLength; i++)
                         in.readLong();
                 }
-                readVarInt(in); // chat type
-                String userName = readChatComponent(in);
-                this.text = "<" + userName + "> " + actualMessage;
+                int chatType = readVarInt(in); // chat type
+                String userName = readChatComponent(in, protocolId);
+                String targetName = "";
+                // target name
                 if (in.readBoolean())
-                    readString(in);
-                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
-                return;
+                    targetName = readChatComponent(in, protocolId);
+                this.text = ChatComponentUtils.sillyTransformWithChatType(chatType, userName, targetName, actualMessage);
+
+                if (text != null)
+                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
-        this.text = readChatComponent(in);
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
-    }
-
-    private String readChatComponent(ByteArrayDataInputWrapper in) {
-        String text = readString(in);
-        try {
-            JSONObject object = (JSONObject) PARSER.parse(text);
-
-            try {
-                text = TextComponent.toPlainText(object);
-            } catch (Exception ignored) {
-                // Ignored
-            }
-
-            // TODO: Handle this correctly. This packet represents the normal chat packet up to 1.18.2 and the vanilla server player chat packet in 1.19 and higher
-        } catch (Exception ignored) {
-            // Ignored
-        }
-        return text;
     }
 }

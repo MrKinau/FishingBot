@@ -1,5 +1,6 @@
 package systems.kinau.fishingbot.utils.nbt;
 
+import com.google.gson.JsonElement;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,4 +66,6 @@ public abstract class Tag<T> {
     public String toString(int tabs) {
         return addTabs(tabs) + getClass().getSimpleName() + " (" + Optional.ofNullable(getName()).orElse("") + "): " + Optional.ofNullable(getValue()).map(Objects::toString).orElse("");
     }
+
+    public abstract JsonElement toJson();
 }

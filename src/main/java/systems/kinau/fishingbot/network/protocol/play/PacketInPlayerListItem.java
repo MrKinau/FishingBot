@@ -87,7 +87,7 @@ public class PacketInPlayerListItem extends Packet {
                 for (Action action : actions) {
                     if (action == Action.ADD_PLAYER)
                         addedPlayers.add(uuid);
-                    action.reader.read(in);
+                    action.reader.read(in, protocolId);
                 }
             }
             in.skipBytes(in.getAvailable());
@@ -96,7 +96,7 @@ public class PacketInPlayerListItem extends Packet {
     }
 
     enum Action {
-        ADD_PLAYER(in -> {
+        ADD_PLAYER((in, protocolId) -> {
             readString(in);
             int propCount = readVarInt(in);
             for (int j = 0; j < propCount; j++) {
@@ -107,7 +107,7 @@ public class PacketInPlayerListItem extends Packet {
                 }
             }
         }),
-        INITIALIZE_CHAT(in -> {
+        INITIALIZE_CHAT((in, protocolId) -> {
             if (in.readBoolean()) {
                 readUUID(in);
                 in.readLong(); // expiresAt
@@ -115,12 +115,12 @@ public class PacketInPlayerListItem extends Packet {
                 in.skipBytes(readVarInt(in)); // public key signature
             }
         }),
-        UPDATE_GAME_MODE(Packet::readVarInt),
-        UPDATE_LISTED(ByteArrayDataInputWrapper::readBoolean),
-        UPDATE_LATENCY(Packet::readVarInt),
-        UPDATE_DISPLAY_NAME(in -> {
+        UPDATE_GAME_MODE((in, protocolId) -> readVarInt(in)),
+        UPDATE_LISTED((in, protocolId) -> in.readBoolean()),
+        UPDATE_LATENCY((in, protocolId) -> readVarInt(in)),
+        UPDATE_DISPLAY_NAME((in, protocolId) -> {
             if (in.readBoolean())
-                readString(in);
+                readChatComponent(in, protocolId);
         });
 
         final Action.Reader reader;
@@ -130,7 +130,7 @@ public class PacketInPlayerListItem extends Packet {
         }
 
         public interface Reader {
-            void read(ByteArrayDataInputWrapper input);
+            void read(ByteArrayDataInputWrapper in, int protocolId);
         }
     }
 }

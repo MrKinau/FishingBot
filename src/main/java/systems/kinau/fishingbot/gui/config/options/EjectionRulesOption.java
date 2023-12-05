@@ -1,5 +1,7 @@
 package systems.kinau.fishingbot.gui.config.options;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextInputDialog;
@@ -8,8 +10,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.utils.LocationUtils;
@@ -89,7 +89,7 @@ public class EjectionRulesOption extends ConfigOption {
     }
 
     private String createValue() {
-        JSONArray rootArray = new JSONArray();
+        JsonArray rootArray = new JsonArray();
         for (EditableEjectionRule ejectionRule : ejectionRules) {
             // update values
             if (ejectionRule.getDirectionOption() != null)
@@ -99,14 +99,16 @@ public class EjectionRulesOption extends ConfigOption {
             if (ejectionRule.getItemListOption() != null)
                 ejectionRule.getEjectionRule().setAllowList(Arrays.asList((String[]) ejectionRule.getItemListOption().getValue()));
 
-            JSONObject ruleObj = new JSONObject();
-            ruleObj.put("name", ejectionRule.getEjectionRule().getName());
-            ruleObj.put("direction", ejectionRule.getEjectionRule().getDirection().name());
-            ruleObj.put("allowList", ejectionRule.getEjectionRule().getAllowList());
-            ruleObj.put("ejectionType", ejectionRule.getEjectionRule().getEjectionType().name());
+            JsonObject ruleObj = new JsonObject();
+            ruleObj.addProperty("name", ejectionRule.getEjectionRule().getName());
+            ruleObj.addProperty("direction", ejectionRule.getEjectionRule().getDirection().name());
+            JsonArray allowList = new JsonArray();
+            ejectionRule.getEjectionRule().getAllowList().forEach(allowList::add);
+            ruleObj.add("allowList", allowList);
+            ruleObj.addProperty("ejectionType", ejectionRule.getEjectionRule().getEjectionType().name());
             rootArray.add(ruleObj);
         }
-        return rootArray.toJSONString();
+        return rootArray.toString();
     }
 
     private EditableEjectionRule getRule(String name) {
