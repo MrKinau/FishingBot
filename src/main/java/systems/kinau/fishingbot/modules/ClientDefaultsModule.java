@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.common.KeepAliveEvent;
+import systems.kinau.fishingbot.event.common.PingPacketEvent;
 import systems.kinau.fishingbot.event.common.ResourcePackEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
@@ -19,6 +20,7 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
+import systems.kinau.fishingbot.network.protocol.common.PacketOutPing;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
@@ -28,11 +30,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public class ClientDefaultsModule extends Module implements Listener {
 
-    @Getter private Thread positionThread;
-    @Getter private boolean joined;
-    @Getter private Set<UUID> onlinePlayers = new HashSet<>();
+    private Thread positionThread;
+    private boolean joined;
+    private Set<UUID> onlinePlayers = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -142,5 +145,10 @@ public class ClientDefaultsModule extends Module implements Listener {
         });
         positionThread.setName("positionThread");
         positionThread.start();
+    }
+
+    @EventHandler
+    public void onPing(PingPacketEvent e) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPing(e.getId()));
     }
 }

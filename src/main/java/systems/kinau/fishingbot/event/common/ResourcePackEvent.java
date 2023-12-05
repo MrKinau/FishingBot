@@ -7,13 +7,14 @@ import systems.kinau.fishingbot.event.Event;
 
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 @ToString
 public class ResourcePackEvent extends Event {
 
-    @Getter private UUID uuid;
-    @Getter private String url;
-    @Getter private String hash;
-    @Getter private boolean forced;
-    @Getter private String prompt;
+    private UUID uuid;
+    private String url;
+    private String hash;
+    private boolean forced;
+    private String prompt;
 }

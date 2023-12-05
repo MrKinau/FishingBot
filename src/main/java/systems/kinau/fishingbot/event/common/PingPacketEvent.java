@@ -11,7 +11,7 @@ import systems.kinau.fishingbot.event.Event;
 
 @Getter
 @AllArgsConstructor
-public class KeepAliveEvent extends Event {
+public class PingPacketEvent extends Event {
 
-    private long id;
+    private int id;
 }

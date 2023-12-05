@@ -209,7 +209,7 @@ public abstract class Packet {
     public static String readChatComponent(ByteArrayDataInputWrapper input, int protocolId) {
         JsonObject chatComponent = null;
         try {
-            if (protocolId < ProtocolConstants.MINECRAFT_1_20_3_PRE_2) {
+            if (protocolId < ProtocolConstants.MINECRAFT_1_20_3) {
                 String text = readString(input);
                 chatComponent = PARSER.parse(text).getAsJsonObject();
             } else {

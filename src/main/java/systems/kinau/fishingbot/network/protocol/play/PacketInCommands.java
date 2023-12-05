@@ -133,21 +133,21 @@ public class PacketInCommands extends Packet {
                 }
             }
             if (parserId >= 18) {
-                if (parserId == 18 && protocolId < ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId == 18 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
                     argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
-                if (parserId == 19 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId == 19 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
                     argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
-                if (parserId == 29 && protocolId < ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId == 29 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
                     in.readByte();
-                if (parserId == 30 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId == 30 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
                     in.readByte();
-                if (parserId == 40 && protocolId < ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId == 40 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
                     in.readInt();
-                if (parserId == 41 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId == 41 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
                     in.readInt();
-                if (parserId >= 41 && parserId <= 44 && protocolId < ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId >= 41 && parserId <= 44 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
                     readString(in);
-                if (parserId >= 42 && parserId <= 45 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3_PRE_2)
+                if (parserId >= 42 && parserId <= 45 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
                     readString(in);
             }
             if (argumentType == null)
