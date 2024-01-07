@@ -37,7 +37,7 @@ public class DiscordModule extends Module implements Listener {
     public void onEnable() {
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
         // Activate Discord web hook
-        if(FishingBot.getInstance().getCurrentBot().getConfig().isWebHookEnabled() && !FishingBot.getInstance().getCurrentBot().getConfig().getWebHook().equalsIgnoreCase("false")
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isWebHookEnabled() && !FishingBot.getInstance().getCurrentBot().getConfig().getWebHook().equalsIgnoreCase("false")
                 && !FishingBot.getInstance().getCurrentBot().getConfig().getWebHook().equals("YOURWEBHOOK"))
             this.discord = new DiscordMessageDispatcher(FishingBot.getInstance().getCurrentBot().getConfig().getWebHook());
     }
@@ -51,6 +51,7 @@ public class DiscordModule extends Module implements Listener {
     }
 
     public void sendSummary(LootHistory lootHistory) {
+        if (getDiscord() == null) return;
         if (!FishingBot.getInstance().getCurrentBot().getConfig().isWebHookEnabled())
             return;
         StringBuilder lootStr = new StringBuilder();
@@ -110,47 +111,47 @@ public class DiscordModule extends Module implements Listener {
 
     @EventHandler
     public void onCaught(FishCaughtEvent event) {
-        if (getDiscord() != null) {
-            FishingModule fishingModule = FishingBot.getInstance().getCurrentBot().getFishingModule();
-            if (fishingModule == null)
-                return;
-            new Thread(() -> {
-                String mention = "";
-                if (FishingBot.getInstance().getCurrentBot().getConfig().isPingOnEnchantmentEnabled()) {
-                    boolean itemMatches = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentItems().isEmpty()
-                            || FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentItems().contains(event.getItem().getName());
-                    List<String> enchantmentFilter = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentEnchantments();
-                    boolean enchantmentMatches = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentEnchantments().isEmpty()
-                            || event.getItem().getEnchantments().stream()
-                                    .anyMatch(enchantment -> enchantmentFilter.contains(enchantment.getEnchantmentType().getName().toUpperCase()));
-                    if (itemMatches && enchantmentMatches) {
-                        mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
-                    }
+        if (getDiscord() == null) return;
+        FishingModule fishingModule = FishingBot.getInstance().getCurrentBot().getFishingModule();
+        if (fishingModule == null)
+            return;
+        new Thread(() -> {
+            String mention = "";
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isPingOnEnchantmentEnabled()) {
+                boolean itemMatches = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentItems().isEmpty()
+                        || FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentItems().contains(event.getItem().getName());
+                List<String> enchantmentFilter = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentEnchantments();
+                boolean enchantmentMatches = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentEnchantments().isEmpty()
+                        || event.getItem().getEnchantments().stream()
+                                .anyMatch(enchantment -> enchantmentFilter.contains(enchantment.getEnchantmentType().getName().toUpperCase()));
+                if (itemMatches && enchantmentMatches) {
+                    mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
                 }
-                if (!mention.isEmpty())
-                    getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
+            }
+            if (!mention.isEmpty())
+                getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
 
-                String itemName = event.getItem().getName().replace("_", " ").toLowerCase();
-                StringBuilder sb = new StringBuilder();
-                for (String s : itemName.split(" ")) {
-                    s = s.substring(0, 1).toUpperCase() + s.substring(1);
-                    sb.append(s).append(" ");
-                }
-                String finalItemName = sb.toString().trim();
+            String itemName = event.getItem().getName().replace("_", " ").toLowerCase();
+            StringBuilder sb = new StringBuilder();
+            for (String s : itemName.split(" ")) {
+                s = s.substring(0, 1).toUpperCase() + s.substring(1);
+                sb.append(s).append(" ");
+            }
+            String finalItemName = sb.toString().trim();
 
-                fishingModule.logItem(
-                        event.getItem(),
-                        FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeDiscord(),
-                        s -> getDiscord().dispatchEmbed("**" + finalItemName + "**", getColor(event.getItem()),
-                                RegistryHandler.getImageUrl(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
-                                getFooter(), DISCORD_DETAILS),
-                        s -> { });
-            }).start();
-        }
+            fishingModule.logItem(
+                    event.getItem(),
+                    FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeDiscord(),
+                    s -> getDiscord().dispatchEmbed("**" + finalItemName + "**", getColor(event.getItem()),
+                            RegistryHandler.getImageUrl(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
+                            getFooter(), DISCORD_DETAILS),
+                    s -> { });
+        }).start();
     }
 
     @EventHandler
     public void onUpdateHealth(UpdateHealthEvent event) {
+        if (getDiscord() == null) return;
         if (event.getEid() != FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
             return;
         NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.ROOT);
@@ -159,6 +160,7 @@ public class DiscordModule extends Module implements Listener {
         if (mention.equals("<@USER_ID> "))
             mention = "";
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAlertOnAttack() && getHealth() > event.getHealth()) {
+            if (getDiscord() == null) return;
             if (!mention.isEmpty())
                 getDiscord().dispatchMessage(mention, DISCORD_DETAILS);
             getDiscord().dispatchEmbed(FishingBot.getI18n().t("config-announces-discord-alert-on-attack"), 0xff0000,
@@ -171,6 +173,7 @@ public class DiscordModule extends Module implements Listener {
 
     @EventHandler
     public void onXP(UpdateExperienceEvent event) {
+        if (getDiscord() == null) return;
         if (getLevel() != event.getLevel() && FishingBot.getInstance().getCurrentBot().getConfig().isAlertOnLevelUpdate()) {
             getDiscord().dispatchEmbed(FishingBot.getI18n().t("config-announces-discord-alert-on-level-update"), 0xb5ea3a,
                     "https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/general/xp.png",
@@ -182,6 +185,7 @@ public class DiscordModule extends Module implements Listener {
 
     @EventHandler
     public void onRespawn(RespawnEvent event) {
+        if (getDiscord() == null) return;
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAlertOnRespawn()) {
             String mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
             if (mention.equals("<@USER_ID> "))
