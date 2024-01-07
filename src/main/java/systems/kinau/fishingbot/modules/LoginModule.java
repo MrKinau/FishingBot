@@ -20,6 +20,7 @@ import systems.kinau.fishingbot.network.protocol.login.PacketOutEncryptionRespon
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginAcknowledge;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginPluginResponse;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginStart;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutAcknowledgeConfiguration;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 import systems.kinau.fishingbot.utils.UUIDUtils;
 
@@ -101,10 +102,17 @@ public class LoginModule extends Module implements Listener {
             FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
         } else {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginAcknowledge());
-            FishingBot.getInstance().getCurrentBot().getNet().setState(State.CONFIGURATION);
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ConfigurationStartEvent());
         }
         FishingBot.getInstance().getCurrentBot().getPlayer().setUuid(event.getUuid());
+    }
+
+    @EventHandler
+    public void onConfigurationStart(ConfigurationStartEvent event) {
+        if (FishingBot.getInstance().getCurrentBot() != null && FishingBot.getInstance().getCurrentBot().getNet() != null
+                && FishingBot.getInstance().getCurrentBot().getNet().getState() == State.PLAY)
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutAcknowledgeConfiguration());
+        FishingBot.getInstance().getCurrentBot().getNet().setState(State.CONFIGURATION);
     }
 
     @EventHandler

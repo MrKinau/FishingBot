@@ -6,6 +6,7 @@
 package systems.kinau.fishingbot.network.protocol;
 
 import lombok.Getter;
+import systems.kinau.fishingbot.Bot;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 
@@ -33,7 +34,11 @@ public class PacketRegistry {
                 .findFirst()
                 .ifPresent(integer -> id[0] = integer);
         if (id[0] == -1) {
-            FishingBot.getI18n().severe("network-unknown-packet-id", clazz.getSimpleName(), ProtocolConstants.getVersionString(FishingBot.getInstance().getCurrentBot().getServerProtocol()));
+            String state = "unknown state";
+            Bot bot = FishingBot.getInstance().getCurrentBot();
+            if (bot != null && bot.getNet() != null && bot.getNet().getState() != null)
+                state = bot.getNet().getState().name();
+            FishingBot.getI18n().severe("network-unknown-packet-id", clazz.getSimpleName() + " (for " + state +  ")", ProtocolConstants.getVersionString(FishingBot.getInstance().getCurrentBot().getServerProtocol()));
             FishingBot.getInstance().getCurrentBot().setRunning(false);
             FishingBot.getInstance().getCurrentBot().setWontConnect(true);
             throw new InvalidPacketException("Packet not registered: " + clazz.getSimpleName());
