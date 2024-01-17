@@ -45,6 +45,7 @@ public class LocationUtils {
         Direction(float yaw, float pitch, String displayName) {
             this.yaw = yaw;
             this.pitch = pitch;
+            this.displayName = displayName;
         }
 
         Direction(float yaw, String displayName) {
