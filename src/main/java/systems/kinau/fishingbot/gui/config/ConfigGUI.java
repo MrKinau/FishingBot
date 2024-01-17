@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.OneSixParamStorage;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.gui.MainGUI;
 import systems.kinau.fishingbot.gui.config.options.*;
 import systems.kinau.fishingbot.io.config.ConvertException;
 import systems.kinau.fishingbot.io.config.Property;
@@ -94,10 +95,7 @@ public class ConfigGUI {
         rootPane.setCenter(configOptionsPane);
 
         Scene scene = new Scene(rootPane, 750, 340);
-        scene.getStylesheets().add("configstyle.css");
-        if (FishingBot.getInstance().isDarkMode()) {
-            scene.getStylesheets().add("darkstyle.css");
-        }
+        MainGUI.setStyle(scene.getStylesheets());
 
         window.setTitle("FishingBot - Config");
         window.getIcons().add(new Image(ConfigGUI.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
