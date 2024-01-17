@@ -4,12 +4,8 @@
  */
 package systems.kinau.fishingbot.io.config;
 
-import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.*;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.i18n.Language;
-import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.utils.ConvertUtils;
 import systems.kinau.fishingbot.utils.ReflectionUtils;
 
@@ -20,8 +16,9 @@ import java.util.*;
 
 public class PropertyProcessor {
 
+    private static final Gson PRETTY_GSON = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
-    public void processAnnotations(final Config config, String dir) throws AnnotationFormatError, IOException, ParseException {
+    public void processAnnotations(final Config config, String dir) throws AnnotationFormatError, IOException, JsonParseException {
         File file = new File(dir);
         File parentDir = file.getParentFile();
         File probOldConfig = new File(parentDir, "config.properties");
@@ -38,7 +35,10 @@ public class PropertyProcessor {
             return;
         }
 
-        org.json.simple.JSONObject configJson = (org.json.simple.JSONObject) new JSONParser().parse(new FileReader(file));
+        JsonElement configJsonElement = new JsonParser().parse(new FileReader(file));
+        if (configJsonElement == null || !configJsonElement.isJsonObject())
+            throw new JsonParseException("Parsed Config Json is not a JSON object, got " + configJsonElement);
+        JsonObject configJson = configJsonElement.getAsJsonObject();
         boolean unsetConfigOptions = false;
 
         List<Field> fields = ReflectionUtils.getAllFields(config);
@@ -53,10 +53,10 @@ public class PropertyProcessor {
             if (key.isEmpty() || source.isEmpty())
                 throw new AnnotationFormatError("Property Annotation needs source and key");
 
-            Object value = getValueByDottedKey(configJson, key);
+            JsonElement value = getValueByDottedKey(configJson, key);
             if (value != null) {
                 if (!convertChangedFields(key, value, field, config, configJson)) {
-                    Object typedValue = ConvertUtils.convert(value.toString(), field.getType(), field.getGenericType());
+                    Object typedValue = ConvertUtils.fromConfigValue(jsonToString(value), field.getType(), field.getGenericType());
                     if (typedValue == null)
                         throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
                     ReflectionUtils.setField(field, config, typedValue);
@@ -73,23 +73,29 @@ public class PropertyProcessor {
         }
     }
 
-    private boolean convertChangedFields(String key, Object value, Field field, Config config, org.json.simple.JSONObject configJson) {
+    private String jsonToString(JsonElement element) {
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString())
+            return element.getAsString();
+        return element.toString();
+    }
+
+    private boolean convertChangedFields(String key, JsonElement value, Field field, Config config, JsonObject configJson) {
         if (key.equals("start-text.text") && !value.toString().startsWith("[")) {
             FishingBot.getI18n().info("config-converting");
-            ReflectionUtils.setField(field, config, Arrays.asList(value.toString().split(";")));
+            ReflectionUtils.setField(field, config, Arrays.asList(value.getAsString().split(";")));
             try {
                 Field discordField1 = config.getClass().getDeclaredField("webHookEnabled");
                 Field discordField2 = config.getClass().getDeclaredField("webHook");
 
                 Object value1 = getValueByDottedKey(configJson, "discord.enabled");
                 if (value1 != null) {
-                    value1 = ConvertUtils.convert(value1.toString(), boolean.class, boolean.class);
+                    value1 = ConvertUtils.fromConfigValue(jsonToString((JsonElement) value1), boolean.class, boolean.class);
                     ReflectionUtils.setField(discordField1, config, value1);
                 }
 
                 Object value2 = getValueByDottedKey(configJson, "discord.web-hook");
                 if (value2 != null) {
-                    value2 = ConvertUtils.convert(value2.toString(), String.class, String.class);
+                    value2 = ConvertUtils.fromConfigValue(jsonToString((JsonElement) value2), String.class, String.class);
                     ReflectionUtils.setField(discordField2, config, value2);
                 }
             } catch (NoSuchFieldException ignore) { }
@@ -98,24 +104,26 @@ public class PropertyProcessor {
         return false;
     }
 
-    private Object getValueByDottedKey(org.json.simple.JSONObject object, String key) {
+    private JsonElement getValueByDottedKey(JsonObject object, String key) {
         String[] parts = key.split("\\.");
-        Object currentObj = object;
+        JsonElement current = object;
         for (String part : parts) {
-            if (currentObj instanceof org.json.simple.JSONObject) {
-                if (((org.json.simple.JSONObject)currentObj).containsKey(part)) {
-                    currentObj = ((org.json.simple.JSONObject)currentObj).get(part);
+            if (current != null && current.isJsonObject()) {
+                if (current.getAsJsonObject().has(part)) {
+                    current = current.getAsJsonObject().get(part);
                 } else
                     return null;
             } else
                 return null;
         }
-        return currentObj;
+        return current;
     }
 
     public void saveConfig(Config config, File file) {
         Map<String, Object> configOptions = new HashMap<>();
         List<Field> fields = ReflectionUtils.getAllFields(config);
+        JsonObject root = new JsonObject();
+
         for (Field field : fields) {
             if (!field.isAnnotationPresent(Property.class))
                 continue;
@@ -124,30 +132,24 @@ public class PropertyProcessor {
             String key = propAnnotation.key().trim();
             Object value = ReflectionUtils.getField(field, config);
             configOptions.put(key, value);
-        }
 
-        JSONObject root = new JSONObject();
-        configOptions.keySet().forEach(key -> {
             if (!key.contains(".")) {
-                root.put(key, configOptions.get(key));
+                ConvertUtils.toConfigValue(root, key, configOptions.get(key), field.getGenericType());
                 return;
             }
             String[] parts = key.split("\\.");
-            JSONObject curr = root;
+            JsonObject curr = root;
             for (String part : Arrays.copyOfRange(parts, 0, parts.length - 1)) {
                 if (!curr.has(part))
-                    curr.put(part, curr = new JSONObject());
+                    curr.add(part, curr = new JsonObject());
                 else
-                    curr = (JSONObject) curr.get(part);
+                    curr = curr.get(part).getAsJsonObject();
             }
-            if (configOptions.get(key) instanceof AnnounceType || configOptions.get(key) instanceof Language)
-                curr.put(parts[parts.length - 1], configOptions.get(key).toString());
-            else
-                curr.put(parts[parts.length - 1], configOptions.get(key));
-        });
+            ConvertUtils.toConfigValue(curr, parts[parts.length - 1], configOptions.get(key), field.getGenericType());
+        }
 
         try (FileWriter fw = new FileWriter(file)) {
-            fw.write(root.toString(4));
+            fw.write(PRETTY_GSON.toJson(root));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -169,7 +171,7 @@ public class PropertyProcessor {
 
             String value = properties.getProperty(key);
 
-            Object typedValue = ConvertUtils.convert(value, field.getType(), field.getGenericType());
+            Object typedValue = ConvertUtils.fromConfigValue(value, field.getType(), field.getGenericType());
             if (typedValue == null)
                 throw new ConvertException("Cannot convert type from " + field.getName() + ":" + field.getType().getSimpleName());
             ReflectionUtils.setField(field, config, typedValue);

@@ -7,13 +7,13 @@ package systems.kinau.fishingbot.network.ping;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.utils.TextComponent;
+import systems.kinau.fishingbot.utils.ChatComponentUtils;
 
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -83,9 +83,9 @@ public class ServerPinger {
 
 //            if (id != 2) {
             String pong = Packet.readString(in);
-            JSONObject root = (JSONObject) new JSONParser().parse(pong);
-            long protocolId = (long) ((JSONObject)root.get("version")).get("protocol");
-            long currPlayers = (long) ((JSONObject)root.get("players")).get("online");
+            JsonObject root = new JsonParser().parse(pong).getAsJsonObject();
+            long protocolId = root.getAsJsonObject("version").get("protocol").getAsLong();
+            long currPlayers = root.getAsJsonObject("players").get("online").getAsLong();
 
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.AUTOMATIC)
                 FishingBot.getInstance().getCurrentBot().setServerProtocol(Long.valueOf(protocolId).intValue());
@@ -98,15 +98,15 @@ public class ServerPinger {
             try {
                 try {
                     if (protocolId > ProtocolConstants.MINECRAFT_1_8)
-                        description = (String) ((JSONObject)root.get("description")).get("text");
+                        description = ChatComponentUtils.toPlainText(root.getAsJsonObject("description"));
                     else
-                        description = (String) root.get("description");
-                } catch (UnsupportedOperationException ex) {
-                    description = TextComponent.toPlainText(((JSONObject)root.get("description")));
+                        description = root.getAsJsonPrimitive("description").getAsString();
+                } catch (Exception ex) {
+                    description = root.get("description").toString();
                 }
-            } catch (UnsupportedOperationException ignored) {
+            } catch (Exception ignored) {
             } finally {
-                if (description.trim().isEmpty())
+                if (description == null || description.trim().isEmpty())
                     description = "Unknown";
             }
 

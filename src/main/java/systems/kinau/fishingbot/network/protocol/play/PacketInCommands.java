@@ -17,6 +17,7 @@ import systems.kinau.fishingbot.modules.command.brigardier.node.Node;
 import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class PacketInCommands extends Packet {
         List<CommandNodeData> nodes = new ArrayList<>();
         try {
             for (int i = 0; i < count; i++) {
-                CommandNodeData data = readCommandNode(in);
+                CommandNodeData data = readCommandNode(in, protocolId);
                 if (data != null)
                     nodes.add(data);
             }
@@ -52,7 +53,7 @@ public class PacketInCommands extends Packet {
         } catch (Exception ignore) {}
     }
 
-    private CommandNodeData readCommandNode(ByteArrayDataInputWrapper in) {
+    private CommandNodeData readCommandNode(ByteArrayDataInputWrapper in, int protocolId) {
         try {
             byte flags = in.readByte();
             int count = readVarInt(in);
@@ -62,14 +63,14 @@ public class PacketInCommands extends Packet {
                 children[i] = readVarInt(in);
             }
             int redirectNode = ((flags & 0x08) != 0) ? readVarInt(in) : 0;
-            Node node = readArgumentBuilder(in, flags);
+            Node node = readArgumentBuilder(in, flags, protocolId);
             return new CommandNodeData(node, flags, redirectNode, children);
         } catch (Exception ex) {
             return null;
         }
     }
 
-    private Node readArgumentBuilder(ByteArrayDataInputWrapper in, byte flags) {
+    private Node readArgumentBuilder(ByteArrayDataInputWrapper in, byte flags, int protocolId) {
         int nodeType = flags & 0x03;
         if (nodeType == 2) {
             String name = readString(in);
@@ -126,26 +127,28 @@ public class PacketInCommands extends Packet {
                     }
                     break;
                 }
-                case 18: {
-                    argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
-                    break;
-                }
-                case 6:
-                case 29: {
+                case 6: {
                     byte propFlags = in.readByte();
                     break;
                 }
-                case 41:
-                case 42:
-                case 43:
-                case 44: {
-                    String identifier = readString(in);
-                    break;
-                }
-                case 40: {
-                    int time = in.readInt();
-                    break;
-                }
+            }
+            if (parserId >= 18) {
+                if (parserId == 18 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
+                    argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
+                if (parserId == 19 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
+                    argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
+                if (parserId == 29 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
+                    in.readByte();
+                if (parserId == 30 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
+                    in.readByte();
+                if (parserId == 40 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
+                    in.readInt();
+                if (parserId == 41 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
+                    in.readInt();
+                if (parserId >= 41 && parserId <= 44 && protocolId < ProtocolConstants.MINECRAFT_1_20_3)
+                    readString(in);
+                if (parserId >= 42 && parserId <= 45 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
+                    readString(in);
             }
             if (argumentType == null)
                 argumentType = new BasicArgumentType<>(parserId, () -> new StubArgumentType(parserId));

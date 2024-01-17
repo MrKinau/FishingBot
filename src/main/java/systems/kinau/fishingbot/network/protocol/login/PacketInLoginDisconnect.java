@@ -23,7 +23,7 @@ public class PacketInLoginDisconnect extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        String errorMessage = readString(in);
+        String errorMessage = readChatComponent(in, protocolId);
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new LoginDisconnectEvent(errorMessage));
     }
 }

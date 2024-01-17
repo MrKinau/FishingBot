@@ -12,13 +12,17 @@ import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.common.KeepAliveEvent;
+import systems.kinau.fishingbot.event.common.PingPacketEvent;
 import systems.kinau.fishingbot.event.common.ResourcePackEvent;
+import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.protocol.State;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
+import systems.kinau.fishingbot.network.protocol.common.PacketOutPing;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
@@ -28,11 +32,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 public class ClientDefaultsModule extends Module implements Listener {
 
-    @Getter private Thread positionThread;
-    @Getter private boolean joined;
-    @Getter private Set<UUID> onlinePlayers = new HashSet<>();
+    private Thread positionThread;
+    private boolean joined;
+    private Set<UUID> onlinePlayers = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -92,8 +97,8 @@ public class ClientDefaultsModule extends Module implements Listener {
 
     @EventHandler
     public void onResourcePack(ResourcePackEvent event) {
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(PacketOutResourcePackResponse.Result.ACCEPTED));
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(PacketOutResourcePackResponse.Result.SUCCESSFULLY_LOADED));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(event.getUuid(), PacketOutResourcePackResponse.Result.ACCEPTED));
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutResourcePackResponse(event.getUuid(), PacketOutResourcePackResponse.Result.SUCCESSFULLY_LOADED));
     }
 
     @EventHandler
@@ -136,11 +141,23 @@ public class ClientDefaultsModule extends Module implements Listener {
         positionThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 Player player = FishingBot.getInstance().getCurrentBot().getPlayer();
-                networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true));
+                if (networkHandler != null && networkHandler.getState() == State.PLAY)
+                    networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true));
                 try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }
         });
         positionThread.setName("positionThread");
         positionThread.start();
+    }
+
+    @EventHandler
+    public void onConfigurationStart(ConfigurationStartEvent e) {
+        if (positionThread != null)
+            positionThread.interrupt();
+    }
+
+    @EventHandler
+    public void onPing(PingPacketEvent e) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPing(e.getId()));
     }
 }

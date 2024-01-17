@@ -1,5 +1,7 @@
 package systems.kinau.fishingbot.utils.nbt;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
@@ -54,5 +56,12 @@ public class CompoundTag extends Tag<Map<String, ? extends Tag<?>>> {
         }
         sb.append("\n").append(TagRegistry.createTag(EndTag.class).toString(tabs));
         return sb.toString();
+    }
+
+    @Override
+    public JsonElement toJson() {
+        JsonObject jsonObject = new JsonObject();
+        getValue().forEach((name, tag) -> jsonObject.add(name, tag.toJson()));
+        return jsonObject;
     }
 }

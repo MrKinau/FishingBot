@@ -4,7 +4,7 @@
  */
 package systems.kinau.fishingbot.io.config;
 
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonParseException;
 import systems.kinau.fishingbot.FishingBot;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public interface Config {
             new PropertyProcessor().processAnnotations(this, dir);
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (JsonParseException e) {
             FishingBot.getI18n().severe("config-failed-parsing", e.toString());
         }
     }
