@@ -1,12 +1,31 @@
 .root {
-    -fx-base: #131313;
+    -fx-base: #181818;
     -fx-default-button: #202325;
     -fx-focus-color: #efefef;
     -fx-text-base-color: #efefef;
 }
 
+.menu-bar {
+    -fx-background-color: #383838;
+}
+.menu-item, .context-menu {
+    -fx-background-color: #4b4b4b;
+}
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #0096c9;
+}
+
+.table-view {
+    -fx-background-color: #383838;
+}
+
+.text-area .content {
+    -fx-background-color: -fx-default-button;
+}
+
 .text-input {
     -fx-text-fill: #efefef;
+    -fx-background-color: -fx-default-button;
 }
 
 .text-input:focused {
@@ -17,4 +36,23 @@
         -fx-dark-text-color  59%,
         -fx-mid-text-color   60%
     );
+}
+
+.button:focused {
+    -fx-focus-color: #0096c9;
+    -fx-background-color: -fx-focus-color;
+}
+
+.list-cell {
+    -fx-background-color: #383838;
+    -fx-text-fill: #efefef;
+}
+
+.list-cell:even {
+    -fx-background-color: #3b3b3b;
+}
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%);
+    -fx-text-fill: #efefef;
 }
