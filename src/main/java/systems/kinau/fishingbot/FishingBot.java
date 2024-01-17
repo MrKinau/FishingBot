@@ -14,6 +14,7 @@ import systems.kinau.fishingbot.io.logging.CustomPrintStream;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,6 +61,11 @@ public class FishingBot {
         log.setUseParentHandlers(false);
         LogFormatter formatter = new LogFormatter();
         ch.setFormatter(formatter);
+        try {
+            ch.setEncoding("UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         CustomPrintStream.enableForPackage("systems.kinau.fishingbot", getLog());
 
         // start message
