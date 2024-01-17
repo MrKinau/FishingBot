@@ -38,6 +38,7 @@ public class FishingBot {
     @Getter @Setter private Bot currentBot;
     @Getter @Setter private MainGUI mainGUI;
     @Getter @Setter private GUIController mainGUIController;
+    @Getter @Setter private boolean darkMode;
 
 
     public FishingBot(CommandLine cmdLine) {
@@ -92,6 +93,8 @@ public class FishingBot {
         } else {
             this.refreshTokenFile = new File(FishingBot.getExecutionDirectory(), "refreshToken");
         }
+
+        this.darkMode = this.config.isDarkMode();
     }
 
     public void startBot() {

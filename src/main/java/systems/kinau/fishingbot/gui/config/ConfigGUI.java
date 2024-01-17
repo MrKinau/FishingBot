@@ -95,6 +95,9 @@ public class ConfigGUI {
 
         Scene scene = new Scene(rootPane, 750, 340);
         scene.getStylesheets().add("configstyle.css");
+        if (FishingBot.getInstance().isDarkMode()) {
+            scene.getStylesheets().add("darkstyle.css");
+        }
 
         window.setTitle("FishingBot - Config");
         window.getIcons().add(new Image(ConfigGUI.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));

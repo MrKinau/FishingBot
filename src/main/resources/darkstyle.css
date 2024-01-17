@@ -1,0 +1,20 @@
+.root {
+    -fx-base: #131313;
+    -fx-default-button: #202325;
+    -fx-focus-color: #efefef;
+    -fx-text-base-color: #efefef;
+}
+
+.text-input {
+    -fx-text-fill: #efefef;
+}
+
+.text-input:focused {
+    -fx-highlight-text-fill: ladder(
+        -fx-highlight-fill,
+        -fx-light-text-color 45%,
+        -fx-dark-text-color  46%,
+        -fx-dark-text-color  59%,
+        -fx-mid-text-color   60%
+    );
+}

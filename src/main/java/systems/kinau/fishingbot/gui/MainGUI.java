@@ -1,6 +1,7 @@
 package systems.kinau.fishingbot.gui;
 
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,7 +26,7 @@ public class MainGUI extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fishingbot.fxml"), FishingBot.getI18n().getBundle());
         Parent root = loader.load();
-        root.getStylesheets().add("mainstyle.css");
+        setStyle(root.getStylesheets());
         
         stage.setTitle("FishingBot");
         stage.getIcons().add(new Image(MainGUI.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
@@ -47,5 +48,12 @@ public class MainGUI extends Application {
     @Override
     public void stop() throws Exception {
         FishingBot.getInstance().interruptMainThread();
+    }
+
+    public static void setStyle(ObservableList<String> stylesheets) {
+        stylesheets.add("mainstyle.css");
+        if (FishingBot.getInstance().isDarkMode()) {
+            stylesheets.add("darkstyle.css");
+        }
     }
 }
