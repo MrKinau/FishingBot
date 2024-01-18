@@ -149,7 +149,7 @@ public class RegistryHandler {
     }
 
     public static int getEntityType(String entityName, int protocol) {
-        return getEntitiesMap(protocol).get(entityName);
+        return getEntitiesMap(protocol).getOrDefault(entityName, 0);
     }
 
     public static String getImageUrl(Item item) {

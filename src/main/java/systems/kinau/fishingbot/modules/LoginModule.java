@@ -13,9 +13,11 @@ import systems.kinau.fishingbot.event.configuration.ConfigurationFinishEvent;
 import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
 import systems.kinau.fishingbot.event.login.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.State;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
+import systems.kinau.fishingbot.network.protocol.configuration.PacketOutPluginMessage;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutEncryptionResponse;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginAcknowledge;
 import systems.kinau.fishingbot.network.protocol.login.PacketOutLoginPluginResponse;
@@ -117,6 +119,7 @@ public class LoginModule extends Module implements Listener {
 
     @EventHandler
     public void onConfigurationFinish(ConfigurationFinishEvent event) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPluginMessage("minecraft:brand", (out, protocol) -> Packet.writeString("fishingbot", out)));
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutFinishConfiguration());
         FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
     }

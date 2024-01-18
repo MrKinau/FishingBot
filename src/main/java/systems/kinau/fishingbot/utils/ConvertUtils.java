@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.utils;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.gui.Theme;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
@@ -64,8 +65,15 @@ public class ConvertUtils {
             try {
                 return Language.valueOf(value.toUpperCase());
             } catch (IllegalArgumentException ex) {
-                FishingBot.getLog().severe("Could not find language " + value + ". Falling back to default langugae ENGLISH");
+                FishingBot.getLog().severe("Could not find language " + value + ". Falling back to default language ENGLISH");
                 return Language.ENGLISH;
+            }
+        } else if (type.isAssignableFrom(Theme.class)) {
+            try {
+                return Theme.valueOf(value.toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                FishingBot.getLog().severe("Could not find theme " + value + ". Falling back to default theme SYSTEM");
+                return Theme.SYSTEM;
             }
         } else if (type.isAssignableFrom(List.class) && ((ParameterizedType)genericType).getActualTypeArguments()[0].equals(EjectionRule.class)) {
             try {

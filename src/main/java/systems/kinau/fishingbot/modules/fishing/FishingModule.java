@@ -24,22 +24,26 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.StringUtils;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class FishingModule extends Module implements Runnable, Listener {
 
     private static int BOBBER_ENTITY_TYPE;
+    private static int ITEM_ENTITY_TYPE;
 
-    @Getter private List<Item> possibleCaughtItems = new CopyOnWriteArrayList<>();
+    @Getter private PossibleCaughtList possibleCaughtItems = new PossibleCaughtList();
 
-    @Getter @Setter private int currentBobber = -1;
+    @Getter @Setter private Bobber currentBobber;
     @Getter @Setter private short lastY = -1;
     @Getter @Setter private boolean trackingNextBobberId = false;
     @Getter @Setter private boolean noRodAvailable = false;
     @Getter private boolean paused = false;
-    @Getter private boolean trackingNextEntityMeta = false;
+    @Getter @Setter private boolean trackingNextEntityMeta = false;
     @Getter private boolean waitForLookFinish = false;
     @Getter @Setter private long lastFish = System.currentTimeMillis();
 
@@ -61,10 +65,18 @@ public class FishingModule extends Module implements Runnable, Listener {
             BOBBER_ENTITY_TYPE = RegistryHandler.getEntityType("minecraft:fishing_bobber", FishingBot.getInstance().getCurrentBot().getServerProtocol());
         if (BOBBER_ENTITY_TYPE == 0)
             BOBBER_ENTITY_TYPE = 90;
-    }
 
-    public void setTrackingNextEntityMeta(boolean trackingNextEntityMeta) {
-        this.trackingNextEntityMeta = trackingNextEntityMeta;
+        if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
+            if (protocolId <= ProtocolConstants.MINECRAFT_1_12_2)
+                ITEM_ENTITY_TYPE = 2;
+            else if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2)
+                ITEM_ENTITY_TYPE = 32;
+            else
+                ITEM_ENTITY_TYPE = 34;
+        } else
+            ITEM_ENTITY_TYPE = RegistryHandler.getEntityType("minecraft:item", FishingBot.getInstance().getCurrentBot().getServerProtocol());
+        if (ITEM_ENTITY_TYPE == 0)
+            ITEM_ENTITY_TYPE = 2;
     }
 
     @Override
@@ -104,7 +116,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     public void setPaused(boolean paused) {
         this.paused = paused;
         if (paused) {
-            if (getCurrentBobber() != -1 && !isTrackingNextEntityMeta())
+            if (getCurrentBobber() != null && !isTrackingNextEntityMeta())
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
         } else {
             stuck();
@@ -113,7 +125,8 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     public void fish() {
         setLastFish(System.currentTimeMillis());
-        setCurrentBobber(-1);
+        Bobber bobberUsedForCatch = getCurrentBobber();
+        setCurrentBobber(null);
         setTrackingNextEntityMeta(true);
         if (isPaused())
             return;
@@ -123,7 +136,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 int timeToWait = FishingBot.getInstance().getCurrentBot().getPlayer().getLastPing() + 200;
                 Thread.sleep(timeToWait);
                 setTrackingNextEntityMeta(false);
-                getCaughtItem();
+                getCaughtItem(bobberUsedForCatch);
                 Thread.sleep(200);
                 if (FishingBot.getInstance().getCurrentBot().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem()) >= 63) {
                     noRod();
@@ -145,35 +158,31 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
-    public boolean containsPossibleItem(int eid) {
-        return getPossibleCaughtItems().stream().anyMatch(item -> item.getEid() == eid);
-    }
-
-    public void addPossibleMotion(int eid, int motX, int motY, int motZ) {
-        getPossibleCaughtItems().forEach(item -> {
-            if (item.getEid() == eid) {
-                item.setMotX(motX);
-                item.setMotY(motY);
-                item.setMotZ(motZ);
-            }
-        });
-    }
-
-    private void getCaughtItem() {
-        if (getPossibleCaughtItems().size() < 1)
+    private void getCaughtItem(Bobber bobberUsedForCatch) {
+        if (getPossibleCaughtItems().isEmpty())
             return;
-        Item currentMax = getPossibleCaughtItems().get(0);
-        int currentMaxMot = getMaxMot(currentMax);
-        for (Item possibleCaughtItem : getPossibleCaughtItems()) {
-            int mot = getMaxMot(possibleCaughtItem);
-            if (mot > currentMaxMot) {
-                currentMax = possibleCaughtItem;
-                currentMaxMot = mot;
+        // Scores each new item based of several factors to how likely it is the caught item
+        // Current factors are:
+        // - Maximum velocity (usually the caught items start with a very high velocity)
+        // - Item Origin location distance to bobber location (items origin located near the bobber ranked significantly higher)
+        Map<Item, Double> itemScore = getPossibleCaughtItems().stream().collect(Collectors.toMap(Function.identity(), item -> Double.valueOf(item.getMaxMot())));
+
+        itemScore.entrySet().forEach(entry -> {
+            Item item = entry.getKey();
+            double score = Optional.ofNullable(entry.getValue()).orElse(0.0);
+            double distToBobber = Math.abs(Math.sqrt(Math.pow(bobberUsedForCatch.getCurrentX() - item.getOriginX(), 2) + Math.pow(bobberUsedForCatch.getCurrentY() - item.getOriginY(), 2) + Math.pow(bobberUsedForCatch.getCurrentZ() - item.getOriginZ(), 2)));
+            if (distToBobber < 1)
+                score += 20_000;
+            else {
+                score /= distToBobber;
             }
-        }
+            entry.setValue(score);
+        });
 
         // Clear mem
         getPossibleCaughtItems().clear();
+
+        Item currentMax = itemScore.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(null);
 
         // Print to console (based on announcetype)
         logItem(currentMax,
@@ -195,6 +204,8 @@ public class FishingModule extends Module implements Runnable, Listener {
 
         LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getEnchantments());
 
+        if (currentMax.getEnchantments() == null)
+            currentMax.setEnchantments(new ArrayList<>());
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new FishCaughtEvent(currentMax, lootItem));
     }
 
@@ -211,7 +222,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         else if (noisiness == AnnounceType.ALL_BUT_FISH && !ItemUtils.isFish(FishingBot.getInstance().getCurrentBot().getServerProtocol(), item.getItemId()))
             announce.accept(stringify(item));
 
-        if (item.getEnchantments().isEmpty())
+        if (item.getEnchantments() == null || item.getEnchantments().isEmpty())
             return;
 
         if (noisiness == AnnounceType.ONLY_ENCHANTED)
@@ -232,10 +243,6 @@ public class FishingModule extends Module implements Runnable, Listener {
         }
     }
 
-    private int getMaxMot(Item item) {
-        return Math.abs(item.getMotX()) + Math.abs(item.getMotY()) + Math.abs(item.getMotZ());
-    }
-
     private void noRod() {
         if (FishingBot.getInstance().getCurrentBot().getConfig().isDisableRodChecking())
             return;
@@ -247,12 +254,9 @@ public class FishingModule extends Module implements Runnable, Listener {
         }
     }
 
-    private void reFish(int id) {
+    private void reFish(int id, double x, double y, double z) {
         setTrackingNextBobberId(false);
-        new Thread(() -> {
-            try { Thread.sleep(2500); } catch (InterruptedException ignored) { }     //Prevent Velocity grabbed from flying hook
-            setCurrentBobber(id);
-        }).start();
+        setCurrentBobber(new Bobber(id, x, y, z));
     }
 
     public boolean swapWithBestFishingRod() {
@@ -303,11 +307,16 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
-    // TODO: Caught detection may be much easier with the Is Caught field in EntityMetadataPacket (since MC-1.16)
+    // TODO: Detect Is Caught field in EntityMetadataPacket (since MC-1.16)
     @EventHandler
     public void onEntityVelocity(EntityVelocityEvent event) {
-        addPossibleMotion(event.getEid(), event.getX(), event.getY(), event.getZ());
-        if (getCurrentBobber() != event.getEid())
+        getPossibleCaughtItems().updateCaught(event.getEid(), null, null, null, event.getX(), event.getY(), event.getZ());
+        if (getCurrentBobber() == null)
+            return;
+        if (getCurrentBobber().getEntityId() != event.getEid())
+            return;
+        // Prevent Velocity grabbed from flying hook
+        if (!getCurrentBobber().existsForAtLeast(2500))
             return;
 
         switch (FishingBot.getInstance().getCurrentBot().getServerProtocol()) {
@@ -344,6 +353,22 @@ public class FishingModule extends Module implements Runnable, Listener {
         }
 
         lastY = event.getY();
+    }
+
+    @EventHandler
+    public void onBobberMove(EntityMoveEvent event) {
+        if (getCurrentBobber() == null) return;
+        if (getCurrentBobber().getEntityId() != event.getEntityId()) return;
+
+        getCurrentBobber().move(event.getDX(), event.getDY(), event.getDZ());
+    }
+
+    @EventHandler
+    public void onBobberTeleport(EntityTeleportEvent event) {
+        if (getCurrentBobber() == null) return;
+        if (getCurrentBobber().getEntityId() != event.getEntityId()) return;
+
+        getCurrentBobber().teleport(event.getX(), event.getY(), event.getZ());
     }
 
     @EventHandler
@@ -385,7 +410,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     FishingBot.getI18n().info("module-fishing-new-rod-available");
                     setLastFish(System.currentTimeMillis());
                     setNoRodAvailable(false);
-                    setCurrentBobber(-1);
+                    setCurrentBobber(null);
                     setTrackingNextEntityMeta(false);
 
                     if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
@@ -403,24 +428,32 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     @EventHandler
-    public void onSpawnObject(SpawnEntityEvent event) {
-        if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextBobberId())
+    public void onSpawnBobber(SpawnEntityEvent event) {
+        if (!isTrackingNextBobberId())
             return;
 
         if (FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != -1 && event.getObjectData() != FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID())
             return;
 
         if (event.getType() == BOBBER_ENTITY_TYPE) {
-            reFish(event.getId());
+            reFish(event.getId(), event.getX(), event.getY(), event.getZ());
         }
     }
 
     @EventHandler
+    public void onSpawnFish(SpawnEntityEvent event) {
+        if (!isTrackingNextEntityMeta()) return;
+        if (event.getType() != ITEM_ENTITY_TYPE) return;
+        getPossibleCaughtItems().addCaught(new Item(event.getId(), null, null, null, event.getXVelocity(), event.getYVelocity(), event.getZVelocity(), event.getX(), event.getY(), event.getZ()));
+    }
+
+    @EventHandler
     public void onDestroy(DestroyEntitiesEvent event) {
-        if (getCurrentBobber() != -1 && event.getEntityIds().contains(getCurrentBobber()))
+        if (getCurrentBobber() != null && event.getEntityIds().contains(getCurrentBobber().getEntityId()))
             stuck();
     }
 
+    // Stucking fix
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
@@ -435,7 +468,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     noRod();
                     continue;
                 }
-                setCurrentBobber(-1);
+                setCurrentBobber(null);
                 setTrackingNextEntityMeta(false);
                 FishingBot.getI18n().warning("module-fishing-bot-is-slow");
 

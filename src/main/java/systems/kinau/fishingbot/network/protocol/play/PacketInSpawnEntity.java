@@ -19,9 +19,9 @@ public class PacketInSpawnEntity extends Packet {
 
     private int id;
     private int type;
-    private int x;
-    private int y;
-    private int z;
+    private double x;
+    private double y;
+    private double z;
     private byte yaw;
     private byte pitch;
     private byte headYaw;
@@ -39,9 +39,9 @@ public class PacketInSpawnEntity extends Packet {
         if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
             this.id = readVarInt(in);       // EID
             this.type = in.readByte();      // Type of the object
-            this.x = in.readInt();          // X POS
-            this.y = in.readInt();          // Y POS
-            this.z = in.readInt();          // Z POS
+            this.x = in.readInt() / 32.0;   // X POS
+            this.y = in.readInt() / 32.0;   // Y POS
+            this.z = in.readInt() / 32.0;   // Z POS
             this.pitch = in.readByte();     // Pitch
             this.yaw = in.readByte();       // Yaw
             this.objectData = in.readInt(); // Data of object: https://wiki.vg/Object_Data
@@ -54,9 +54,9 @@ public class PacketInSpawnEntity extends Packet {
             this.id = readVarInt(in);       // EID
             readUUID(in);                   // E UUID
             this.type = in.readByte();      // Obj type
-            this.x = (int) in.readDouble();  // X POS (casts are incorrect, but if nobody sees it, nobody can blame it)
-            this.y = (int) in.readDouble();  // Y POS
-            this.z = (int) in.readDouble();  // Z POS
+            this.x = in.readDouble();  // X POS (casts are incorrect, but if nobody sees it, nobody can blame it)
+            this.y = in.readDouble();  // Y POS
+            this.z = in.readDouble();  // Z POS
             this.pitch = in.readByte();     // Pitch
             this.yaw = in.readByte();       // Yaw
             this.objectData = in.readInt(); // Data of object: https://wiki.vg/Object_Data
@@ -66,16 +66,16 @@ public class PacketInSpawnEntity extends Packet {
                 this.zVelocity = in.readShort();
             }
         } else {
-            this.id = readVarInt(in);       // EID
-            readUUID(in);                   // E UUID
-            this.type = readVarInt(in);      // Obj type
-            this.x = (int) in.readDouble();  // X POS (casts are incorrect, but if nobody sees it, nobody can blame it)
-            this.y = (int) in.readDouble();  // Y POS
-            this.z = (int) in.readDouble();  // Z POS
-            this.pitch = in.readByte();     // Pitch
-            this.yaw = in.readByte();       // Yaw
-            this.headYaw = in.readByte();   // head yaw
-            this.objectData = readVarInt(in); // Data of object: https://wiki.vg/Object_Data
+            this.id = readVarInt(in);               // EID
+            readUUID(in);                           // E UUID
+            this.type = readVarInt(in);             // Obj type
+            this.x = in.readDouble();               // X POS (casts are incorrect, but if nobody sees it, nobody can blame it)
+            this.y = in.readDouble();               // Y POS
+            this.z = in.readDouble();               // Z POS
+            this.pitch = in.readByte();             // Pitch
+            this.yaw = in.readByte();               // Yaw
+            this.headYaw = in.readByte();           // head yaw
+            this.objectData = readVarInt(in);       // Data of object: https://wiki.vg/Object_Data
             if (getObjectData() != 0) {
                 this.xVelocity = in.readShort();    // Velocity only present if data nonzero
                 this.yVelocity = in.readShort();

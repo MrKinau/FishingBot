@@ -45,12 +45,15 @@ import java.util.stream.Collectors;
 
 public class ConfigGUI {
 
+    public Stage owner;
+
     public Label configOptionCategoryTitle;
     public VBox configOptionsBox;
 
     public Multimap<String, ConfigOption> configOptions = MultimapBuilder.hashKeys().arrayListValues().build();
 
     public ConfigGUI(Stage primaryStage) {
+        this.owner = primaryStage;
         Stage window = new Stage();
         createConfigElements(window);
         VBox categoriesPane = new VBox(5);
@@ -95,7 +98,7 @@ public class ConfigGUI {
         rootPane.setCenter(configOptionsPane);
 
         Scene scene = new Scene(rootPane, 750, 340);
-        MainGUI.setStyle(scene.getStylesheets());
+        MainGUI.setStyle(scene.getRoot().getStylesheets());
 
         window.setTitle("FishingBot - Config");
         window.getIcons().add(new Image(ConfigGUI.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
@@ -120,11 +123,11 @@ public class ConfigGUI {
         boolean usingOneSix = OneSixParamStorage.getInstance() != null;
 
         if (usingOneSix)
-            addConfigOption("account.onesix", new EmptyConfigOption("account.onesix", FishingBot.getI18n().t("config-account-onesix")));
+            addConfigOption("account.onesix", new EmptyConfigOption(this, "account.onesix", FishingBot.getI18n().t("config-account-onesix")));
         else {
-            addConfigOption("account.microsoft", new EmptyConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-microsoft")));
+            addConfigOption("account.microsoft", new EmptyConfigOption(this, "account.microsoft", FishingBot.getI18n().t("config-account-microsoft")));
             boolean refreshTokenExists = FishingBot.getInstance().getRefreshTokenFile().exists();
-            addConfigOption("account.microsoft", new ButtonConfigOption("account.microsoft", FishingBot.getI18n().t("config-account-logout"), refreshTokenExists, event -> {
+            addConfigOption("account.microsoft", new ButtonConfigOption(this, "account.microsoft", FishingBot.getI18n().t("config-account-logout"), refreshTokenExists, event -> {
                 try {
                     Files.delete(FishingBot.getInstance().getRefreshTokenFile().toPath());
                     ((Node) event.getSource()).setDisable(true);
@@ -151,33 +154,33 @@ public class ConfigGUI {
                 continue;
 
             if (field.getName().equals("defaultProtocol")) {
-                addConfigOption(key, new VersionConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString()));
+                addConfigOption(key, new VersionConfigOption(this, key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString()));
             } else if (field.getName().equals("realmId")) {
-                addConfigOption(key, new RealmConfigOption(key, FishingBot.getI18n().t(description), (long) ReflectionUtils.getField(field, config), this));
+                addConfigOption(key, new RealmConfigOption(this, key, FishingBot.getI18n().t(description), (long) ReflectionUtils.getField(field, config), this));
             } else if (field.getType().isAssignableFrom(boolean.class)) {
-                addConfigOption(key, new BooleanConfigOption(key, FishingBot.getI18n().t(description), (boolean) ReflectionUtils.getField(field, config)));
+                addConfigOption(key, new BooleanConfigOption(this, key, FishingBot.getI18n().t(description), (boolean) ReflectionUtils.getField(field, config)));
             } else if (field.getType().isAssignableFrom(String.class)) {
-                addConfigOption(key, new StringConfigOption(key, FishingBot.getI18n().t(description), (String) ReflectionUtils.getField(field, config), field.getName().contains("password")));
+                addConfigOption(key, new StringConfigOption(this, key, FishingBot.getI18n().t(description), (String) ReflectionUtils.getField(field, config), field.getName().contains("password")));
             } else if (field.getType().isAssignableFrom(int.class)) {
-                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), (int) ReflectionUtils.getField(field, config)));
+                addConfigOption(key, new IntegerConfigOption(this, key, FishingBot.getI18n().t(description), (int) ReflectionUtils.getField(field, config)));
             } else if (field.getType().isAssignableFrom(float.class)) {
-                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Float.valueOf((float) ReflectionUtils.getField(field, config)).intValue()));
+                addConfigOption(key, new IntegerConfigOption(this, key, FishingBot.getI18n().t(description), Float.valueOf((float) ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isAssignableFrom(double.class)) {
-                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Double.valueOf((double) ReflectionUtils.getField(field, config)).intValue()));
+                addConfigOption(key, new IntegerConfigOption(this, key, FishingBot.getI18n().t(description), Double.valueOf((double) ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isAssignableFrom(long.class)) {
-                addConfigOption(key, new IntegerConfigOption(key, FishingBot.getI18n().t(description), Long.valueOf((long) ReflectionUtils.getField(field, config)).intValue()));
+                addConfigOption(key, new IntegerConfigOption(this, key, FishingBot.getI18n().t(description), Long.valueOf((long) ReflectionUtils.getField(field, config)).intValue()));
             } else if (field.getType().isEnum()) {
                 Enum currEnum = (Enum) ReflectionUtils.getField(field, config);
-                addConfigOption(key, new EnumConfigOption(key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), (Enum[]) currEnum.getDeclaringClass().getEnumConstants()));
+                addConfigOption(key, new EnumConfigOption(this, key, FishingBot.getI18n().t(description), ReflectionUtils.getField(field, config).toString(), (Enum[]) currEnum.getDeclaringClass().getEnumConstants()));
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].equals(String.class)) {
                 List<String> content = (List<String>) ReflectionUtils.getField(field, config);
-                addConfigOption(key, new StringArrayConfigOption(key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
+                addConfigOption(key, new StringArrayConfigOption(this, key, FishingBot.getI18n().t(description), content.toArray(new String[content.size()]), window));
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].equals(Timer.class)) {
                 List<Timer> content = (List<Timer>) ReflectionUtils.getField(field, config);
-                addConfigOption(key, new TimersConfigOption(key, FishingBot.getI18n().t(description), content, window));
+                addConfigOption(key, new TimersConfigOption(this, key, FishingBot.getI18n().t(description), content, window));
             } else if (field.getType().isAssignableFrom(List.class) && ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].equals(EjectionRule.class)) {
                 List<EjectionRule> content = (List<EjectionRule>) ReflectionUtils.getField(field, config);
-                addConfigOption(key, new EjectionRulesOption(key, FishingBot.getI18n().t(description), content, window));
+                addConfigOption(key, new EjectionRulesOption(this, key, FishingBot.getI18n().t(description), content, window));
             }
         }
     }
@@ -198,10 +201,10 @@ public class ConfigGUI {
             } else if (lastSubCatPane != null && lastSubCatPane.contains(currPath.toString())) {
                 lastSubCatPane = (TitledPaneOption) lastSubCatPane.get(currPath.toString()).get();
             } else if (lastSubCatPane == null) {
-                configOptions.put(category, new ActivateableTitledPaneOption(currPath.toString(), configOption.getDescription(), new VBox(5), (boolean) configOption.getValue()));
+                configOptions.put(category, new ActivateableTitledPaneOption(this, currPath.toString(), configOption.getDescription(), new VBox(5), (boolean) configOption.getValue()));
                 return;
             } else {
-                lastSubCatPane.getContent().getChildren().add(new ActivateableTitledPaneOption(currPath.toString(), configOption.getDescription(), new VBox(5), (boolean) configOption.getValue()));
+                lastSubCatPane.getContent().getChildren().add(new ActivateableTitledPaneOption(this, currPath.toString(), configOption.getDescription(), new VBox(5), (boolean) configOption.getValue()));
                 return;
             }
             currPath.append(".");

@@ -27,7 +27,6 @@
     -fx-text-fill: #efefef;
     -fx-background-color: -fx-default-button;
 }
-
 .text-input:focused {
     -fx-highlight-text-fill: ladder(
         -fx-highlight-fill,
@@ -47,12 +46,20 @@
     -fx-background-color: #383838;
     -fx-text-fill: #efefef;
 }
-
 .list-cell:even {
     -fx-background-color: #3b3b3b;
 }
-
 .list-cell:filled:selected:focused, .list-cell:filled:selected {
     -fx-background-color: linear-gradient(#328BDB 0%, #207BCF 25%, #1973C9 75%, #0A65BF 100%);
     -fx-text-fill: #efefef;
+}
+
+.header-panel {
+    -fx-background-color: #383838;
+    -fx-border-style: hidden hidden solid hidden;
+    -fx-border-width: 2;
+    -fx-border-color: linear-gradient(#181818 0%, #3c3c3c 100%)
+}
+#authorizationText > Text {
+    -fx-fill: #efefef;
 }

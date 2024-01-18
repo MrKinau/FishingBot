@@ -9,8 +9,8 @@ public class RealmConfigOption extends ConfigOption {
 
     private BooleanConfigOption checkBox;
 
-    public RealmConfigOption(String key, String description, long value, ConfigGUI configGUI) {
-        super(key, description, value);
+    public RealmConfigOption(ConfigGUI configGui, String key, String description, long value, ConfigGUI configGUI) {
+        super(configGui, key, description, value);
 
         Optional<ConfigOption> serverIP = configGUI.getConfigOption("server.ip");
         Optional<ConfigOption> serverPort = configGUI.getConfigOption("server.port");
@@ -19,7 +19,7 @@ public class RealmConfigOption extends ConfigOption {
             serverPort.ifPresent(configOption -> configOption.setDisable(true));
         }
 
-        checkBox = new BooleanConfigOption(key + "-hidden", description, value >= 0, event -> {
+        checkBox = new BooleanConfigOption(getConfigGui(), key + "-hidden", description, value >= 0, event -> {
             serverIP.ifPresent(configOption -> configOption.setDisable(((CheckBox)event.getSource()).isSelected()));
             serverPort.ifPresent(configOption -> configOption.setDisable(((CheckBox)event.getSource()).isSelected()));
         });

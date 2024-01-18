@@ -67,9 +67,6 @@ public class FishingBot {
         }
         CustomPrintStream.enableForPackage("systems.kinau.fishingbot", getLog());
 
-        // start message
-        getLog().info("Using " + TITLE);
-
         // i18n pre init
 
         i18n = new I18n(Language.ENGLISH, PREFIX, true);

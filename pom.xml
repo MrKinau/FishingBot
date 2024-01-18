@@ -11,7 +11,7 @@
 
     <groupId>systems.kinau</groupId>
     <artifactId>FishingBot</artifactId>
-    <version>2.10.17</version>
+    <version>2.11.0</version>
     <name>FishingBot</name>
     <description>An AFK fishing bot for Minecraft</description>
 
@@ -98,6 +98,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Dansoftowner</groupId>
+            <artifactId>jSystemThemeDetector</artifactId>
+            <version>3.8</version>
         </dependency>
 
         <!-- ONESIX -->

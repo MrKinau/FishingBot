@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.io.config;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import systems.kinau.fishingbot.gui.Theme;
 import systems.kinau.fishingbot.i18n.Language;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
@@ -85,7 +86,7 @@ public class SettingsConfig implements Config {
     @Property(key = "misc.stucking-fix-enabled", description = "config-misc-stucking-fix-enabled") private boolean stuckingFixEnabled = true;
     @Property(key = "misc.prevent-rod-breaking", description = "config-misc-prevent-rod-breaking") private boolean preventRodBreaking = true;
     @Property(key = "misc.disable-rod-checking", description = "config-misc-disable-rod-checking") private boolean disableRodChecking = false;
-    @Property(key = "misc.dark-mode", description = "config-misc-dark-mode") private boolean darkMode = false;
+    @Property(key = "misc.theme", description = "config-misc-theme") @Setter private Theme theme = Theme.SYSTEM;
     @Property(key = "misc.gui-console-max-lines", description = "config-misc-gui-console-max-lines") private int guiConsoleMaxLines = 1000;
     @Property(key = "misc.language", description = "config-misc-language") private Language language = Language.getByLocale(Locale.getDefault());
     @Property(key = "misc.look-speed", description = "config-misc-look-speed") private int lookSpeed = 16;

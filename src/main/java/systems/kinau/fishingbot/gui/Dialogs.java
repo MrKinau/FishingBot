@@ -185,6 +185,7 @@ public class Dialogs {
             codeText.setAlignment(Pos.CENTER);
 
             TextFlow flow = new TextFlow();
+            flow.setId("authorizationText");
             if (texts.size() >= 1)
                 flow.getChildren().add(texts.get(0));
             flow.getChildren().add(codeText);

@@ -123,6 +123,9 @@ public class Bot {
             return;
         }
 
+        // start message
+        FishingBot.getLog().info("Using " + FishingBot.TITLE);
+
         // log config location
         FishingBot.getI18n().info("config-loaded-from", new File(getConfig().getPath()).getAbsolutePath());
 

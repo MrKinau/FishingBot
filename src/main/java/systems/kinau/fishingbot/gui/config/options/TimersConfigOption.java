@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.gui.config.ConfigGUI;
 import systems.kinau.fishingbot.modules.timer.Timer;
 
 import java.util.*;
@@ -21,8 +22,8 @@ public class TimersConfigOption extends ConfigOption {
     private VBox root;
     private List<EditableTimer> timers = new ArrayList<>();
 
-    public TimersConfigOption(String key, String description, List<Timer> value, Stage primaryStage) {
-        super(key, description, value);
+    public TimersConfigOption(ConfigGUI configGui, String key, String description, List<Timer> value, Stage primaryStage) {
+        super(configGui, key, description, value);
         this.root = new VBox(5);
         setValue(createValue());
         Button addTimerButton = new Button(FishingBot.getI18n().t("config-auto-timer-add-timer"));
@@ -51,9 +52,9 @@ public class TimersConfigOption extends ConfigOption {
         titledPane.setContent(content);
         titledPane.setExpanded(expanded);
 
-        IntegerConfigOption unitsOption = new IntegerConfigOption("auto.timer.units", FishingBot.getI18n().t("config-auto-timer-units"), timer.getUnits());
-        EnumConfigOption timeUnitOption = new EnumConfigOption("auto.timer.timeunit", FishingBot.getI18n().t("config-auto-auto-timer-time-unit"), timer.getTimeUnit().name(), TimeUnit.values());
-        StringArrayConfigOption commandsOption = new StringArrayConfigOption("auto.timer.commands", FishingBot.getI18n().t("config-auto-auto-command-on-respawn-commands"), timer.getCommands().toArray(new String[0]), primaryStage);
+        IntegerConfigOption unitsOption = new IntegerConfigOption(getConfigGui(), "auto.timer.units", FishingBot.getI18n().t("config-auto-timer-units"), timer.getUnits());
+        EnumConfigOption timeUnitOption = new EnumConfigOption(getConfigGui(), "auto.timer.timeunit", FishingBot.getI18n().t("config-auto-auto-timer-time-unit"), timer.getTimeUnit().name(), TimeUnit.values());
+        StringArrayConfigOption commandsOption = new StringArrayConfigOption(getConfigGui(), "auto.timer.commands", FishingBot.getI18n().t("config-auto-auto-command-on-respawn-commands"), timer.getCommands().toArray(new String[0]), primaryStage);
         Button deleteTimer = new Button(FishingBot.getI18n().t("config-auto-timer-delete-timer"));
 
         timers.add(new EditableTimer(timer, unitsOption, timeUnitOption, commandsOption));

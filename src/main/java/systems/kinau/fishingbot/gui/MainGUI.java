@@ -51,9 +51,13 @@ public class MainGUI extends Application {
     }
 
     public static void setStyle(ObservableList<String> stylesheets) {
-        stylesheets.add("mainstyle.css");
-        if (FishingBot.getInstance().getConfig().isDarkMode()) {
-            stylesheets.add("darkstyle.css");
+        if (!stylesheets.contains("mainstyle.css"))
+            stylesheets.add("mainstyle.css");
+        if (FishingBot.getInstance().getConfig().getTheme().isDarkMode()) {
+            if (!stylesheets.contains("darkstyle.css"))
+                stylesheets.add("darkstyle.css");
+        } else {
+            stylesheets.remove("darkstyle.css");
         }
     }
 }

@@ -287,10 +287,6 @@ public class GUIController implements Listener {
                 if (item.getName().equalsIgnoreCase(event.getLootItem().getName())) {
                     item.setCount(event.getLootItem().getCount());
                     existing.set(true);
-                    Platform.runLater(() -> {
-                        lootCountColumn.setVisible(false);
-                        lootCountColumn.setVisible(true);
-                    });
                 }
             });
 
@@ -371,10 +367,6 @@ public class GUIController implements Listener {
                 if (item.getName().equalsIgnoreCase(enchantment.getEnchantmentType().getName()) && item.getLevel() == enchantment.getLevel()) {
                     item.setCount(item.getCount() + 1);
                     exists.set(true);
-                    Platform.runLater(() -> {
-                        table.getColumns().get(2).setVisible(false);
-                        table.getColumns().get(2).setVisible(true);
-                    });
                 }
             });
             if (!exists.get())

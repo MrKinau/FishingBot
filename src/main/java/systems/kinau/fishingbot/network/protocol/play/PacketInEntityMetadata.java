@@ -9,7 +9,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Enchantment;
-import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.enums.MaterialMc18;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
@@ -37,8 +36,6 @@ public class PacketInEntityMetadata extends Packet {
         try {
             int eid = readVarInt(in);
             if (!FishingBot.getInstance().getCurrentBot().getFishingModule().isTrackingNextEntityMeta() && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
-                return;
-            if (FishingBot.getInstance().getCurrentBot().getFishingModule().containsPossibleItem(eid) && FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID() != eid)
                 return;
             if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
                 readWatchableObjects18(in, networkHandler, eid, protocolId);
@@ -114,7 +111,7 @@ public class PacketInEntityMetadata extends Packet {
                     return;
                 List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                 String name = ItemUtils.getItemName(slot);
-                FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().updateCaught(eid, name, slot.getItemId(), enchantments, -1, -1, -1);
                 return;
             }
             case 8: {
@@ -254,7 +251,7 @@ public class PacketInEntityMetadata extends Packet {
                     return;
                 List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                 String name = ItemUtils.getItemName(slot);
-                FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().updateCaught(eid, name, slot.getItemId(), enchantments, -1, -1, -1);
                 return;
             }
             case 7: {
@@ -378,7 +375,7 @@ public class PacketInEntityMetadata extends Packet {
 
                     String name = ItemUtils.getItemName(slot);
 
-                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().updateCaught(eid, name, slot.getItemId(), enchantments, -1, -1, -1);
 
                     return;
                 }
@@ -497,7 +494,7 @@ public class PacketInEntityMetadata extends Packet {
                         return;
                     String name = ItemUtils.getItemName(slot);
                     List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
-                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                    FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().updateCaught(eid, name, slot.getItemId(), enchantments, -1, -1, -1);
                     return;
                 }
                 case 6: {
@@ -578,7 +575,7 @@ public class PacketInEntityMetadata extends Packet {
                         Slot slot = readSlot(in, protocolId);
                         String name = MaterialMc18.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
                         List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
-                        FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().add(new Item(eid, slot.getItemId(), name, enchantments, -1, -1, -1));
+                        FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().updateCaught(eid, name, slot.getItemId(), enchantments, -1, -1, -1);
 
                         return;
                     }

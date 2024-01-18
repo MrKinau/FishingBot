@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.gui.MainGUI;
+import systems.kinau.fishingbot.gui.config.ConfigGUI;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
@@ -22,8 +23,8 @@ public class EjectionRulesOption extends ConfigOption {
     private VBox root;
     private List<EditableEjectionRule> ejectionRules;
 
-    public EjectionRulesOption(String key, String description, List<EjectionRule> value, Stage primaryStage) {
-        super(key, description, value);
+    public EjectionRulesOption(ConfigGUI configGui, String key, String description, List<EjectionRule> value, Stage primaryStage) {
+        super(configGui, key, description, value);
         this.ejectionRules = new ArrayList<>();
         for (EjectionRule ejectionRule : value) {
             ejectionRules.add(new EditableEjectionRule(ejectionRule, null, null, null));
@@ -58,9 +59,9 @@ public class EjectionRulesOption extends ConfigOption {
         titledPane.setContent(content);
         titledPane.setExpanded(expanded);
 
-        EnumConfigOption directionOption = new EnumConfigOption("auto.auto-eject.rules.direction", FishingBot.getI18n().t("config-auto-auto-eject-direction"), ejectionRule.getDirection().name(), LocationUtils.Direction.values());
-        EnumConfigOption ejectionType = new EnumConfigOption("auto.auto-eject.rules.ejection-type", FishingBot.getI18n().t("config-auto-auto-eject-ejection-type"), ejectionRule.getEjectionType().name(), EjectionRule.EjectionType.values());
-        StringArrayConfigOption allowListOption = new StringArrayConfigOption("auto.auto-eject.rules.list", FishingBot.getI18n().t("config-auto-auto-eject-list"), ejectionRule.getAllowList().toArray(new String[0]), primaryStage);
+        EnumConfigOption directionOption = new EnumConfigOption(getConfigGui(), "auto.auto-eject.rules.direction", FishingBot.getI18n().t("config-auto-auto-eject-direction"), ejectionRule.getDirection().name(), LocationUtils.Direction.values());
+        EnumConfigOption ejectionType = new EnumConfigOption(getConfigGui(), "auto.auto-eject.rules.ejection-type", FishingBot.getI18n().t("config-auto-auto-eject-ejection-type"), ejectionRule.getEjectionType().name(), EjectionRule.EjectionType.values());
+        StringArrayConfigOption allowListOption = new StringArrayConfigOption(getConfigGui(), "auto.auto-eject.rules.list", FishingBot.getI18n().t("config-auto-auto-eject-list"), ejectionRule.getAllowList().toArray(new String[0]), primaryStage);
         Button deleteRule = new Button(FishingBot.getI18n().t("config-auto-auto-eject-delete-rule"));
 
         deleteRule.setOnAction(event -> {

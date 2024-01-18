@@ -47,7 +47,7 @@ public class Main {
                 String[] finalArgs = args;
                 new Thread(() -> {
                     try {
-//                        throw new IllegalArgumentException("lol");
+//                        if (true) throw new IllegalArgumentException("simulate error");
                         new MainGUI(finalArgs);
                         if (FishingBot.getInstance().getCurrentBot() != null) {
                             FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);

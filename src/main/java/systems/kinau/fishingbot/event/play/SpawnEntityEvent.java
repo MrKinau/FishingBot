@@ -14,9 +14,9 @@ public class SpawnEntityEvent extends Event {
 
     @Getter private int id;
     @Getter private int type;
-    @Getter private int x;
-    @Getter private int y;
-    @Getter private int z;
+    @Getter private double x;
+    @Getter private double y;
+    @Getter private double z;
     @Getter private byte yaw;
     @Getter private byte pitch;
     @Getter private int objectData;

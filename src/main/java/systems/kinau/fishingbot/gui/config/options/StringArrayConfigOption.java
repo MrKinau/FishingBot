@@ -16,6 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.gui.MainGUI;
+import systems.kinau.fishingbot.gui.config.ConfigGUI;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -23,8 +24,8 @@ import java.util.Optional;
 
 public class StringArrayConfigOption extends ConfigOption {
 
-    public StringArrayConfigOption(String key, String description, String[] values, Stage primaryStage) {
-        super(key, description, values);
+    public StringArrayConfigOption(ConfigGUI configGui, String key, String description, String[] values, Stage primaryStage) {
+        super(configGui, key, description, values);
 
         Label nameLabel = new Label(description);
         Button editButton = new Button(FishingBot.getI18n().t("ui-menu-edit"));

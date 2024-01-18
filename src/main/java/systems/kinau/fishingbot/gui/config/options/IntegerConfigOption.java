@@ -5,17 +5,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.util.StringConverter;
+import systems.kinau.fishingbot.gui.config.ConfigGUI;
 
 public class IntegerConfigOption extends ConfigOption {
 
     private Spinner<Integer> spinner;
 
-    public IntegerConfigOption(String key, String description, int value) {
-        this(key, description, value, null);
+    public IntegerConfigOption(ConfigGUI configGui, String key, String description, int value) {
+        this(configGui, key, description, value, null);
     }
 
-    public IntegerConfigOption(String key, String description, int value, ChangeListener<Integer> onClick) {
-        super(key, description, value);
+    public IntegerConfigOption(ConfigGUI configGui, String key, String description, int value, ChangeListener<Integer> onClick) {
+        super(configGui, key, description, value);
         Label nameLabel = new Label(description);
         spinner = new Spinner<>(Integer.MIN_VALUE, Integer.MAX_VALUE, value);
         spinner.setEditable(true);
