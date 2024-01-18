@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.gui.MainGUI;
 import systems.kinau.fishingbot.modules.ejection.EjectionRule;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
@@ -38,6 +39,7 @@ public class EjectionRulesOption extends ConfigOption {
 
         addRuleButton.setOnAction(event -> {
             TextInputDialog inputDialog = new TextInputDialog();
+            MainGUI.setStyle(inputDialog.getDialogPane().getStylesheets());
             inputDialog.setTitle("FishingBot - Config");
             inputDialog.setHeaderText(FishingBot.getI18n().t("config-auto-auto-eject-new-rule-name"));
             Optional<String> result = inputDialog.showAndWait();

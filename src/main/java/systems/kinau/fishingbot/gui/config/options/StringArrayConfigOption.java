@@ -15,6 +15,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.gui.MainGUI;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -48,6 +49,7 @@ public class StringArrayConfigOption extends ConfigOption {
 
             addButton.setOnAction(event1 -> {
                 TextInputDialog inputDialog = new TextInputDialog();
+                MainGUI.setStyle(inputDialog.getDialogPane().getStylesheets());
                 inputDialog.setTitle("FishingBot - Config");
                 inputDialog.setHeaderText(FishingBot.getI18n().t("ui-array-input-header"));
                 Optional<String> result = inputDialog.showAndWait();
@@ -85,6 +87,7 @@ public class StringArrayConfigOption extends ConfigOption {
             rootPane.setRight(controlsPane);
 
             Scene scene = new Scene(rootPane, 300, 400);
+            MainGUI.setStyle(scene.getStylesheets());
 
             Stage window = new Stage();
             window.setTitle("FishingBot - Config");

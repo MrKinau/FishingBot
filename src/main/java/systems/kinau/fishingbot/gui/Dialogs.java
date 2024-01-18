@@ -43,6 +43,7 @@ public class Dialogs {
             }
 
             dialog.setTitle(FishingBot.TITLE);
+            MainGUI.setStyle(dialog.getDialogPane().getStylesheets());
 
             Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
             stage.setAlwaysOnTop(true);
@@ -73,6 +74,7 @@ public class Dialogs {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.NO, ButtonType.YES);
             alert.setTitle(FishingBot.TITLE);
+            MainGUI.setStyle(alert.getDialogPane().getStylesheets());
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-realms-tos-header"));
             alert.setContentText(FishingBot.getI18n().t("dialog-realms-tos-content", "https://www.minecraft.net/en-us/realms/terms"));
@@ -102,6 +104,7 @@ public class Dialogs {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle(FishingBot.TITLE);
+            MainGUI.setStyle(alert.getDialogPane().getStylesheets());
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-about-header"));
             FlowPane fp = new FlowPane();
@@ -130,6 +133,7 @@ public class Dialogs {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle(FishingBot.TITLE);
+            MainGUI.setStyle(alert.getDialogPane().getStylesheets());
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-credentials-invalid-header"));
             FlowPane fp = new FlowPane();
@@ -158,6 +162,7 @@ public class Dialogs {
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle(FishingBot.TITLE);
+            MainGUI.setStyle(alert.getDialogPane().getStylesheets());
             alert.getButtonTypes().setAll(ButtonType.CANCEL);
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-authorization-header"));
@@ -176,7 +181,7 @@ public class Dialogs {
 
             TextField codeText = new TextField(code);
             codeText.setEditable(false);
-            codeText.setPrefWidth(95);
+            codeText.setPrefWidth(100);
             codeText.setAlignment(Pos.CENTER);
 
             TextFlow flow = new TextFlow();
@@ -221,6 +226,7 @@ public class Dialogs {
         Platform.runLater(() -> {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle(FishingBot.TITLE);
+            MainGUI.setStyle(alert.getDialogPane().getStylesheets());
 
             alert.setHeaderText(FishingBot.getI18n().t("dialog-authorization-failed-header"));
             FlowPane flowPane = new FlowPane();

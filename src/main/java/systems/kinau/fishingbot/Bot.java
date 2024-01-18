@@ -115,6 +115,7 @@ public class Bot {
             FishingBot.getLog().removeHandler(Arrays.stream(FishingBot.getLog().getHandlers()).filter(handler -> handler instanceof FileHandler).findAny().orElse(null));
             FishingBot.getLog().addHandler(fh = new FileHandler(logsFolder.getPath() + "/log%g.log", 0 /* 0 = infinity */, getConfig().getLogCount()));
             fh.setFormatter(new LogFormatter());
+            fh.setEncoding("UTF-8");
         } catch (IOException e) {
             FishingBot.getI18n().severe("log-failed-creating-log");
             FishingBot.getInstance().getCurrentBot().setRunning(false);
