@@ -11,14 +11,15 @@
 
     <groupId>systems.kinau</groupId>
     <artifactId>FishingBot</artifactId>
-    <version>2.11.0</version>
+    <version>2.11.1</version>
     <name>FishingBot</name>
     <description>An AFK fishing bot for Minecraft</description>
 
     <properties>
         <jar.finalName>Fishingbot</jar.finalName>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>17.0.2</javafx.version>
+        <javafx.version>16-ea+7</javafx.version>
+        <javafx.version.new>21.0.2</javafx.version.new>
     </properties>
 
     <repositories>
@@ -165,25 +166,25 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
+            <version>${javafx.version.new}</version>
             <classifier>mac-aarch64</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
+            <version>${javafx.version.new}</version>
             <classifier>mac-aarch64</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>${javafx.version}</version>
+            <version>${javafx.version.new}</version>
             <classifier>mac-aarch64</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
+            <version>${javafx.version.new}</version>
             <classifier>mac-aarch64</classifier>
         </dependency>
     </dependencies>
