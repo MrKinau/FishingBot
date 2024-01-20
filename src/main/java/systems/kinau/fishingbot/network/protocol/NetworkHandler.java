@@ -1135,4 +1135,8 @@ public class NetworkHandler {
             e.printStackTrace();
         }
     }
+
+    public boolean isEncrypted() {
+        return outputEncrypted;
+    }
 }
