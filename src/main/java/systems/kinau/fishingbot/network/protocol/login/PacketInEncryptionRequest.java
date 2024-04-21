@@ -13,6 +13,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.login.EncryptionRequestEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
 
@@ -26,6 +27,7 @@ public class PacketInEncryptionRequest extends Packet {
     @Getter private String serverId;
     @Getter private PublicKey publicKey;
     @Getter private byte[] verifyToken;
+    @Getter private boolean shouldAuthenticate;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException { }
@@ -36,6 +38,9 @@ public class PacketInEncryptionRequest extends Packet {
         this.publicKey = CryptManager.decodePublicKey(readBytesFromStream(in));
         this.verifyToken = readBytesFromStream(in);
 
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EncryptionRequestEvent(serverId, publicKey, verifyToken));
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_2)
+            this.shouldAuthenticate = in.readBoolean();
+
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EncryptionRequestEvent(serverId, publicKey, verifyToken, shouldAuthenticate));
     }
 }

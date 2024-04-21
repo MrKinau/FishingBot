@@ -39,6 +39,7 @@ public class CompoundTag extends Tag<Map<String, ? extends Tag<?>>> {
                     break;
                 } else {
                     Tag<?> tag = readNextNamedTag(in, type);
+                    System.out.println(tag.getName());
                     value.put(tag.getName(), tag);
                 }
             }

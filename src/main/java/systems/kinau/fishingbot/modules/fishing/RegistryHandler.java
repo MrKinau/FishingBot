@@ -33,6 +33,7 @@ public class RegistryHandler {
     public static Map<Integer, String> itemsMap_1_19_4 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_20 = new HashMap<>();
     public static Map<Integer, String> itemsMap_1_20_3 = new HashMap<>();
+    public static Map<Integer, String> itemsMap_1_20_5 = new HashMap<>();
 
     public static Map<String, Integer> entitiesMap_1_14 = new HashMap<>();
     public static Map<String, Integer> entitiesMap_1_15 = new HashMap<>();
@@ -45,6 +46,7 @@ public class RegistryHandler {
     public static Map<String, Integer> entitiesMap_1_19_4 = new HashMap<>();
     public static Map<String, Integer> entitiesMap_1_20 = new HashMap<>();
     public static Map<String, Integer> entitiesMap_1_20_3 = new HashMap<>();
+    public static Map<String, Integer> entitiesMap_1_20_5 = new HashMap<>();
 
     public RegistryHandler(int protocolId) {
         JsonObject root = null;
@@ -112,9 +114,13 @@ public class RegistryHandler {
                     root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20.json"))).getAsJsonObject();
                     break;
                 }
-                case ProtocolConstants.MINECRAFT_1_20_3:
-                default: {
+                case ProtocolConstants.MINECRAFT_1_20_3: {
                     root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20_3.json"))).getAsJsonObject();
+                    break;
+                }
+                case ProtocolConstants.MINECRAFT_1_20_5_RC_2:
+                default: {
+                    root = new JsonParser().parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("registries_1_20_5.json"))).getAsJsonObject();
                     break;
                 }
             }
@@ -188,8 +194,10 @@ public class RegistryHandler {
             return itemsMap_1_19_4;
         else if (protocol <= ProtocolConstants.MINECRAFT_1_20_2)
             return itemsMap_1_20;
-        else
+        else if (protocol == ProtocolConstants.MINECRAFT_1_20_3)
             return itemsMap_1_20_3;
+        else
+            return itemsMap_1_20_5;
     }
 
     public static Map<String, Integer> getEntitiesMap(int protocol) {
@@ -213,7 +221,9 @@ public class RegistryHandler {
             return entitiesMap_1_19_3;
         else if (protocol <= ProtocolConstants.MINECRAFT_1_20_2)
             return entitiesMap_1_20;
-        else
+        else if (protocol == ProtocolConstants.MINECRAFT_1_20_3)
             return entitiesMap_1_20_3;
+        else
+            return entitiesMap_1_20_5;
     }
 }

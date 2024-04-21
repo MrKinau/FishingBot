@@ -10,8 +10,10 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
+import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
@@ -253,7 +255,35 @@ public abstract class Packet {
     }
 
     public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_2) {
+            int count = readVarInt(input);
+            if (count < 0) return Slot.EMPTY;
+
+            int itemId = readVarInt(input);
+
+            int presentObjectCount = readVarInt(input);
+            int emptyObjectCount = readVarInt(input);
+            if (presentObjectCount == 0 && emptyObjectCount == 0) return new Slot(true, itemId, (byte) count, -1, null);
+
+            //TODO: Create Registry for all DataComponentType (automatically warn if new types are available, use registries_1_20_5)
+            //TODO: Create DataComponentType
+            //TODO: Read Data based of DataComponentType codec
+            //TODO: Replace all NBT methods with item components
+
+            FishingBot.getLog().info("readSlot: " + RegistryHandler.getItemName(itemId, protocolId) + " / " + presentObjectCount + " / " + emptyObjectCount + " / " + count);
+
+            for (int i = 0; i < presentObjectCount; i++) {
+                int dataComponentType = readVarInt(input);
+                FishingBot.getLog().info("dataComponentType (present) = " + dataComponentType);
+            }
+
+            for (int i = 0; i < emptyObjectCount; i++) {
+                int dataComponentType = readVarInt(input);
+                FishingBot.getLog().info("dataComponentType (empty) = " + dataComponentType);
+            }
+
+            return new Slot(true, itemId, (byte) count, -1, null);
+        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
             boolean present = input.readBoolean();
             if (present) {
                 int itemId = readVarInt(input);
