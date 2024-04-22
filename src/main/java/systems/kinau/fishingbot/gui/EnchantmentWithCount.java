@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+@Getter
 @Data
 @AllArgsConstructor
-public class Enchantment {
+public class EnchantmentWithCount {
 
-    @Getter private String name;
-    @Getter private short level;
-    @Getter private int count;
+    private String name;
+    private int level;
+    private int count;
 
 }

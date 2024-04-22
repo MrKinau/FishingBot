@@ -60,7 +60,6 @@ public class TagRegistry {
     }
 
     public static <T extends Tag<?>> T createTag(byte id) {
-        System.out.println("createTag: " + id + " " + registeredTags.get(id).get().getClass().getSimpleName());
         return (T) registeredTags.get(id).get();
     }
 

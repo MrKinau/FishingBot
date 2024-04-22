@@ -8,7 +8,7 @@ package systems.kinau.fishingbot.enums;
 /**
  * An enum of all material IDs accepted by the official server and client
  */
-public enum MaterialMc18 {
+public enum LegacyMaterial {
     AIR(0, 0),
     STONE(1),
     GRASS(2),
@@ -359,17 +359,17 @@ public enum MaterialMc18 {
     int id;
     short durability;
     int maxStack;
-    private static MaterialMc18[] byId = new MaterialMc18[2267];
+    private static LegacyMaterial[] byId = new LegacyMaterial[2267];
 
-    private MaterialMc18(final int id) {
+    private LegacyMaterial(final int id) {
         this(id, 64);
     }
 
-    private MaterialMc18(final int id, final int stack) {
+    private LegacyMaterial(final int id, final int stack) {
         this(id, stack, 1);
     }
 
-    private MaterialMc18(final int id, final int stack, final int durability) {
+    private LegacyMaterial(final int id, final int stack, final int durability) {
         this.id = id;
         this.durability = (short) durability;
         this.maxStack = stack;
@@ -454,7 +454,7 @@ public enum MaterialMc18 {
      * @param id ID of the material to get
      * @return Material if found, or null
      */
-    public static MaterialMc18 getMaterial(final int id) {
+    public static LegacyMaterial getMaterial(final int id) {
         if (byId.length > id && id >= 0) {
             return byId[id];
         } else {
@@ -485,7 +485,7 @@ public enum MaterialMc18 {
 
 
     static {
-        for (MaterialMc18 material : values()) {
+        for (LegacyMaterial material : values()) {
             if (byId.length > material.id) {
                 byId[material.id] = material;
             }

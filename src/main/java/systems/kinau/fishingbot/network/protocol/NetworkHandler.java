@@ -12,6 +12,7 @@ import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.common.*;
 import systems.kinau.fishingbot.network.protocol.configuration.*;
+import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketOutHandshake;
 import systems.kinau.fishingbot.network.protocol.login.*;
 import systems.kinau.fishingbot.network.protocol.play.*;
@@ -26,6 +27,8 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 public class NetworkHandler {
+
+    @Getter @Setter private DataComponentRegistry dataComponentRegistry;
 
     @Getter private DataOutputStream out;
     @Getter private DataInputStream in;
@@ -51,6 +54,7 @@ public class NetworkHandler {
             this.in = new DataInputStream(FishingBot.getInstance().getCurrentBot().getSocket().getInputStream());
 
             this.state = State.HANDSHAKE;
+            this.dataComponentRegistry = new DataComponentRegistry();
             initPacketRegistries();
         } catch (IOException e) {
             e.printStackTrace();

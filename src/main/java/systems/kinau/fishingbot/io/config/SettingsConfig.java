@@ -73,7 +73,7 @@ public class SettingsConfig implements Config {
     @Property(key = "announces.discord.ping-on-enchantment.enabled", description = "config-announces-discord-ping-on-enchantment") private boolean pingOnEnchantmentEnabled = false;
     @Property(key = "announces.discord.ping-on-enchantment.mention", description = "config-announces-discord-ping-on-enchantment-mention") private String pingOnEnchantmentMention = "<@USER_ID>";
     @Property(key = "announces.discord.ping-on-enchantment.items", description = "config-announces-discord-ping-on-enchantment-items") private List<String> pingOnEnchantmentItems = Collections.singletonList("enchanted_book");
-    @Property(key = "announces.discord.ping-on-enchantment.enchantments", description = "config-announces-discord-ping-on-enchantment-enchantments") private List<String> pingOnEnchantmentEnchantments = Arrays.asList("MENDING","UNBREAKING");
+    @Property(key = "announces.discord.ping-on-enchantment.enchantments", description = "config-announces-discord-ping-on-enchantment-enchantments") private List<String> pingOnEnchantmentEnchantments = Arrays.asList("mending","unbreaking");
 
     @Property(key = "announces.announce-type-chat", description = "config-announces-announce-type-chat") private AnnounceType announceTypeChat = AnnounceType.ONLY_ENCHANTED;
     @Property(key = "announces.announce-type-console", description = "config-announces-announce-type-console") private AnnounceType announceTypeConsole = AnnounceType.ALL;

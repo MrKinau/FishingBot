@@ -6,6 +6,7 @@ package systems.kinau.fishingbot.io.config;
 
 import com.google.gson.*;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.enums.LegacyEnchantmentType;
 import systems.kinau.fishingbot.utils.ConvertUtils;
 import systems.kinau.fishingbot.utils.ReflectionUtils;
 
@@ -99,6 +100,34 @@ public class PropertyProcessor {
                     ReflectionUtils.setField(discordField2, config, value2);
                 }
             } catch (NoSuchFieldException ignore) { }
+            return true;
+        } else if (key.equals("announces.discord.ping-on-enchantment.enchantments") && value.isJsonArray()) {
+            JsonArray enchantmentsArray = value.getAsJsonArray();
+            List<String> enchantments = new ArrayList<>();
+            for (JsonElement element : enchantmentsArray) {
+                enchantments.add(element.getAsString());
+            }
+
+            boolean anyUpperCase = false;
+            for (String enchantment : enchantments) {
+                for (char c : enchantment.toCharArray()) {
+                    if (Character.isUpperCase(c)) {
+                        anyUpperCase = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!anyUpperCase)
+                return false;
+
+            List<String> newNames = new ArrayList<>();
+            for (String enchantment : enchantments) {
+                try {
+                    newNames.add(LegacyEnchantmentType.valueOf(enchantment).getName());
+                } catch (Throwable ignore) {}
+            }
+            ReflectionUtils.setField(field, config, newNames);
             return true;
         }
         return false;

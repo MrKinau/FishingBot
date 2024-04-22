@@ -33,7 +33,7 @@ public class PacketInWindowItems extends Packet {
         this.slots = new ArrayList<>();
         int count = protocolId >= ProtocolConstants.MINECRAFT_1_17_1 ? readVarInt(in) : in.readShort();
         for (int i = 0; i < count; i++) {
-            this.slots.add(readSlot(in, protocolId));
+            this.slots.add(readSlot(in, protocolId, networkHandler.getDataComponentRegistry()));
         }
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateWindowItemsEvent(windowId, slots));
     }

@@ -25,7 +25,6 @@ import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.modules.discord.DiscordModule;
 import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
-import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.modules.timer.TimerModule;
 import systems.kinau.fishingbot.network.mojangapi.MojangAPI;
 import systems.kinau.fishingbot.network.mojangapi.Realm;
@@ -352,9 +351,6 @@ public class Bot {
 
                 if (FishingBot.getInstance().getMainGUIController() != null && !getEventManager().isRegistered(FishingBot.getInstance().getMainGUIController()))
                     getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
-
-                // registry handler
-                new RegistryHandler(getServerProtocol());
 
                 // enable required modules
 

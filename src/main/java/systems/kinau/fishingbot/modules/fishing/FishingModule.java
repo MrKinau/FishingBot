@@ -13,6 +13,7 @@ import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.bot.loot.LootItem;
+import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
@@ -56,25 +57,12 @@ public class FishingModule extends Module implements Runnable, Listener {
     public FishingModule(LootHistory savedLootHistory) {
         this.lootHistory = savedLootHistory;
         int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
-        if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
-            if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2)
-                BOBBER_ENTITY_TYPE = 90;
-            else
-                BOBBER_ENTITY_TYPE = 101;
-        } else
-            BOBBER_ENTITY_TYPE = RegistryHandler.getEntityType("minecraft:fishing_bobber", FishingBot.getInstance().getCurrentBot().getServerProtocol());
+
+        BOBBER_ENTITY_TYPE = Registries.ENTITY_TYPE.getEntityType("minecraft:fishing_bobber", protocolId);
         if (BOBBER_ENTITY_TYPE == 0)
             BOBBER_ENTITY_TYPE = 90;
 
-        if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
-            if (protocolId <= ProtocolConstants.MINECRAFT_1_12_2)
-                ITEM_ENTITY_TYPE = 2;
-            else if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2)
-                ITEM_ENTITY_TYPE = 32;
-            else
-                ITEM_ENTITY_TYPE = 34;
-        } else
-            ITEM_ENTITY_TYPE = RegistryHandler.getEntityType("minecraft:item", FishingBot.getInstance().getCurrentBot().getServerProtocol());
+        ITEM_ENTITY_TYPE = Registries.ENTITY_TYPE.getEntityType("minecraft:item", protocolId);
         if (ITEM_ENTITY_TYPE == 0)
             ITEM_ENTITY_TYPE = 2;
     }
@@ -235,7 +223,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         if (!item.getEnchantments().isEmpty()) {
             for (Enchantment enchantment : item.getEnchantments()) {
                 String asText = "-> "
-                        + enchantment.getEnchantmentType().getName().toUpperCase()
+                        + enchantment.getCleanEnchantmentName()
                         + " "
                         + StringUtils.getRomanLevel(enchantment.getLevel());
                 announceEnchants.accept(asText);

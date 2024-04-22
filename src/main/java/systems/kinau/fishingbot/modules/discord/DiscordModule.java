@@ -16,7 +16,7 @@ import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.modules.Module;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
-import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
+import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.StringUtils;
 
 import java.text.NumberFormat;
@@ -68,7 +68,7 @@ public class DiscordModule extends Module implements Listener {
             return null;
         StringBuilder sb = new StringBuilder("**Enchantments:**\n");
         enchantments.forEach(enchantment -> {
-            sb.append(enchantment.getEnchantmentType().getName().toUpperCase());
+            sb.append(enchantment.getCleanEnchantmentName());
             if (enchantment.getLevel() > 1)
                 sb.append(" ").append(StringUtils.getRomanLevel(enchantment.getLevel()));
             sb.append("\n");
@@ -123,7 +123,7 @@ public class DiscordModule extends Module implements Listener {
                 List<String> enchantmentFilter = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentEnchantments();
                 boolean enchantmentMatches = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentEnchantments().isEmpty()
                         || event.getItem().getEnchantments().stream()
-                                .anyMatch(enchantment -> enchantmentFilter.contains(enchantment.getEnchantmentType().getName().toUpperCase()));
+                                .anyMatch(enchantment -> enchantmentFilter.contains(enchantment.getCleanEnchantmentName()));
                 if (itemMatches && enchantmentMatches) {
                     mention = FishingBot.getInstance().getCurrentBot().getConfig().getPingOnEnchantmentMention() + " ";
                 }
@@ -143,7 +143,7 @@ public class DiscordModule extends Module implements Listener {
                     event.getItem(),
                     FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeDiscord(),
                     s -> getDiscord().dispatchEmbed("**" + finalItemName + "**", getColor(event.getItem()),
-                            RegistryHandler.getImageUrl(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
+                            ItemUtils.getImageURL(event.getItem()), formatEnchantment(event.getItem().getEnchantments()),
                             getFooter(), DISCORD_DETAILS),
                     s -> { });
         }).start();
