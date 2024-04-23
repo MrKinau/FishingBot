@@ -138,7 +138,9 @@ public class AdventureModeComponent extends DataComponent {
     public static class BlockState implements DataComponentPart {
 
         private String name;
-        private String exactState, minState, maxState;
+        private String exactState;
+        private String minState;
+        private String maxState;
 
         @Override
         public void write(ByteArrayDataOutput out, int protocolId) {

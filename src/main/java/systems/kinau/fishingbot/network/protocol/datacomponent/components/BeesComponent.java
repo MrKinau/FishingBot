@@ -24,7 +24,10 @@ public class BeesComponent extends DataComponent {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-
+        Packet.writeVarInt(bees.size(), out);
+        for (Bee bee : bees) {
+            bee.write(out, protocolId);
+        }
     }
 
     @Override

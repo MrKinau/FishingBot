@@ -11,8 +11,12 @@ public class EmptyComponent extends DataComponent {
     }
 
     @Override
-    public void write(ByteArrayDataOutput out, int protocolId) {}
+    public void write(ByteArrayDataOutput out, int protocolId) {
+        // no content in empty component
+    }
 
     @Override
-    public void read(ByteArrayDataInputWrapper in, int protocolId) {}
+    public void read(ByteArrayDataInputWrapper in, int protocolId) {
+        // no content in empty component
+    }
 }
