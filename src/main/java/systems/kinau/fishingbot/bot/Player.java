@@ -245,7 +245,10 @@ public class Player implements Listener {
 
     private void executeChatCommand(String command, CommandExecutor commandExecutor) {
         if (mcCommandDispatcher == null) {
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5_RC_3)
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUnsignedChatCommand(command));
+            else
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
             return;
         }
 
@@ -253,7 +256,10 @@ public class Player implements Listener {
         Map<String, Pair<ArgumentType<?>, ParsedArgument<CommandExecutor, ?>>> arguments = CommandUtils.getArguments(context);
         boolean containsSignableArguments = arguments.values().stream().anyMatch(argument -> argument.getKey() instanceof MessageArgumentType);
         if (!containsSignableArguments) {
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5_RC_3)
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUnsignedChatCommand(command));
+            else
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
             return;
         }
         List<CryptManager.SignableArgument> signableArguments = arguments.entrySet().stream()

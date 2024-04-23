@@ -31,6 +31,7 @@ import systems.kinau.fishingbot.network.mojangapi.Realm;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.utils.MinecraftTranslations;
 import systems.kinau.fishingbot.utils.UUIDUtils;
 
 import java.io.File;
@@ -68,6 +69,8 @@ public class Bot {
     @Getter         private NetworkHandler net;
 
     @Getter @Setter private FishingModule fishingModule;
+
+    @Getter         private MinecraftTranslations minecraftTranslations;
 
     @Getter         private File logsFolder = new File(FishingBot.getExecutionDirectory(), "logs");
 
@@ -127,6 +130,9 @@ public class Bot {
 
         // log config location
         FishingBot.getI18n().info("config-loaded-from", new File(getConfig().getPath()).getAbsolutePath());
+
+        // init MinecraftTranslations
+        this.minecraftTranslations = new MinecraftTranslations();
 
         // authenticate player if online-mode is set
         if (getConfig().isOnlineMode()) {

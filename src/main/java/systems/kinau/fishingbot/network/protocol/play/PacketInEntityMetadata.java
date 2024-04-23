@@ -187,8 +187,15 @@ public class PacketInEntityMetadata extends Packet {
                 readVarInt(in);
                 break;
             }
-            case 18: {
-                readVarInt(in);
+            case 18: { // Particles (e.g. Potion effect color in LivingEntity (10))
+                if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) {
+                    int count = readVarInt(in);
+                    for (int i = 0; i < count; i++) {
+                        readVarInt(in);
+                    }
+                } else {
+                    readVarInt(in);
+                }
                 break;
             }
             case 19: {
@@ -211,6 +218,9 @@ public class PacketInEntityMetadata extends Packet {
             case 23: {
                 readVarInt(in);
                 break;
+            }
+            default: {
+                FishingBot.getLog().info("Unhandled type: " + type);
             }
         }
     }

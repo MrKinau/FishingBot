@@ -10,12 +10,10 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.bot.item.ComponentItemData;
 import systems.kinau.fishingbot.bot.item.NBTItemData;
-import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
@@ -272,14 +270,9 @@ public abstract class Packet {
 
             int presentObjectCount = readVarInt(input);
             int emptyObjectCount = readVarInt(input);
-            FishingBot.getLog().info("readSlot: " + Registries.ITEM.getItemName(itemId, protocolId) + " / " + presentObjectCount + " / " + emptyObjectCount + " / " + count);
 
             if (presentObjectCount == 0 && emptyObjectCount == 0)
                 return new Slot(true, itemId, (byte) count, -1, null);
-
-            //TODO: Create all Component Data classes:
-            //TODO: Unhandled data component 22 minecraft:tool
-            //TODO: Replace all NBT methods with item components
 
             List<DataComponent> presentComponents = new LinkedList<>();
             List<DataComponent> emptyComponents = new LinkedList<>();
@@ -291,7 +284,6 @@ public abstract class Packet {
                     dataComponent.read(input, protocolId);
                     presentComponents.add(dataComponent);
                 }
-                FishingBot.getLog().info("dataComponentType (present) = " + (dataComponent == null ? "null" : dataComponent.getClass().getSimpleName()) + " » " + Registries.DATA_COMPONENT_TYPE.getElement(dataComponentType, protocolId));
             }
 
             for (int i = 0; i < emptyObjectCount; i++) {
@@ -300,7 +292,6 @@ public abstract class Packet {
                 if (dataComponent != null) {
                     emptyComponents.add(dataComponent);
                 }
-                FishingBot.getLog().info("dataComponentType (empty) = " + (dataComponent == null ? "null" : dataComponent.getClass().getSimpleName()) + " » " + Registries.DATA_COMPONENT_TYPE.getElement(dataComponentType, protocolId));
             }
 
             return new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));

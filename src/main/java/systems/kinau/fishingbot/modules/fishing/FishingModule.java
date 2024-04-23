@@ -190,7 +190,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(str));
                 });
 
-        LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getEnchantments());
+        LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getDisplayName(), currentMax.getEnchantments());
 
         if (currentMax.getEnchantments() == null)
             currentMax.setEnchantments(new ArrayList<>());
@@ -199,7 +199,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
 
     private String stringify(Item item) {
-        return FishingBot.getI18n().t("module-fishing-caught-item", item.getName());
+        return FishingBot.getI18n().t("module-fishing-caught-item", item.getDisplayName());
     }
 
     public void logItem(Item item, AnnounceType noisiness, Consumer<String> announce, Consumer<String> announceEnchants) {
@@ -223,7 +223,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         if (!item.getEnchantments().isEmpty()) {
             for (Enchantment enchantment : item.getEnchantments()) {
                 String asText = "-> "
-                        + enchantment.getCleanEnchantmentName()
+                        + enchantment.getDisplayName()
                         + " "
                         + StringUtils.getRomanLevel(enchantment.getLevel());
                 announceEnchants.accept(asText);

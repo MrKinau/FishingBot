@@ -36,6 +36,7 @@ public class DataComponentRegistry {
         registry.put(19, NBTComponent::new); // Custom Data only Compound tag
         registry.put(20, FoodComponent::new);
         registry.put(21, EmptyComponent::new);
+        registry.put(22, ToolComponent::new);
         registry.put(23, EnchantmentsComponent::new);
         registry.put(24, DyedColorComponent::new);
         registry.put(25, IntComponent::new);

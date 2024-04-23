@@ -989,7 +989,7 @@ public class NetworkHandler {
         getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5_RC_3).registerPacket(0x70, PacketInEntityTeleport.class);
 
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5_RC_3).registerPacket(0x00, PacketOutTeleportConfirm.class);
-        //TODO Add non signable chat command arguments packet
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5_RC_3).registerPacket(0x04, PacketOutUnsignedChatCommand.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5_RC_3).registerPacket(0x05, PacketOutChatCommand.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5_RC_3).registerPacket(0x06, PacketOutChatMessage.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5_RC_3).registerPacket(0x07, PacketOutChatSessionUpdate.class);

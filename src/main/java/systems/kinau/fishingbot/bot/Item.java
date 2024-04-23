@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import systems.kinau.fishingbot.FishingBot;
 
 import java.util.List;
 
@@ -37,8 +38,11 @@ public class Item {
         return getMaxMot(motX, motY, motZ);
     }
 
+    public String getDisplayName() {
+        return FishingBot.getInstance().getCurrentBot().getMinecraftTranslations().getItemName(getName());
+    }
+
     public static int getMaxMot(int motX, int motY, int motZ) {
         return Math.abs(motX) + Math.abs(motY) + Math.abs(motZ);
-
     }
 }

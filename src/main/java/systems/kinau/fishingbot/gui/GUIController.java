@@ -364,13 +364,13 @@ public class GUIController implements Listener {
         enchantments.forEach(enchantment -> {
             AtomicBoolean exists = new AtomicBoolean(false);
             table.getItems().forEach(item -> {
-                if (item.getName().equalsIgnoreCase(enchantment.getCleanEnchantmentName()) && item.getLevel() == enchantment.getLevel()) {
+                if (item.getName().equalsIgnoreCase(enchantment.getDisplayName()) && item.getLevel() == enchantment.getLevel()) {
                     item.setCount(item.getCount() + 1);
                     exists.set(true);
                 }
             });
             if (!exists.get())
-                table.getItems().add(new EnchantmentWithCount(enchantment.getCleanEnchantmentName(), enchantment.getLevel(), 1));
+                table.getItems().add(new EnchantmentWithCount(enchantment.getDisplayName(), enchantment.getLevel(), 1));
         });
     }
 }
