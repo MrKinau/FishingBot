@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponent;
+import systems.kinau.fishingbot.network.protocol.datacomponent.components.EnchantmentsComponent;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ComponentItemData implements ItemData {
@@ -17,8 +18,11 @@ public class ComponentItemData implements ItemData {
 
     @Override
     public List<Enchantment> getEnchantments() {
-        //TODO
-        return Collections.emptyList();
+        return presentComponents.stream()
+                .filter(dataComponent -> dataComponent instanceof EnchantmentsComponent)
+                .map(dataComponent -> (EnchantmentsComponent) dataComponent)
+                .flatMap(enchantmentsComponent -> enchantmentsComponent.getEnchantments().stream())
+                .collect(Collectors.toList());
     }
 
     @Override

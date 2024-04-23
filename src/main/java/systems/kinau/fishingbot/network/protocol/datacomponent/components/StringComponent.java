@@ -7,21 +7,21 @@ import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @Getter
-public class DamageComponent extends DataComponent {
+public class StringComponent extends DataComponent {
 
-    private int damage = -1;
+    private String value;
 
-    public DamageComponent(int componentTypeId) {
+    public StringComponent(int componentTypeId) {
         super(componentTypeId);
     }
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        Packet.writeVarInt(damage, out);
+        Packet.writeString(value, out);
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        this.damage = Packet.readVarInt(in);
+        this.value = Packet.readString(in);
     }
 }

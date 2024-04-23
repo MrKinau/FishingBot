@@ -14,14 +14,14 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class PacketOutKnownResourcePacks extends Packet {
+public class PacketOutKnownPacks extends Packet {
 
-    @Getter private List<PacketInKnownResourcePacks.KnownResourcePack> knownResourcePacks = new LinkedList<>();
+    @Getter private List<PacketInKnownPacks.KnownPack> knownPacks = new LinkedList<>();
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        writeVarInt(knownResourcePacks.size(), out);
-        for (PacketInKnownResourcePacks.KnownResourcePack pack : knownResourcePacks) {
+        writeVarInt(knownPacks.size(), out);
+        for (PacketInKnownPacks.KnownPack pack : knownPacks) {
             writeString(pack.getNamespace(), out);
             writeString(pack.getId(), out);
             writeString(pack.getVersion(), out);

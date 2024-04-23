@@ -1,27 +1,26 @@
 package systems.kinau.fishingbot.network.protocol.datacomponent.components;
 
 import com.google.common.io.ByteArrayDataOutput;
-import lombok.Getter;
-import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponent;
+import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponentPart;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
-@Getter
-public class DamageComponent extends DataComponent {
+public class SimpleMapperComponent extends DataComponent {
 
-    private int damage = -1;
+    private final DataComponentPart part;
 
-    public DamageComponent(int componentTypeId) {
+    public SimpleMapperComponent(DataComponentPart part, int componentTypeId) {
         super(componentTypeId);
+        this.part = part;
     }
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        Packet.writeVarInt(damage, out);
+        part.write(out, protocolId);
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        this.damage = Packet.readVarInt(in);
+        part.read(in, protocolId);
     }
 }

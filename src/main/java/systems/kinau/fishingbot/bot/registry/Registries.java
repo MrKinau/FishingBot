@@ -39,7 +39,7 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_19_4);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_3);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_5_RC_2);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_5_RC_3);
     }
 
     public static ItemRegistry ITEM = new ItemRegistry();
@@ -87,7 +87,7 @@ public class Registries {
             case ProtocolConstants.MINECRAFT_1_19_4: return "registries_1_19_4.json";
             case ProtocolConstants.MINECRAFT_1_20: return "registries_1_20.json";
             case ProtocolConstants.MINECRAFT_1_20_3: return "registries_1_20_3.json";
-            case ProtocolConstants.MINECRAFT_1_20_5_RC_2: return "registries_1_20_5.json";
+            case ProtocolConstants.MINECRAFT_1_20_5_RC_3: return "registries_1_20_5.json";
             default: return null;
         }
     }

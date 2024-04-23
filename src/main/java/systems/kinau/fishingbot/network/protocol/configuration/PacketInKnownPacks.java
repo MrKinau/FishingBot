@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.event.configuration.KnownResourcePacksRequestedEvent;
+import systems.kinau.fishingbot.event.configuration.KnownPacksRequestedEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -15,9 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 @NoArgsConstructor
-public class PacketInKnownResourcePacks extends Packet {
+public class PacketInKnownPacks extends Packet {
 
-    @Getter private final List<KnownResourcePack> knownResourcePacks = new LinkedList<>();
+    @Getter private final List<KnownPack> knownPacks = new LinkedList<>();
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
@@ -31,13 +31,13 @@ public class PacketInKnownResourcePacks extends Packet {
             String name = readString(in);
             String id = readString(in);
             String version = readString(in);
-            knownResourcePacks.add(new KnownResourcePack(name, id, version));
+            knownPacks.add(new KnownPack(name, id, version));
         }
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new KnownResourcePacksRequestedEvent(knownResourcePacks));
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new KnownPacksRequestedEvent(knownPacks));
     }
 
     @Data
-    public static class KnownResourcePack {
+    public static class KnownPack {
         private final String namespace;
         private final String id;
         private final String version;

@@ -5,23 +5,24 @@ import lombok.Getter;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
+import systems.kinau.fishingbot.utils.nbt.NBTTag;
 
 @Getter
-public class DamageComponent extends DataComponent {
+public class NBTComponent extends DataComponent {
 
-    private int damage = -1;
+    private NBTTag tag;
 
-    public DamageComponent(int componentTypeId) {
+    public NBTComponent(int componentTypeId) {
         super(componentTypeId);
     }
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        Packet.writeVarInt(damage, out);
+        Packet.writeNBT(tag, out);
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        this.damage = Packet.readVarInt(in);
+        this.tag = Packet.readNBT(in, protocolId);
     }
 }

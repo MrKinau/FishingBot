@@ -1,8 +1,8 @@
 package systems.kinau.fishingbot.network.protocol.datacomponent.components;
 
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
 import systems.kinau.fishingbot.bot.Enchantment;
-import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
@@ -10,6 +10,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.util.LinkedList;
 import java.util.List;
 
+@Getter
 public class EnchantmentsComponent extends DataComponent {
 
     private List<Enchantment> enchantments;
@@ -23,8 +24,7 @@ public class EnchantmentsComponent extends DataComponent {
     public void write(ByteArrayDataOutput out, int protocolId) {
         Packet.writeVarInt(enchantments.size(), out);
         for (Enchantment enchantment : enchantments) {
-            Packet.writeVarInt(Registries.ENCHANTMENT.findKey(enchantment.getEnchantmentType(), protocolId), out);
-            Packet.writeVarInt(enchantment.getLevel(), out);
+            enchantment.write(out, protocolId);
         }
         out.writeBoolean(showInTooltip);
     }
@@ -34,9 +34,9 @@ public class EnchantmentsComponent extends DataComponent {
         this.enchantments = new LinkedList<>();
         int count = Packet.readVarInt(in);
         for (int i = 0; i < count; i++) {
-            int enchantmentId = Packet.readVarInt(in);
-            int level = Packet.readVarInt(in);
-            enchantments.add(new Enchantment(Registries.ENCHANTMENT.getEnchantmentName(enchantmentId, protocolId), level));
+            Enchantment enchantment = new Enchantment();
+            enchantment.read(in, protocolId);
+            enchantments.add(enchantment);
         }
         this.showInTooltip = in.readBoolean();
     }

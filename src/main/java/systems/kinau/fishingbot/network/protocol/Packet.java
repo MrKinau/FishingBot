@@ -231,7 +231,7 @@ public abstract class Packet {
     }
 
     public static void writeSlot(Slot slot, ByteArrayDataOutput output, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_2) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) {
             writeVarInt(slot.getItemCount(), output);
             if (slot.getItemCount() <= 0) return;
             writeVarInt(slot.getItemId(), output);
@@ -264,7 +264,7 @@ public abstract class Packet {
     }
 
     public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId, DataComponentRegistry dataComponentRegistry) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_2) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) {
             int count = readVarInt(input);
             if (count <= 0) return Slot.EMPTY;
 
@@ -272,13 +272,14 @@ public abstract class Packet {
 
             int presentObjectCount = readVarInt(input);
             int emptyObjectCount = readVarInt(input);
-            if (presentObjectCount == 0 && emptyObjectCount == 0) return new Slot(true, itemId, (byte) count, -1, null);
-
-            //TODO: Create DataComponentType
-            //TODO: Read Data based of DataComponentType codec
-            //TODO: Replace all NBT methods with item components
-
             FishingBot.getLog().info("readSlot: " + Registries.ITEM.getItemName(itemId, protocolId) + " / " + presentObjectCount + " / " + emptyObjectCount + " / " + count);
+
+            if (presentObjectCount == 0 && emptyObjectCount == 0)
+                return new Slot(true, itemId, (byte) count, -1, null);
+
+            //TODO: Create all Component Data classes:
+            //TODO: Unhandled data component 22 minecraft:tool
+            //TODO: Replace all NBT methods with item components
 
             List<DataComponent> presentComponents = new LinkedList<>();
             List<DataComponent> emptyComponents = new LinkedList<>();
@@ -290,7 +291,7 @@ public abstract class Packet {
                     dataComponent.read(input, protocolId);
                     presentComponents.add(dataComponent);
                 }
-                FishingBot.getLog().info("dataComponentType (present) = " + (dataComponent == null ? "null (" + dataComponentType + ")" : dataComponent.getClass().getSimpleName()));
+                FishingBot.getLog().info("dataComponentType (present) = " + (dataComponent == null ? "null" : dataComponent.getClass().getSimpleName()) + " » " + Registries.DATA_COMPONENT_TYPE.getElement(dataComponentType, protocolId));
             }
 
             for (int i = 0; i < emptyObjectCount; i++) {
@@ -299,7 +300,7 @@ public abstract class Packet {
                 if (dataComponent != null) {
                     emptyComponents.add(dataComponent);
                 }
-                FishingBot.getLog().info("dataComponentType (empty) = " + (dataComponent == null ? "null (" + dataComponentType + ")" : dataComponent.getClass().getSimpleName()));
+                FishingBot.getLog().info("dataComponentType (empty) = " + (dataComponent == null ? "null" : dataComponent.getClass().getSimpleName()) + " » " + Registries.DATA_COMPONENT_TYPE.getElement(dataComponentType, protocolId));
             }
 
             return new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));
