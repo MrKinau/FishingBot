@@ -1,6 +1,7 @@
 package systems.kinau.fishingbot.bot.item;
 
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Getter
 public class ComponentItemData implements ItemData {
 
     private final List<DataComponent> presentComponents;

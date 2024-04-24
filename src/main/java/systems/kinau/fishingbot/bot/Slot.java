@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.item.ComponentItemData;
 import systems.kinau.fishingbot.bot.item.ItemData;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.protocol.datacomponent.components.DamageComponent;
 
 @Getter
 @AllArgsConstructor
@@ -21,6 +23,17 @@ public class Slot {
     private byte itemCount;
     private int itemDamage;
     private ItemData itemData;
+
+    public int getItemDamage() {
+        if (itemDamage == -1 && itemData != null && itemData instanceof ComponentItemData) {
+            ComponentItemData componentItemData = (ComponentItemData) itemData;
+            return this.itemDamage = componentItemData.getPresentComponents().stream()
+                    .filter(dataComponent -> dataComponent instanceof DamageComponent)
+                    .mapToInt(dataComponent -> ((DamageComponent) dataComponent).getDamage())
+                    .findAny().orElse(-1);
+        }
+        return itemDamage;
+    }
 
     public void writeItemData(ByteArrayDataOutput output, int protocolId) {
         if (itemData == null) {
