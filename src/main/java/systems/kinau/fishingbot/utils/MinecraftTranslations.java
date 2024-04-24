@@ -28,10 +28,10 @@ public class MinecraftTranslations {
     }
 
     public String getEnchantmentName(String id) {
-        id = id.replace("minecraft:", "");
-        String translation = getTranslation("enchantment.minecraft." + id);
+        String idWithoutNamespace = id.replace("minecraft:", "");
+        String translation = getTranslation("enchantment.minecraft." + idWithoutNamespace);
         if (translation == null)
-            return id;
+            return idWithoutNamespace;
         return translation;
     }
 
