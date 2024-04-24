@@ -24,7 +24,16 @@ public class Registries {
         return registries;
     }
 
+    public static ItemRegistry ITEM;
+    public static EntityTypeRegistry ENTITY_TYPE;
+    public static EnchantmentRegistry ENCHANTMENT;
+    public static DataComponentTypeRegistry DATA_COMPONENT_TYPE;
+
     public static final Set<Integer> BUNDLED_REGISTRY_IDS = new HashSet<>();
+
+    private final Map<Integer, JsonObject> registryData = new HashMap<>();
+    private final JsonParser parser = new JsonParser();
+
     static {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_13);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_13_1);
@@ -40,15 +49,12 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_3);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_5);
+
+        ITEM = new ItemRegistry();
+        ENTITY_TYPE = new EntityTypeRegistry();
+        ENCHANTMENT = new EnchantmentRegistry();
+        DATA_COMPONENT_TYPE = new DataComponentTypeRegistry();
     }
-
-    public static ItemRegistry ITEM = new ItemRegistry();
-    public static EntityTypeRegistry ENTITY_TYPE = new EntityTypeRegistry();
-    public static EnchantmentRegistry ENCHANTMENT = new EnchantmentRegistry();
-    public static DataComponentTypeRegistry DATA_COMPONENT_TYPE = new DataComponentTypeRegistry();
-
-    private final Map<Integer, JsonObject> registryData = new HashMap<>();
-    private final JsonParser parser = new JsonParser();
 
     public Registries() {
         loadBundledRegistries();

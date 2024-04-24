@@ -5,6 +5,7 @@
 
 package systems.kinau.fishingbot.modules.fishing;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
@@ -32,27 +33,31 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class FishingModule extends Module implements Runnable, Listener {
 
-    private static int BOBBER_ENTITY_TYPE;
-    private static int ITEM_ENTITY_TYPE;
+    @Getter(AccessLevel.NONE)
+    private int BOBBER_ENTITY_TYPE;
+    @Getter(AccessLevel.NONE)
+    private int ITEM_ENTITY_TYPE;
 
-    @Getter private PossibleCaughtList possibleCaughtItems = new PossibleCaughtList();
+    private final PossibleCaughtList possibleCaughtItems = new PossibleCaughtList();
 
-    @Getter @Setter private Bobber currentBobber;
-    @Getter @Setter private short lastY = -1;
-    @Getter @Setter private boolean trackingNextBobberId = false;
-    @Getter @Setter private boolean noRodAvailable = false;
-    @Getter private boolean paused = false;
-    @Getter @Setter private boolean trackingNextEntityMeta = false;
-    @Getter private boolean waitForLookFinish = false;
-    @Getter @Setter private long lastFish = System.currentTimeMillis();
+    private Bobber currentBobber;
+    private short lastY = -1;
+    private boolean trackingNextBobberId = false;
+    private boolean noRodAvailable = false;
+    private boolean paused = false;
+    private boolean trackingNextEntityMeta = false;
+    private boolean waitForLookFinish = false;
+    private long lastFish = System.currentTimeMillis();
 
-    @Getter @Setter private int currentFishingRodValue;
+    private int currentFishingRodValue;
 
-    @Getter private Thread stuckingFix;
-    @Getter private boolean joined;
-    @Getter @Setter private LootHistory lootHistory;
+    private Thread stuckingFix;
+    private boolean joined;
+    private LootHistory lootHistory;
 
     public FishingModule(LootHistory savedLootHistory) {
         this.lootHistory = savedLootHistory;
