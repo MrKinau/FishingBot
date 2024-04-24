@@ -145,16 +145,16 @@ public class PacketInCommands extends Packet {
 
                 if (parserId == 40 && protocolId < ProtocolConstants.MINECRAFT_1_20_3) // time
                     in.readInt();
-                else if (parserId == 41 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3 && protocolId < ProtocolConstants.MINECRAFT_1_20_5_RC_3) // time
+                else if (parserId == 41 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3 && protocolId < ProtocolConstants.MINECRAFT_1_20_5) // time
                     in.readInt();
-                else if (parserId == 42 && protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) // time
+                else if (parserId == 42 && protocolId >= ProtocolConstants.MINECRAFT_1_20_5) // time
                     in.readInt();
 
                 if (parserId >= 41 && parserId <= 44 && protocolId < ProtocolConstants.MINECRAFT_1_20_3) // resource*
                     readString(in);
-                else if (parserId >= 42 && parserId <= 45 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3 && protocolId < ProtocolConstants.MINECRAFT_1_20_5_RC_3) // resource*
+                else if (parserId >= 42 && parserId <= 45 && protocolId >= ProtocolConstants.MINECRAFT_1_20_3 && protocolId < ProtocolConstants.MINECRAFT_1_20_5) // resource*
                     readString(in);
-                else if (parserId >= 43 && parserId <= 46 && protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) // resource*
+                else if (parserId >= 43 && parserId <= 46 && protocolId >= ProtocolConstants.MINECRAFT_1_20_5) // resource*
                     readString(in);
             }
             if (argumentType == null)

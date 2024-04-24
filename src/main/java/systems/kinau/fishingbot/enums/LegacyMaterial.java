@@ -477,7 +477,7 @@ public enum LegacyMaterial {
             }else if (byId[id].equals(INK_SACK)) {
                 return "ink_sac";
             }
-            return byId[id].name();
+            return byId[id].name().toLowerCase();
         } else {
             return "";
         }

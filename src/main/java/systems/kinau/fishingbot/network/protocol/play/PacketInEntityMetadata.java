@@ -188,7 +188,7 @@ public class PacketInEntityMetadata extends Packet {
                 break;
             }
             case 18: { // Particles (e.g. Potion effect color in LivingEntity (10))
-                if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) {
+                if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
                     int count = readVarInt(in);
                     for (int i = 0; i < count; i++) {
                         readVarInt(in);

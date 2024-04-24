@@ -224,8 +224,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             for (Enchantment enchantment : item.getEnchantments()) {
                 String asText = "-> "
                         + enchantment.getDisplayName()
-                        + " "
-                        + StringUtils.getRomanLevel(enchantment.getLevel());
+                        + (enchantment.getLevel() > 1 ? " " + StringUtils.getRomanLevel(enchantment.getLevel()) : "");
                 announceEnchants.accept(asText);
             }
         }

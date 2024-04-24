@@ -38,8 +38,11 @@ public class MinecraftTranslations {
     public String getItemName(String id) {
         id = id.replace("minecraft:", "");
         String translation = getTranslation("item.minecraft." + id);
-        if (translation == null)
-            return id;
+        if (translation == null) {
+            translation = getTranslation("block.minecraft." + id);
+            if (translation == null)
+                return id;
+        }
         return translation;
     }
 }

@@ -245,7 +245,7 @@ public class Player implements Listener {
 
     private void executeChatCommand(String command, CommandExecutor commandExecutor) {
         if (mcCommandDispatcher == null) {
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5_RC_3)
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5)
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUnsignedChatCommand(command));
             else
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
@@ -256,7 +256,7 @@ public class Player implements Listener {
         Map<String, Pair<ArgumentType<?>, ParsedArgument<CommandExecutor, ?>>> arguments = CommandUtils.getArguments(context);
         boolean containsSignableArguments = arguments.values().stream().anyMatch(argument -> argument.getKey() instanceof MessageArgumentType);
         if (!containsSignableArguments) {
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5_RC_3)
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5)
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUnsignedChatCommand(command));
             else
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));

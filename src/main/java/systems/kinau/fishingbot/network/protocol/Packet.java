@@ -229,7 +229,11 @@ public abstract class Packet {
     }
 
     public static void writeSlot(Slot slot, ByteArrayDataOutput output, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
+            if (!slot.isPresent()) {
+                writeVarInt(0, output);
+                return;
+            }
             writeVarInt(slot.getItemCount(), output);
             if (slot.getItemCount() <= 0) return;
             writeVarInt(slot.getItemId(), output);
@@ -262,7 +266,7 @@ public abstract class Packet {
     }
 
     public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId, DataComponentRegistry dataComponentRegistry) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5_RC_3) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
             int count = readVarInt(input);
             if (count <= 0) return Slot.EMPTY;
 
