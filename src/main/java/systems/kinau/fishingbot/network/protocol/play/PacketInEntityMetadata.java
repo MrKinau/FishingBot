@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.bot.Slot;
-import systems.kinau.fishingbot.enums.MaterialMc18;
+import systems.kinau.fishingbot.enums.LegacyMaterial;
 import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -106,7 +106,7 @@ public class PacketInEntityMetadata extends Packet {
                 break;
             }
             case 7: {
-                Slot slot = readSlot(in, protocolId);
+                Slot slot = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
                 if (!slot.isPresent())
                     return;
                 List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
@@ -187,8 +187,15 @@ public class PacketInEntityMetadata extends Packet {
                 readVarInt(in);
                 break;
             }
-            case 18: {
-                readVarInt(in);
+            case 18: { // Particles (e.g. Potion effect color in LivingEntity (10))
+                if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
+                    int count = readVarInt(in);
+                    for (int i = 0; i < count; i++) {
+                        readVarInt(in);
+                    }
+                } else {
+                    readVarInt(in);
+                }
                 break;
             }
             case 19: {
@@ -211,6 +218,9 @@ public class PacketInEntityMetadata extends Packet {
             case 23: {
                 readVarInt(in);
                 break;
+            }
+            default: {
+                FishingBot.getLog().info("Unhandled type: " + type);
             }
         }
     }
@@ -246,7 +256,7 @@ public class PacketInEntityMetadata extends Packet {
                 break;
             }
             case 6: {
-                Slot slot = readSlot(in, protocolId);
+                Slot slot = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
                 if (!slot.isPresent())
                     return;
                 List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
@@ -367,7 +377,7 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 6: {
-                    Slot slot = readSlot(in, protocolId);
+                    Slot slot = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
                     if (!slot.isPresent())
                         return;
 
@@ -489,7 +499,7 @@ public class PacketInEntityMetadata extends Packet {
                     break;
                 }
                 case 5: {
-                    Slot slot = readSlot(in, protocolId);
+                    Slot slot = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
                     if (!slot.isPresent())
                         return;
                     String name = ItemUtils.getItemName(slot);
@@ -572,8 +582,8 @@ public class PacketInEntityMetadata extends Packet {
                     }
 
                     case 5: {
-                        Slot slot = readSlot(in, protocolId);
-                        String name = MaterialMc18.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
+                        Slot slot = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
+                        String name = LegacyMaterial.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
                         List<Enchantment> enchantments = ItemUtils.getEnchantments(slot);
                         FishingBot.getInstance().getCurrentBot().getFishingModule().getPossibleCaughtItems().updateCaught(eid, name, slot.getItemId(), enchantments, -1, -1, -1);
 

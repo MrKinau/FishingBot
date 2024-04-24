@@ -38,7 +38,7 @@ public class CommandSummary extends BrigardierCommand {
             }
             source.sendTranslatedMessages("ui-tabs-loot", lootHistory.getItems().stream().mapToInt(LootItem::getCount).sum());
             lootHistory.getItems().stream().sorted(Comparator.comparingInt(LootItem::getCount).reversed()).forEach(lootItem -> {
-                source.sendMessage(lootItem.getCount() + "x " + lootItem.getName());
+                source.sendMessage(lootItem.getCount() + "x " + lootItem.getDisplayName());
             });
 
             if (FishingBot.getInstance().getCurrentBot().getDiscordModule() != null)

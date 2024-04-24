@@ -12,6 +12,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
+import systems.kinau.fishingbot.bot.item.ComponentItemData;
+import systems.kinau.fishingbot.bot.item.NBTItemData;
+import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponent;
+import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
@@ -225,12 +229,21 @@ public abstract class Packet {
     }
 
     public static void writeSlot(Slot slot, ByteArrayDataOutput output, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
+            if (!slot.isPresent()) {
+                writeVarInt(0, output);
+                return;
+            }
+            writeVarInt(slot.getItemCount(), output);
+            if (slot.getItemCount() <= 0) return;
+            writeVarInt(slot.getItemId(), output);
+            slot.writeItemData(output, protocolId);
+        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
             output.writeBoolean(slot.isPresent());
             if (slot.isPresent()) {
                 writeVarInt(slot.getItemId(), output);
                 output.writeByte(slot.getItemCount());
-                writeNBT(slot.getNbtData(), output);
+                slot.writeItemData(output, protocolId);
             }
         } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13) {
             if (!slot.isPresent()) {
@@ -239,7 +252,7 @@ public abstract class Packet {
             }
             output.writeShort(slot.getItemId());
             output.writeByte(slot.getItemCount());
-            writeNBT(slot.getNbtData(), output);
+            slot.writeItemData(output, protocolId);
         } else {
             if (!slot.isPresent()) {
                 output.writeShort(-1);
@@ -248,12 +261,45 @@ public abstract class Packet {
             output.writeShort(slot.getItemId());
             output.writeByte(slot.getItemCount());
             output.writeShort(slot.getItemDamage());
-            writeNBT(slot.getNbtData(), output);
+            slot.writeItemData(output, protocolId);
         }
     }
 
-    public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
+    public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId, DataComponentRegistry dataComponentRegistry) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
+            int count = readVarInt(input);
+            if (count <= 0) return Slot.EMPTY;
+
+            int itemId = readVarInt(input);
+
+            int presentObjectCount = readVarInt(input);
+            int emptyObjectCount = readVarInt(input);
+
+            if (presentObjectCount == 0 && emptyObjectCount == 0)
+                return new Slot(true, itemId, (byte) count, -1, null);
+
+            List<DataComponent> presentComponents = new LinkedList<>();
+            List<DataComponent> emptyComponents = new LinkedList<>();
+
+            for (int i = 0; i < presentObjectCount; i++) {
+                int dataComponentType = readVarInt(input);
+                DataComponent dataComponent = dataComponentRegistry.createComponent(dataComponentType, protocolId);
+                if (dataComponent != null) {
+                    dataComponent.read(input, protocolId);
+                    presentComponents.add(dataComponent);
+                }
+            }
+
+            for (int i = 0; i < emptyObjectCount; i++) {
+                int dataComponentType = readVarInt(input);
+                DataComponent dataComponent = dataComponentRegistry.createComponent(dataComponentType, protocolId);
+                if (dataComponent != null) {
+                    emptyComponents.add(dataComponent);
+                }
+            }
+
+            return new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));
+        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
             boolean present = input.readBoolean();
             if (present) {
                 int itemId = readVarInt(input);
@@ -265,7 +311,7 @@ public abstract class Packet {
                             .map(Tag::getValue)
                             .orElse(-1);
                 }
-                return new Slot(true, itemId, itemCount, damage, tag);
+                return new Slot(true, itemId, itemCount, damage, new NBTItemData(tag));
             } else
                 return Slot.EMPTY;
         } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13) {
@@ -280,7 +326,7 @@ public abstract class Packet {
                         .map(Tag::getValue)
                         .orElse(-1);
             }
-            return new Slot(true, itemId, itemCount, damage, tag);
+            return new Slot(true, itemId, itemCount, damage, new NBTItemData(tag));
         } else {
             int itemId = input.readShort();
             if (itemId == -1)
@@ -288,7 +334,7 @@ public abstract class Packet {
             byte itemCount = input.readByte();
             short itemDamage = input.readShort();
             NBTTag tag = readNBT(input, protocolId);
-            return new Slot(true, itemId, itemCount, itemDamage, tag);
+            return new Slot(true, itemId, itemCount, itemDamage, new NBTItemData(tag));
         }
     }
 

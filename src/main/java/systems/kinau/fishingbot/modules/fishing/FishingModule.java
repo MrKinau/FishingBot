@@ -5,6 +5,7 @@
 
 package systems.kinau.fishingbot.modules.fishing;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
@@ -13,6 +14,7 @@ import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.bot.loot.LootItem;
+import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
@@ -31,50 +33,41 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class FishingModule extends Module implements Runnable, Listener {
 
-    private static int BOBBER_ENTITY_TYPE;
-    private static int ITEM_ENTITY_TYPE;
+    @Getter(AccessLevel.NONE)
+    private int BOBBER_ENTITY_TYPE;
+    @Getter(AccessLevel.NONE)
+    private int ITEM_ENTITY_TYPE;
 
-    @Getter private PossibleCaughtList possibleCaughtItems = new PossibleCaughtList();
+    private final PossibleCaughtList possibleCaughtItems = new PossibleCaughtList();
 
-    @Getter @Setter private Bobber currentBobber;
-    @Getter @Setter private short lastY = -1;
-    @Getter @Setter private boolean trackingNextBobberId = false;
-    @Getter @Setter private boolean noRodAvailable = false;
-    @Getter private boolean paused = false;
-    @Getter @Setter private boolean trackingNextEntityMeta = false;
-    @Getter private boolean waitForLookFinish = false;
-    @Getter @Setter private long lastFish = System.currentTimeMillis();
+    private Bobber currentBobber;
+    private short lastY = -1;
+    private boolean trackingNextBobberId = false;
+    private boolean noRodAvailable = false;
+    private boolean paused = false;
+    private boolean trackingNextEntityMeta = false;
+    private boolean waitForLookFinish = false;
+    private long lastFish = System.currentTimeMillis();
 
-    @Getter @Setter private int currentFishingRodValue;
+    private int currentFishingRodValue;
 
-    @Getter private Thread stuckingFix;
-    @Getter private boolean joined;
-    @Getter @Setter private LootHistory lootHistory;
+    private Thread stuckingFix;
+    private boolean joined;
+    private LootHistory lootHistory;
 
     public FishingModule(LootHistory savedLootHistory) {
         this.lootHistory = savedLootHistory;
         int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
-        if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
-            if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2)
-                BOBBER_ENTITY_TYPE = 90;
-            else
-                BOBBER_ENTITY_TYPE = 101;
-        } else
-            BOBBER_ENTITY_TYPE = RegistryHandler.getEntityType("minecraft:fishing_bobber", FishingBot.getInstance().getCurrentBot().getServerProtocol());
+
+        BOBBER_ENTITY_TYPE = Registries.ENTITY_TYPE.getEntityType("minecraft:fishing_bobber", protocolId);
         if (BOBBER_ENTITY_TYPE == 0)
             BOBBER_ENTITY_TYPE = 90;
 
-        if (protocolId < ProtocolConstants.MINECRAFT_1_14) {
-            if (protocolId <= ProtocolConstants.MINECRAFT_1_12_2)
-                ITEM_ENTITY_TYPE = 2;
-            else if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2)
-                ITEM_ENTITY_TYPE = 32;
-            else
-                ITEM_ENTITY_TYPE = 34;
-        } else
-            ITEM_ENTITY_TYPE = RegistryHandler.getEntityType("minecraft:item", FishingBot.getInstance().getCurrentBot().getServerProtocol());
+        ITEM_ENTITY_TYPE = Registries.ENTITY_TYPE.getEntityType("minecraft:item", protocolId);
         if (ITEM_ENTITY_TYPE == 0)
             ITEM_ENTITY_TYPE = 2;
     }
@@ -202,7 +195,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(str));
                 });
 
-        LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getEnchantments());
+        LootItem lootItem = getLootHistory().registerItem(currentMax.getName(), currentMax.getDisplayName(), currentMax.getEnchantments());
 
         if (currentMax.getEnchantments() == null)
             currentMax.setEnchantments(new ArrayList<>());
@@ -211,7 +204,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
 
     private String stringify(Item item) {
-        return FishingBot.getI18n().t("module-fishing-caught-item", item.getName());
+        return FishingBot.getI18n().t("module-fishing-caught-item", item.getDisplayName());
     }
 
     public void logItem(Item item, AnnounceType noisiness, Consumer<String> announce, Consumer<String> announceEnchants) {
@@ -235,9 +228,8 @@ public class FishingModule extends Module implements Runnable, Listener {
         if (!item.getEnchantments().isEmpty()) {
             for (Enchantment enchantment : item.getEnchantments()) {
                 String asText = "-> "
-                        + enchantment.getEnchantmentType().getName().toUpperCase()
-                        + " "
-                        + StringUtils.getRomanLevel(enchantment.getLevel());
+                        + enchantment.getDisplayName()
+                        + (enchantment.getLevel() > 1 ? " " + StringUtils.getRomanLevel(enchantment.getLevel()) : "");
                 announceEnchants.accept(asText);
             }
         }

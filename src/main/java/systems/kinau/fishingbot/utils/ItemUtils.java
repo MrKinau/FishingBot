@@ -3,16 +3,15 @@ package systems.kinau.fishingbot.utils;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.bot.Inventory;
+import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.Slot;
-import systems.kinau.fishingbot.enums.EnchantmentType;
-import systems.kinau.fishingbot.enums.MaterialMc18;
-import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
+import systems.kinau.fishingbot.bot.registry.Registries;
+import systems.kinau.fishingbot.bot.registry.Registry;
+import systems.kinau.fishingbot.enums.LegacyMaterial;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.utils.nbt.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class ItemUtils {
 
@@ -24,11 +23,11 @@ public class ItemUtils {
         if (rodId.containsKey(protocolId))
             return rodId.get(protocolId);
 
-        if (RegistryHandler.getItemsMap(protocolId).containsValue("minecraft:fishing_rod")) {
-            rodId.put(protocolId, RegistryHandler.getItemsMap(protocolId).entrySet().stream()
-                    .filter(entry -> entry.getValue().equals("minecraft:fishing_rod"))
-                    .findAny().get().getKey());
-            return rodId.get(protocolId);
+        Registry<Integer, String> itemRegistry = Registries.ITEM.getRegistry(protocolId);
+        if (itemRegistry.containsValue("minecraft:fishing_rod")) {
+            int id = itemRegistry.findKey("minecraft:fishing_rod");
+            rodId.put(protocolId, id);
+            return id;
         }
         return 563;
     }
@@ -43,78 +42,40 @@ public class ItemUtils {
             protocol = FishingBot.getInstance().getCurrentBot().getServerProtocol();
 
         if (protocol < ProtocolConstants.MINECRAFT_1_13)
-            return MaterialMc18.getMaterial(slot.getItemId()) == MaterialMc18.FISHING_ROD;
+            return LegacyMaterial.getMaterial(slot.getItemId()) == LegacyMaterial.FISHING_ROD;
         else
             return getRodId(protocol) == slot.getItemId();
     }
 
     public static boolean isFish(int protocol, int itemId) {
         if (protocol < ProtocolConstants.MINECRAFT_1_13)
-            return itemId == MaterialMc18.RAW_FISH.getId();
+            return itemId == LegacyMaterial.RAW_FISH.getId();
         if (fishIds.containsKey(protocol))
             return fishIds.get(protocol).contains(itemId);
         Set<Integer> ids = new HashSet<>();
-        RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
-            if (name.equals("minecraft:cod") || name.equals("minecraft:salmon") || name.equals("minecraft:tropical_fish") || name.equals("minecraft:pufferfish"))
-                ids.add(id);
-        });
+        Registry<Integer, String> registry = Registries.ITEM.getRegistry(protocol);
+        ids.add(registry.findKey("minecraft:cod"));
+        ids.add(registry.findKey("minecraft:salmon"));
+        ids.add(registry.findKey("minecraft:tropical_fish"));
+        ids.add(registry.findKey("minecraft:pufferfish"));
         fishIds.put(protocol, ids);
         return ids.contains(itemId);
     }
 
     public static boolean isEnchantedBook(int protocol, int itemId) {
         if (protocol < ProtocolConstants.MINECRAFT_1_13)
-            return itemId == MaterialMc18.ENCHANTED_BOOK.getId();
+            return itemId == LegacyMaterial.ENCHANTED_BOOK.getId();
         if (enchantedBookId.containsKey(protocol))
             return enchantedBookId.get(protocol) == itemId;
-        AtomicInteger ebId = new AtomicInteger();
-        RegistryHandler.getItemsMap(protocol).forEach((id, name) -> {
-            if (name.equals("minecraft:enchanted_book"))
-                ebId.set(id);
-        });
-        enchantedBookId.put(protocol, ebId.get());
-        return ebId.get() == itemId;
+        int ebId = Registries.ITEM.findKey("minecraft:enchanted_book", protocol);
+        enchantedBookId.put(protocol, ebId);
+        return ebId == itemId;
     }
 
     public static List<Enchantment> getEnchantments(Slot slot) {
         List<Enchantment> enchantmentList = new ArrayList<>();
-        Tag<?> rootTag = slot.getNbtData().getTag();
-        if (!(rootTag instanceof CompoundTag)) return enchantmentList;
-        CompoundTag root = (CompoundTag) rootTag;
-        String key;
-        if (root.containsKey("StoredEnchantments"))
-            key = "StoredEnchantments";
-        else if (root.containsKey("ench"))
-            key = "ench";
-        else if (root.containsKey("Enchantments"))
-            key = "Enchantments";
-        else
-            return enchantmentList;
-        List<CompoundTag> enchants = root.get(key, ListTag.class).getValue().stream()
-                .filter(tag -> tag instanceof CompoundTag)
-                .map(tag -> (CompoundTag) tag)
-                .collect(Collectors.toList());
-        for (CompoundTag enchant : enchants) {
-            Optional<EnchantmentType> enchType;
-            short level = enchant.get("lvl", ShortTag.class).getValue();
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_13) {
-                String id = enchant.get("id", StringTag.class).getValue();
-                enchType = EnchantmentType.getFromName(id);
-                if (!enchType.isPresent()) {
-                    enchType = Optional.of(EnchantmentType.FUTURE);
-                    enchType.get().setFutureName(id);
-                }
-            } else {
-                short id = enchant.get("id", ShortTag.class).getValue();
-                enchType = EnchantmentType.getFromId(Short.valueOf(id).intValue());
-                if (!enchType.isPresent()) {
-                    enchType = Optional.of(EnchantmentType.FUTURE);
-                    enchType.get().setFutureName("ID: " + id);
-                }
-            }
-            enchType.ifPresent(enchantmentType -> enchantmentList.add(new Enchantment(enchantmentType, level)));
-        }
-        return enchantmentList;
+        if (slot.getItemData() == null) return enchantmentList;
+        return slot.getItemData().getEnchantments();
     }
 
     public static int getDamage(Slot slot) {
@@ -129,21 +90,21 @@ public class ItemUtils {
         if (FishingBot.getInstance().getCurrentBot().getConfig().isPreventRodBreaking() && ItemUtils.getDamage(slot) >= 63)
             return -100;
         List<Enchantment> enchantments = getEnchantments(slot);
-        short luckOfTheSeaLevel = enchantments.stream()
-                .filter(enchantment -> enchantment.getEnchantmentType() == EnchantmentType.LUCK_OF_THE_SEA)
-                .map(Enchantment::getLevel).findAny().orElse((short)0);
-        short lureLevel = enchantments.stream()
-                .filter(enchantment -> enchantment.getEnchantmentType() == EnchantmentType.LURE)
-                .map(Enchantment::getLevel).findAny().orElse((short)0);
-        short unbreakingLevel = enchantments.stream()
-                .filter(enchantment -> enchantment.getEnchantmentType() == EnchantmentType.UNBREAKING)
-                .map(Enchantment::getLevel).findAny().orElse((short)0);
-        short mendingLevel = enchantments.stream()
-                .filter(enchantment -> enchantment.getEnchantmentType() == EnchantmentType.MENDING)
-                .map(Enchantment::getLevel).findAny().orElse((short)0);
-        short vanishingCurseLevel = enchantments.stream()
-                .filter(enchantment -> enchantment.getEnchantmentType() == EnchantmentType.CURSE_OF_VANISHING)
-                .map(Enchantment::getLevel).findAny().orElse((short)0);
+        int luckOfTheSeaLevel = enchantments.stream()
+                .filter(enchantment -> enchantment.getEnchantmentType().equals("minecraft:luck_of_the_sea"))
+                .map(Enchantment::getLevel).findAny().orElse(0);
+        int lureLevel = enchantments.stream()
+                .filter(enchantment -> enchantment.getEnchantmentType().equals("minecraft:lure"))
+                .map(Enchantment::getLevel).findAny().orElse(0);
+        int unbreakingLevel = enchantments.stream()
+                .filter(enchantment -> enchantment.getEnchantmentType().equals("minecraft:unbreaking"))
+                .map(Enchantment::getLevel).findAny().orElse(0);
+        int mendingLevel = enchantments.stream()
+                .filter(enchantment -> enchantment.getEnchantmentType().equals("minecraft:mending"))
+                .map(Enchantment::getLevel).findAny().orElse(0);
+        int vanishingCurseLevel = enchantments.stream()
+                .filter(enchantment -> enchantment.getEnchantmentType().equals("minecraft:vanishing_curse"))
+                .map(Enchantment::getLevel).findAny().orElse(0);
         return luckOfTheSeaLevel * 9 + lureLevel * 9 + unbreakingLevel * 2 + mendingLevel - vanishingCurseLevel;
     }
 
@@ -167,9 +128,14 @@ public class ItemUtils {
             return "N/A";
         int version = FishingBot.getInstance().getCurrentBot().getServerProtocol();
         if (version <= ProtocolConstants.MINECRAFT_1_12_2) {
-            return MaterialMc18.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
+            return LegacyMaterial.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
         } else {
-            return RegistryHandler.getItemName(slot.getItemId(), version).replace("minecraft:", "");
+            return Registries.ITEM.getItemName(slot.getItemId(), version).replace("minecraft:", "");
         }
+    }
+
+    public static String getImageURL(Item item) {
+        String fileType = (item.getEnchantments() == null || item.getEnchantments().isEmpty()) ? "png" : "gif";
+        return String.format("https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/items/%s." + fileType, item.getName().toLowerCase()).replace(" ", "%20");
     }
 }

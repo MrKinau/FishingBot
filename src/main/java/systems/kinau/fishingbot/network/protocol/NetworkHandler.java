@@ -11,9 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.common.*;
-import systems.kinau.fishingbot.network.protocol.configuration.PacketInFinishConfiguration;
-import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
-import systems.kinau.fishingbot.network.protocol.configuration.PacketOutPluginMessage;
+import systems.kinau.fishingbot.network.protocol.configuration.*;
+import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketOutHandshake;
 import systems.kinau.fishingbot.network.protocol.login.*;
 import systems.kinau.fishingbot.network.protocol.play.*;
@@ -28,6 +27,8 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 public class NetworkHandler {
+
+    @Getter @Setter private DataComponentRegistry dataComponentRegistry;
 
     @Getter private DataOutputStream out;
     @Getter private DataInputStream in;
@@ -53,6 +54,8 @@ public class NetworkHandler {
             this.in = new DataInputStream(FishingBot.getInstance().getCurrentBot().getSocket().getInputStream());
 
             this.state = State.HANDSHAKE;
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5)
+                this.dataComponentRegistry = new DataComponentRegistry();
             initPacketRegistries();
         } catch (IOException e) {
             e.printStackTrace();
@@ -945,6 +948,67 @@ public class NetworkHandler {
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_3).registerPacket(0x2C, PacketOutHeldItemChange.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_3).registerPacket(0x35, PacketOutBlockPlace.class);
         getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_3).registerPacket(0x36, PacketOutUseItem.class);
+
+        // Minecraft 1.20.5
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x03, PacketInFinishConfiguration.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x04, PacketInKeepAlive.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x05, PacketInPing.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x09, PacketInResourcePack.class);
+        getConfigurationRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x0E, PacketInKnownPacks.class);
+
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x02, PacketOutPluginMessage.class);
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x03, PacketOutFinishConfiguration.class);
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x04, PacketOutKeepAlive.class);
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x05, PacketOutPing.class);
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x06, PacketOutResourcePackResponse.class);
+        getConfigurationRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x07, PacketOutKnownPacks.class);
+
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x01, PacketInSpawnEntity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x0B, PacketInDifficultySet.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x11, PacketInCommands.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x12, PacketInWindowClose.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x13, PacketInWindowItems.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x15, PacketInSetSlot.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x1D, PacketInDisconnect.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x26, PacketInKeepAlive.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x2B, PacketInJoinGame.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x2E, PacketInEntityPosition.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x2F, PacketInEntityPositionRotation.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x33, PacketInOpenWindow.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x39, PacketInChatPlayer.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x3D, PacketInPlayerListItemRemove.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x3E, PacketInPlayerListItem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x40, PacketInPlayerPosLook.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x46, PacketInResourcePack.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x53, PacketInHeldItemChange.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x58, PacketInEntityMetadata.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x5A, PacketInEntityVelocity.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x5C, PacketInSetExperience.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x5D, PacketInUpdateHealth.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x69, PacketInStartConfiguration.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x6C, PacketInChatSystem.class);
+        getPlayRegistryIn().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x70, PacketInEntityTeleport.class);
+
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x00, PacketOutTeleportConfirm.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x04, PacketOutUnsignedChatCommand.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x05, PacketOutChatCommand.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x06, PacketOutChatMessage.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x07, PacketOutChatSessionUpdate.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x09, PacketOutClientStatus.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x0A, PacketOutClientSettings.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x0C, PacketOutAcknowledgeConfiguration.class);
+//        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_2).registerPacket(0x07, PacketOutConfirmTransaction.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x0E, PacketOutClickWindow.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x0F, PacketOutCloseInventory.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x12, PacketOutPluginMessage.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x18, PacketOutKeepAlive.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x1A, PacketOutPosition.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x1B, PacketOutPosLook.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x24, PacketOutEntityAction.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x2B, PacketOutResourcePackResponse.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x2F, PacketOutHeldItemChange.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x38, PacketOutBlockPlace.class);
+        getPlayRegistryOut().get(ProtocolConstants.MINECRAFT_1_20_5).registerPacket(0x39, PacketOutUseItem.class);
 
 
         // Register protocol of latest for unknown versions

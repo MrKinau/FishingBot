@@ -17,5 +17,6 @@ public class EncryptionRequestEvent extends Event {
     @Getter private String serverId;
     @Getter private PublicKey publicKey;
     @Getter private byte[] verifyToken;
+    @Getter private boolean shouldAuthenticate;
 
 }

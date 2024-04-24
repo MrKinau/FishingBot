@@ -43,9 +43,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GUIController implements Listener {
 
     @FXML private TableView<LootItem> lootTable;
-    @FXML private TableView<Enchantment> booksTable;
-    @FXML private TableView<Enchantment> bowsTable;
-    @FXML private TableView<Enchantment> rodsTable;
+    @FXML private TableView<EnchantmentWithCount> booksTable;
+    @FXML private TableView<EnchantmentWithCount> bowsTable;
+    @FXML private TableView<EnchantmentWithCount> rodsTable;
     @FXML private TableColumn lootItemColumn;
     @FXML private TableColumn lootCountColumn;
     @FXML private TextField commandlineTextField;
@@ -354,23 +354,23 @@ public class GUIController implements Listener {
         lootCountColumn.setCellValueFactory(new PropertyValueFactory<>("count"));
     }
 
-    private void setupEnchantmentTable(TableView<Enchantment> table) {
+    private void setupEnchantmentTable(TableView<EnchantmentWithCount> table) {
         table.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
         table.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("level"));
         table.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("count"));
     }
 
-    private void updateEnchantments(TableView<Enchantment> table, List<systems.kinau.fishingbot.bot.Enchantment> enchantments) {
+    private void updateEnchantments(TableView<EnchantmentWithCount> table, List<systems.kinau.fishingbot.bot.Enchantment> enchantments) {
         enchantments.forEach(enchantment -> {
             AtomicBoolean exists = new AtomicBoolean(false);
             table.getItems().forEach(item -> {
-                if (item.getName().equalsIgnoreCase(enchantment.getEnchantmentType().getName()) && item.getLevel() == enchantment.getLevel()) {
+                if (item.getName().equalsIgnoreCase(enchantment.getDisplayName()) && item.getLevel() == enchantment.getLevel()) {
                     item.setCount(item.getCount() + 1);
                     exists.set(true);
                 }
             });
             if (!exists.get())
-                table.getItems().add(new Enchantment(enchantment.getEnchantmentType().getName(), enchantment.getLevel(), 1));
+                table.getItems().add(new EnchantmentWithCount(enchantment.getDisplayName(), enchantment.getLevel(), 1));
         });
     }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 public class LootItem {
 
     private String name;
+    private String displayName;
     private int count;
     private List<Enchantment> enchantments;
     private ImagedName imagedName;

@@ -6,13 +6,9 @@
 package systems.kinau.fishingbot.enums;
 
 import lombok.Getter;
-import lombok.Setter;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-public enum EnchantmentType {
+@Getter
+public enum LegacyEnchantmentType {
 
     PROTECTION(0, "protection"),
     FIRE_PROTECTION(1, "fire_protection"),
@@ -52,37 +48,14 @@ public enum EnchantmentType {
     PIERCING(-1, "piercing"),
     MENDING(70, "mending"),
     CURSE_OF_VANISHING(71, "vanishing_curse"),
-    SWIFT_SNEAK(-1, "swift_sneak"),
-    FUTURE(-1);
+    SWIFT_SNEAK(-1, "swift_sneak")
+    ;
 
-    @Getter private List<String> names;
-    @Getter private int legacyId;
-    @Getter @Setter private String futureName;
+    private final String name;
+    private final int legacyId;
 
-
-    EnchantmentType(int legacyId, String... names) {
+    LegacyEnchantmentType(int legacyId, String name) {
         this.legacyId = legacyId;
-        this.names = Arrays.asList(names);
+        this.name = name;
     }
-
-    public String getName() {
-        if (this == FUTURE)
-            return getFutureName();
-        return name();
-    }
-
-    public static Optional<EnchantmentType> getFromId(int id) {
-        return Arrays.stream(values()).filter(enchantmentType -> enchantmentType.getLegacyId() == id).findAny();
-    }
-
-    public static Optional<EnchantmentType> getFromName(String name) {
-        if (name.startsWith("minecraft:"))
-            name = name.replace("minecraft:", "");
-        for (EnchantmentType value : values()) {
-            if (value.getNames().contains(name))
-                return Optional.of(value);
-        }
-        return Optional.empty();
-    }
-
 }

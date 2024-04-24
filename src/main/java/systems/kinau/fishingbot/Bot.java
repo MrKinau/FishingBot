@@ -25,13 +25,13 @@ import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.modules.discord.DiscordModule;
 import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.FishingModule;
-import systems.kinau.fishingbot.modules.fishing.RegistryHandler;
 import systems.kinau.fishingbot.modules.timer.TimerModule;
 import systems.kinau.fishingbot.network.mojangapi.MojangAPI;
 import systems.kinau.fishingbot.network.mojangapi.Realm;
 import systems.kinau.fishingbot.network.ping.ServerPinger;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.utils.MinecraftTranslations;
 import systems.kinau.fishingbot.utils.UUIDUtils;
 
 import java.io.File;
@@ -69,6 +69,8 @@ public class Bot {
     @Getter         private NetworkHandler net;
 
     @Getter @Setter private FishingModule fishingModule;
+
+    @Getter         private MinecraftTranslations minecraftTranslations;
 
     @Getter         private File logsFolder = new File(FishingBot.getExecutionDirectory(), "logs");
 
@@ -128,6 +130,9 @@ public class Bot {
 
         // log config location
         FishingBot.getI18n().info("config-loaded-from", new File(getConfig().getPath()).getAbsolutePath());
+
+        // init MinecraftTranslations
+        this.minecraftTranslations = new MinecraftTranslations();
 
         // authenticate player if online-mode is set
         if (getConfig().isOnlineMode()) {
@@ -352,9 +357,6 @@ public class Bot {
 
                 if (FishingBot.getInstance().getMainGUIController() != null && !getEventManager().isRegistered(FishingBot.getInstance().getMainGUIController()))
                     getEventManager().registerListener(FishingBot.getInstance().getMainGUIController());
-
-                // registry handler
-                new RegistryHandler(getServerProtocol());
 
                 // enable required modules
 
