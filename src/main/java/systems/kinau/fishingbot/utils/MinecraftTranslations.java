@@ -36,12 +36,12 @@ public class MinecraftTranslations {
     }
 
     public String getItemName(String id) {
-        id = id.replace("minecraft:", "");
-        String translation = getTranslation("item.minecraft." + id);
+        String idWithoutNamespace = id.replace("minecraft:", "");
+        String translation = getTranslation("item.minecraft." + idWithoutNamespace);
         if (translation == null) {
-            translation = getTranslation("block.minecraft." + id);
+            translation = getTranslation("block.minecraft." + idWithoutNamespace);
             if (translation == null)
-                return id;
+                return idWithoutNamespace;
         }
         return translation;
     }

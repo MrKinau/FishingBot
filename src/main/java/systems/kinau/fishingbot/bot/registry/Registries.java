@@ -18,12 +18,6 @@ public class Registries {
 
     private static Registries registries;
 
-    public static Registries get() {
-        if (registries == null)
-            registries = new Registries();
-        return registries;
-    }
-
     public static ItemRegistry ITEM;
     public static EntityTypeRegistry ENTITY_TYPE;
     public static EnchantmentRegistry ENCHANTMENT;
@@ -54,6 +48,12 @@ public class Registries {
         ENTITY_TYPE = new EntityTypeRegistry();
         ENCHANTMENT = new EnchantmentRegistry();
         DATA_COMPONENT_TYPE = new DataComponentTypeRegistry();
+    }
+
+    public static Registries get() {
+        if (registries == null)
+            registries = new Registries();
+        return registries;
     }
 
     public Registries() {
