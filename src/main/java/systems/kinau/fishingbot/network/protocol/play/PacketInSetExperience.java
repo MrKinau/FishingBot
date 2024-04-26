@@ -11,16 +11,19 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@Getter
+@NoArgsConstructor
 public class PacketInSetExperience extends Packet {
 	
-	@Getter private int experience;
-	@Getter private int level;
+	private int experience;
+	private int level;
 	
 	@Override
 	public void write(ByteArrayDataOutput out, int protocolId) {

@@ -10,7 +10,6 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
-import com.google.gson.JsonParser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
@@ -23,13 +22,11 @@ import systems.kinau.fishingbot.utils.ChatComponentUtils;
 
 import java.util.UUID;
 
+@Getter
 @NoArgsConstructor
 public class PacketInChatPlayer extends Packet {
 
-    private final JsonParser PARSER = new JsonParser();
-    @Getter
     private String text;
-    @Getter
     private UUID sender;
 
     @Override
@@ -46,7 +43,7 @@ public class PacketInChatPlayer extends Packet {
         } else {
             try {
                 if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
-                    readUUID(in); // sender
+                    this.sender = readUUID(in); // sender
                     readVarInt(in); // index
                 }
                 if (in.readBoolean()) {
@@ -58,7 +55,7 @@ public class PacketInChatPlayer extends Packet {
                     }
                 }
                 if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
-                    readUUID(in);
+                    this.sender = readUUID(in);
                     int sigLength = readVarInt(in);
                     in.skipBytes(sigLength);
                 }
@@ -70,7 +67,7 @@ public class PacketInChatPlayer extends Packet {
                 int prevMsgs = readVarInt(in);
                 for (int i = 0; i < prevMsgs; i++) {
                     if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
-                        readUUID(in);
+                        this.sender = readUUID(in);
                         int prevMsgSig = readVarInt(in);
                         in.skipBytes(prevMsgSig);
                     } else {
@@ -96,8 +93,7 @@ public class PacketInChatPlayer extends Packet {
                     targetName = readChatComponent(in, protocolId);
                 this.text = ChatComponentUtils.sillyTransformWithChatType(chatType, userName, targetName, actualMessage);
 
-                if (text != null)
-                    FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
+                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
             } catch (Throwable e) {
                 e.printStackTrace();
             }

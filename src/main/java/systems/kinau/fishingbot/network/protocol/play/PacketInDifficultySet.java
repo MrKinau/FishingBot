@@ -14,10 +14,11 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@Getter
 @NoArgsConstructor
 public class PacketInDifficultySet extends Packet {
 
-    @Getter private int difficulty;
+    private int difficulty;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

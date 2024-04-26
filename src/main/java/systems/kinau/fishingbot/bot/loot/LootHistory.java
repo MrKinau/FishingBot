@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
 public class LootHistory {
 
-    @Getter private List<LootItem> items = new ArrayList<>();
+    private final List<LootItem> items = new ArrayList<>();
 
     public LootItem registerItem(String name, String displayName, List<Enchantment> enchantments) {
-        Optional<LootItem> optItem = items.stream().filter(item -> item.getName().equalsIgnoreCase(name)).findAny();
+        Optional<LootItem> optItem = items.stream().filter(item -> item.getName() != null).filter(item -> item.getName().equalsIgnoreCase(name)).findAny();
         if (optItem.isPresent()) {
             optItem.get().setCount(optItem.get().getCount() + 1);
             return optItem.get();

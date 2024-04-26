@@ -14,12 +14,13 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutLook extends Packet {
 
-    @Getter private float yaw;
-    @Getter private float pitch;
-    @Getter private boolean onGround;
+    private float yaw;
+    private float pitch;
+    private boolean onGround;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

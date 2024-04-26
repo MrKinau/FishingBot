@@ -15,15 +15,16 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutPosLook extends Packet {
 
-    @Getter private double x;
-    @Getter private double y;
-    @Getter private double z;
-    @Getter private float yaw;
-    @Getter private float pitch;
-    @Getter private boolean onGround;
+    private double x;
+    private double y;
+    private double z;
+    private float yaw;
+    private float pitch;
+    private boolean onGround;
 
     public PacketOutPosLook(float yaw, float pitch) {
         this(FishingBot.getInstance().getCurrentBot().getPlayer().getX(), FishingBot.getInstance().getCurrentBot().getPlayer().getY(), FishingBot.getInstance().getCurrentBot().getPlayer().getZ(), yaw, pitch, true);

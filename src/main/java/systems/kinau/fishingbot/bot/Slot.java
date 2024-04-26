@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.bot.item.ComponentItemData;
-import systems.kinau.fishingbot.bot.item.ItemData;
+import systems.kinau.fishingbot.network.item.ComponentItemData;
+import systems.kinau.fishingbot.network.item.ItemData;
+import systems.kinau.fishingbot.network.item.datacomponent.components.DamageComponent;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.datacomponent.components.DamageComponent;
 
 @Getter
 @AllArgsConstructor

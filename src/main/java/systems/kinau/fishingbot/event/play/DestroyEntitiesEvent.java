@@ -6,9 +6,10 @@ import systems.kinau.fishingbot.event.Event;
 
 import java.util.List;
 
+@Getter
 @AllArgsConstructor
 public class DestroyEntitiesEvent extends Event {
 
-    @Getter private List<Integer> entityIds;
+    private List<Integer> entityIds;
 
 }

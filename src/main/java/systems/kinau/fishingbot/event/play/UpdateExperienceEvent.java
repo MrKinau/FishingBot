@@ -9,9 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class UpdateExperienceEvent extends Event {
 
-    @Getter private int experience;
-    @Getter private int level;
+    private int experience;
+    private int level;
 }

@@ -10,9 +10,10 @@ import com.google.common.io.ByteStreams;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.network.entity.EntityDataParser;
+import systems.kinau.fishingbot.network.item.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.protocol.common.*;
 import systems.kinau.fishingbot.network.protocol.configuration.*;
-import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketOutHandshake;
 import systems.kinau.fishingbot.network.protocol.login.*;
 import systems.kinau.fishingbot.network.protocol.play.*;
@@ -26,27 +27,28 @@ import java.util.HashMap;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+@Getter
 public class NetworkHandler {
 
-    @Getter @Setter private DataComponentRegistry dataComponentRegistry;
+    private DataComponentRegistry dataComponentRegistry;
+    private EntityDataParser entityDataParser;
 
-    @Getter private DataOutputStream out;
-    @Getter private DataInputStream in;
+    private DataOutputStream out;
+    private DataInputStream in;
 
-    @Getter @Setter private State state;
-    @Getter private PacketRegistry handshakeRegistry;
-    @Getter private PacketRegistry loginRegistryIn;
-    @Getter private PacketRegistry loginRegistryOut;
-    @Getter private HashMap<Integer, PacketRegistry> configurationRegistryIn;
-    @Getter private HashMap<Integer, PacketRegistry> configurationRegistryOut;
-    @Getter private HashMap<Integer, PacketRegistry> playRegistryIn;
-    @Getter private HashMap<Integer, PacketRegistry> playRegistryOut;
+    @Setter private State state;
+    private PacketRegistry handshakeRegistry;
+    private PacketRegistry loginRegistryIn;
+    private PacketRegistry loginRegistryOut;
+    private HashMap<Integer, PacketRegistry> configurationRegistryIn;
+    private HashMap<Integer, PacketRegistry> configurationRegistryOut;
+    private HashMap<Integer, PacketRegistry> playRegistryIn;
+    private HashMap<Integer, PacketRegistry> playRegistryOut;
 
-    @Getter @Setter private int threshold = -1;
-    @Getter @Setter private PublicKey publicKey;
-    @Getter @Setter private SecretKey secretKey;
-    @Getter @Setter private boolean outputEncrypted;
-    @Getter @Setter private boolean inputBeingDecrypted;
+    @Setter private int threshold = -1;
+    @Setter private PublicKey publicKey;
+    @Setter private SecretKey secretKey;
+    @Setter private boolean outputEncrypted;
 
     public NetworkHandler() {
         try {
@@ -56,6 +58,7 @@ public class NetworkHandler {
             this.state = State.HANDSHAKE;
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5)
                 this.dataComponentRegistry = new DataComponentRegistry();
+            this.entityDataParser = new EntityDataParser();
             initPacketRegistries();
         } catch (IOException e) {
             e.printStackTrace();
@@ -1190,7 +1193,6 @@ public class NetworkHandler {
     }
 
     public void decryptInputStream() {
-        setInputBeingDecrypted(true);
         try {
             InputStream var1;
             var1 = FishingBot.getInstance().getCurrentBot().getSocket().getInputStream();

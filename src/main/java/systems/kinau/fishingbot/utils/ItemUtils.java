@@ -7,7 +7,7 @@ import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.bot.registry.Registry;
-import systems.kinau.fishingbot.enums.LegacyMaterial;
+import systems.kinau.fishingbot.bot.registry.legacy.LegacyMaterial;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.util.*;

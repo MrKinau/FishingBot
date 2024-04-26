@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class UpdateHealthEvent extends Event {
 
-    @Getter private int eid;
-    @Getter private float health;
-    @Getter private int food;
-    @Getter private float saturation;
+    private int eid;
+    private float health;
+    private int food;
+    private float saturation;
 
 }

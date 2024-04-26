@@ -12,10 +12,11 @@ import systems.kinau.fishingbot.event.Event;
 
 import java.util.List;
 
+@Getter
 @AllArgsConstructor
 public class UpdateWindowItemsEvent extends Event {
 
-    @Getter private int windowId;
-    @Getter private List<Slot> slots;
+    private int windowId;
+    private List<Slot> slots;
 
 }

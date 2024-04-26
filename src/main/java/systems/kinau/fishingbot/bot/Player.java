@@ -9,6 +9,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContextBuilder;
 import com.mojang.brigadier.context.ParsedArgument;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
@@ -31,37 +32,40 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class Player implements Listener {
 
-    @Getter @Setter private double x;
-    @Getter @Setter private double y;
-    @Getter @Setter private double z;
-    @Getter @Setter private float yaw;
-    @Getter @Setter private float pitch;
-    @Getter @Setter private float originYaw = -255;
-    @Getter @Setter private float originPitch = -255;
+    private double x;
+    private double y;
+    private double z;
+    private float yaw;
+    private float pitch;
+    private float originYaw = -255;
+    private float originPitch = -255;
 
-    @Getter @Setter private int experience;
-    @Getter @Setter private int levels;
-    @Getter @Setter private float health = -1;
-    @Getter @Setter private boolean sentLowHealth;
-    @Getter @Setter private boolean respawning;
-    @Getter @Setter private boolean sneaking;
+    private int experience;
+    private int levels;
+    private float health = -1;
+    private boolean sentLowHealth;
+    private boolean respawning;
+    private boolean sneaking;
 
-    @Getter         private int heldSlot;
-    @Getter @Setter private Slot heldItem;
-    @Getter @Setter private Inventory inventory;
-    @Getter         private final Map<Integer, Inventory> openedInventories = new HashMap<>();
-    @Getter @Setter private Optional<CryptManager.MessageSignature> lastUsedSignature = Optional.empty();
-    @Getter         private int chatSessionIndex = 0;
-    @Getter @Setter private CommandDispatcher<CommandExecutor> mcCommandDispatcher;
+    private int heldSlot;
+    private Slot heldItem;
+    private Inventory inventory;
+    @Setter(AccessLevel.NONE)
+    private final Map<Integer, Inventory> openedInventories = new HashMap<>();
+    private Optional<CryptManager.MessageSignature> lastUsedSignature = Optional.empty();
+    private int chatSessionIndex = 0;
+    private CommandDispatcher<CommandExecutor> mcCommandDispatcher;
 
-    @Getter @Setter private UUID uuid;
+    private UUID uuid;
 
-    @Getter @Setter private int entityID = -1;
-    @Getter @Setter private int lastPing = 500;
+    private int entityID = -1;
+    private int lastPing = 500;
 
-    @Getter @Setter private Thread lookThread;
+    private Thread lookThread;
 
     public Player() {
         this.inventory = new Inventory();

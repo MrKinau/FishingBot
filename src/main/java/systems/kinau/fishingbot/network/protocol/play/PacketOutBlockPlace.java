@@ -11,18 +11,19 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
 // This actually is the UseItemPacket in newer versions
+@Getter
 @AllArgsConstructor
 public class PacketOutBlockPlace extends Packet {
 
-    @Getter private Hand hand;
-    @Getter private int x;
-    @Getter private int y;
-    @Getter private int z;
-    @Getter private BlockFace blockFace;
-    @Getter private float cursorX;
-    @Getter private float cursorY;
-    @Getter private float cursorZ;
-    @Getter private boolean insideBlock;
+    private Hand hand;
+    private int x;
+    private int y;
+    private int z;
+    private BlockFace blockFace;
+    private float cursorX;
+    private float cursorY;
+    private float cursorZ;
+    private boolean insideBlock;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

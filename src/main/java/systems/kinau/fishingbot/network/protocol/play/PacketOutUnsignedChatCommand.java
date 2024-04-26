@@ -11,9 +11,10 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@Getter
 public class PacketOutUnsignedChatCommand extends Packet {
 
-    @Getter private String command;
+    private String command;
 
     public PacketOutUnsignedChatCommand(String command) {
         this.command = command;

@@ -36,7 +36,7 @@ public class MinecraftTranslations {
     }
 
     public String getItemName(String id) {
-        String idWithoutNamespace = id.replace("minecraft:", "");
+        String idWithoutNamespace = id == null ? "air" : id.replace("minecraft:", "");
         String translation = getTranslation("item.minecraft." + idWithoutNamespace);
         if (translation == null) {
             translation = getTranslation("block.minecraft." + idWithoutNamespace);

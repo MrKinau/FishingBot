@@ -20,10 +20,11 @@ import java.util.BitSet;
 import java.util.Optional;
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutChatMessage extends Packet {
 
-    @Getter private String message;
+    private String message;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class LoginPluginRequestEvent extends Event {
 
-    @Getter private int msgId;
-    @Getter private String channel;
-    @Getter private byte[] data;
+    private int msgId;
+    private String channel;
+    private byte[] data;
 }

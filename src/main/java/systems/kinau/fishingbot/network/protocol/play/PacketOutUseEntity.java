@@ -14,15 +14,16 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutUseEntity extends Packet {
 
-    @Getter private int eId;
-    @Getter private int action;
-    @Getter private float x;
-    @Getter private float y;
-    @Getter private float z;
-    @Getter private int hand;
+    private int eId;
+    private int action;
+    private float x;
+    private float y;
+    private float z;
+    private int hand;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

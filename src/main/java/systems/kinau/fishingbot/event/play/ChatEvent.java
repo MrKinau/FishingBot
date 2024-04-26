@@ -11,9 +11,10 @@ import systems.kinau.fishingbot.event.Event;
 
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 public class ChatEvent extends Event {
 
-    @Getter private String text;
-    @Getter private UUID sender;
+    private String text;
+    private UUID sender;
 }

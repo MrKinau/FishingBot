@@ -20,10 +20,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Getter
 public class PacketOutChatCommand extends Packet {
 
-    @Getter private String command;
-    @Getter private List<CryptManager.SignableArgument> arguments;
+    private String command;
+    private List<CryptManager.SignableArgument> arguments;
 
     public PacketOutChatCommand(String command) {
         this.command = command;

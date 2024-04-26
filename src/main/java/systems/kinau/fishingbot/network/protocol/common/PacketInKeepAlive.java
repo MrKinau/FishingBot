@@ -15,10 +15,11 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@Getter
 @NoArgsConstructor
 public class PacketInKeepAlive extends Packet {
 
-    @Getter private long id;
+    private long id;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

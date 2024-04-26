@@ -11,9 +11,10 @@ import systems.kinau.fishingbot.event.Event;
 
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 public class LoginSuccessEvent extends Event {
 
-    @Getter private UUID uuid;
-    @Getter private String userName;
+    private UUID uuid;
+    private String userName;
 }

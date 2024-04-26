@@ -18,10 +18,11 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@Getter
 @NoArgsConstructor
 public class PacketInChatSystem extends Packet {
 
-    @Getter private String text;
+    private String text;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

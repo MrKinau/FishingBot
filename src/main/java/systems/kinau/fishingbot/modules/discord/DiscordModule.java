@@ -79,6 +79,8 @@ public class DiscordModule extends Module implements Listener {
     private int getColor(Item item) {
         if (item.getEnchantments() != null && !item.getEnchantments().isEmpty())
             return 0x6a01fb;
+        if (item.getName() == null)
+            return 0x3ac8e7;
         switch (item.getName()) {
             case "nametag": return 0xf5e4bc;
             case "leather":

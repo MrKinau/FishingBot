@@ -6,9 +6,10 @@ import systems.kinau.fishingbot.bot.Item;
 import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class FishCaughtEvent extends Event {
 
-    @Getter private Item item;
-    @Getter private LootItem lootItem;
+    private Item item;
+    private LootItem lootItem;
 }
