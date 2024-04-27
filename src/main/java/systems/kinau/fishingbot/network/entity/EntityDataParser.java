@@ -50,7 +50,7 @@ public class EntityDataParser {
             }
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityDataEvent(entityId, data));
         } catch (Exception ex) {
-//            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
                 ex.printStackTrace();
         }
     }

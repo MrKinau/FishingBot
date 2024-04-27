@@ -45,7 +45,6 @@ public class EntityDataElementRegistry {
         add(ProtocolMapperBuilder.create(4)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 5)
                 .build(), simple("text_component", Packet::readChatComponent));
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 5)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 6)
@@ -54,7 +53,6 @@ public class EntityDataElementRegistry {
                         return Optional.of(Packet.readChatComponent(in, protocolId));
                     return Optional.empty();
         }));
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(5)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 6)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 7)
@@ -70,12 +68,10 @@ public class EntityDataElementRegistry {
             return vector;
         }));
 
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(6)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 7)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 8)
                 .build(), simple("boolean", ByteArrayDataInputWrapper::readBoolean)); // Boolean
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(7)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 8)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 9)
@@ -86,12 +82,10 @@ public class EntityDataElementRegistry {
                     rotation[2] = in.readFloat();
                     return rotation;
         })); // Rotation
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(8)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 9)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 10)
                 .build(), simple("position", ByteArrayDataInputWrapper::readLong)); // Position
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(9)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 10)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 11)
@@ -100,12 +94,10 @@ public class EntityDataElementRegistry {
                         return Optional.of(in.readLong());
                     return Optional.empty();
         })); // Optional Position
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(10)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 11)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 12)
                 .build(), simple("direction", in -> Packet.readVarInt(in))); // Direction
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(11)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 12)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 13)
@@ -114,29 +106,24 @@ public class EntityDataElementRegistry {
                         return Optional.of(Packet.readUUID(in));
                     return Optional.empty(); // Optional UUID
         }));
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(12)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 13)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 14)
                 .build(), simple("block_state", in -> Packet.readVarInt(in))); // Block State
-        //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 15)
                 .build(), simple("optional_block_state", in -> Packet.readVarInt(in))); // Optional Block State
-        //TODO Check 1.13.X Check 1.19.X+
         add(ProtocolMapperBuilder.create(13)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 14)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 15)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 16)
                 .build(), simple("nbt", Packet::readNBT)); // NBT
 
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 15)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 16)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 17)
                 .build(), simple("particle", this::readParticle)); // Particle
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 18)
                 .build(), simple("particles", (in, networkHandler, protocolId) -> {
@@ -148,9 +135,8 @@ public class EntityDataElementRegistry {
                     return particles;
         })); // Particle Array
 
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
-                .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_14_4, 16)
+                .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_14, 16)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 17)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 18)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 19)
@@ -161,40 +147,34 @@ public class EntityDataElementRegistry {
                     villagerData[2] = Packet.readVarInt(in);
                     return villagerData;
         })); // VillagerData
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
-                .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_14_4, 17)
+                .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_14, 17)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 18)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 19)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 20)
                 .build(), simple("optional_varint", in -> Packet.readVarInt(in))); // Optional Var Int
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
-                .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_14_4, 18)
+                .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_14, 18)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 19)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 20)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 21)
                 .build(), simple("pose", in -> Packet.readVarInt(in))); // Pose
 
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19, 19)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 20)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 21)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 22)
                 .build(), simple("cat_variant", in -> Packet.readVarInt(in))); // Cat Variant
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 23)
                 .build(), simple("wolf_variant", in -> Packet.readVarInt(in))); // Wolf Variant
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19, 20)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 21)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 22)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 24)
                 .build(), simple("frog_variant", in -> Packet.readVarInt(in))); // Frog Variant
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19, 21)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 22)
@@ -207,7 +187,6 @@ public class EntityDataElementRegistry {
                     long pos = in.readLong();
                     return Optional.of(dimension);
         })); // (Optional) Global Pos
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19, 22)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 23)
@@ -215,16 +194,13 @@ public class EntityDataElementRegistry {
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 26)
                 .build(), simple("painting_variant", in -> Packet.readVarInt(in))); // Painting Variant
 
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 25)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 27)
                 .build(), simple("sniffer_state", in -> Packet.readVarInt(in))); // Sniffer State
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 28)
                 .build(), simple("armadillo_state", in -> Packet.readVarInt(in))); // Armadillo State
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 26)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 29)
@@ -235,7 +211,6 @@ public class EntityDataElementRegistry {
             vector[2] = in.readFloat();
             return vector;
         })); // Vector3f
-        //TODO Check All
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 27)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 30)

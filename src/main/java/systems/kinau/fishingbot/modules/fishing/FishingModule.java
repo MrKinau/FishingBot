@@ -91,12 +91,9 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     public void stuck() {
-        if (isPaused())
-            return;
-        if (isNoRodAvailable())
-            return;
-        if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking())
-            return;
+        if (isPaused()) return;
+        if (isNoRodAvailable()) return;
+        if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) return;
         setLastFish(System.currentTimeMillis());
         setTrackingNextBobberId(true);
         try {
@@ -264,8 +261,9 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     public void finishedLooking() {
-        if (isPaused())
-            return;
+        if (isPaused()) return;
+        if (trackingNextBobberId) return;
+        if (currentBobber != null) return;
         new Thread(() -> {
             setTrackingNextBobberId(true);
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
@@ -296,7 +294,6 @@ public class FishingModule extends Module implements Runnable, Listener {
         }).start();
     }
 
-    // TODO: Detect Is Caught field in EntityMetadataPacket (since MC-1.16)
     @EventHandler
     public void onEntityVelocity(EntityVelocityEvent event) {
         getPossibleCaughtItems().updateCaught(event.getEid(), null, null, null, event.getX(), event.getY(), event.getZ());
@@ -308,36 +305,14 @@ public class FishingModule extends Module implements Runnable, Listener {
         if (!getCurrentBobber().existsForAtLeast(2500))
             return;
 
-        switch (FishingBot.getInstance().getCurrentBot().getServerProtocol()) {
-            case ProtocolConstants.MINECRAFT_1_10:
-            case ProtocolConstants.MINECRAFT_1_9_4:
-            case ProtocolConstants.MINECRAFT_1_9_2:
-            case ProtocolConstants.MINECRAFT_1_9_1:
-            case ProtocolConstants.MINECRAFT_1_9:
-            case ProtocolConstants.MINECRAFT_1_8: {
+        int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
+        if (protocolId <= ProtocolConstants.MINECRAFT_1_10) {
+            FishingBot.getInstance().getCurrentBot().getFishingModule().fish();
+        } else {
+            if (Math.abs(event.getY()) > 350) {
                 FishingBot.getInstance().getCurrentBot().getFishingModule().fish();
-                break;
-            }
-            case ProtocolConstants.MINECRAFT_1_13_2:
-            case ProtocolConstants.MINECRAFT_1_13_1:
-            case ProtocolConstants.MINECRAFT_1_13:
-            case ProtocolConstants.MINECRAFT_1_12_2:
-            case ProtocolConstants.MINECRAFT_1_12_1:
-            case ProtocolConstants.MINECRAFT_1_12:
-            case ProtocolConstants.MINECRAFT_1_11_1:
-            case ProtocolConstants.MINECRAFT_1_11:
-            case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1:
-            case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4:
-            default: {
-                if (Math.abs(event.getY()) > 350) {
-                    FishingBot.getInstance().getCurrentBot().getFishingModule().fish();
-                } else if (lastY == 0 && event.getY() == 0) {    //Sometimes Minecraft does not push the bobber down, but this workaround works good
-                    FishingBot.getInstance().getCurrentBot().getFishingModule().fish();
-                }
-                break;
+            } else if (lastY == 0 && event.getY() == 0) {    //Sometimes Minecraft does not push the bobber down, but this workaround works good
+                FishingBot.getInstance().getCurrentBot().getFishingModule().fish();
             }
         }
 
@@ -439,8 +414,36 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     @EventHandler
     public void onDestroy(DestroyEntitiesEvent event) {
-        if (getCurrentBobber() != null && event.getEntityIds().contains(getCurrentBobber().getEntityId()))
+        if (getCurrentBobber() != null && event.getEntityIds().contains(getCurrentBobber().getEntityId())) {
+            setCurrentBobber(null);
             stuck();
+        }
+    }
+
+    @EventHandler
+    public void onHookEntity(EntityDataEvent event) {
+        if (currentBobber == null) return;
+        if (event.getEntityId() != currentBobber.getEntityId()) return;
+        int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
+        event.getData().stream().filter(entityDataValue -> entityDataValue.getElement().getInternalId().equals("varint")).forEach(entityDataValue -> {
+            boolean hookedEntity = false;
+            if (protocolId <= ProtocolConstants.MINECRAFT_1_9_4 && entityDataValue.getElementIndex() == 5)
+                hookedEntity = true;
+            else if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2 && entityDataValue.getElementIndex() == 6)
+                hookedEntity = true;
+            else if (protocolId <= ProtocolConstants.MINECRAFT_1_16_4 && entityDataValue.getElementIndex() == 7)
+                hookedEntity = true;
+            else if (protocolId <= ProtocolConstants.MINECRAFT_1_20_5 && entityDataValue.getElementIndex() == 8)
+                hookedEntity = true;
+            if (hookedEntity && ((int)entityDataValue.getElement().getValue()) > 0) {
+                FishingBot.getI18n().warning("module-fishing-entity-hooked");
+                setPaused(true);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ignore) {}
+                setPaused(false);
+            }
+        });
     }
 
     // Stucking fix
