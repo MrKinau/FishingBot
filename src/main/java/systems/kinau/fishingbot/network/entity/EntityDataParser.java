@@ -12,11 +12,9 @@ import java.util.List;
 
 public class EntityDataParser {
 
-    private final LegacyDataParser legacyDataParser;
     private final EntityDataElementRegistry dataElementRegistry;
 
     public EntityDataParser() {
-        this.legacyDataParser = new LegacyDataParser();
         this.dataElementRegistry = new EntityDataElementRegistry();
     }
 
@@ -24,21 +22,24 @@ public class EntityDataParser {
         int entityId = Packet.readVarInt(in);
 
         try {
-            if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
-                legacyDataParser.readEntityData(in, networkHandler, entityId, protocolId);
-                return;
-            }
-
             List<EntityDataValue<?>> data = new ArrayList<>();
 
             while (true) {
                 if (in.getAvailable() == 0)
                     break;
                 int elementIndex = in.readByte();
-                if (elementIndex == -1 || elementIndex == 127 || in.getAvailable() <= 1)
+                if (protocolId == ProtocolConstants.MINECRAFT_1_8 && elementIndex == 127)
+                    break;
+                else if (protocolId != ProtocolConstants.MINECRAFT_1_8 && (elementIndex == -1 || elementIndex == 127 || in.getAvailable() <= 1))
                     break;
 
-                int elementType = in.readByte();
+                int elementType;
+                if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
+                    elementIndex = elementIndex & 224;
+                    elementType = elementIndex >> 5;
+                } else {
+                    elementType = in.readByte();
+                }
 
                 EntityDataElement<?> element = dataElementRegistry.createElement(elementType, protocolId);
                 element.read(in, networkHandler, protocolId);
@@ -49,7 +50,7 @@ public class EntityDataParser {
             }
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityDataEvent(entityId, data));
         } catch (Exception ex) {
-            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
+//            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
                 ex.printStackTrace();
         }
     }

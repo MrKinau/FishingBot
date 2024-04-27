@@ -136,6 +136,11 @@ public class ItemUtils {
 
     public static String getImageURL(Item item) {
         String fileType = (item.getEnchantments() == null || item.getEnchantments().isEmpty()) ? "png" : "gif";
-        return String.format("https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/items/%s." + fileType, item.getName().toLowerCase()).replace(" ", "%20");
+        String itemName;
+        if (item.getName() != null)
+            itemName = item.getName().toLowerCase();
+        else
+            itemName = "air";
+        return String.format("https://raw.githubusercontent.com/MrKinau/FishingBot/master/src/main/resources/img/items/%s." + fileType, itemName).replace(" ", "%20");
     }
 }

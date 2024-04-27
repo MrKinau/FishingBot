@@ -21,20 +21,30 @@ public class EntityDataElementRegistry {
     private final Map<ProtocolIdToElementType, Supplier<EntityDataElement<?>>> elements = new HashMap<>();
 
     public EntityDataElementRegistry() {
-        add(protocolId -> 0, simple("byte", ByteArrayDataInputWrapper::readByte)); // Byte
-        add(protocolId -> 1, simple("varint", in -> Packet.readVarInt(in))); // Var Int
+        add(protocolId -> 0, simple("byte", ByteArrayDataInputWrapper::readByte));
+
+        add(ProtocolMapperBuilder.create(-1)
+                .addRule(protocolId -> protocolId == ProtocolConstants.MINECRAFT_1_8, 1)
+                .build(), simple("short", ByteArrayDataInputWrapper::readShort));
+        add(ProtocolMapperBuilder.create(-1)
+                .addRule(protocolId -> protocolId == ProtocolConstants.MINECRAFT_1_8, 2)
+                .build(), simple("int", ByteArrayDataInputWrapper::readInt));
+
+        add(protocolId -> 1, simple("varint", in -> Packet.readVarInt(in)));
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 2)
-                .build(), simple("varlong", Packet::readVarLong)); // Var Long
+                .build(), simple("varlong", Packet::readVarLong));
         add(ProtocolMapperBuilder.create(2)
+                .addRule(protocolId -> protocolId == ProtocolConstants.MINECRAFT_1_8, 3)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 3)
-                .build(), simple("float", ByteArrayDataInputWrapper::readFloat)); // Float
+                .build(), simple("float", ByteArrayDataInputWrapper::readFloat));
         add(ProtocolMapperBuilder.create(3)
+                .addRule(protocolId -> protocolId == ProtocolConstants.MINECRAFT_1_8, 4)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 4)
-                .build(), simple("string", Packet::readString)); // String
+                .build(), simple("string", Packet::readString));
         add(ProtocolMapperBuilder.create(4)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 5)
-                .build(), simple("text_component", Packet::readChatComponent)); // Chat Component
+                .build(), simple("text_component", Packet::readChatComponent));
         //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 5)
@@ -43,12 +53,23 @@ public class EntityDataElementRegistry {
                     if (in.readBoolean())
                         return Optional.of(Packet.readChatComponent(in, protocolId));
                     return Optional.empty();
-        })); // Optional Chat Component
+        }));
         //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(5)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 6)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 7)
-                .build(), simple("slot", (in, networkHandler, protocolId) -> Packet.readSlot(in, protocolId, networkHandler.getDataComponentRegistry()))); // Slot
+                .build(), simple("slot", (in, networkHandler, protocolId) -> Packet.readSlot(in, protocolId, networkHandler.getDataComponentRegistry())));
+
+        add(ProtocolMapperBuilder.create(-1)
+                .addRule(protocolId -> protocolId == ProtocolConstants.MINECRAFT_1_8, 6)
+                .build(), simple("int_vector", in -> {
+            int[] vector = new int[3];
+            vector[0] = in.readInt();
+            vector[1] = in.readInt();
+            vector[2] = in.readInt();
+            return vector;
+        }));
+
         //TODO Check 1.13.X
         add(ProtocolMapperBuilder.create(6)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_13, 7)
@@ -337,7 +358,7 @@ public class EntityDataElementRegistry {
 
         @AllArgsConstructor
         @Getter
-        class Rule {
+        static class Rule {
             private Predicate<Integer> protocolPredicate;
             private int elementType;
         }
