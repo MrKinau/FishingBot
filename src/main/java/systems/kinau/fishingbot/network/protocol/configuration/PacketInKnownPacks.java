@@ -14,10 +14,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 public class PacketInKnownPacks extends Packet {
 
-    @Getter private final List<KnownPack> knownPacks = new LinkedList<>();
+    private final List<KnownPack> knownPacks = new LinkedList<>();
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

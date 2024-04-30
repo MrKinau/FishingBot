@@ -14,10 +14,11 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@Getter
 @NoArgsConstructor
 public class PacketInDisconnect extends Packet {
 
-    @Getter private String disconnectMessage;
+    private String disconnectMessage;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

@@ -9,8 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class SetCompressionEvent extends Event {
 
-    @Getter private int threshold;
+    private int threshold;
 }

@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.PingChangeEvent;
 import systems.kinau.fishingbot.event.play.UpdatePlayerListEvent;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@NoArgsConstructor
 public class PacketInPlayerListItem extends Packet {
 
     @Getter private static Set<UUID> currPlayers = new HashSet<>();

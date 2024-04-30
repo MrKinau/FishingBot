@@ -9,8 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class DisconnectEvent extends Event {
 
-    @Getter private String disconnectMessage;
+    private String disconnectMessage;
 }

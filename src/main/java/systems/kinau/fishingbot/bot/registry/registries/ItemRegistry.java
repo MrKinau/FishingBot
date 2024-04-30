@@ -3,7 +3,7 @@ package systems.kinau.fishingbot.bot.registry.registries;
 import systems.kinau.fishingbot.bot.registry.MetaRegistry;
 import systems.kinau.fishingbot.bot.registry.Registry;
 import systems.kinau.fishingbot.bot.registry.RegistryLoader;
-import systems.kinau.fishingbot.enums.LegacyMaterial;
+import systems.kinau.fishingbot.bot.registry.legacy.LegacyMaterial;
 
 import java.util.Arrays;
 import java.util.Optional;

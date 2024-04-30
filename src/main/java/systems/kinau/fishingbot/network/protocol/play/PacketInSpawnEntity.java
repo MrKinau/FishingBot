@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.SpawnEntityEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -15,6 +16,7 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @Getter
+@NoArgsConstructor
 public class PacketInSpawnEntity extends Packet {
 
     private int id;
@@ -82,7 +84,6 @@ public class PacketInSpawnEntity extends Packet {
                 this.zVelocity = in.readShort();
             }
         }
-
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(
                 new SpawnEntityEvent(getId(), getType(), getX(), getY(), getZ(), getYaw(), getPitch(), getObjectData(), getXVelocity(), getYVelocity(), getZVelocity()));

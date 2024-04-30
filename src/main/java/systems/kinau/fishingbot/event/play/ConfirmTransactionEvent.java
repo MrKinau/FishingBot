@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class ConfirmTransactionEvent extends Event {
 
-    @Getter private byte windowId;
-    @Getter private short action;
-    @Getter private boolean accepted;
+    private byte windowId;
+    private short action;
+    private boolean accepted;
 }

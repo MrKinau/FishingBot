@@ -13,15 +13,13 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @NoArgsConstructor
 @ToString
 public class PacketInOpenWindow extends Packet {
 
-    @Getter
     private int windowId;
-    @Getter
     private int windowType;
-    @Getter
     private String title;
 
     @Override

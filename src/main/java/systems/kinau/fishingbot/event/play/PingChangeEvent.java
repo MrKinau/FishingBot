@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class PingChangeEvent extends Event {
 
-    @Getter private int ping;
+    private int ping;
 
 }

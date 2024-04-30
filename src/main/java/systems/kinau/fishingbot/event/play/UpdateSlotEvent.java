@@ -10,11 +10,12 @@ import lombok.Getter;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class UpdateSlotEvent extends Event {
 
-    @Getter private int windowId;
-    @Getter private short slotId;
-    @Getter private Slot slot;
+    private int windowId;
+    private short slotId;
+    private Slot slot;
 
 }

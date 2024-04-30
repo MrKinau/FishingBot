@@ -12,11 +12,12 @@ import systems.kinau.fishingbot.event.Event;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 public class UpdatePlayerListEvent extends Event {
 
-    @Getter private Action action;
-    @Getter private Set<UUID> players;
+    private Action action;
+    private Set<UUID> players;
 
     public static enum Action {
         REPLACE,

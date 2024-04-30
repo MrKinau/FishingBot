@@ -2,10 +2,7 @@ package systems.kinau.fishingbot.bot.registry;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import systems.kinau.fishingbot.bot.registry.registries.DataComponentTypeRegistry;
-import systems.kinau.fishingbot.bot.registry.registries.EnchantmentRegistry;
-import systems.kinau.fishingbot.bot.registry.registries.EntityTypeRegistry;
-import systems.kinau.fishingbot.bot.registry.registries.ItemRegistry;
+import systems.kinau.fishingbot.bot.registry.registries.*;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.InputStreamReader;
@@ -22,6 +19,7 @@ public class Registries {
     public static EntityTypeRegistry ENTITY_TYPE;
     public static EnchantmentRegistry ENCHANTMENT;
     public static DataComponentTypeRegistry DATA_COMPONENT_TYPE;
+    public static ParticleTypeRegistry PARTICLE_TYPE;
 
     public static final Set<Integer> BUNDLED_REGISTRY_IDS = new HashSet<>();
 
@@ -48,6 +46,7 @@ public class Registries {
         ENTITY_TYPE = new EntityTypeRegistry();
         ENCHANTMENT = new EnchantmentRegistry();
         DATA_COMPONENT_TYPE = new DataComponentTypeRegistry();
+        PARTICLE_TYPE = new ParticleTypeRegistry();
     }
 
     public static Registries get() {

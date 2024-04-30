@@ -7,6 +7,10 @@ package systems.kinau.fishingbot.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import systems.kinau.fishingbot.FishingBot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // TODO This is garbage
 public class ChatComponentUtils {
@@ -15,19 +19,7 @@ public class ChatComponentUtils {
         StringBuilder messageBuilder = new StringBuilder();
 
         try {
-            if (object.has("with")) {
-                JsonArray array = object.getAsJsonArray("with");
-                for (Object o : array) {
-                    messageBuilder = new StringBuilder(getText(o, messageBuilder) + " ");
-                }
-                if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.joined"))
-                    return messageBuilder + "joined the game";
-                if (object.has("translate") && object.get("translate").getAsString().equals("multiplayer.player.left"))
-                    return messageBuilder + "left the game";
-                return messageBuilder.toString();
-            } else {
-                return getText(object, messageBuilder);
-            }
+            return getText(object, messageBuilder);
         } catch (Exception ignore) {}
         return null;
     }
@@ -62,8 +54,18 @@ public class ChatComponentUtils {
             }
         }
 
-        if (messageBuilder.toString().trim().isEmpty() && jObject.has("translate"))
-            messageBuilder.append(jObject.get("translate").getAsString());
+        if (jObject.has("translate")) {
+            String translationKey = jObject.get("translate").getAsString();
+            List<String> arguments = new ArrayList<>();
+            if (jObject.has("with")) {
+                JsonArray array = jObject.getAsJsonArray("with");
+                for (Object argument : array) {
+                    arguments.add(getText(argument, new StringBuilder()));
+                }
+            }
+            messageBuilder.append(FishingBot.getInstance().getCurrentBot().getMinecraftTranslations().getTranslation(translationKey, arguments.toArray(new String[0])));
+        }
+
         return messageBuilder.toString();
     }
 

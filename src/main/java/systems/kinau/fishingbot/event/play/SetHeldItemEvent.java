@@ -9,8 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class SetHeldItemEvent extends Event {
 
-    @Getter private int slot;
+    private int slot;
 }

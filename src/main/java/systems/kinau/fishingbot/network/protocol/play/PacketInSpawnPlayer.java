@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.SpawnPlayerEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -16,15 +17,17 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 import java.util.UUID;
 
+@Getter
+@NoArgsConstructor
 public class PacketInSpawnPlayer extends Packet {
 
-    @Getter private int eID;
-    @Getter private UUID uuid;
-    @Getter private double x;
-    @Getter private double y;
-    @Getter private double z;
-    @Getter private byte yaw;
-    @Getter private byte pitch;
+    private int eID;
+    private UUID uuid;
+    private double x;
+    private double y;
+    private double z;
+    private byte yaw;
+    private byte pitch;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

@@ -9,8 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class DifficultySetEvent extends Event {
 
-    @Getter private int difficulty;
+    private int difficulty;
 }

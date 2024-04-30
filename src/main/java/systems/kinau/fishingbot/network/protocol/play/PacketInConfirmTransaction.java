@@ -11,12 +11,13 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @NoArgsConstructor
 public class PacketInConfirmTransaction extends Packet {
 
-    @Getter private byte windowId;
-    @Getter private short action;
-    @Getter private boolean accepted;
+    private byte windowId;
+    private short action;
+    private boolean accepted;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

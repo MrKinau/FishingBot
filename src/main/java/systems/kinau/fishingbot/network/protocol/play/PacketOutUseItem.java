@@ -16,17 +16,18 @@ import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PacketOutUseItem extends Packet {
 
-    @Getter private int x = -1;   // ||
-    @Getter private int y = 4095; // \/
-    @Getter private int z = -1;   // blockpos = -1
-    @Getter private byte cursorX = 0;
-    @Getter private byte cursorY = 0;
-    @Getter private byte cursorZ = 0;
-    @Getter private PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.UNSET;
+    private int x = -1;   // ||
+    private int y = 4095; // \/
+    private int z = -1;   // blockpos = -1
+    private byte cursorX = 0;
+    private byte cursorY = 0;
+    private byte cursorZ = 0;
+    private PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.UNSET;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

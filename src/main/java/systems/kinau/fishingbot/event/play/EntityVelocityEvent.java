@@ -9,11 +9,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class EntityVelocityEvent extends Event {
 
-    @Getter private short x;
-    @Getter private short y;
-    @Getter private short z;
-    @Getter private int eid;
+    private short x;
+    private short y;
+    private short z;
+    private int eid;
 }

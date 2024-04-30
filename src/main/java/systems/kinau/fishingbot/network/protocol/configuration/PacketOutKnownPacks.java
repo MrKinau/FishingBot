@@ -12,11 +12,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PacketOutKnownPacks extends Packet {
 
-    @Getter private List<PacketInKnownPacks.KnownPack> knownPacks = new LinkedList<>();
+    private List<PacketInKnownPacks.KnownPack> knownPacks = new LinkedList<>();
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

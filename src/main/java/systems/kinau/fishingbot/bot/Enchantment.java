@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.registry.Registries;
+import systems.kinau.fishingbot.network.item.datacomponent.DataComponentPart;
 import systems.kinau.fishingbot.network.protocol.Packet;
-import systems.kinau.fishingbot.network.protocol.datacomponent.DataComponentPart;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @Getter

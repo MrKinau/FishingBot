@@ -284,6 +284,7 @@ public class GUIController implements Listener {
                 return;
 
             lootTable.getItems().forEach(item -> {
+                if (item.getName() == null || event.getLootItem().getName() == null) return;
                 if (item.getName().equalsIgnoreCase(event.getLootItem().getName())) {
                     item.setCount(event.getLootItem().getCount());
                     existing.set(true);

@@ -14,10 +14,11 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutTeleportConfirm extends Packet {
 
-    @Getter private int teleportId;
+    private int teleportId;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

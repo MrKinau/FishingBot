@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
@@ -15,11 +16,13 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@NoArgsConstructor
+@Getter
 public class PacketInSetSlot extends Packet {
 
-    @Getter private int windowId;
-    @Getter private short slotId;
-    @Getter private Slot slot;
+    private int windowId;
+    private short slotId;
+    private Slot slot;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) { }
