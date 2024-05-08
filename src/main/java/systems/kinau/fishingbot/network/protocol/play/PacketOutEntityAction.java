@@ -15,6 +15,7 @@ import java.io.IOException;
  *
  * @author Summerfeeling
  */
+// This is the Player Command Packet according to the wiki.vg name
 @AllArgsConstructor
 @Getter
 public class PacketOutEntityAction extends Packet {
