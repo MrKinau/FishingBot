@@ -15,12 +15,13 @@ import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @NoArgsConstructor
+@Getter
 public class PacketInEntityVelocity extends Packet {
 
-    @Getter private short x;
-    @Getter private short y;
-    @Getter private short z;
-    @Getter private int eid;
+    private short x;
+    private short y;
+    private short z;
+    private int eid;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

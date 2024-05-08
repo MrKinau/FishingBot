@@ -20,14 +20,15 @@ import systems.kinau.fishingbot.network.utils.CryptManager;
 import java.io.IOException;
 import java.security.PublicKey;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PacketInEncryptionRequest extends Packet {
 
-    @Getter private String serverId;
-    @Getter private PublicKey publicKey;
-    @Getter private byte[] verifyToken;
-    @Getter private boolean shouldAuthenticate;
+    private String serverId;
+    private PublicKey publicKey;
+    private byte[] verifyToken;
+    private boolean shouldAuthenticate;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException { }

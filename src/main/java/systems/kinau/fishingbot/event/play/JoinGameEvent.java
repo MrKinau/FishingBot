@@ -9,23 +9,24 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import systems.kinau.fishingbot.event.Event;
 
+@Getter
 @AllArgsConstructor
 public class JoinGameEvent extends Event {
 
-    @Getter private int eid;
-    @Getter private int gamemode;
-    @Getter private String[] worldIdentifier;
-    @Getter private String dimension;
-    @Getter private String spawnWorld;
-    @Getter private long hashedSeed;
-    @Getter private int difficulty;
-    @Getter private int maxPlayers;
-    @Getter private int viewDistance;
-    @Getter private int simulationDistance;
-    @Getter private String levelType;
-    @Getter private boolean reducedDebugInfo;
-    @Getter private boolean enableRespawnScreen;
-    @Getter private boolean debug;
-    @Getter private boolean flat;
+    private int eid;
+    private int gamemode;
+    private String[] worldIdentifier;
+    private String dimension;
+    private String spawnWorld;
+    private long hashedSeed;
+    private int difficulty;
+    private int maxPlayers;
+    private int viewDistance;
+    private int simulationDistance;
+    private String levelType;
+    private boolean reducedDebugInfo;
+    private boolean enableRespawnScreen;
+    private boolean debug;
+    private boolean flat;
 
 }

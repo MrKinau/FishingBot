@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.event.play.UpdateWindowItemsEvent;
@@ -14,10 +15,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@NoArgsConstructor
 public class PacketInWindowItems extends Packet {
 
-    @Getter private int windowId;
-    @Getter private List<Slot> slots;
+    private int windowId;
+    private List<Slot> slots;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

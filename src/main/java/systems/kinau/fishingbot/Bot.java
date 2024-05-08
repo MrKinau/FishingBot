@@ -400,9 +400,9 @@ public class Bot {
                 while (running) {
                     try {
                         net.readData();
-                    } catch (Exception ex) {
+                    } catch (Throwable ex) {
                         ex.printStackTrace();
-                        FishingBot.getI18n().warning("packet-could-not-be-received");
+                        FishingBot.getI18n().severe("packet-could-not-be-received");
                         break;
                     }
                 }

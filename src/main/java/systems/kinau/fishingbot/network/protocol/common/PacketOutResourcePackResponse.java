@@ -11,11 +11,12 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutResourcePackResponse extends Packet {
 
-    @Getter private UUID uuid;
-    @Getter private Result result;
+    private UUID uuid;
+    private Result result;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

@@ -9,10 +9,11 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutClientStatus extends Packet {
 
-    @Getter private Action action;
+    private Action action;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

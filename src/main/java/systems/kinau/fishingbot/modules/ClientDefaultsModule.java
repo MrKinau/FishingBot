@@ -162,4 +162,19 @@ public class ClientDefaultsModule extends Module implements Listener {
     public void onPing(PingPacketEvent e) {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPing(e.getId()));
     }
+
+    @EventHandler
+    public void onEntityData(EntityDataEvent event) {
+        event.getData().stream()
+                .filter(element -> element.getElement().getInternalId().equals("float"))
+                .forEach(element -> {
+                    int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
+                    if ((protocolId < ProtocolConstants.MINECRAFT_1_10 && element.getElementIndex() == 6)
+                            || (protocolId < ProtocolConstants.MINECRAFT_1_14_4 && element.getElementIndex() == 7)
+                            || (protocolId < ProtocolConstants.MINECRAFT_1_17 && element.getElementIndex() == 8)
+                            || (protocolId >= ProtocolConstants.MINECRAFT_1_17 && element.getElementIndex() == 9)) {
+                        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(event.getEntityId(), (float) element.getElement().getValue(), -1 ,-1));
+                    }
+                });
+    }
 }

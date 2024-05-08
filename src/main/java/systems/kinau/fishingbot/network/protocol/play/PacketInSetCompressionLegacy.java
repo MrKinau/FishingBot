@@ -17,11 +17,11 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PacketInSetCompressionLegacy extends Packet {
 
-    @Getter
     private int threshold;
 
     @Override

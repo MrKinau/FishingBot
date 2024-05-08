@@ -11,10 +11,11 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @NoArgsConstructor
 public class PacketInWindowClose extends Packet {
 
-    @Getter private int windowId;
+    private int windowId;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.UpdatePlayerListEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -13,10 +14,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@NoArgsConstructor
+@Getter
 public class PacketInPlayerListItemRemove extends Packet {
 
-    @Getter
-    private Set<UUID> players = new HashSet<>();
+    private final Set<UUID> players = new HashSet<>();
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

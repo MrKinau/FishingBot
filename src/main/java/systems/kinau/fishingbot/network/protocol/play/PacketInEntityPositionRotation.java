@@ -1,6 +1,7 @@
 package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.EntityMoveEvent;
@@ -12,6 +13,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 
 @NoArgsConstructor
+@Getter
 public class PacketInEntityPositionRotation extends Packet {
 
     private int entityId;

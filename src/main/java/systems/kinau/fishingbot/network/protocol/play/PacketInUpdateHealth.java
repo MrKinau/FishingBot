@@ -11,12 +11,13 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @NoArgsConstructor
 public class PacketInUpdateHealth extends Packet {
 
-    @Getter private float health;
-    @Getter private int food;
-    @Getter private float saturation;
+    private float health;
+    private int food;
+    private float saturation;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

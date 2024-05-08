@@ -24,14 +24,15 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.Random;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PacketOutEncryptionResponse extends Packet {
 
-    @Getter private String serverId;
-    @Getter private PublicKey publicKey;
-    @Getter private byte[] verifyToken;
-    @Getter private SecretKey secretKey;
+    private String serverId;
+    private PublicKey publicKey;
+    private byte[] verifyToken;
+    private SecretKey secretKey;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

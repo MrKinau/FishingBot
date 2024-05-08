@@ -12,13 +12,14 @@ import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutPosition extends Packet {
 
-    @Getter private double x;
-    @Getter private double y;
-    @Getter private double z;
-    @Getter private boolean onGround;
+    private double x;
+    private double y;
+    private double z;
+    private boolean onGround;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {

@@ -15,10 +15,11 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutKeepAlive extends Packet {
 
-    @Getter private long id;
+    private long id;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

@@ -13,10 +13,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 public class PacketInDestroyEntities extends Packet {
 
-    @Getter private List<Integer> entityIds;
+    private List<Integer> entityIds;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

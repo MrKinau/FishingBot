@@ -11,12 +11,13 @@ import systems.kinau.fishingbot.event.Event;
 
 import java.security.PublicKey;
 
+@Getter
 @AllArgsConstructor
 public class EncryptionRequestEvent extends Event {
 
-    @Getter private String serverId;
-    @Getter private PublicKey publicKey;
-    @Getter private byte[] verifyToken;
-    @Getter private boolean shouldAuthenticate;
+    private String serverId;
+    private PublicKey publicKey;
+    private byte[] verifyToken;
+    private boolean shouldAuthenticate;
 
 }

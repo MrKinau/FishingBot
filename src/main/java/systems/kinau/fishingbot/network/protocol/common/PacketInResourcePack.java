@@ -13,14 +13,15 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 import java.util.UUID;
 
+@Getter
 @NoArgsConstructor
 public class PacketInResourcePack extends Packet {
 
-    @Getter private UUID uuid;
-    @Getter private String url;
-    @Getter private String hash;
-    @Getter private boolean forced;
-    @Getter private String prompt;
+    private UUID uuid;
+    private String url;
+    private String hash;
+    private boolean forced;
+    private String prompt;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

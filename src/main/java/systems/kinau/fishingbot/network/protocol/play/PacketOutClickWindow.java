@@ -13,16 +13,17 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.io.IOException;
 import java.util.Map;
 
+@Getter
 @AllArgsConstructor
 public class PacketOutClickWindow extends Packet {
 
-    @Getter private int windowId;
-    @Getter private short slot;
-    @Getter private byte button;
-    @Getter private short actionNumber;
-    @Getter private int mode;
-    @Getter private Slot item;
-    @Getter private Map<Short, Slot> remaining;
+    private int windowId;
+    private short slot;
+    private byte button;
+    private short actionNumber;
+    private int mode;
+    private Slot item;
+    private Map<Short, Slot> remaining;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {

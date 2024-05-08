@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PacketInLoginSuccess extends Packet {
 
-    @Getter private UUID uuid;
-    @Getter private String userName;
+    private UUID uuid;
+    private String userName;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException { }

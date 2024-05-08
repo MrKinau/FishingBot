@@ -25,7 +25,7 @@ public enum Theme implements DisplayNameProvider {
                 if (!OsThemeDetector.isSupported()) return false;
                 return OsThemeDetector.getDetector().isDark();
             } catch (Throwable ex) {
-                FishingBot.getI18n().severe("could-not-detect-theme", ex.getClass().getSimpleName() + ": " + ex.getMessage(), System.getProperty("java.version"));
+                FishingBot.getI18n().warning("could-not-detect-theme", ex.getClass().getSimpleName() + ": " + ex.getMessage(), System.getProperty("java.version"));
             }
         }
         return false;

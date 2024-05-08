@@ -6,7 +6,7 @@ package systems.kinau.fishingbot.io.config;
 
 import com.google.gson.*;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.enums.LegacyEnchantmentType;
+import systems.kinau.fishingbot.bot.registry.legacy.LegacyEnchantmentType;
 import systems.kinau.fishingbot.utils.ConvertUtils;
 import systems.kinau.fishingbot.utils.ReflectionUtils;
 

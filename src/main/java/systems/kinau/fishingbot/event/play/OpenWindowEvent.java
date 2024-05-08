@@ -5,17 +5,16 @@
 
 package systems.kinau.fishingbot.event.play;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import systems.kinau.fishingbot.event.Event;
 
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public class OpenWindowEvent extends Event {
 
-    @Getter
-    private int windowId;
-    @Getter
-    private int windowType;
-    @Getter
-    private String title;
+    private final int windowId;
+    private final int windowType;
+    private final String title;
+
 }

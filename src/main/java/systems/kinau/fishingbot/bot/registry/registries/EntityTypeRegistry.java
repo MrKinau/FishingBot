@@ -10,11 +10,6 @@ import java.util.Optional;
 public class EntityTypeRegistry extends MetaRegistry<Integer, String> {
 
     public EntityTypeRegistry() {
-        Registry<Integer, String> legacy1_13_2Registry = new Registry<>();
-        legacy1_13_2Registry.registerElement(90, "minecraft:fishing_bobber");
-        legacy1_13_2Registry.registerElement(32, "minecraft:item");
-        addRegistry(ProtocolConstants.MINECRAFT_1_13_2, legacy1_13_2Registry);
-
         Registry<Integer, String> legacy1_8Registry = new Registry<>();
         legacy1_8Registry.registerElement(90, "minecraft:fishing_bobber");
         legacy1_8Registry.registerElement(2, "minecraft:item");

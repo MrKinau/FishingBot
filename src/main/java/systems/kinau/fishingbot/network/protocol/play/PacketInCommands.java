@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 public class PacketInCommands extends Packet {
 
-    @Getter
     private CommandDispatcher<CommandExecutor> commandDispatcher;
 
     @Override

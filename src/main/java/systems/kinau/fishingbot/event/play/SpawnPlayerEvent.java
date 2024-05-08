@@ -11,14 +11,15 @@ import systems.kinau.fishingbot.event.Event;
 
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
 public class SpawnPlayerEvent extends Event {
 
-    @Getter private int eID;
-    @Getter private UUID uuid;
-    @Getter private double x;
-    @Getter private double y;
-    @Getter private double z;
-    @Getter private byte yaw;
-    @Getter private byte pitch;
+    private int eID;
+    private UUID uuid;
+    private double x;
+    private double y;
+    private double z;
+    private byte yaw;
+    private byte pitch;
 }
