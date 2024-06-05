@@ -7,13 +7,14 @@ package systems.kinau.fishingbot.modules;
 
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.network.protocol.State;
+import systems.kinau.fishingbot.network.protocol.ProtocolState;
 import systems.kinau.fishingbot.network.protocol.handshake.PacketOutHandshake;
 
+@Getter
 public class HandshakeModule extends Module {
 
-    @Getter private String serverName;
-    @Getter private int serverPort;
+    private String serverName;
+    private int serverPort;
 
     public HandshakeModule(String serverName, int serverPort) {
         this.serverName = serverName;
@@ -23,7 +24,7 @@ public class HandshakeModule extends Module {
     @Override
     public void onEnable() {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHandshake(serverName, serverPort));
-        FishingBot.getInstance().getCurrentBot().getNet().setState(State.LOGIN);
+        FishingBot.getInstance().getCurrentBot().getNet().setState(ProtocolState.LOGIN);
     }
 
     @Override

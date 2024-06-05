@@ -8,6 +8,7 @@ package systems.kinau.fishingbot.utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,9 @@ public class ChatComponentUtils {
     }
 
     // If chat types changed in registry, this is not working
-    public static String sillyTransformWithChatType(int chatType, String senderName, String recipientName, String message) {
+    public static String sillyTransformWithChatType(int protocolId, int chatType, String senderName, String recipientName, String message) {
+        if (protocolId >= ProtocolConstants.MINECRAFT_1_21_PRE_2)
+            chatType--;
         if (chatType == 1) {
             return "* " + senderName + " " + message;
         } else if (chatType == 2) {

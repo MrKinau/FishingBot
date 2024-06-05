@@ -91,7 +91,7 @@ public class PacketInChatPlayer extends Packet {
                 // target name
                 if (in.readBoolean())
                     targetName = readChatComponent(in, protocolId);
-                this.text = ChatComponentUtils.sillyTransformWithChatType(chatType, userName, targetName, actualMessage);
+                this.text = ChatComponentUtils.sillyTransformWithChatType(protocolId, chatType, userName, targetName, actualMessage);
 
                 FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
             } catch (Throwable e) {

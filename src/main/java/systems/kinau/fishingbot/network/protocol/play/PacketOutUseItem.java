@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -27,7 +28,14 @@ public class PacketOutUseItem extends Packet {
     private byte cursorX = 0;
     private byte cursorY = 0;
     private byte cursorZ = 0;
+    private float yaw = 0;
+    private float pitch = 0;
     private PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.UNSET;
+
+    public PacketOutUseItem(Player player) {
+        this.yaw = player.getYaw();
+        this.pitch = player.getPitch();
+    }
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -46,6 +54,10 @@ public class PacketOutUseItem extends Packet {
             writeVarInt(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal(), out);
             if (protocolId >= ProtocolConstants.MINECRAFT_1_19)
                 writeVarInt(0, out); //sequence
+            if (protocolId >= ProtocolConstants.MINECRAFT_1_21_PRE_2) {
+                out.writeFloat(yaw);
+                out.writeFloat(pitch);
+            }
         }
     }
 

@@ -159,11 +159,16 @@ public class MojangAPI {
 
             servers.forEach(server -> {
                 JsonObject serverObj = server.getAsJsonObject();
-                long id = serverObj.get("id").getAsLong();
-                String owner = serverObj.get("owner").getAsString();
-                String name = serverObj.get("name").getAsString();
-                String motd = serverObj.get("motd").getAsString();
-                joinableRealms.add(new Realm(id, name, owner, motd));
+                try {
+                    long id = serverObj.get("id").getAsLong();
+                    String owner = serverObj.get("owner").isJsonNull() ? "null" : serverObj.get("owner").getAsString();
+                    String name = serverObj.get("name").isJsonNull() ? "null" : serverObj.get("name").getAsString();
+                    String motd = serverObj.get("motd").isJsonNull() ? "null" : serverObj.get("motd").getAsString();
+                    joinableRealms.add(new Realm(id, name, owner, motd));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    FishingBot.getI18n().severe("realms-could-not-parse-server-entry", serverObj.toString());
+                }
             });
         } catch (IOException | JsonParseException e) {
             e.printStackTrace();

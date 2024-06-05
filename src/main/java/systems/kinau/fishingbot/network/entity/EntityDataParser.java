@@ -10,6 +10,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: Check for changes in 1.21
 public class EntityDataParser {
 
     private final EntityDataElementRegistry dataElementRegistry;

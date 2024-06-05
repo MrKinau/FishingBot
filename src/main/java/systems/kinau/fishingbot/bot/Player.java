@@ -407,7 +407,7 @@ public class Player implements Listener {
         }
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(
-                    x, y, z, (byte)0, (byte)0, (byte)0, blockFace
+                    x, y, z, (byte)0, (byte)0, (byte)0, 0F, 0F, blockFace
             ));
         } else {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutBlockPlace(
@@ -438,7 +438,7 @@ public class Player implements Listener {
     }
 
     public void use() {
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(this));
     }
 
     public int incrementChatSessionIndex() {

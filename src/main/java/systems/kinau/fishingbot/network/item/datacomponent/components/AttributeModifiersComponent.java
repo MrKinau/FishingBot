@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponentPart;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.Collections;
@@ -64,7 +65,8 @@ public class AttributeModifiersComponent extends DataComponent {
         public void write(ByteArrayDataOutput out, int protocolId) {
             Packet.writeVarInt(getAttributeId(), out);
 
-            Packet.writeUUID(getUuid(), out);
+            if (protocolId < ProtocolConstants.MINECRAFT_1_21_PRE_2)
+                Packet.writeUUID(getUuid(), out);
             Packet.writeString(getName(), out);
             out.writeDouble(getAmount());
             Packet.writeVarInt(getOperationId(), out);
@@ -76,7 +78,8 @@ public class AttributeModifiersComponent extends DataComponent {
         public void read(ByteArrayDataInputWrapper in, int protocolId) {
             this.attributeId = Packet.readVarInt(in);
 
-            this.uuid = Packet.readUUID(in);
+            if (protocolId < ProtocolConstants.MINECRAFT_1_21_PRE_2)
+                this.uuid = Packet.readUUID(in);
             this.name = Packet.readString(in);
             this.amount = in.readDouble();
             this.operationId = Packet.readVarInt(in);

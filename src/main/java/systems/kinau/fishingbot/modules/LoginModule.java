@@ -16,7 +16,7 @@ import systems.kinau.fishingbot.event.login.*;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.State;
+import systems.kinau.fishingbot.network.protocol.ProtocolState;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutKnownPacks;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutPluginMessage;
@@ -103,7 +103,7 @@ public class LoginModule extends Module implements Listener {
     public void onLoginSuccess(LoginSuccessEvent event) {
         FishingBot.getI18n().info("module-login-successful", event.getUserName(), event.getUuid().toString());
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_20_2) {
-            FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
+            FishingBot.getInstance().getCurrentBot().getNet().setState(ProtocolState.PLAY);
         } else {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginAcknowledge());
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ConfigurationStartEvent());
@@ -114,16 +114,16 @@ public class LoginModule extends Module implements Listener {
     @EventHandler
     public void onConfigurationStart(ConfigurationStartEvent event) {
         if (FishingBot.getInstance().getCurrentBot() != null && FishingBot.getInstance().getCurrentBot().getNet() != null
-                && FishingBot.getInstance().getCurrentBot().getNet().getState() == State.PLAY)
+                && FishingBot.getInstance().getCurrentBot().getNet().getState() == ProtocolState.PLAY)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutAcknowledgeConfiguration());
-        FishingBot.getInstance().getCurrentBot().getNet().setState(State.CONFIGURATION);
+        FishingBot.getInstance().getCurrentBot().getNet().setState(ProtocolState.CONFIGURATION);
     }
 
     @EventHandler
     public void onConfigurationFinish(ConfigurationFinishEvent event) {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPluginMessage("minecraft:brand", (out, protocol) -> Packet.writeString("fishingbot", out)));
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutFinishConfiguration());
-        FishingBot.getInstance().getCurrentBot().getNet().setState(State.PLAY);
+        FishingBot.getInstance().getCurrentBot().getNet().setState(ProtocolState.PLAY);
     }
 
     @EventHandler

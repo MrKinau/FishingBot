@@ -23,7 +23,6 @@ import systems.kinau.fishingbot.modules.Module;
 import systems.kinau.fishingbot.network.entity.EntityDataValue;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatMessage;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.StringUtils;
 
@@ -100,14 +99,14 @@ public class FishingModule extends Module implements Runnable, Listener {
             Thread.sleep(200);
         } catch (InterruptedException ignore) {
         }
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+        FishingBot.getInstance().getCurrentBot().getPlayer().use();
     }
 
     public void setPaused(boolean paused) {
         this.paused = paused;
         if (paused) {
             if (getCurrentBobber() != null && !isTrackingNextEntityMeta())
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+                FishingBot.getInstance().getCurrentBot().getPlayer().use();
         } else {
             stuck();
         }
@@ -120,7 +119,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         setTrackingNextEntityMeta(true);
         if (isPaused())
             return;
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+        FishingBot.getInstance().getCurrentBot().getPlayer().use();
         new Thread(() -> {
             try {
                 int timeToWait = FishingBot.getInstance().getCurrentBot().getPlayer().getLastPing() + 200;
@@ -139,7 +138,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
                 if (FishingBot.getInstance().getCurrentBot().getPlayer() != null
                         && !FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking()) {
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+                    FishingBot.getInstance().getCurrentBot().getPlayer().use();
                 } else {
                     setTrackingNextBobberId(false);
                 }
@@ -266,7 +265,7 @@ public class FishingModule extends Module implements Runnable, Listener {
         if (currentBobber != null) return;
         new Thread(() -> {
             setTrackingNextBobberId(true);
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+            FishingBot.getInstance().getCurrentBot().getPlayer().use();
         }).start();
     }
 
@@ -289,7 +288,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 FishingBot.getI18n().info("module-fishing-start-fishing");
                 if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking())
                     return;
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+                FishingBot.getInstance().getCurrentBot().getPlayer().use();
             }
         }).start();
     }
@@ -383,7 +382,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                     if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking())
                         return;
                     setTrackingNextBobberId(true);
-                    FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+                    FishingBot.getInstance().getCurrentBot().getPlayer().use();
                 } else if (!isNoRodAvailable() && !ItemUtils.isFishingRod(slot)) {
                     noRod();
                 }
@@ -468,7 +467,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 if (FishingBot.getInstance().getCurrentBot().getPlayer().isCurrentlyLooking())
                     return;
                 setTrackingNextBobberId(true);
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem());
+                FishingBot.getInstance().getCurrentBot().getPlayer().use();
             }
             try {
                 Thread.sleep(5000);
