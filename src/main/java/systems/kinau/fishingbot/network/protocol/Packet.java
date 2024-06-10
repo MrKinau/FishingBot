@@ -10,6 +10,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.network.item.ComponentItemData;
@@ -287,6 +288,8 @@ public abstract class Packet {
                 if (dataComponent != null) {
                     dataComponent.read(input, protocolId);
                     presentComponents.add(dataComponent);
+                } else {
+                    FishingBot.getLog().severe("Invalid component: " + dataComponentType);
                 }
             }
 

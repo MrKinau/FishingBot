@@ -128,7 +128,7 @@ public class LoginModule extends Module implements Listener {
 
     @EventHandler
     public void onKnownPacksRequested(KnownPacksRequestedEvent event) {
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutKnownPacks());
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutKnownPacks(event.getKnownPacks()));
     }
 
     private String sendSessionRequest(String user, String session, String serverid) {

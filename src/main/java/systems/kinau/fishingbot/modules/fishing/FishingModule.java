@@ -432,7 +432,7 @@ public class FishingModule extends Module implements Runnable, Listener {
                 hookedEntity = true;
             else if (protocolId <= ProtocolConstants.MINECRAFT_1_16_4 && entityDataValue.getElementIndex() == 7)
                 hookedEntity = true;
-            else if (protocolId <= ProtocolConstants.MINECRAFT_1_20_5 && entityDataValue.getElementIndex() == 8)
+            else if (entityDataValue.getElementIndex() == 8)
                 hookedEntity = true;
             if (hookedEntity && ((int)entityDataValue.getElement().getValue()) > 0) {
                 FishingBot.getI18n().warning("module-fishing-entity-hooked");

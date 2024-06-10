@@ -3,8 +3,7 @@ package systems.kinau.fishingbot.bot.registry;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class Registry<K, V> {
@@ -20,6 +19,10 @@ public class Registry<K, V> {
     }
 
     public void registerElement(K key, V value) {
+        if (registry.containsValue(value)) {
+            BiMap<V, K> inverted = registry.inverse();
+            inverted.remove(value);
+        }
         registry.put(key, value);
     }
 
@@ -41,5 +44,18 @@ public class Registry<K, V> {
 
     public K findKey(V value) {
         return registry.inverse().get(value);
+    }
+
+    public void merge(Registry<Integer, String> other) {
+        Set<String> identifiers = (Set<String>) new HashSet<>(values());
+        identifiers.addAll(other.values());
+
+        List<String> identifierList = new ArrayList<>(identifiers);
+        identifierList.sort(RegistryLoader.RESOURCE_LOCATION_COMPARATOR);
+        Integer i = 0;
+        reset();
+        for (String identifier : identifierList) {
+            registerElement((K)i++, (V)identifier);
+        }
     }
 }

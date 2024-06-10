@@ -23,15 +23,21 @@ public class MetaRegistry<K, V> {
     }
 
     public Registry<K, V> getRegistry(int protocolId) {
-        for (int i = protocolId; i >= 0; i--) {
-            if (versionToRegistry.containsKey(i))
-                return versionToRegistry.get(i);
+        int nearestRegistry = -1;
+        for (Integer registryId : versionToRegistry.keySet()) {
+            if (registryId > nearestRegistry && protocolId >= registryId) {
+                nearestRegistry = registryId;
+            }
         }
-        return null;
+        if (nearestRegistry == -1) return null;
+        return versionToRegistry.get(nearestRegistry);
     }
 
     protected void addRegistry(int protocolId, Registry<K, V> registry) {
-        versionToRegistry.put(protocolId, registry);
+        if (versionToRegistry.containsKey(protocolId))
+            versionToRegistry.get(protocolId).merge((Registry<Integer, String>) registry);
+        else
+            versionToRegistry.put(protocolId, registry);
     }
 
     protected void load(RegistryLoader.Json<K, V> registryLoader) {
@@ -47,5 +53,11 @@ public class MetaRegistry<K, V> {
         });
         if (legacyRegistry != null)
             addRegistry(ProtocolConstants.MINECRAFT_1_8, legacyRegistry);
+    }
+
+    public void load(Map<String, ?> networkRegistry, RegistryLoader.Map<K, V> registryLoader, int protocolId) {
+        Registry<K, V> registry = registryLoader.apply(networkRegistry);
+        if (registry == null) return;
+        addRegistry(protocolId, registry);
     }
 }

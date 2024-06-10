@@ -165,16 +165,16 @@ public class EntityDataElementRegistry {
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 20)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 21)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 22)
-                .build(), simple("cat_variant", in -> Packet.readVarInt(in))); // Cat Variant
+                .build(), simple("cat_variant", in -> Packet.readVarInt(in))); // Cat Variant TODO: Not correct for custom cat variants
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 23)
-                .build(), simple("wolf_variant", in -> Packet.readVarInt(in))); // Wolf Variant
+                .build(), simple("wolf_variant", in -> Packet.readVarInt(in))); // Wolf Variant TODO: Not correct for custom wolf variants
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19, 20)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 21)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 22)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 24)
-                .build(), simple("frog_variant", in -> Packet.readVarInt(in))); // Frog Variant
+                .build(), simple("frog_variant", in -> Packet.readVarInt(in))); // Frog Variant TODO: Not correct for custom frog variants
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19, 21)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 22)
@@ -192,7 +192,7 @@ public class EntityDataElementRegistry {
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_3, 23)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 24)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_20_5, 26)
-                .build(), simple("painting_variant", in -> Packet.readVarInt(in))); // Painting Variant
+                .build(), simple("painting_variant", in -> Packet.readVarInt(in))); // Painting Variant TODO: Not correct for custom painting variants
 
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MINECRAFT_1_19_4, 25)

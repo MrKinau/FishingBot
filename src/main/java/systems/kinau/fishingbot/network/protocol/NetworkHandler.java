@@ -220,8 +220,15 @@ public class NetworkHandler {
             FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] |C| <<<  S : " + clazz.getSimpleName());
 
         try {
+            long startTime = System.currentTimeMillis();
+
             Packet packet = clazz.newInstance();
             packet.read(buf, this, len, FishingBot.getInstance().getCurrentBot().getServerProtocol());
+
+            long endTime = System.currentTimeMillis();
+
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets() && endTime - startTime > 2)
+                FishingBot.getLog().info("Handling packet " + clazz.getSimpleName() + " took " + (endTime - startTime) + "ms");
         } catch (InstantiationException | IllegalAccessException e) {
             FishingBot.getLog().warning("Could not create new instance of " + clazz.getSimpleName());
             e.printStackTrace();

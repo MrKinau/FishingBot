@@ -5202,7 +5202,7 @@
       "minecraft:replace_block": {
         "protocol_id": 7
       },
-      "minecraft:replace_disc": {
+      "minecraft:replace_disk": {
         "protocol_id": 8
       },
       "minecraft:run_function": {
@@ -5269,7 +5269,7 @@
       "minecraft:replace_block": {
         "protocol_id": 8
       },
-      "minecraft:replace_disc": {
+      "minecraft:replace_disk": {
         "protocol_id": 9
       },
       "minecraft:run_function": {

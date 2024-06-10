@@ -41,7 +41,7 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_3);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_5);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_21_PRE_2);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_21_RC_1);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();
@@ -54,6 +54,17 @@ public class Registries {
         if (registries == null)
             registries = new Registries();
         return registries;
+    }
+
+    public static MetaRegistry<Integer, String> getByIdentifier(String identifier, int protocolId) {
+        switch (identifier) {
+            case "minecraft:item": return ITEM;
+            case "minecraft:entity_type": return ENTITY_TYPE;
+            case "minecraft:enchantment": return ENCHANTMENT;
+            case "minecraft:data_component_type": return DATA_COMPONENT_TYPE;
+            case "minecraft:particle_type": return PARTICLE_TYPE;
+        }
+        return null;
     }
 
     public Registries() {
@@ -94,7 +105,7 @@ public class Registries {
             case ProtocolConstants.MINECRAFT_1_20: return "mc_data/1_20/registries.json";
             case ProtocolConstants.MINECRAFT_1_20_3: return "mc_data/1_20_3/registries.json";
             case ProtocolConstants.MINECRAFT_1_20_5: return "mc_data/1_20_5/registries.json";
-            case ProtocolConstants.MINECRAFT_1_21_PRE_2: return "mc_data/1_21/registries.json";
+            case ProtocolConstants.MINECRAFT_1_21_RC_1: return "mc_data/1_21/registries.json";
             default: return null;
         }
     }

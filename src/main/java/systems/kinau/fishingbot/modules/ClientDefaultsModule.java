@@ -9,12 +9,16 @@ import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.auth.AuthData;
 import systems.kinau.fishingbot.bot.Player;
+import systems.kinau.fishingbot.bot.registry.MetaRegistry;
+import systems.kinau.fishingbot.bot.registry.Registries;
+import systems.kinau.fishingbot.bot.registry.RegistryLoader;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.common.KeepAliveEvent;
 import systems.kinau.fishingbot.event.common.PingPacketEvent;
 import systems.kinau.fishingbot.event.common.ResourcePackEvent;
 import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
+import systems.kinau.fishingbot.event.configuration.RegistryDataEvent;
 import systems.kinau.fishingbot.event.play.*;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
@@ -176,5 +180,12 @@ public class ClientDefaultsModule extends Module implements Listener {
                         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(event.getEntityId(), (float) element.getElement().getValue(), -1 ,-1));
                     }
                 });
+    }
+
+    @EventHandler
+    public void onRegistryData(RegistryDataEvent event) {
+        MetaRegistry<Integer, String> metaRegistry = Registries.getByIdentifier(event.getRegistryId(), FishingBot.getInstance().getCurrentBot().getServerProtocol());
+        if (metaRegistry == null) return;
+        metaRegistry.load(event.getRegistryData(), RegistryLoader.mapped(), FishingBot.getInstance().getCurrentBot().getServerProtocol());
     }
 }
