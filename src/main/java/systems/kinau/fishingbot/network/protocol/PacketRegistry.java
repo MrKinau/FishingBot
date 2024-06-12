@@ -43,7 +43,8 @@ public class PacketRegistry {
         for (String packetId : flowObj.keySet()) {
             Class<? extends Packet> packetClazz = mapMojangPacketId(packetId);
             if (packetClazz == null) {
-                FishingBot.getLog().warning("Could not map packet id " + packetId + " in " + state.name() + " (" + flow.name() + ")");
+                if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
+                    FishingBot.getLog().warning("Could not map packet id " + packetId + " in " + state.name() + " (" + flow.name() + ")");
                 continue;
             }
 
@@ -179,6 +180,10 @@ public class PacketRegistry {
     }
 
     private void registerPacket(int id, Class<? extends Packet> clazz) {
+        if (clazz == null) {
+            FishingBot.getLog().severe("Tried to register null packet for: " + id);
+            return;
+        }
         if (registeredPackets.containsKey(id)) {
             FishingBot.getLog().severe("Tried to register packet twice: " + id + " is registered as " + registeredPackets.get(id).getSimpleName() + " wants to register as " + clazz.getSimpleName());
             return;

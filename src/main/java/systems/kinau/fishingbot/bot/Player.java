@@ -79,13 +79,10 @@ public class Player implements Listener {
         this.z = event.getZ();
         this.yaw = event.getYaw();
         this.pitch = event.getPitch();
-        if (originYaw == -255 && originPitch == -255) {
-            this.originYaw = yaw;
-            this.originPitch = pitch;
-        }
+        this.originYaw = yaw;
+        this.originPitch = pitch;
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
-
     }
 
     @EventHandler
@@ -410,12 +407,17 @@ public class Player implements Listener {
                     x, y, z, (byte)0, (byte)0, (byte)0, 0F, 0F, blockFace
             ));
         } else {
+            boolean autoSneak = FishingBot.getInstance().getCurrentBot().getConfig().isAutoSneak();
+            if (autoSneak)
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutEntityAction(EntityAction.STOP_SNEAKING));
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutBlockPlace(
                     PacketOutBlockPlace.Hand.MAIN_HAND,
                     x, y, z, blockFace,
                     0.5F, 0.5F, 0.5F,
                     false
             ));
+            if (autoSneak)
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutEntityAction(EntityAction.START_SNEAKING));
         }
     }
 
