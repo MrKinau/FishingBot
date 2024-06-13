@@ -74,7 +74,7 @@ public class DataComponentRegistry {
         registry.put(dataComponentRegistry.findKey("minecraft:lock"), NBTComponent::new);
         registry.put(dataComponentRegistry.findKey("minecraft:container_loot"), NBTComponent::new);
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_21_RC_1) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_21) {
             registry.put(dataComponentRegistry.findKey("minecraft:jukebox_playable"), JukeboxPlayableComponent::new);
         }
 

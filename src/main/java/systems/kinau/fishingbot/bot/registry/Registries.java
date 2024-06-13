@@ -41,7 +41,7 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_3);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_5);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_21_RC_1);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_21);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();
@@ -105,7 +105,7 @@ public class Registries {
             case ProtocolConstants.MINECRAFT_1_20: return "mc_data/1_20/registries.json";
             case ProtocolConstants.MINECRAFT_1_20_3: return "mc_data/1_20_3/registries.json";
             case ProtocolConstants.MINECRAFT_1_20_5: return "mc_data/1_20_5/registries.json";
-            case ProtocolConstants.MINECRAFT_1_21_RC_1: return "mc_data/1_21/registries.json";
+            case ProtocolConstants.MINECRAFT_1_21: return "mc_data/1_21/registries.json";
             default: return null;
         }
     }

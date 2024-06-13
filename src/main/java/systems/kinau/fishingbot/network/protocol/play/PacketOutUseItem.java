@@ -54,7 +54,7 @@ public class PacketOutUseItem extends Packet {
             writeVarInt(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal(), out);
             if (protocolId >= ProtocolConstants.MINECRAFT_1_19)
                 writeVarInt(0, out); //sequence
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_21_RC_1) {
+            if (protocolId >= ProtocolConstants.MINECRAFT_1_21) {
                 out.writeFloat(yaw);
                 out.writeFloat(pitch);
             }

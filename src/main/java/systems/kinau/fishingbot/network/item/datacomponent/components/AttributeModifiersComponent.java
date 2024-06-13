@@ -65,7 +65,7 @@ public class AttributeModifiersComponent extends DataComponent {
         public void write(ByteArrayDataOutput out, int protocolId) {
             Packet.writeVarInt(getAttributeId(), out);
 
-            if (protocolId < ProtocolConstants.MINECRAFT_1_21_RC_1)
+            if (protocolId < ProtocolConstants.MINECRAFT_1_21)
                 Packet.writeUUID(getUuid(), out);
             Packet.writeString(getName(), out);
             out.writeDouble(getAmount());
@@ -78,7 +78,7 @@ public class AttributeModifiersComponent extends DataComponent {
         public void read(ByteArrayDataInputWrapper in, int protocolId) {
             this.attributeId = Packet.readVarInt(in);
 
-            if (protocolId < ProtocolConstants.MINECRAFT_1_21_RC_1)
+            if (protocolId < ProtocolConstants.MINECRAFT_1_21)
                 this.uuid = Packet.readUUID(in);
             this.name = Packet.readString(in);
             this.amount = in.readDouble();
