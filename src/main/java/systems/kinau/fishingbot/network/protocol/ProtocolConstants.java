@@ -139,7 +139,7 @@ public class ProtocolConstants {
             case MINECRAFT_1_20_2: return "1.20.2";
             case MINECRAFT_1_20_3: return "1.20.3 / 1.20.4";
             case MINECRAFT_1_20_5: return "1.20.5 / 1.20.6";
-            case MINECRAFT_1_21: return "1.21-rc1";
+            case MINECRAFT_1_21: return "1.21";
             default: return "Unknown version";
         }
     }
@@ -209,7 +209,7 @@ public class ProtocolConstants {
             case "1.20.5":
             case "1.20.6":
             case "1.20.5 / 1.20.6": return MINECRAFT_1_20_5;
-            case "1.21-rc1": return MINECRAFT_1_21;
+            case "1.21": return MINECRAFT_1_21;
             default: return MINECRAFT_1_8;
         }
     }
