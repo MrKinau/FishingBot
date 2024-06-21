@@ -20,6 +20,6 @@ public class ItemRegistry extends MetaRegistry<Integer, String> {
     }
 
     public String getItemName(int id, int protocol) {
-        return Optional.ofNullable(getElement(id, protocol)).orElse("Modded Item");
+        return Optional.ofNullable(getElement(id, protocol)).orElse("Modded Item (" + id + ")");
     }
 }
