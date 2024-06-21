@@ -137,6 +137,7 @@ public class PacketRegistry {
                     case "minecraft:remove_entities": return PacketInDestroyEntities.class;
                     case "minecraft:confirm_transaction": return PacketInConfirmTransaction.class;
                     case "minecraft:play_compression": return PacketInSetCompressionLegacy.class;
+                    case "minecraft:ping": return PacketInPing.class;
                 }
             } else if (flow == ProtocolFlow.OUTGOING_PACKET) {
                 switch (mojangPacketId) {
@@ -161,6 +162,7 @@ public class PacketRegistry {
                     case "minecraft:use_item": return PacketOutUseItem.class;
                     case "minecraft:swing": return PacketOutArmAnimation.class;
                     case "minecraft:confirm_transaction": return PacketOutConfirmTransaction.class;
+                    case "minecraft:pong": return PacketOutPing.class;
                 }
             }
         }

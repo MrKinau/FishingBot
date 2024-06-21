@@ -154,6 +154,9 @@
       },
       "minecraft:teleport_entity": {
         "protocol_id": 112
+      },
+      "minecraft:ping": {
+        "protocol_id": 51
       }
     },
     "serverbound": {
@@ -213,6 +216,9 @@
       },
       "minecraft:use_item": {
         "protocol_id": 57
+      },
+      "minecraft:pong": {
+        "protocol_id": 36
       }
     }
   }
