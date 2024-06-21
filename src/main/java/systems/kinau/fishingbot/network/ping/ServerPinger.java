@@ -97,7 +97,7 @@ public class ServerPinger {
             String description = "Unknown";
             try {
                 try {
-                    if (protocolId > ProtocolConstants.MINECRAFT_1_8)
+                    if (protocolId > ProtocolConstants.MC_1_8)
                         description = ChatComponentUtils.toPlainText(root.getAsJsonObject("description"));
                     else
                         description = root.getAsJsonPrimitive("description").getAsString();

@@ -23,7 +23,7 @@ public class PacketOutKeepAlive extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        if(protocolId <= ProtocolConstants.MINECRAFT_1_12_1) {
+        if(protocolId <= ProtocolConstants.MC_1_12_1) {
             writeVarInt(Long.valueOf(getId()).intValue(), out);
         } else {
             out.writeLong(id);

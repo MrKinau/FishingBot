@@ -27,21 +27,21 @@ public class Registries {
     private final JsonParser parser = new JsonParser();
 
     static {
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_13);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_13_1);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_14);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_15);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_16);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_16_2);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_17);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_18);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_19);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_19_3);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_19_4);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_3);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_20_5);
-        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MINECRAFT_1_21);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_13);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_13_1);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_14);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_15);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_16);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_16_2);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_17);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_18);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_19);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_19_3);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_19_4);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_20);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_20_3);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_20_5);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();
@@ -91,21 +91,21 @@ public class Registries {
 
     private String getRegistriesFileName(int protocolId) {
         switch (protocolId) {
-            case ProtocolConstants.MINECRAFT_1_13: return "mc_data/1_13/registries.json";
-            case ProtocolConstants.MINECRAFT_1_13_1: return "mc_data/1_13_1/registries.json";
-            case ProtocolConstants.MINECRAFT_1_14: return "mc_data/1_14/registries.json";
-            case ProtocolConstants.MINECRAFT_1_15: return "mc_data/1_15/registries.json";
-            case ProtocolConstants.MINECRAFT_1_16: return "mc_data/1_16/registries.json";
-            case ProtocolConstants.MINECRAFT_1_16_2: return "mc_data/1_16_2/registries.json";
-            case ProtocolConstants.MINECRAFT_1_17: return "mc_data/1_17/registries.json";
-            case ProtocolConstants.MINECRAFT_1_18: return "mc_data/1_18/registries.json";
-            case ProtocolConstants.MINECRAFT_1_19: return "mc_data/1_19/registries.json";
-            case ProtocolConstants.MINECRAFT_1_19_3: return "mc_data/1_19_3/registries.json";
-            case ProtocolConstants.MINECRAFT_1_19_4: return "mc_data/1_19_4/registries.json";
-            case ProtocolConstants.MINECRAFT_1_20: return "mc_data/1_20/registries.json";
-            case ProtocolConstants.MINECRAFT_1_20_3: return "mc_data/1_20_3/registries.json";
-            case ProtocolConstants.MINECRAFT_1_20_5: return "mc_data/1_20_5/registries.json";
-            case ProtocolConstants.MINECRAFT_1_21: return "mc_data/1_21/registries.json";
+            case ProtocolConstants.MC_1_13: return "mc_data/1_13/registries.json";
+            case ProtocolConstants.MC_1_13_1: return "mc_data/1_13_1/registries.json";
+            case ProtocolConstants.MC_1_14: return "mc_data/1_14/registries.json";
+            case ProtocolConstants.MC_1_15: return "mc_data/1_15/registries.json";
+            case ProtocolConstants.MC_1_16: return "mc_data/1_16/registries.json";
+            case ProtocolConstants.MC_1_16_2: return "mc_data/1_16_2/registries.json";
+            case ProtocolConstants.MC_1_17: return "mc_data/1_17/registries.json";
+            case ProtocolConstants.MC_1_18: return "mc_data/1_18/registries.json";
+            case ProtocolConstants.MC_1_19: return "mc_data/1_19/registries.json";
+            case ProtocolConstants.MC_1_19_3: return "mc_data/1_19_3/registries.json";
+            case ProtocolConstants.MC_1_19_4: return "mc_data/1_19_4/registries.json";
+            case ProtocolConstants.MC_1_20: return "mc_data/1_20/registries.json";
+            case ProtocolConstants.MC_1_20_3: return "mc_data/1_20_3/registries.json";
+            case ProtocolConstants.MC_1_20_5: return "mc_data/1_20_5/registries.json";
+            case ProtocolConstants.MC_1_21: return "mc_data/1_21/registries.json";
             default: return null;
         }
     }

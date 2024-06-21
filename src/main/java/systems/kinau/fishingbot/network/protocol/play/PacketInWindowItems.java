@@ -30,11 +30,11 @@ public class PacketInWindowItems extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.windowId = in.readUnsignedByte();
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_17_1) {
+        if (protocolId >= ProtocolConstants.MC_1_17_1) {
             readVarInt(in); // revision (whatever it is?) or arbitrary state id?
         }
         this.slots = new ArrayList<>();
-        int count = protocolId >= ProtocolConstants.MINECRAFT_1_17_1 ? readVarInt(in) : in.readShort();
+        int count = protocolId >= ProtocolConstants.MC_1_17_1 ? readVarInt(in) : in.readShort();
         for (int i = 0; i < count; i++) {
             this.slots.add(readSlot(in, protocolId, networkHandler.getDataComponentRegistry()));
         }

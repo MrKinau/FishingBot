@@ -41,7 +41,7 @@ public class NBTItemData implements ItemData {
         for (CompoundTag enchant : enchants) {
             String enchType;
             short level = enchant.get("lvl", ShortTag.class).getValue();
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_13) {
+            if (protocolId >= ProtocolConstants.MC_1_13) {
                 enchType = enchant.get("id", StringTag.class).getValue();
             } else {
                 short id = enchant.get("id", ShortTag.class).getValue();

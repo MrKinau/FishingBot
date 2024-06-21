@@ -40,7 +40,7 @@ public class NBTTag {
         ByteArrayDataInputWrapper clone = in.clone();
         int startAvailable = in.getAvailable();
         byte type = in.readByte();
-        if (protocol >= ProtocolConstants.MINECRAFT_1_20_2) {
+        if (protocol >= ProtocolConstants.MC_1_20_2) {
             this.tag = TagRegistry.createTag(type).read(in);
         } else {
             this.tag = TagRegistry.createTag(type).readNamed(in);

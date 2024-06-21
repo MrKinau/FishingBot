@@ -40,7 +40,7 @@ public class PacketOutEncryptionResponse extends Packet {
         byte[] verifyToken = CryptManager.encryptData(getPublicKey(), getVerifyToken());
         writeVarInt(sharedSecret.length, out);
         out.write(sharedSecret);
-        if (protocolId < ProtocolConstants.MINECRAFT_1_19 || protocolId > ProtocolConstants.MINECRAFT_1_19_1) {
+        if (protocolId < ProtocolConstants.MC_1_19 || protocolId > ProtocolConstants.MC_1_19_1) {
             writeVarInt(verifyToken.length, out);
             out.write(verifyToken);
         } else {

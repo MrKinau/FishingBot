@@ -81,7 +81,7 @@ public class Player implements Listener {
         this.pitch = event.getPitch();
         this.originYaw = yaw;
         this.originPitch = pitch;
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_9)
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_9)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
     }
 
@@ -229,11 +229,11 @@ public class Player implements Listener {
     public void sendMessage(String message, CommandExecutor commandExecutor) {
         message = message.replace("%prefix%", FishingBot.PREFIX);
         for (String line : message.split("\n")) {
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MC_1_8) {
                 for (String split : StringUtils.splitDescription(line)) {
                     FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(split));
                 }
-            } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_19) {
+            } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MC_1_19) {
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatMessage(line));
             } else {
                 if (line.startsWith("/"))
@@ -246,7 +246,7 @@ public class Player implements Listener {
 
     private void executeChatCommand(String command, CommandExecutor commandExecutor) {
         if (mcCommandDispatcher == null) {
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5)
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_20_5)
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUnsignedChatCommand(command));
             else
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
@@ -257,7 +257,7 @@ public class Player implements Listener {
         Map<String, Pair<ArgumentType<?>, ParsedArgument<CommandExecutor, ?>>> arguments = CommandUtils.getArguments(context);
         boolean containsSignableArguments = arguments.values().stream().anyMatch(argument -> argument.getKey() instanceof MessageArgumentType);
         if (!containsSignableArguments) {
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5)
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_20_5)
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUnsignedChatCommand(command));
             else
                 FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatCommand(command));
@@ -306,7 +306,7 @@ public class Player implements Listener {
         try { Thread.sleep(20); } catch (InterruptedException ignore) { }
         closeInventory();
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_17) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MC_1_17) {
             Slot slot = FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(slotId);
             FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(slotId, FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().get(hotBarButton + 36));
             FishingBot.getInstance().getCurrentBot().getPlayer().getInventory().getContent().put(hotBarButton + 36, slot);
@@ -402,7 +402,7 @@ public class Player implements Listener {
             case DOWN: y--; blockFace = PacketOutBlockPlace.BlockFace.TOP; break;
             default: z++; blockFace = PacketOutBlockPlace.BlockFace.NORTH; break;
         }
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MINECRAFT_1_8) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() == ProtocolConstants.MC_1_8) {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutUseItem(
                     x, y, z, (byte)0, (byte)0, (byte)0, 0F, 0F, blockFace
             ));

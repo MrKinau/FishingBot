@@ -29,7 +29,7 @@ public class PacketOutChatMessage extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(getMessage(), out);
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_19 && protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+        if (protocolId >= ProtocolConstants.MC_1_19 && protocolId <= ProtocolConstants.MC_1_19_1) {
             AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
             UUID signer = null;
             try {
@@ -54,11 +54,11 @@ public class PacketOutChatMessage extends Packet {
                 FishingBot.getInstance().getCurrentBot().getPlayer().setLastUsedSignature(Optional.of(signature));
             }
 
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
+            if (protocolId >= ProtocolConstants.MC_1_19_1) {
                 writeVarInt(0, out);
                 out.writeBoolean(false);
             }
-        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
+        } else if (protocolId >= ProtocolConstants.MC_1_19_3) {
             AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
             UUID signer = null;
             try {

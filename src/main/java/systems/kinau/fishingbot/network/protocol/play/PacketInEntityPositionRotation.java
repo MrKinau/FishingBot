@@ -32,7 +32,7 @@ public class PacketInEntityPositionRotation extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.entityId = readVarInt(in);
-        if (protocolId <= ProtocolConstants.MINECRAFT_1_8) {
+        if (protocolId <= ProtocolConstants.MC_1_8) {
             this.dX = Integer.valueOf(in.readByte() * 128).shortValue();
             this.dY = Integer.valueOf(in.readByte() * 128).shortValue();
             this.dZ = Integer.valueOf(in.readByte() * 128).shortValue();

@@ -39,7 +39,7 @@ public class PacketOutUseItem extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
+        if (protocolId == ProtocolConstants.MC_1_8) {
             out.writeLong(LocationUtils.toBlockPos(x, y, z));
             out.writeByte(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal());
             Packet.writeSlot(FishingBot.getInstance().getCurrentBot().getPlayer().getHeldItem(), out, protocolId);
@@ -52,9 +52,9 @@ public class PacketOutUseItem extends Packet {
             }).start();
         } else {
             writeVarInt(PacketOutBlockPlace.Hand.MAIN_HAND.ordinal(), out);
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_19)
+            if (protocolId >= ProtocolConstants.MC_1_19)
                 writeVarInt(0, out); //sequence
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_21) {
+            if (protocolId >= ProtocolConstants.MC_1_21) {
                 out.writeFloat(yaw);
                 out.writeFloat(pitch);
             }

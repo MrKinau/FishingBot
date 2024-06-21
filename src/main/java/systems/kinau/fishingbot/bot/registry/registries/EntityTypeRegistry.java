@@ -13,7 +13,7 @@ public class EntityTypeRegistry extends MetaRegistry<Integer, String> {
         Registry<Integer, String> legacy1_8Registry = new Registry<>();
         legacy1_8Registry.registerElement(90, "minecraft:fishing_bobber");
         legacy1_8Registry.registerElement(2, "minecraft:item");
-        addRegistry(ProtocolConstants.MINECRAFT_1_8, legacy1_8Registry);
+        addRegistry(ProtocolConstants.MC_1_8, legacy1_8Registry);
 
         load(RegistryLoader.simple("minecraft:entity_type"));
     }

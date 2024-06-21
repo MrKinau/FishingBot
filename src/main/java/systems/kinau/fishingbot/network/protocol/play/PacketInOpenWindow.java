@@ -29,7 +29,7 @@ public class PacketInOpenWindow extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2) {
+        if (protocolId <= ProtocolConstants.MC_1_13_2) {
             this.windowId = in.readUnsignedByte();
             this.windowType = readString(in).hashCode();
             this.title = readChatComponent(in, protocolId);

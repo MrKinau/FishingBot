@@ -102,7 +102,7 @@ public class LoginModule extends Module implements Listener {
     @EventHandler
     public void onLoginSuccess(LoginSuccessEvent event) {
         FishingBot.getI18n().info("module-login-successful", event.getUserName(), event.getUuid().toString());
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MINECRAFT_1_20_2) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() < ProtocolConstants.MC_1_20_2) {
             FishingBot.getInstance().getCurrentBot().getNet().setState(ProtocolState.PLAY);
         } else {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutLoginAcknowledge());

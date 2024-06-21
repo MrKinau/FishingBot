@@ -305,7 +305,7 @@ public class FishingModule extends Module implements Runnable, Listener {
             return;
 
         int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
-        if (protocolId <= ProtocolConstants.MINECRAFT_1_10) {
+        if (protocolId <= ProtocolConstants.MC_1_10) {
             FishingBot.getInstance().getCurrentBot().getFishingModule().fish();
         } else {
             if (Math.abs(event.getY()) > 350) {
@@ -426,11 +426,11 @@ public class FishingModule extends Module implements Runnable, Listener {
         int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
         event.getData().stream().filter(entityDataValue -> entityDataValue.getElement().getInternalId().equals("varint")).forEach(entityDataValue -> {
             boolean hookedEntity = false;
-            if (protocolId <= ProtocolConstants.MINECRAFT_1_9_4 && entityDataValue.getElementIndex() == 5)
+            if (protocolId <= ProtocolConstants.MC_1_9_4 && entityDataValue.getElementIndex() == 5)
                 hookedEntity = true;
-            else if (protocolId <= ProtocolConstants.MINECRAFT_1_13_2 && entityDataValue.getElementIndex() == 6)
+            else if (protocolId <= ProtocolConstants.MC_1_13_2 && entityDataValue.getElementIndex() == 6)
                 hookedEntity = true;
-            else if (protocolId <= ProtocolConstants.MINECRAFT_1_16_4 && entityDataValue.getElementIndex() == 7)
+            else if (protocolId <= ProtocolConstants.MC_1_16_4 && entityDataValue.getElementIndex() == 7)
                 hookedEntity = true;
             else if (entityDataValue.getElementIndex() == 8)
                 hookedEntity = true;

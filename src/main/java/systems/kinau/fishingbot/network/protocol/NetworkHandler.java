@@ -50,7 +50,7 @@ public class NetworkHandler {
             this.in = new DataInputStream(FishingBot.getInstance().getCurrentBot().getSocket().getInputStream());
 
             this.state = ProtocolState.HANDSHAKE;
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5)
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_20_5)
                 this.dataComponentRegistry = new DataComponentRegistry();
             this.entityDataParser = new EntityDataParser();
             initPacketRegistries();

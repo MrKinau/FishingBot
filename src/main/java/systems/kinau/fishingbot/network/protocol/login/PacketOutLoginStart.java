@@ -28,8 +28,8 @@ public class PacketOutLoginStart extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         writeString(userName, out);
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
-            if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+        if (protocolId >= ProtocolConstants.MC_1_19) {
+            if (protocolId <= ProtocolConstants.MC_1_19_1) {
                 AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
                 out.writeBoolean(keys != null);
                 if (keys != null) {
@@ -42,13 +42,13 @@ public class PacketOutLoginStart extends Packet {
                     out.write(signature);
                 }
             }
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
+            if (protocolId >= ProtocolConstants.MC_1_19_1) {
                 UUID uuid = null;
                 try {
                     uuid = UUID.fromString(FishingBot.getInstance().getCurrentBot().getAuthData().getUuid());
                 } catch (Exception ignore) {
                 }
-                if (protocolId < ProtocolConstants.MINECRAFT_1_20_2)
+                if (protocolId < ProtocolConstants.MC_1_20_2)
                     out.writeBoolean(uuid != null);
                 if (uuid != null) {
                     writeUUID(uuid, out);

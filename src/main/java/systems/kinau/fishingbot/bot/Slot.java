@@ -37,7 +37,7 @@ public class Slot {
 
     public void writeItemData(ByteArrayDataOutput output, int protocolId) {
         if (itemData == null) {
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_20_5) {
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_20_5) {
                 Packet.writeVarInt(0, output);
                 Packet.writeVarInt(0, output);
             }

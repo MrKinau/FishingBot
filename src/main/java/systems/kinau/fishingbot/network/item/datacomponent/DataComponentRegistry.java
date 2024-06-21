@@ -37,7 +37,7 @@ public class DataComponentRegistry {
         registry.put(dataComponentRegistry.findKey("minecraft:creative_slot_lock"), EmptyComponent::new);
         registry.put(dataComponentRegistry.findKey("minecraft:enchantment_glint_override"), BooleanComponent::new);
         registry.put(dataComponentRegistry.findKey("minecraft:intangible_projectile"), NBTComponent::new);
-        registry.put(dataComponentRegistry.findKey("minecraft:food"), FoodComponent::new);
+        registry.put(dataComponentRegistry.findKey("minecraft:food"), componentTypeId -> new FoodComponent(this, componentTypeId));
         registry.put(dataComponentRegistry.findKey("minecraft:fire_resistant"), EmptyComponent::new);
         registry.put(dataComponentRegistry.findKey("minecraft:tool"), ToolComponent::new);
         registry.put(dataComponentRegistry.findKey("minecraft:stored_enchantments"), EnchantmentsComponent::new);
@@ -74,7 +74,7 @@ public class DataComponentRegistry {
         registry.put(dataComponentRegistry.findKey("minecraft:lock"), NBTComponent::new);
         registry.put(dataComponentRegistry.findKey("minecraft:container_loot"), NBTComponent::new);
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_21) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21) {
             registry.put(dataComponentRegistry.findKey("minecraft:jukebox_playable"), JukeboxPlayableComponent::new);
         }
 

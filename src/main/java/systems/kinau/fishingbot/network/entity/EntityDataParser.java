@@ -28,13 +28,13 @@ public class EntityDataParser {
                 if (in.getAvailable() == 0)
                     break;
                 int elementIndex = in.readByte();
-                if (protocolId == ProtocolConstants.MINECRAFT_1_8 && elementIndex == 127)
+                if (protocolId == ProtocolConstants.MC_1_8 && elementIndex == 127)
                     break;
-                else if (protocolId != ProtocolConstants.MINECRAFT_1_8 && (elementIndex == -1 || elementIndex == 127 || in.getAvailable() <= 1))
+                else if (protocolId != ProtocolConstants.MC_1_8 && (elementIndex == -1 || elementIndex == 127 || in.getAvailable() <= 1))
                     break;
 
                 int elementType;
-                if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
+                if (protocolId == ProtocolConstants.MC_1_8) {
                     elementIndex = elementIndex & 224;
                     elementType = elementIndex >> 5;
                 } else {

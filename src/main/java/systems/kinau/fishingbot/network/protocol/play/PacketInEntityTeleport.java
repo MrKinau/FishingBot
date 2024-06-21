@@ -32,7 +32,7 @@ public class PacketInEntityTeleport extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.entityId = readVarInt(in);
-        if (protocolId <= ProtocolConstants.MINECRAFT_1_8) {
+        if (protocolId <= ProtocolConstants.MC_1_8) {
             this.x = in.readInt() / 32.0;
             this.y = in.readInt() / 32.0;
             this.z = in.readInt() / 32.0;

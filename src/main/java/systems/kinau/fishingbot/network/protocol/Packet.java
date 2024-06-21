@@ -214,7 +214,7 @@ public abstract class Packet {
     public static String readChatComponent(ByteArrayDataInputWrapper input, int protocolId) {
         JsonObject chatComponent = null;
         try {
-            if (protocolId < ProtocolConstants.MINECRAFT_1_20_3) {
+            if (protocolId < ProtocolConstants.MC_1_20_3) {
                 String text = readString(input);
                 chatComponent = PARSER.parse(text).getAsJsonObject();
             } else {
@@ -230,7 +230,7 @@ public abstract class Packet {
     }
 
     public static void writeSlot(Slot slot, ByteArrayDataOutput output, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
+        if (protocolId >= ProtocolConstants.MC_1_20_5) {
             if (!slot.isPresent()) {
                 writeVarInt(0, output);
                 return;
@@ -239,14 +239,14 @@ public abstract class Packet {
             if (slot.getItemCount() <= 0) return;
             writeVarInt(slot.getItemId(), output);
             slot.writeItemData(output, protocolId);
-        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
+        } else if (protocolId >= ProtocolConstants.MC_1_13_2) {
             output.writeBoolean(slot.isPresent());
             if (slot.isPresent()) {
                 writeVarInt(slot.getItemId(), output);
                 output.writeByte(slot.getItemCount());
                 slot.writeItemData(output, protocolId);
             }
-        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13) {
+        } else if (protocolId >= ProtocolConstants.MC_1_13) {
             if (!slot.isPresent()) {
                 output.writeShort(-1);
                 return;
@@ -267,7 +267,7 @@ public abstract class Packet {
     }
 
     public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId, DataComponentRegistry dataComponentRegistry) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5) {
+        if (protocolId >= ProtocolConstants.MC_1_20_5) {
             int count = readVarInt(input);
             if (count <= 0) return Slot.EMPTY;
 
@@ -302,7 +302,7 @@ public abstract class Packet {
             }
 
             return new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));
-        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13_2) {
+        } else if (protocolId >= ProtocolConstants.MC_1_13_2) {
             boolean present = input.readBoolean();
             if (present) {
                 int itemId = readVarInt(input);
@@ -317,7 +317,7 @@ public abstract class Packet {
                 return new Slot(true, itemId, itemCount, damage, new NBTItemData(tag));
             } else
                 return Slot.EMPTY;
-        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_13) {
+        } else if (protocolId >= ProtocolConstants.MC_1_13) {
             int itemId = input.readShort();
             if (itemId == -1)
                 return Slot.EMPTY;

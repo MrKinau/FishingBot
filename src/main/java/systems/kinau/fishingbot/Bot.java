@@ -51,7 +51,7 @@ public class Bot {
     @Getter @Setter private boolean preventStartup;
     @Getter @Setter private boolean preventReconnect;
     @Getter         private SettingsConfig config;
-    @Getter @Setter private int serverProtocol = ProtocolConstants.MINECRAFT_1_8; //default 1.8
+    @Getter @Setter private int serverProtocol = ProtocolConstants.MC_1_8; //default 1.8
     @Getter @Setter private String serverHost;
     @Getter @Setter private int serverPort;
     @Getter @Setter private AuthData authData;

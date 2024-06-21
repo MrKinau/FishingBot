@@ -59,7 +59,7 @@ public class ClientDefaultsModule extends Module implements Listener {
     public void onSetDifficulty(DifficultySetEvent event) {
         if (FishingBot.getInstance().getCurrentBot().getNet().isEncrypted()
                 && FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys() != null
-                && FishingBot.getInstance().getCurrentBot().getServerProtocol() > ProtocolConstants.MINECRAFT_1_19_1) {
+                && FishingBot.getInstance().getCurrentBot().getServerProtocol() > ProtocolConstants.MC_1_19_1) {
             AuthData.ProfileKeys keys = FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys();
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChatSessionUpdate(keys));
         }
@@ -173,10 +173,10 @@ public class ClientDefaultsModule extends Module implements Listener {
                 .filter(element -> element.getElement().getInternalId().equals("float"))
                 .forEach(element -> {
                     int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
-                    if ((protocolId < ProtocolConstants.MINECRAFT_1_10 && element.getElementIndex() == 6)
-                            || (protocolId < ProtocolConstants.MINECRAFT_1_14_4 && element.getElementIndex() == 7)
-                            || (protocolId < ProtocolConstants.MINECRAFT_1_17 && element.getElementIndex() == 8)
-                            || (protocolId >= ProtocolConstants.MINECRAFT_1_17 && element.getElementIndex() == 9)) {
+                    if ((protocolId < ProtocolConstants.MC_1_10 && element.getElementIndex() == 6)
+                            || (protocolId < ProtocolConstants.MC_1_14_4 && element.getElementIndex() == 7)
+                            || (protocolId < ProtocolConstants.MC_1_17 && element.getElementIndex() == 8)
+                            || (protocolId >= ProtocolConstants.MC_1_17 && element.getElementIndex() == 9)) {
                         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateHealthEvent(event.getEntityId(), (float) element.getElement().getValue(), -1 ,-1));
                     }
                 });

@@ -73,7 +73,7 @@ public class ChatComponentUtils {
     // If chat types changed in registry, this is not working
     // TODO load from networked registry
     public static String sillyTransformWithChatType(int protocolId, int chatType, String senderName, String recipientName, String message) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_21)
+        if (protocolId >= ProtocolConstants.MC_1_21)
             chatType--;
         if (chatType == 1) {
             return "* " + senderName + " " + message;

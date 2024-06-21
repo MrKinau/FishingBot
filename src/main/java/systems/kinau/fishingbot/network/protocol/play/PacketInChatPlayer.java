@@ -36,37 +36,37 @@ public class PacketInChatPlayer extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (protocolId < ProtocolConstants.MINECRAFT_1_19) {
+        if (protocolId < ProtocolConstants.MC_1_19) {
             this.text = readChatComponent(in, protocolId);
             if (text != null)
                 FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
         } else {
             try {
-                if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
+                if (protocolId >= ProtocolConstants.MC_1_19_3) {
                     this.sender = readUUID(in); // sender
                     readVarInt(in); // index
                 }
                 if (in.readBoolean()) {
-                    if (protocolId >= ProtocolConstants.MINECRAFT_1_19_3) {
+                    if (protocolId >= ProtocolConstants.MC_1_19_3) {
                         in.skipBytes(256);
                     } else {
                         int sigLength = readVarInt(in);
                         in.skipBytes(sigLength);
                     }
                 }
-                if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+                if (protocolId <= ProtocolConstants.MC_1_19_1) {
                     this.sender = readUUID(in);
                     int sigLength = readVarInt(in);
                     in.skipBytes(sigLength);
                 }
                 String actualMessage = readString(in); //plain
-                if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1 && in.readBoolean())
+                if (protocolId <= ProtocolConstants.MC_1_19_1 && in.readBoolean())
                     readString(in);
                 in.readLong();
                 in.readLong();
                 int prevMsgs = readVarInt(in);
                 for (int i = 0; i < prevMsgs; i++) {
-                    if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+                    if (protocolId <= ProtocolConstants.MC_1_19_1) {
                         this.sender = readUUID(in);
                         int prevMsgSig = readVarInt(in);
                         in.skipBytes(prevMsgSig);

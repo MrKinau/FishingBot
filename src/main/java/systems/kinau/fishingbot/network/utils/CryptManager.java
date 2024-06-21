@@ -236,7 +236,7 @@ public class CryptManager {
 
     private static MessageSignature signMessage(AuthData.ProfileKeys keys, UUID signer, String message, long salt, Instant timestamp) {
         String component = "{\"text\":\"" + message + "\"}";
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_3) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_19_3) {
             return new MessageSignature(sign(keys, signature -> {
                 try {
                     signature.update(Ints.toByteArray(1));
@@ -257,7 +257,7 @@ public class CryptManager {
                     e.printStackTrace();
                 }
             }), salt, timestamp);
-        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1) {
+        } else if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_19_1) {
             byte[] messageHeader = uuidToByteArray(signer);
 
             HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha256(), new OutputStream() {

@@ -43,8 +43,8 @@ public class PacketInJoinGame extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         switch (protocolId) {
-            case ProtocolConstants.MINECRAFT_1_9:
-            case ProtocolConstants.MINECRAFT_1_8: {
+            case ProtocolConstants.MC_1_9:
+            case ProtocolConstants.MC_1_8: {
                 eid = in.readInt();                         // entity ID
                 gamemode = in.readUnsignedByte();           // gamemode
                 dimension = String.valueOf(in.readByte());  // dimension
@@ -54,18 +54,18 @@ public class PacketInJoinGame extends Packet {
                 reducedDebugInfo = in.readBoolean();        // reduced Debug info
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_13_2:
-            case ProtocolConstants.MINECRAFT_1_13_1:
-            case ProtocolConstants.MINECRAFT_1_13:
-            case ProtocolConstants.MINECRAFT_1_12_2:
-            case ProtocolConstants.MINECRAFT_1_12_1:
-            case ProtocolConstants.MINECRAFT_1_12:
-            case ProtocolConstants.MINECRAFT_1_11_1:
-            case ProtocolConstants.MINECRAFT_1_11:
-            case ProtocolConstants.MINECRAFT_1_10:
-            case ProtocolConstants.MINECRAFT_1_9_4:
-            case ProtocolConstants.MINECRAFT_1_9_2:
-            case ProtocolConstants.MINECRAFT_1_9_1: {
+            case ProtocolConstants.MC_1_13_2:
+            case ProtocolConstants.MC_1_13_1:
+            case ProtocolConstants.MC_1_13:
+            case ProtocolConstants.MC_1_12_2:
+            case ProtocolConstants.MC_1_12_1:
+            case ProtocolConstants.MC_1_12:
+            case ProtocolConstants.MC_1_11_1:
+            case ProtocolConstants.MC_1_11:
+            case ProtocolConstants.MC_1_10:
+            case ProtocolConstants.MC_1_9_4:
+            case ProtocolConstants.MC_1_9_2:
+            case ProtocolConstants.MC_1_9_1: {
                 eid = in.readInt();                         // entity ID
                 gamemode = in.readUnsignedByte();           // gamemode
                 dimension = String.valueOf(in.readInt());   // dimension
@@ -75,11 +75,11 @@ public class PacketInJoinGame extends Packet {
                 reducedDebugInfo = in.readBoolean();        // reduced Debug info
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_14:
-            case ProtocolConstants.MINECRAFT_1_14_1:
-            case ProtocolConstants.MINECRAFT_1_14_2:
-            case ProtocolConstants.MINECRAFT_1_14_3:
-            case ProtocolConstants.MINECRAFT_1_14_4: {
+            case ProtocolConstants.MC_1_14:
+            case ProtocolConstants.MC_1_14_1:
+            case ProtocolConstants.MC_1_14_2:
+            case ProtocolConstants.MC_1_14_3:
+            case ProtocolConstants.MC_1_14_4: {
                 eid = in.readInt();                         // entity ID
                 gamemode = in.readUnsignedByte();           // gamemode
                 dimension = String.valueOf(in.readInt());   // dimension
@@ -89,9 +89,9 @@ public class PacketInJoinGame extends Packet {
                 reducedDebugInfo = in.readBoolean();        // reduced Debug info
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_15:
-            case ProtocolConstants.MINECRAFT_1_15_1:
-            case ProtocolConstants.MINECRAFT_1_15_2: {
+            case ProtocolConstants.MC_1_15:
+            case ProtocolConstants.MC_1_15_1:
+            case ProtocolConstants.MC_1_15_2: {
                 eid = in.readInt();                         // entity ID
                 gamemode = in.readUnsignedByte();           // gamemode
                 dimension = String.valueOf(in.readInt());   // dimension
@@ -103,8 +103,8 @@ public class PacketInJoinGame extends Packet {
                 enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_16:
-            case ProtocolConstants.MINECRAFT_1_16_1: {
+            case ProtocolConstants.MC_1_16:
+            case ProtocolConstants.MC_1_16_1: {
                 eid = in.readInt();                         // entity ID
                 gamemode = in.readUnsignedByte();           // gamemode
                 in.readUnsignedByte();                      // previous gamemode
@@ -124,11 +124,11 @@ public class PacketInJoinGame extends Packet {
                 flat = in.readBoolean();                    // flat world
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_16_2:
-            case ProtocolConstants.MINECRAFT_1_16_3:
-            case ProtocolConstants.MINECRAFT_1_16_4:
-            case ProtocolConstants.MINECRAFT_1_17:
-            case ProtocolConstants.MINECRAFT_1_17_1: {
+            case ProtocolConstants.MC_1_16_2:
+            case ProtocolConstants.MC_1_16_3:
+            case ProtocolConstants.MC_1_16_4:
+            case ProtocolConstants.MC_1_17:
+            case ProtocolConstants.MC_1_17_1: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
                 gamemode = in.readUnsignedByte();           // current gamemode
@@ -149,8 +149,8 @@ public class PacketInJoinGame extends Packet {
                 flat = in.readBoolean();                    // flat world
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_18:
-            case ProtocolConstants.MINECRAFT_1_18_2: {
+            case ProtocolConstants.MC_1_18:
+            case ProtocolConstants.MC_1_18_2: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
                 gamemode = in.readUnsignedByte();           // current gamemode
@@ -172,10 +172,10 @@ public class PacketInJoinGame extends Packet {
                 flat = in.readBoolean();                    // flat world
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_19:
-            case ProtocolConstants.MINECRAFT_1_19_1:
-            case ProtocolConstants.MINECRAFT_1_19_3:
-            case ProtocolConstants.MINECRAFT_1_19_4: {
+            case ProtocolConstants.MC_1_19:
+            case ProtocolConstants.MC_1_19_1:
+            case ProtocolConstants.MC_1_19_3:
+            case ProtocolConstants.MC_1_19_4: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
                 gamemode = in.readUnsignedByte();           // current gamemode
@@ -201,7 +201,7 @@ public class PacketInJoinGame extends Packet {
                 }
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_20: {
+            case ProtocolConstants.MC_1_20: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
                 gamemode = in.readUnsignedByte();           // current gamemode
@@ -228,8 +228,8 @@ public class PacketInJoinGame extends Packet {
                 portalCooldown = readVarInt(in);
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_20_2:
-            case ProtocolConstants.MINECRAFT_1_20_3: {
+            case ProtocolConstants.MC_1_20_2:
+            case ProtocolConstants.MC_1_20_3: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
                 int worldCount = readVarInt(in);            // count of worlds
@@ -256,8 +256,8 @@ public class PacketInJoinGame extends Packet {
                 portalCooldown = readVarInt(in);
                 break;
             }
-            case ProtocolConstants.MINECRAFT_1_20_5:
-            case ProtocolConstants.MINECRAFT_1_21:
+            case ProtocolConstants.MC_1_20_5:
+            case ProtocolConstants.MC_1_21:
             default: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore

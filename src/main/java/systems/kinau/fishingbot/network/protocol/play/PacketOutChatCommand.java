@@ -46,9 +46,9 @@ public class PacketOutChatCommand extends Packet {
             out.writeLong(System.currentTimeMillis());  // timestamp
             out.writeLong(System.currentTimeMillis());  // arg sig salt
             writeVarInt(0, out);                  // arg sig map
-            if (protocolId < ProtocolConstants.MINECRAFT_1_19_3) {
+            if (protocolId < ProtocolConstants.MC_1_19_3) {
                 out.writeBoolean(false);                 // signed preview
-                if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
+                if (protocolId >= ProtocolConstants.MC_1_19_1) {
                     writeVarInt(0, out);              // acknowledgements lastSeen (LastSeenMessageList.write(buf))
                     out.writeBoolean(false);             // acknowledgements lastReceived (Optional<LastSeenMessageList.Entry>)
                 }
@@ -69,7 +69,7 @@ public class PacketOutChatCommand extends Packet {
             for (int i = 0; i < signatures.getArgumentSignatures().size(); i++) {
                 CryptManager.ArgumentSignature signature = signatures.getArgumentSignatures().get(i);
                 writeString(signature.getName(), out);
-                if (protocolId < ProtocolConstants.MINECRAFT_1_19_3)
+                if (protocolId < ProtocolConstants.MC_1_19_3)
                     writeVarInt(signature.getSignature().length, out);
                 out.write(signature.getSignature());
                 if (i == signatures.getArgumentSignatures().size() - 1)
@@ -77,11 +77,11 @@ public class PacketOutChatCommand extends Packet {
                             new CryptManager.MessageSignature(signature.getSignature(), signatures.getSalt(), signatures.getTimestamp())
                     ));
             }
-            if (protocolId < ProtocolConstants.MINECRAFT_1_19_3)
+            if (protocolId < ProtocolConstants.MC_1_19_3)
                 out.writeBoolean(false);
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_19_1) {
+            if (protocolId >= ProtocolConstants.MC_1_19_1) {
                 writeVarInt(0, out);
-                if (protocolId < ProtocolConstants.MINECRAFT_1_19_3)
+                if (protocolId < ProtocolConstants.MC_1_19_3)
                     out.writeBoolean(false);
                 else
                     writeFixedBitSet(new BitSet(), 20, out);

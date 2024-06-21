@@ -20,7 +20,7 @@ public class PacketOutResourcePackResponse extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_3)
+        if (protocolId >= ProtocolConstants.MC_1_20_3)
             writeUUID(uuid, out);
         writeVarInt(result.ordinal(), out);
     }

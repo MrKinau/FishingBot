@@ -38,7 +38,7 @@ public class PacketInSpawnEntity extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (protocolId == ProtocolConstants.MINECRAFT_1_8) {
+        if (protocolId == ProtocolConstants.MC_1_8) {
             this.id = readVarInt(in);       // EID
             this.type = in.readByte();      // Type of the object
             this.x = in.readInt() / 32.0;   // X POS
@@ -52,7 +52,7 @@ public class PacketInSpawnEntity extends Packet {
                 this.yVelocity = in.readShort();
                 this.zVelocity = in.readShort();
             }
-        } else if (protocolId < ProtocolConstants.MINECRAFT_1_19) {
+        } else if (protocolId < ProtocolConstants.MC_1_19) {
             this.id = readVarInt(in);       // EID
             readUUID(in);                   // E UUID
             this.type = in.readByte();      // Obj type

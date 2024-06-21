@@ -27,17 +27,17 @@ public class PacketOutBlockPlace extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_14) {
+        if (protocolId >= ProtocolConstants.MC_1_14) {
             writeVarInt(hand.ordinal(), out);
             MovingObjectPositionBlock movObjPos = new MovingObjectPositionBlock(LocationUtils.toBlockPos(x, y, z), blockFace, cursorX, cursorY, cursorZ, insideBlock);
             writeMovingObjectPosition(movObjPos, out);
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_19)
+            if (protocolId >= ProtocolConstants.MC_1_19)
                 writeVarInt(0, out); // sequence
-        } else if (protocolId >= ProtocolConstants.MINECRAFT_1_9) {
+        } else if (protocolId >= ProtocolConstants.MC_1_9) {
             out.writeLong(LocationUtils.toBlockPos(x, y, z));
             writeVarInt(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal(), out);
             writeVarInt(hand.ordinal(), out);
-            if (protocolId >= ProtocolConstants.MINECRAFT_1_11) {
+            if (protocolId >= ProtocolConstants.MC_1_11) {
                 out.writeFloat(cursorX);
                 out.writeFloat(cursorY);
                 out.writeFloat(cursorZ);

@@ -107,7 +107,7 @@ public class MojangAPI {
                     .replace("-----BEGIN RSA PRIVATE KEY-----", "")
                     .replace("-----END RSA PRIVATE KEY-----", "");
             String pubKeySig = responseJson.get(
-                    FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_19_1
+                    FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_19_1
                             ? "publicKeySignatureV2"
                             : "publicKeySignature").getAsString();
 

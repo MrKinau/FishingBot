@@ -41,14 +41,14 @@ public class ItemUtils {
         if (FishingBot.getInstance().getCurrentBot() != null)
             protocol = FishingBot.getInstance().getCurrentBot().getServerProtocol();
 
-        if (protocol < ProtocolConstants.MINECRAFT_1_13)
+        if (protocol < ProtocolConstants.MC_1_13)
             return LegacyMaterial.getMaterial(slot.getItemId()) == LegacyMaterial.FISHING_ROD;
         else
             return getRodId(protocol) == slot.getItemId();
     }
 
     public static boolean isFish(int protocol, int itemId) {
-        if (protocol < ProtocolConstants.MINECRAFT_1_13)
+        if (protocol < ProtocolConstants.MC_1_13)
             return itemId == LegacyMaterial.RAW_FISH.getId();
         if (fishIds.containsKey(protocol))
             return fishIds.get(protocol).contains(itemId);
@@ -63,7 +63,7 @@ public class ItemUtils {
     }
 
     public static boolean isEnchantedBook(int protocol, int itemId) {
-        if (protocol < ProtocolConstants.MINECRAFT_1_13)
+        if (protocol < ProtocolConstants.MC_1_13)
             return itemId == LegacyMaterial.ENCHANTED_BOOK.getId();
         if (enchantedBookId.containsKey(protocol))
             return enchantedBookId.get(protocol) == itemId;
@@ -127,7 +127,7 @@ public class ItemUtils {
         if (FishingBot.getInstance().getCurrentBot() == null || !slot.isPresent())
             return "N/A";
         int version = FishingBot.getInstance().getCurrentBot().getServerProtocol();
-        if (version <= ProtocolConstants.MINECRAFT_1_12_2) {
+        if (version <= ProtocolConstants.MC_1_12_2) {
             return LegacyMaterial.getMaterialName(slot.getItemId(), Integer.valueOf(slot.getItemDamage()).shortValue());
         } else {
             return Registries.ITEM.getItemName(slot.getItemId(), version).replace("minecraft:", "");

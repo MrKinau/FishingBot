@@ -34,7 +34,7 @@ public class PacketInPlayerListItem extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        if (protocolId <= ProtocolConstants.MINECRAFT_1_19_1) {
+        if (protocolId <= ProtocolConstants.MC_1_19_1) {
             int action = readVarInt(in);
             int playerCount = readVarInt(in);
             for (int i = 0; i < playerCount; i++) {
@@ -54,7 +54,7 @@ public class PacketInPlayerListItem extends Packet {
                     int ping = readVarInt(in);
                     if (in.readBoolean()) // has display name
                         readString(in); // display name
-                    if (protocolId >= ProtocolConstants.MINECRAFT_1_19) {
+                    if (protocolId >= ProtocolConstants.MC_1_19) {
                         if (in.readBoolean()) {
                             in.readLong(); // expiration
                             int size = readVarInt(in); // pubkey length

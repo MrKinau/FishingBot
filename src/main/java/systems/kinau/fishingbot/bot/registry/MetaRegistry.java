@@ -52,7 +52,7 @@ public class MetaRegistry<K, V> {
             addRegistry(protocolId, registry);
         });
         if (legacyRegistry != null)
-            addRegistry(ProtocolConstants.MINECRAFT_1_8, legacyRegistry);
+            addRegistry(ProtocolConstants.MC_1_8, legacyRegistry);
     }
 
     public void load(Map<String, ?> networkRegistry, RegistryLoader.Map<K, V> registryLoader, int protocolId) {

@@ -27,7 +27,7 @@ public class PacketOutClickWindow extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MINECRAFT_1_16_4) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MC_1_16_4) {
             out.writeByte(windowId);
             out.writeShort(slot);
             out.writeByte(button);
@@ -36,7 +36,7 @@ public class PacketOutClickWindow extends Packet {
             writeSlot(item, out, protocolId);
         } else {
             out.writeByte(windowId);
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MINECRAFT_1_17_1)
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_17_1)
                 writeVarInt(0, out); // revision
             out.writeShort(slot);
             out.writeByte(button);

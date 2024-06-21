@@ -30,7 +30,7 @@ public class PacketInSetSlot extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.windowId = in.readByte();
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_17_1) {
+        if (protocolId >= ProtocolConstants.MC_1_17_1) {
             readVarInt(in); // revision
         }
         this.slotId = in.readShort();

@@ -39,7 +39,7 @@ public class PacketInEncryptionRequest extends Packet {
         this.publicKey = CryptManager.decodePublicKey(readBytesFromStream(in));
         this.verifyToken = readBytesFromStream(in);
 
-        if (protocolId >= ProtocolConstants.MINECRAFT_1_20_5)
+        if (protocolId >= ProtocolConstants.MC_1_20_5)
             this.shouldAuthenticate = in.readBoolean();
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EncryptionRequestEvent(serverId, publicKey, verifyToken, shouldAuthenticate));
