@@ -10,6 +10,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.login.LoginDisconnectEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class PacketInLoginDisconnect extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        String errorMessage = readChatComponent(in, protocolId);
+        String errorMessage = readChatComponent(in, ProtocolConstants.MC_1_20_2); // always only a string, don't ask why
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new LoginDisconnectEvent(errorMessage));
     }
 }
