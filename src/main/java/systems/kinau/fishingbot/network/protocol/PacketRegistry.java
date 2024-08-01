@@ -35,6 +35,10 @@ public class PacketRegistry {
         this.state = state;
         this.flow = flow;
         JsonObject data = loadBundledPacketRegistry(protocolId);
+        if (data == null) {
+            protocolId = ProtocolConstants.getLatest();
+            data = loadBundledPacketRegistry(protocolId);
+        }
         if (data == null) throw new IllegalArgumentException("Could not load bundled packets for " + ProtocolConstants.getVersionString(protocolId));
         JsonObject stateObj = data.getAsJsonObject(state.getId());
         if (stateObj == null) throw new IllegalArgumentException("Could not load bundled packets for " + state.getId() + "/" + ProtocolConstants.getVersionString(protocolId));
