@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.bot.registry;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import systems.kinau.fishingbot.FishingBot;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -43,7 +44,10 @@ public class Registry<K, V> {
     }
 
     public K findKey(V value) {
-        return registry.inverse().get(value);
+        K key = registry.inverse().get(value);
+        if (key == null)
+            FishingBot.getLog().severe("Could not find key for value: " + value);
+        return key;
     }
 
     public void merge(Registry<Integer, String> other) {

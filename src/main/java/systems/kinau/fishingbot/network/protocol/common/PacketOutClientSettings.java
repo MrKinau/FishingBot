@@ -76,6 +76,20 @@ public class PacketOutClientSettings extends Packet {
             case ProtocolConstants.MC_1_19_4:
             case ProtocolConstants.MC_1_20:
             case ProtocolConstants.MC_1_20_2:
+            case ProtocolConstants.MC_1_20_3:
+            case ProtocolConstants.MC_1_20_5:
+            case ProtocolConstants.MC_1_21: {
+                writeString("lol_aa", out); //use speach "LOLCAT", lol
+                out.writeByte(1);           //render-distance
+                writeVarInt(0, out);        //chat enabled
+                out.writeBoolean(true);     //support colors
+                out.writeByte(128);         //skin bitmask
+                writeVarInt(1, out);        //right = main hand
+                out.writeBoolean(false);     //Disable text filtering
+                out.writeBoolean(true);     //Allow server listings
+                break;
+            }
+            case ProtocolConstants.MC_1_21_2_PRE_4:
             default: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
                 out.writeByte(1);           //render-distance
@@ -85,6 +99,7 @@ public class PacketOutClientSettings extends Packet {
                 writeVarInt(1, out);        //right = main hand
                 out.writeBoolean(false);     //Disable text filtering
                 out.writeBoolean(true);     //Allow server listings
+                writeVarInt(2, out);     //particle status = minimal
                 break;
             }
         }

@@ -29,7 +29,7 @@ public class PacketInWindowItems extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
-        this.windowId = in.readUnsignedByte();
+        this.windowId = readContainerIdUnsigned(in, protocolId);
         if (protocolId >= ProtocolConstants.MC_1_17_1) {
             readVarInt(in); // revision (whatever it is?) or arbitrary state id?
         }

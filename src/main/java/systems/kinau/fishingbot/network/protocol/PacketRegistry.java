@@ -78,6 +78,7 @@ public class PacketRegistry {
                 switch (mojangPacketId) {
                     case "minecraft:login_disconnect": return PacketInLoginDisconnect.class;
                     case "minecraft:hello": return PacketInEncryptionRequest.class;
+                    case "minecraft:login_finished":
                     case "minecraft:game_profile": return PacketInLoginSuccess.class;
                     case "minecraft:login_compression": return PacketInSetCompression.class;
                     case "minecraft:custom_query": return PacketInLoginPluginRequest.class;
@@ -129,7 +130,9 @@ public class PacketRegistry {
                     case "minecraft:player_info_remove": return PacketInPlayerListItemRemove.class;
                     case "minecraft:player_info_update": return PacketInPlayerListItem.class;
                     case "minecraft:player_position": return PacketInPlayerPosLook.class;
+                    case "minecraft:player_rotation": return PacketInPlayerLook.class;
                     case "minecraft:resource_pack_push": return PacketInResourcePack.class;
+                    case "minecraft:set_held_slot":
                     case "minecraft:set_carried_item": return PacketInHeldItemChange.class;
                     case "minecraft:set_entity_data": return PacketInEntityMetadata.class;
                     case "minecraft:set_entity_motion": return PacketInEntityVelocity.class;
@@ -142,6 +145,8 @@ public class PacketRegistry {
                     case "minecraft:confirm_transaction": return PacketInConfirmTransaction.class;
                     case "minecraft:play_compression": return PacketInSetCompressionLegacy.class;
                     case "minecraft:ping": return PacketInPing.class;
+                    case "minecraft:set_player_inventory": return PacketInPlayerInventory.class;
+                    case "minecraft:entity_position_sync": return PacketInEntityPositionSync.class;
                 }
             } else if (flow == ProtocolFlow.OUTGOING_PACKET) {
                 switch (mojangPacketId) {
@@ -176,6 +181,9 @@ public class PacketRegistry {
     public String getRegistryFileName(int protocolId) {
         if (protocolId == ProtocolConstants.AUTOMATIC)
             protocolId = ProtocolConstants.getLatest();
+        //TODO: REMOVE SNAPSHOT DATA
+        if (protocolId == ProtocolConstants.MC_1_21_2_PRE_4)
+            return "mc_data/1_21_2/packets.json";
         String version = ProtocolConstants.getVersionString(protocolId);
         if (version.contains("/"))
             version = version.split("/")[0];

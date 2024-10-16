@@ -148,7 +148,7 @@ public class ClientDefaultsModule extends Module implements Listener {
             while (!Thread.currentThread().isInterrupted()) {
                 Player player = FishingBot.getInstance().getCurrentBot().getPlayer();
                 if (networkHandler != null && networkHandler.getState() == ProtocolState.PLAY)
-                    networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true));
+                    networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true, true));
                 try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }
         });

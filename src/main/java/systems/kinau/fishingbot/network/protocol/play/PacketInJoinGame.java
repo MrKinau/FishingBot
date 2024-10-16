@@ -34,6 +34,7 @@ public class PacketInJoinGame extends Packet {
     private boolean flat;
     private boolean hardcore;
     private int portalCooldown;
+    private int seaLevel;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -257,7 +258,34 @@ public class PacketInJoinGame extends Packet {
                 break;
             }
             case ProtocolConstants.MC_1_20_5:
-            case ProtocolConstants.MC_1_21:
+            case ProtocolConstants.MC_1_21: {
+                eid = in.readInt();                         // entity ID
+                hardcore = in.readBoolean();                // is hardcore
+                int worldCount = readVarInt(in);            // count of worlds
+                worldIdentifier = new String[worldCount];   // identifier for all worlds
+                for (int i = 0; i < worldCount; i++)
+                    worldIdentifier[i] = readString(in);
+                maxPlayers = readVarInt(in);                // maxPlayer
+                viewDistance = readVarInt(in);              // view distance
+                simulationDistance = readVarInt(in);        // simulation distance
+                reducedDebugInfo = in.readBoolean();        // reduced Debug info
+                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+                in.readBoolean();                           // doLimitedCrafting
+                readVarInt(in);                             // dimension type
+                spawnWorld = readString(in);                // dimension name
+                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+                gamemode = in.readUnsignedByte();           // current gamemode
+                in.readUnsignedByte();                      // previous gamemode
+                debug = in.readBoolean();                   // debug world
+                flat = in.readBoolean();                    // flat world
+                if (in.readBoolean()) {                     // has last death location
+                    readString(in);                         // last death dimension
+                    in.readLong();                          // last death position
+                }
+                portalCooldown = readVarInt(in);
+                break;
+            }
+            case ProtocolConstants.MC_1_21_2_PRE_4:
             default: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore
@@ -283,6 +311,7 @@ public class PacketInJoinGame extends Packet {
                     in.readLong();                          // last death position
                 }
                 portalCooldown = readVarInt(in);
+                seaLevel = readVarInt(in);
                 break;
             }
         }

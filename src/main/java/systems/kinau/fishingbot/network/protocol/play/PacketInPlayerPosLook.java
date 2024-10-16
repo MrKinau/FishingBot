@@ -33,24 +33,45 @@ public class PacketInPlayerPosLook extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        double x = in.readDouble();
-        double y = in.readDouble();
-        double z = in.readDouble();
-        float yaw = in.readFloat();
-        float pitch = in.readFloat();
-        if (in.readByte() == 0) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.yaw = yaw;
-            this.pitch = pitch;
-            if (protocolId >= ProtocolConstants.MC_1_9) {
-                this.teleportId = readVarInt(in); //tID
+        if (protocolId < ProtocolConstants.MC_1_21_2_PRE_4) {
+            double x = in.readDouble();
+            double y = in.readDouble();
+            double z = in.readDouble();
+            float yaw = in.readFloat();
+            float pitch = in.readFloat();
+            if (in.readByte() == 0) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.yaw = yaw;
+                this.pitch = pitch;
+                if (protocolId >= ProtocolConstants.MC_1_9) {
+                    this.teleportId = readVarInt(in); //tID
+                }
+                if (protocolId >= ProtocolConstants.MC_1_17 && protocolId <= ProtocolConstants.MC_1_19_3) {
+                    in.readBoolean(); // should dismount
+                }
+                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
             }
-            if (protocolId >= ProtocolConstants.MC_1_17 && protocolId <= ProtocolConstants.MC_1_19_3) {
-                in.readBoolean(); // should dismount
+        } else {
+            this.teleportId = readVarInt(in);
+            double x = in.readDouble();
+            double y = in.readDouble();
+            double z = in.readDouble();
+            double dx = in.readDouble();
+            double dy = in.readDouble();
+            double dz = in.readDouble();
+            float yaw = in.readFloat();
+            float pitch = in.readFloat();
+            int relatives = in.readInt();
+            if (relatives == 0) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.yaw = yaw;
+                this.pitch = pitch;
+                FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
             }
-            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new PosLookChangeEvent(x, y, z, yaw, pitch, teleportId));
         }
     }
 }

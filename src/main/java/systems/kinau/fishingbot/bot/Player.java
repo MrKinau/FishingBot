@@ -86,6 +86,14 @@ public class Player implements Listener {
     }
 
     @EventHandler
+    public void onPosLookChange(LookChangeEvent event) {
+        this.yaw = event.getYaw();
+        this.pitch = event.getPitch();
+        this.originYaw = yaw;
+        this.originPitch = pitch;
+    }
+
+    @EventHandler
     public void onUpdateXP(UpdateExperienceEvent event) {
         if (getLevels() >= 0 && getLevels() < event.getLevel()) {
             if (FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeConsole() != AnnounceType.NONE)
@@ -373,7 +381,7 @@ public class Player implements Listener {
                 setYaw(-180 + (getYaw() - 180));
             if (getYaw() < -180)
                 setYaw(180 + (getYaw() + 180));
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true, true));
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ignore) { }
@@ -414,6 +422,7 @@ public class Player implements Listener {
                     PacketOutBlockPlace.Hand.MAIN_HAND,
                     x, y, z, blockFace,
                     0.5F, 0.5F, 0.5F,
+                    false,
                     false
             ));
             if (autoSneak)

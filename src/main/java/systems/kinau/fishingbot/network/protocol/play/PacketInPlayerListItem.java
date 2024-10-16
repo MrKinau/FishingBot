@@ -123,7 +123,8 @@ public class PacketInPlayerListItem extends Packet {
         UPDATE_DISPLAY_NAME((in, protocolId) -> {
             if (in.readBoolean())
                 readChatComponent(in, protocolId);
-        });
+        }),
+        UPDATE_LIST_ORDER((in, protocolId) -> Packet.readVarInt(in));
 
         final Action.Reader reader;
 

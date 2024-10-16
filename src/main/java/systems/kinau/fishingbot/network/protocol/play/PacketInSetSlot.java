@@ -29,7 +29,7 @@ public class PacketInSetSlot extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        this.windowId = in.readByte();
+        this.windowId = Packet.readContainerIdSigned(in, protocolId);
         if (protocolId >= ProtocolConstants.MC_1_17_1) {
             readVarInt(in); // revision
         }

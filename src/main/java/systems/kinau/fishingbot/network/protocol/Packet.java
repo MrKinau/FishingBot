@@ -13,6 +13,7 @@ import com.google.gson.JsonParser;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.MovingObjectPositionBlock;
 import systems.kinau.fishingbot.bot.Slot;
+import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.network.item.ComponentItemData;
 import systems.kinau.fishingbot.network.item.NBTItemData;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
@@ -276,8 +277,12 @@ public abstract class Packet {
             int presentObjectCount = readVarInt(input);
             int emptyObjectCount = readVarInt(input);
 
-            if (presentObjectCount == 0 && emptyObjectCount == 0)
-                return new Slot(true, itemId, (byte) count, -1, null);
+            if (presentObjectCount == 0 && emptyObjectCount == 0) {
+                Slot slot = new Slot(true, itemId, (byte) count, -1, null);
+                if (FishingBot.getInstance().getConfig().isLogPackets())
+                    FishingBot.getLog().info("Read slot: " + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
+                return slot;
+            }
 
             List<DataComponent> presentComponents = new LinkedList<>();
             List<DataComponent> emptyComponents = new LinkedList<>();
@@ -301,7 +306,17 @@ public abstract class Packet {
                 }
             }
 
-            return new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));
+            Slot slot = new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));
+            if (FishingBot.getInstance().getConfig().isLogPackets()) {
+                FishingBot.getLog().info("Read slot: " + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
+                for (DataComponent presentComponent : presentComponents) {
+                    FishingBot.getLog().info("» +" + Registries.DATA_COMPONENT_TYPE.getElement(presentComponent.getComponentTypeId(), protocolId));
+                }
+                for (DataComponent emptyComponent : emptyComponents) {
+                    FishingBot.getLog().info("» -" + Registries.DATA_COMPONENT_TYPE.getElement(emptyComponent.getComponentTypeId(), protocolId));
+                }
+            }
+            return slot;
         } else if (protocolId >= ProtocolConstants.MC_1_13_2) {
             boolean present = input.readBoolean();
             if (present) {
@@ -341,24 +356,29 @@ public abstract class Packet {
         }
     }
 
-    public static MovingObjectPositionBlock readMovingObjectPosition(ByteArrayDataInputWrapper input) {
+    public static MovingObjectPositionBlock readMovingObjectPosition(ByteArrayDataInputWrapper input, int protocolId) {
         long blockPos = input.readLong();
         PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.byOrdinal(readVarInt(input));
         float dx = input.readFloat();
         float dy = input.readFloat();
         float dz = input.readFloat();
-        boolean flag = input.readBoolean();
-        return new MovingObjectPositionBlock(blockPos, blockFace, dx, dy, dz, flag);
+        boolean inside = input.readBoolean();
+        boolean worldBorderHit = false;
+        if (protocolId >= ProtocolConstants.MC_1_21_2_PRE_4)
+            worldBorderHit = input.readBoolean();
+        return new MovingObjectPositionBlock(blockPos, blockFace, dx, dy, dz, inside, worldBorderHit);
     }
 
-    public static void writeMovingObjectPosition(MovingObjectPositionBlock movingObjectPositionBlock, ByteArrayDataOutput output) {
+    public static void writeMovingObjectPosition(MovingObjectPositionBlock movingObjectPositionBlock, ByteArrayDataOutput output, int protocolId) {
         output.writeLong(movingObjectPositionBlock.getBlockPos());
         PacketOutBlockPlace.BlockFace blockFace = movingObjectPositionBlock.getDirection();
         writeVarInt(blockFace == PacketOutBlockPlace.BlockFace.UNSET ? 255 : blockFace.ordinal(), output);
         output.writeFloat(movingObjectPositionBlock.getDx());
         output.writeFloat(movingObjectPositionBlock.getDy());
         output.writeFloat(movingObjectPositionBlock.getDz());
-        output.writeBoolean(movingObjectPositionBlock.isFlag());
+        output.writeBoolean(movingObjectPositionBlock.isInside());
+        if (protocolId >= ProtocolConstants.MC_1_21_2_PRE_4)
+            output.writeBoolean(movingObjectPositionBlock.isWorldBorderHit());
     }
 
     public static <E extends Enum<E>> EnumSet<E> readEnumSet(Class<E> type, ByteArrayDataInput input) {
@@ -388,6 +408,25 @@ public abstract class Packet {
 
             output.write(Arrays.copyOf(abyte, -Math.floorDiv(-size, 8)));
         }
+    }
+
+    public static int readContainerIdUnsigned(ByteArrayDataInputWrapper in, int protocolId) {
+        return protocolId < ProtocolConstants.MC_1_21_2_PRE_4 ? in.readUnsignedByte() : readVarInt(in);
+    }
+
+    public static int readContainerIdSigned(ByteArrayDataInputWrapper in, int protocolId) {
+        return protocolId < ProtocolConstants.MC_1_21_2_PRE_4 ? in.readByte() : readVarInt(in);
+    }
+
+    public static int readContainerIdVarInt(ByteArrayDataInputWrapper in, int protocolId) {
+        return readVarInt(in);
+    }
+
+    public static void writeContainerId(int containerId, ByteArrayDataOutput out, int protocolId) {
+        if (protocolId < ProtocolConstants.MC_1_21_2_PRE_4)
+            out.writeByte(containerId);
+        else
+            writeVarInt(containerId, out);
     }
 
 }

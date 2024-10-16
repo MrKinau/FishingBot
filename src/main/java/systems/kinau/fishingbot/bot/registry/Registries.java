@@ -20,6 +20,7 @@ public class Registries {
     public static EnchantmentRegistry ENCHANTMENT;
     public static DataComponentTypeRegistry DATA_COMPONENT_TYPE;
     public static ParticleTypeRegistry PARTICLE_TYPE;
+    public static ConsumeEffectTypeRegistry CONSUME_EFFECT_TYPE;
 
     public static final Set<Integer> BUNDLED_REGISTRY_IDS = new HashSet<>();
 
@@ -42,12 +43,14 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_20_3);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_20_5);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_2_PRE_4);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();
         ENCHANTMENT = new EnchantmentRegistry();
         DATA_COMPONENT_TYPE = new DataComponentTypeRegistry();
         PARTICLE_TYPE = new ParticleTypeRegistry();
+        CONSUME_EFFECT_TYPE = new ConsumeEffectTypeRegistry();
     }
 
     public static Registries get() {
@@ -63,6 +66,7 @@ public class Registries {
             case "minecraft:enchantment": return ENCHANTMENT;
             case "minecraft:data_component_type": return DATA_COMPONENT_TYPE;
             case "minecraft:particle_type": return PARTICLE_TYPE;
+            case "minecraft:consume_effect_type": return CONSUME_EFFECT_TYPE;
         }
         return null;
     }
@@ -106,6 +110,7 @@ public class Registries {
             case ProtocolConstants.MC_1_20_3: return "mc_data/1_20_3/registries.json";
             case ProtocolConstants.MC_1_20_5: return "mc_data/1_20_5/registries.json";
             case ProtocolConstants.MC_1_21: return "mc_data/1_21/registries.json";
+            case ProtocolConstants.MC_1_21_2_PRE_4: return "mc_data/1_21_2/registries.json";
             default: return null;
         }
     }
