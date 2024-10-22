@@ -298,7 +298,6 @@ public class Player implements Listener {
 
     public void swapToHotBar(int slotId, int hotBarButton) {
         // This is not notchian behaviour, but it works
-        FishingBot.getLog().info("Executing swap: " + slotId + " <> " + (hotBarButton + 36));
         Map<Short, Slot> remainingSlots = new HashMap<>();
         remainingSlots.put((short) slotId, Slot.EMPTY);
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(

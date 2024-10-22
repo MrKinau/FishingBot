@@ -89,7 +89,7 @@ public class PacketOutClientSettings extends Packet {
                 out.writeBoolean(true);     //Allow server listings
                 break;
             }
-            case ProtocolConstants.MC_1_21_2_RC_2:
+            case ProtocolConstants.MC_1_21_2:
             default: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
                 out.writeByte(1);           //render-distance

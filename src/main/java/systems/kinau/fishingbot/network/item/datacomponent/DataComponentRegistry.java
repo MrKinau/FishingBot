@@ -83,7 +83,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:fire_resistant"), EmptyComponent::new);
         }
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_2_RC_2) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_2) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:consumable"), ConsumableComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_remainder"), componentTypeId -> new UseRemainderComponent(this, componentTypeId));
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_cooldown"), UseCooldownComponent::new);

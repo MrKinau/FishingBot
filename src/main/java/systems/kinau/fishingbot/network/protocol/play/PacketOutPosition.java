@@ -41,7 +41,7 @@ public class PacketOutPosition extends Packet {
         out.writeDouble(getX());
         out.writeDouble(getY());
         out.writeDouble(getZ());
-        if (protocolId >= ProtocolConstants.MC_1_21_2_RC_2)
+        if (protocolId >= ProtocolConstants.MC_1_21_2)
             out.writeByte(packFlags(onGround, horizontalCollision));
         else
             out.writeBoolean(onGround);

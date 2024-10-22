@@ -39,7 +39,7 @@ public class PacketOutPosLook extends Packet {
         out.writeDouble(getZ());
         out.writeFloat(getYaw());
         out.writeFloat(getPitch());
-        if (protocolId >= ProtocolConstants.MC_1_21_2_RC_2)
+        if (protocolId >= ProtocolConstants.MC_1_21_2)
             out.writeByte(PacketOutPosition.packFlags(onGround, horizontalCollision));
         else
             out.writeBoolean(onGround);

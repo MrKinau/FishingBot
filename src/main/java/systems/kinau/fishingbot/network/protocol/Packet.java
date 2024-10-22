@@ -364,7 +364,7 @@ public abstract class Packet {
         float dz = input.readFloat();
         boolean inside = input.readBoolean();
         boolean worldBorderHit = false;
-        if (protocolId >= ProtocolConstants.MC_1_21_2_RC_2)
+        if (protocolId >= ProtocolConstants.MC_1_21_2)
             worldBorderHit = input.readBoolean();
         return new MovingObjectPositionBlock(blockPos, blockFace, dx, dy, dz, inside, worldBorderHit);
     }
@@ -377,7 +377,7 @@ public abstract class Packet {
         output.writeFloat(movingObjectPositionBlock.getDy());
         output.writeFloat(movingObjectPositionBlock.getDz());
         output.writeBoolean(movingObjectPositionBlock.isInside());
-        if (protocolId >= ProtocolConstants.MC_1_21_2_RC_2)
+        if (protocolId >= ProtocolConstants.MC_1_21_2)
             output.writeBoolean(movingObjectPositionBlock.isWorldBorderHit());
     }
 
@@ -411,11 +411,11 @@ public abstract class Packet {
     }
 
     public static int readContainerIdUnsigned(ByteArrayDataInputWrapper in, int protocolId) {
-        return protocolId < ProtocolConstants.MC_1_21_2_RC_2 ? in.readUnsignedByte() : readVarInt(in);
+        return protocolId < ProtocolConstants.MC_1_21_2 ? in.readUnsignedByte() : readVarInt(in);
     }
 
     public static int readContainerIdSigned(ByteArrayDataInputWrapper in, int protocolId) {
-        return protocolId < ProtocolConstants.MC_1_21_2_RC_2 ? in.readByte() : readVarInt(in);
+        return protocolId < ProtocolConstants.MC_1_21_2 ? in.readByte() : readVarInt(in);
     }
 
     public static int readContainerIdVarInt(ByteArrayDataInputWrapper in, int protocolId) {
@@ -423,7 +423,7 @@ public abstract class Packet {
     }
 
     public static void writeContainerId(int containerId, ByteArrayDataOutput out, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_2_RC_2)
+        if (protocolId < ProtocolConstants.MC_1_21_2)
             out.writeByte(containerId);
         else
             writeVarInt(containerId, out);
