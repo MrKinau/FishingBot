@@ -279,7 +279,7 @@ public abstract class Packet {
 
             if (presentObjectCount == 0 && emptyObjectCount == 0) {
                 Slot slot = new Slot(true, itemId, (byte) count, -1, null);
-                if (FishingBot.getInstance().getConfig().isLogPackets())
+                if (FishingBot.getInstance().getConfig().isLogItemData())
                     FishingBot.getLog().info("Read slot: " + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
                 return slot;
             }
@@ -307,13 +307,13 @@ public abstract class Packet {
             }
 
             Slot slot = new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));
-            if (FishingBot.getInstance().getConfig().isLogPackets()) {
+            if (FishingBot.getInstance().getConfig().isLogItemData()) {
                 FishingBot.getLog().info("Read slot: " + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
                 for (DataComponent presentComponent : presentComponents) {
-                    FishingBot.getLog().info("» +" + Registries.DATA_COMPONENT_TYPE.getElement(presentComponent.getComponentTypeId(), protocolId));
+                    FishingBot.getLog().info("» + " + presentComponent.toString(protocolId));
                 }
                 for (DataComponent emptyComponent : emptyComponents) {
-                    FishingBot.getLog().info("» -" + Registries.DATA_COMPONENT_TYPE.getElement(emptyComponent.getComponentTypeId(), protocolId));
+                    FishingBot.getLog().info("» - " + emptyComponent.toString(protocolId));
                 }
             }
             return slot;
@@ -364,7 +364,7 @@ public abstract class Packet {
         float dz = input.readFloat();
         boolean inside = input.readBoolean();
         boolean worldBorderHit = false;
-        if (protocolId >= ProtocolConstants.MC_1_21_2_PRE_4)
+        if (protocolId >= ProtocolConstants.MC_1_21_2_RC_2)
             worldBorderHit = input.readBoolean();
         return new MovingObjectPositionBlock(blockPos, blockFace, dx, dy, dz, inside, worldBorderHit);
     }
@@ -377,7 +377,7 @@ public abstract class Packet {
         output.writeFloat(movingObjectPositionBlock.getDy());
         output.writeFloat(movingObjectPositionBlock.getDz());
         output.writeBoolean(movingObjectPositionBlock.isInside());
-        if (protocolId >= ProtocolConstants.MC_1_21_2_PRE_4)
+        if (protocolId >= ProtocolConstants.MC_1_21_2_RC_2)
             output.writeBoolean(movingObjectPositionBlock.isWorldBorderHit());
     }
 
@@ -411,11 +411,11 @@ public abstract class Packet {
     }
 
     public static int readContainerIdUnsigned(ByteArrayDataInputWrapper in, int protocolId) {
-        return protocolId < ProtocolConstants.MC_1_21_2_PRE_4 ? in.readUnsignedByte() : readVarInt(in);
+        return protocolId < ProtocolConstants.MC_1_21_2_RC_2 ? in.readUnsignedByte() : readVarInt(in);
     }
 
     public static int readContainerIdSigned(ByteArrayDataInputWrapper in, int protocolId) {
-        return protocolId < ProtocolConstants.MC_1_21_2_PRE_4 ? in.readByte() : readVarInt(in);
+        return protocolId < ProtocolConstants.MC_1_21_2_RC_2 ? in.readByte() : readVarInt(in);
     }
 
     public static int readContainerIdVarInt(ByteArrayDataInputWrapper in, int protocolId) {
@@ -423,7 +423,7 @@ public abstract class Packet {
     }
 
     public static void writeContainerId(int containerId, ByteArrayDataOutput out, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_2_PRE_4)
+        if (protocolId < ProtocolConstants.MC_1_21_2_RC_2)
             out.writeByte(containerId);
         else
             writeVarInt(containerId, out);

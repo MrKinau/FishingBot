@@ -28,6 +28,7 @@ public class PacketInHeldItemChange extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.heldItemSlot = in.readByte() + 36;
+        FishingBot.getLog().info("Received set held item: " + heldItemSlot);
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new SetHeldItemEvent(heldItemSlot));
     }

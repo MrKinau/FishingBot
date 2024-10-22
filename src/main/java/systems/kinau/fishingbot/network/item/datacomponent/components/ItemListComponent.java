@@ -1,6 +1,7 @@
 package systems.kinau.fishingbot.network.item.datacomponent.components;
 
 import com.google.common.io.ByteArrayDataOutput;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponentRegistry;
@@ -33,8 +34,15 @@ public class ItemListComponent extends DataComponent {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.items = new LinkedList<>();
         int count = Packet.readVarInt(in);
+        if (count <= 0) return;
+        if (FishingBot.getInstance().getConfig().isLogItemData()) {
+            FishingBot.getLog().info("Start reading item list component with " + count + " elements");
+        }
         for (int i = 0; i < count; i++) {
             this.items.add(Packet.readSlot(in, protocolId, dataComponentRegistry));
+        }
+        if (FishingBot.getInstance().getConfig().isLogItemData()) {
+            FishingBot.getLog().info("End of reading item list component with " + count + " elements");
         }
     }
 }

@@ -33,4 +33,9 @@ public class UseCooldownComponent extends DataComponent {
             this.cooldownGroup = Optional.empty();
         }
     }
+
+    @Override
+    public String toString(int protocolId) {
+        return super.toString(protocolId) + "[seconds=" + seconds + (cooldownGroup.map(s -> ",cooldownGroup=" + s).orElse("")) + "]";
+    }
 }

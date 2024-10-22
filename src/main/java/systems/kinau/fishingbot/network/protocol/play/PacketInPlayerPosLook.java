@@ -33,7 +33,7 @@ public class PacketInPlayerPosLook extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_2_PRE_4) {
+        if (protocolId < ProtocolConstants.MC_1_21_2_RC_2) {
             double x = in.readDouble();
             double y = in.readDouble();
             double z = in.readDouble();

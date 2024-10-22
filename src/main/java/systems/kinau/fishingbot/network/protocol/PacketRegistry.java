@@ -182,7 +182,7 @@ public class PacketRegistry {
         if (protocolId == ProtocolConstants.AUTOMATIC)
             protocolId = ProtocolConstants.getLatest();
         //TODO: REMOVE SNAPSHOT DATA
-        if (protocolId == ProtocolConstants.MC_1_21_2_PRE_4)
+        if (protocolId == ProtocolConstants.MC_1_21_2_RC_2)
             return "mc_data/1_21_2/packets.json";
         String version = ProtocolConstants.getVersionString(protocolId);
         if (version.contains("/"))

@@ -4,6 +4,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.bot.registry.Registry;
 import systems.kinau.fishingbot.network.item.datacomponent.components.*;
+import systems.kinau.fishingbot.network.item.datacomponent.components.parts.fireworks.FireworkExplosion;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:ominous_bottle_amplifier"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:recipes"), NBTComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:lodestone_tracker"), LodestoneTrackerComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:firework_explosion"), componentTypeId -> new SimpleMapperComponent(new FireworksComponent.FireworkExplosion(), componentTypeId));
+        addToRegistry(dataComponentRegistry.findKey("minecraft:firework_explosion"), componentTypeId -> new SimpleMapperComponent(new FireworkExplosion(), componentTypeId));
         addToRegistry(dataComponentRegistry.findKey("minecraft:fireworks"), FireworksComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:profile"), ProfileComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:note_block_sound"), StringComponent::new);
@@ -82,7 +83,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:fire_resistant"), EmptyComponent::new);
         }
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_2_PRE_4) {
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_2_RC_2) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:consumable"), ConsumableComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_remainder"), componentTypeId -> new UseRemainderComponent(this, componentTypeId));
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_cooldown"), UseCooldownComponent::new);

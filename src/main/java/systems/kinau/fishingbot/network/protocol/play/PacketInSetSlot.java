@@ -34,8 +34,15 @@ public class PacketInSetSlot extends Packet {
             readVarInt(in); // revision
         }
         this.slotId = in.readShort();
+        if (FishingBot.getInstance().getConfig().isLogItemData()) {
+            FishingBot.getLog().info("Start reading PacketInSetSlot slot");
+        }
         this.slot = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
-
+        if (FishingBot.getInstance().getConfig().isLogItemData()) {
+            FishingBot.getLog().info("End of reading PacketInSetSlot slot");
+            if (in.getAvailable() > 0)
+                FishingBot.getLog().warning("End of reading PacketInSetSlot has " + in.getAvailable() + " byte(s) left");
+        }
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateSlotEvent(windowId, slotId, slot));
     }
 }

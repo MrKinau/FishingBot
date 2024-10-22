@@ -285,7 +285,7 @@ public class PacketInJoinGame extends Packet {
                 portalCooldown = readVarInt(in);
                 break;
             }
-            case ProtocolConstants.MC_1_21_2_PRE_4:
+            case ProtocolConstants.MC_1_21_2_RC_2:
             default: {
                 eid = in.readInt();                         // entity ID
                 hardcore = in.readBoolean();                // is hardcore

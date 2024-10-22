@@ -2,12 +2,10 @@ package systems.kinau.fishingbot.network.item.datacomponent.components;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
-import systems.kinau.fishingbot.network.item.datacomponent.DataComponentPart;
+import systems.kinau.fishingbot.network.item.datacomponent.components.parts.bees.Bee;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
-import systems.kinau.fishingbot.utils.nbt.NBTTag;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -38,28 +36,6 @@ public class BeesComponent extends DataComponent {
             Bee bee = new Bee();
             bee.read(in, protocolId);
             bees.add(bee);
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class Bee implements DataComponentPart {
-        private NBTTag entityData;
-        private int ticksInHive;
-        private int minTicksInHive;
-
-        @Override
-        public void write(ByteArrayDataOutput out, int protocolId) {
-            Packet.writeNBT(entityData, out);
-            Packet.writeVarInt(ticksInHive, out);
-            Packet.writeVarInt(minTicksInHive, out);
-        }
-
-        @Override
-        public void read(ByteArrayDataInputWrapper in, int protocolId) {
-            this.entityData = Packet.readNBT(in, protocolId);
-            this.ticksInHive = Packet.readVarInt(in);
-            this.minTicksInHive = Packet.readVarInt(in);
         }
     }
 }

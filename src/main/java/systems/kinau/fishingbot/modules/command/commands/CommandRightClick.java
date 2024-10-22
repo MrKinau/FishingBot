@@ -22,7 +22,7 @@ public class CommandRightClick extends BrigardierCommand {
                                 source.sendTranslatedMessages("command-rightclick-invalid-slot", slot + 1);
                                 return 0;
                             }
-                            FishingBot.getInstance().getCurrentBot().getPlayer().setHeldSlot(slot);
+                            FishingBot.getInstance().getCurrentBot().getPlayer().setHeldSlot(slot + 36);
                             try {
                                 Thread.sleep(50);
                             } catch (InterruptedException e) {
