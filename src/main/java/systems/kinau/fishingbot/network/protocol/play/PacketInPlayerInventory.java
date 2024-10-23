@@ -27,15 +27,13 @@ public class PacketInPlayerInventory extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.slotId = readVarInt(in);
-        if (FishingBot.getInstance().getConfig().isLogItemData()) {
+        if (FishingBot.getInstance().getConfig().isLogItemData())
             FishingBot.getLog().info("Start reading PacketInPlayerInventory slot");
-        }
         this.item = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
-        if (FishingBot.getInstance().getConfig().isLogItemData()) {
+        if (FishingBot.getInstance().getConfig().isLogItemData())
             FishingBot.getLog().info("End of reading PacketInPlayerInventory slot");
-            if (in.getAvailable() > 0)
-                FishingBot.getLog().warning("End of reading PacketInPlayerInventory has " + in.getAvailable() + " byte(s) left");
-        }
+        if (in.getAvailable() > 0)
+            FishingBot.getLog().warning("End of reading PacketInPlayerInventory has " + in.getAvailable() + " byte(s) left");
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateSlotEvent(0, Integer.valueOf(slotId).shortValue(), item));
     }
 }

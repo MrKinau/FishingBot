@@ -31,9 +31,8 @@ public class PacketInWindowItems extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.windowId = readContainerIdUnsigned(in, protocolId);
-        if (protocolId >= ProtocolConstants.MC_1_17_1) {
+        if (protocolId >= ProtocolConstants.MC_1_17_1)
             readVarInt(in); // revision (whatever it is?) or arbitrary state id?
-        }
         this.slots = new ArrayList<>();
         int count = protocolId >= ProtocolConstants.MC_1_17_1 ? readVarInt(in) : in.readShort();
         if (FishingBot.getInstance().getConfig().isLogItemData())
@@ -50,7 +49,7 @@ public class PacketInWindowItems extends Packet {
             if (FishingBot.getInstance().getConfig().isLogItemData())
                 FishingBot.getLog().info("End of reading PacketInWindowItems carriedItem");
         }
-        if (FishingBot.getInstance().getConfig().isLogItemData() && in.getAvailable() > 0)
+        if (in.getAvailable() > 0)
             FishingBot.getLog().warning("End of reading PacketInWindowItems has " + in.getAvailable() + " byte(s) left");
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateWindowItemsEvent(windowId, slots));
     }
