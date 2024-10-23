@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.Effect;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ public class PotionContentsComponent extends DataComponent {
     private Optional<Integer> potionId;
     private Optional<Integer> customColor;
     private List<Effect> effects = Collections.emptyList();
+    private Optional<String> customName;
 
     public PotionContentsComponent(int componentTypeId) {
         super(componentTypeId);
@@ -30,6 +32,10 @@ public class PotionContentsComponent extends DataComponent {
         Packet.writeVarInt(effects.size(), out);
         for (Effect effect : effects) {
             effect.write(out, protocolId);
+        }
+        if (protocolId >= ProtocolConstants.MC_1_21_2) {
+            out.writeBoolean(customName.isPresent());
+            customName.ifPresent(s -> Packet.writeString(s, out));
         }
     }
 
@@ -53,6 +59,14 @@ public class PotionContentsComponent extends DataComponent {
             Effect effect = new Effect();
             effect.read(in, protocolId);
             effects.add(effect);
+        }
+
+        if (protocolId >= ProtocolConstants.MC_1_21_2) {
+            if (in.readBoolean()) {
+                customName = Optional.of(Packet.readString(in));
+            } else {
+                customName = Optional.empty();
+            }
         }
     }
 }

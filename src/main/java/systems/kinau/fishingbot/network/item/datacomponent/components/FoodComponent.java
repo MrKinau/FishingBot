@@ -36,14 +36,16 @@ public class FoodComponent extends DataComponent {
         Packet.writeVarInt(nutrition, out);
         out.writeFloat(saturation);
         out.writeBoolean(canAlwaysEat);
-        out.writeFloat(eatSeconds);
-        if (protocolId >= ProtocolConstants.MC_1_21) {
-            out.writeBoolean(usingConvertsTo.isPresent());
-            usingConvertsTo.ifPresent(slot -> Packet.writeSlot(slot, out, protocolId));
-        }
-        Packet.writeVarInt(possibleEffects.size(), out);
-        for (PossibleEffect effect : possibleEffects) {
-            effect.write(out, protocolId);
+        if (protocolId < ProtocolConstants.MC_1_21_2) {
+            out.writeFloat(eatSeconds);
+            if (protocolId == ProtocolConstants.MC_1_21) {
+                out.writeBoolean(usingConvertsTo.isPresent());
+                usingConvertsTo.ifPresent(slot -> Packet.writeSlot(slot, out, protocolId));
+            }
+            Packet.writeVarInt(possibleEffects.size(), out);
+            for (PossibleEffect effect : possibleEffects) {
+                effect.write(out, protocolId);
+            }
         }
     }
 
@@ -52,26 +54,28 @@ public class FoodComponent extends DataComponent {
         this.nutrition = Packet.readVarInt(in);
         this.saturation = in.readFloat();
         this.canAlwaysEat = in.readBoolean();
-        this.eatSeconds = in.readFloat();
-        if (protocolId >= ProtocolConstants.MC_1_21) {
-            if (in.readBoolean()) {
-                if (FishingBot.getInstance().getConfig().isLogItemData()) {
-                    FishingBot.getLog().info("Start reading food component usingConvertsTo");
+        if (protocolId < ProtocolConstants.MC_1_21_2) {
+            this.eatSeconds = in.readFloat();
+            if (protocolId == ProtocolConstants.MC_1_21) {
+                if (in.readBoolean()) {
+                    if (FishingBot.getInstance().getConfig().isLogItemData()) {
+                        FishingBot.getLog().info("Start reading food component usingConvertsTo");
+                    }
+                    this.usingConvertsTo = Optional.of(Packet.readSlot(in, protocolId, dataComponentRegistry));
+                    if (FishingBot.getInstance().getConfig().isLogItemData()) {
+                        FishingBot.getLog().info("End of reading food component usingConvertsTo");
+                    }
+                } else {
+                    this.usingConvertsTo = Optional.empty();
                 }
-                this.usingConvertsTo = Optional.of(Packet.readSlot(in, protocolId, dataComponentRegistry));
-                if (FishingBot.getInstance().getConfig().isLogItemData()) {
-                    FishingBot.getLog().info("End of reading food component usingConvertsTo");
-                }
-            } else {
-                this.usingConvertsTo = Optional.empty();
             }
-        }
-        this.possibleEffects = new LinkedList<>();
-        int count = Packet.readVarInt(in);
-        for (int i = 0; i < count; i++) {
-            PossibleEffect possibleEffect = new PossibleEffect();
-            possibleEffect.read(in, protocolId);
-            possibleEffects.add(possibleEffect);
+            this.possibleEffects = new LinkedList<>();
+            int count = Packet.readVarInt(in);
+            for (int i = 0; i < count; i++) {
+                PossibleEffect possibleEffect = new PossibleEffect();
+                possibleEffect.read(in, protocolId);
+                possibleEffects.add(possibleEffect);
+            }
         }
     }
 }

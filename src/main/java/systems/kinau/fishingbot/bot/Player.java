@@ -328,7 +328,7 @@ public class Player implements Listener {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
                 new PacketOutClickWindow(
                         /* player inventory */ inventory.getWindowId(),
-                        /* the clicked slot */ (short) (slotId + (inventory.getContent().size() == 63 ? 18 : 45)),
+                        /* the clicked slot */ (short) (slotId + (inventory.getContent().size() - 45)),
                         /* use right click */ (byte) 0,
                         /* action count starting at 1 */ inventory.getActionCounter(),
                         /* shift click mode */ 1,
@@ -445,7 +445,7 @@ public class Player implements Listener {
     public void setHeldSlot(int heldSlot, boolean sendPacket) {
         if (sendPacket)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHeldItemChange(heldSlot));
-        this.heldSlot = heldSlot;
+        this.heldSlot = heldSlot + 36;
     }
 
     public void use() {

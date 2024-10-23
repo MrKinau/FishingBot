@@ -363,7 +363,6 @@ public class FishingModule extends Module implements Runnable, Listener {
             }
             // check current fishing rod value and swap if a better one is in inventory
             if (ItemUtils.isFishingRod(slot) && !FishingBot.getInstance().getCurrentBot().getConfig().isDisableRodChecking()) {
-                FishingBot.getLog().info("Found rod at: " + slotId + " (current: " + FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() + ")");
                 swapWithBestFishingRod();
             }
 
