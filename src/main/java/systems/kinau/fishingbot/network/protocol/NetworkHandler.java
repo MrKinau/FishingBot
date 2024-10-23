@@ -189,31 +189,25 @@ public class NetworkHandler {
         }
     }
 
-    private void readPacket(int len, int packetId, ByteArrayDataInputWrapper buf) throws IOException {
-        Class<? extends Packet> clazz = null;
-
+    private PacketRegistry getCurrentPacketRegistry() {
         switch (state) {
-            case HANDSHAKE:
-                clazz = getHandshakeRegistry().getPacket(packetId);
-                break;
-            case LOGIN:
-                clazz = getLoginRegistryIn().getPacket(packetId);
-                break;
-            case PLAY:
-                clazz = getPlayRegistryIn().getPacket(packetId);
-                break;
-            case CONFIGURATION:
-                clazz = getConfigurationRegistryIn().getPacket(packetId);
-                break;
-            default:
-                break;
+            case HANDSHAKE: return getHandshakeRegistry();
+            case LOGIN: return getLoginRegistryIn();
+            case PLAY: return getPlayRegistryIn();
+            case CONFIGURATION: return getConfigurationRegistryIn();
         }
+        return null;
+    }
+
+    private void readPacket(int len, int packetId, ByteArrayDataInputWrapper buf) throws IOException {
+        PacketRegistry packetRegistry = getCurrentPacketRegistry();
+        Class<? extends Packet> clazz = packetRegistry == null ? null : packetRegistry.getPacket(packetId);
 
         if (clazz == null) {
             if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets()) {
                 byte[] bytes = new byte[buf.getAvailable()];
                 buf.readFully(bytes);
-                FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] |C| <<<  S : 0x" + Integer.toHexString(packetId));
+                FishingBot.getLog().info("[" + getState().name().toUpperCase() + "] |C| <<<  S : 0x" + Integer.toHexString(packetId) + " (" + (packetRegistry != null ? packetRegistry.getMojMapPacketName(packetId) : "") + ")");
             }
             return;
         } else if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())

@@ -151,6 +151,9 @@
       },
       "minecraft:ping": {
         "protocol_id": 51
+      },
+      "minecraft:chunk_batch_finished": {
+        "protocol_id": 12
       }
     },
     "serverbound": {
@@ -165,6 +168,9 @@
       },
       "minecraft:chat_session_update": {
         "protocol_id": 6
+      },
+      "minecraft:chunk_batch_received": {
+        "protocol_id": 7
       },
       "minecraft:client_command": {
         "protocol_id": 8
