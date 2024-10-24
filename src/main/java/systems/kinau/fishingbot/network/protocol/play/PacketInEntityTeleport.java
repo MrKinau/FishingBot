@@ -41,9 +41,9 @@ public class PacketInEntityTeleport extends Packet {
             this.y = in.readDouble();
             this.z = in.readDouble();
             if (protocolId >= ProtocolConstants.MC_1_21_2) {
-                double dx = in.readDouble();
-                double dy = in.readDouble();
-                double dz = in.readDouble();
+                in.readDouble(); //dx
+                in.readDouble(); //dy
+                in.readDouble(); //dz
             }
         }
         int relatives = 0;

@@ -80,6 +80,9 @@ A list of all commands can be found in the wiki ([here](https://github.com/MrKin
 - 1.20.5
 - 1.20.6
 - 1.21
+- 1.21.1
+- 1.21.2
+- 1.21.3
 
 ## Discord
 To follow the project, get support or request features or bugs you can join my Discord: https://discord.gg/xHpCDYf

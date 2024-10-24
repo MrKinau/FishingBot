@@ -58,9 +58,9 @@ public class PacketInPlayerPosLook extends Packet {
             double x = in.readDouble();
             double y = in.readDouble();
             double z = in.readDouble();
-            double dx = in.readDouble();
-            double dy = in.readDouble();
-            double dz = in.readDouble();
+            in.readDouble(); //dx
+            in.readDouble(); //dy
+            in.readDouble(); //dz
             float yaw = in.readFloat();
             float pitch = in.readFloat();
             int relatives = in.readInt();

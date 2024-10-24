@@ -25,7 +25,6 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:unbreakable"), BooleanComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:custom_name"), NBTComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:item_name"), NBTComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:item_model"), StringComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:lore"), LoreComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:rarity"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:enchantments"), EnchantmentsComponent::new);
@@ -84,6 +83,7 @@ public class DataComponentRegistry {
         }
 
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_2) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:item_model"), StringComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:consumable"), ConsumableComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_remainder"), componentTypeId -> new UseRemainderComponent(this, componentTypeId));
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_cooldown"), UseCooldownComponent::new);
