@@ -24,4 +24,9 @@ public class DamageComponent extends DataComponent {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.damage = Packet.readVarInt(in);
     }
+
+    @Override
+    public String toString(int protocolId) {
+        return super.toString(protocolId) + "[damage=" + damage + "]";
+    }
 }

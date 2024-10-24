@@ -254,8 +254,8 @@ public class FishingModule extends Module implements Runnable, Listener {
             return false;
         if (bestSlot == FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot())
             return false;
-        int newSlot = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() - 36;
-        FishingBot.getInstance().getCurrentBot().getPlayer().swapToHotBar(bestSlot, newSlot);
+        int numberKey = FishingBot.getInstance().getCurrentBot().getPlayer().getHeldSlot() - 36;
+        FishingBot.getInstance().getCurrentBot().getPlayer().swapToHotBar(bestSlot, numberKey);
         return true;
     }
 

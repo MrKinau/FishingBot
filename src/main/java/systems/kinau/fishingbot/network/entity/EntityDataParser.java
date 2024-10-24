@@ -45,12 +45,12 @@ public class EntityDataParser {
                 element.read(in, networkHandler, protocolId);
 
                 data.add(new EntityDataValue<>(elementIndex, elementType, element));
-                if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
+                if (FishingBot.getInstance().getCurrentBot().getConfig().isLogEntityData())
                     FishingBot.getLog().info("Entity data for " + entityId + " is: " + elementIndex + " of type " + elementType + " = " + element.getValue());
             }
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityDataEvent(entityId, data));
         } catch (Exception ex) {
-            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogEntityData())
                 ex.printStackTrace();
         }
     }

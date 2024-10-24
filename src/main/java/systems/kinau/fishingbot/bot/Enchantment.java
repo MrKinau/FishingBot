@@ -44,4 +44,9 @@ public class Enchantment implements DataComponentPart {
         this.level = Packet.readVarInt(in);
         this.enchantmentType = Registries.ENCHANTMENT.getEnchantmentName(enchantmentId, protocolId);
     }
+
+    @Override
+    public String toString(int protocolId) {
+        return "{enchantment=" + getEnchantmentType() + ",level=" + level + "}";
+    }
 }

@@ -11,6 +11,7 @@ import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -25,9 +26,10 @@ public class PacketOutPosLook extends Packet {
     private float yaw;
     private float pitch;
     private boolean onGround;
+    private boolean horizontalCollision;
 
     public PacketOutPosLook(float yaw, float pitch) {
-        this(FishingBot.getInstance().getCurrentBot().getPlayer().getX(), FishingBot.getInstance().getCurrentBot().getPlayer().getY(), FishingBot.getInstance().getCurrentBot().getPlayer().getZ(), yaw, pitch, true);
+        this(FishingBot.getInstance().getCurrentBot().getPlayer().getX(), FishingBot.getInstance().getCurrentBot().getPlayer().getY(), FishingBot.getInstance().getCurrentBot().getPlayer().getZ(), yaw, pitch, true, true);
     }
 
     @Override
@@ -37,7 +39,10 @@ public class PacketOutPosLook extends Packet {
         out.writeDouble(getZ());
         out.writeFloat(getYaw());
         out.writeFloat(getPitch());
-        out.writeBoolean(isOnGround());
+        if (protocolId >= ProtocolConstants.MC_1_21_2)
+            out.writeByte(PacketOutPosition.packFlags(onGround, horizontalCollision));
+        else
+            out.writeBoolean(onGround);
     }
 
     @Override

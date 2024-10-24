@@ -19,7 +19,7 @@ public class PacketOutCloseInventory extends Packet {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
-        out.writeByte(windowId);
+        writeContainerId(windowId, out, protocolId);
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new InventoryCloseEvent(getWindowId()));
     }

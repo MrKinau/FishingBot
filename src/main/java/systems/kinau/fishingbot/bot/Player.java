@@ -86,6 +86,14 @@ public class Player implements Listener {
     }
 
     @EventHandler
+    public void onPosLookChange(LookChangeEvent event) {
+        this.yaw = event.getYaw();
+        this.pitch = event.getPitch();
+        this.originYaw = yaw;
+        this.originPitch = pitch;
+    }
+
+    @EventHandler
     public void onUpdateXP(UpdateExperienceEvent event) {
         if (getLevels() >= 0 && getLevels() < event.getLevel()) {
             if (FishingBot.getInstance().getCurrentBot().getConfig().getAnnounceTypeConsole() != AnnounceType.NONE)
@@ -320,7 +328,7 @@ public class Player implements Listener {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
                 new PacketOutClickWindow(
                         /* player inventory */ inventory.getWindowId(),
-                        /* the clicked slot */ (short) (slotId + (inventory.getContent().size() == 63 ? 18 : 45)),
+                        /* the clicked slot */ (short) (slotId + (inventory.getContent().size() - 45)),
                         /* use right click */ (byte) 0,
                         /* action count starting at 1 */ inventory.getActionCounter(),
                         /* shift click mode */ 1,
@@ -373,7 +381,7 @@ public class Player implements Listener {
                 setYaw(-180 + (getYaw() - 180));
             if (getYaw() < -180)
                 setYaw(180 + (getYaw() + 180));
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true));
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true, true));
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ignore) { }
@@ -414,6 +422,7 @@ public class Player implements Listener {
                     PacketOutBlockPlace.Hand.MAIN_HAND,
                     x, y, z, blockFace,
                     0.5F, 0.5F, 0.5F,
+                    false,
                     false
             ));
             if (autoSneak)
@@ -436,7 +445,7 @@ public class Player implements Listener {
     public void setHeldSlot(int heldSlot, boolean sendPacket) {
         if (sendPacket)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutHeldItemChange(heldSlot));
-        this.heldSlot = heldSlot;
+        this.heldSlot = heldSlot + 36;
     }
 
     public void use() {

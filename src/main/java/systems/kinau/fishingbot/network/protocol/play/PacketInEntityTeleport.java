@@ -40,10 +40,23 @@ public class PacketInEntityTeleport extends Packet {
             this.x = in.readDouble();
             this.y = in.readDouble();
             this.z = in.readDouble();
+            if (protocolId >= ProtocolConstants.MC_1_21_2) {
+                in.readDouble(); //dx
+                in.readDouble(); //dy
+                in.readDouble(); //dz
+            }
         }
-        this.yaw = in.readByte();
-        this.pitch = in.readByte();
+        int relatives = 0;
+        if (protocolId <= ProtocolConstants.MC_1_21) {
+            this.yaw = in.readByte();
+            this.pitch = in.readByte();
+        } else {
+            this.yaw = Double.valueOf(Math.floor(in.readFloat() * 256.0F / 360.0F)).byteValue();
+            this.pitch = Double.valueOf(Math.floor(in.readFloat() * 256.0F / 360.0F)).byteValue();
+            relatives = in.readInt();
+        }
         this.onGround = in.readBoolean();
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityTeleportEvent(entityId, x, y, z, yaw, pitch, onGround));
+        if (relatives == 0)
+            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityTeleportEvent(entityId, x, y, z, yaw, pitch, onGround));
     }
 }

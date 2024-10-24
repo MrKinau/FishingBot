@@ -18,6 +18,6 @@ public class PosLookChangeEvent extends Event {
     private double z;
     private float yaw;
     private float pitch;
-    private  int teleportId;
+    private int teleportId;
 
 }

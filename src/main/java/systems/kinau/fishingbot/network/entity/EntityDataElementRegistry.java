@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.function.TriFunction;
+import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
@@ -56,7 +58,16 @@ public class EntityDataElementRegistry {
         add(ProtocolMapperBuilder.create(5)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MC_1_13, 6)
                 .addRule(protocolId -> protocolId >= ProtocolConstants.MC_1_19_3, 7)
-                .build(), simple("slot", (in, networkHandler, protocolId) -> Packet.readSlot(in, protocolId, networkHandler.getDataComponentRegistry())));
+                .build(), simple("slot", (in, networkHandler, protocolId) -> {
+                    if (FishingBot.getInstance().getConfig().isLogItemData()) {
+                        FishingBot.getLog().info("Start reading entity data slot");
+                    }
+                    Slot slot = Packet.readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
+                    if (FishingBot.getInstance().getConfig().isLogItemData()) {
+                        FishingBot.getLog().info("End of reading entity data slot");
+                    }
+                    return slot;
+        }));
 
         add(ProtocolMapperBuilder.create(-1)
                 .addRule(protocolId -> protocolId == ProtocolConstants.MC_1_8, 6)
@@ -282,7 +293,13 @@ public class EntityDataElementRegistry {
                 in.readFloat(); // roll
                 break;
             case "minecraft:item":
+                if (FishingBot.getInstance().getConfig().isLogItemData()) {
+                    FishingBot.getLog().info("Start reading particle item");
+                }
                 Packet.readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
+                if (FishingBot.getInstance().getConfig().isLogItemData()) {
+                    FishingBot.getLog().info("End of reading particle item");
+                }
                 break;
             case "minecraft:vibration":
                 int positionSource = Packet.readVarInt(in);

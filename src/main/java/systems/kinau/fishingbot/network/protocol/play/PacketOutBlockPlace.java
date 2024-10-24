@@ -24,13 +24,14 @@ public class PacketOutBlockPlace extends Packet {
     private float cursorY;
     private float cursorZ;
     private boolean insideBlock;
+    private boolean worldBorderHit;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         if (protocolId >= ProtocolConstants.MC_1_14) {
             writeVarInt(hand.ordinal(), out);
-            MovingObjectPositionBlock movObjPos = new MovingObjectPositionBlock(LocationUtils.toBlockPos(x, y, z), blockFace, cursorX, cursorY, cursorZ, insideBlock);
-            writeMovingObjectPosition(movObjPos, out);
+            MovingObjectPositionBlock movObjPos = new MovingObjectPositionBlock(LocationUtils.toBlockPos(x, y, z), blockFace, cursorX, cursorY, cursorZ, insideBlock, worldBorderHit);
+            writeMovingObjectPosition(movObjPos, out, protocolId);
             if (protocolId >= ProtocolConstants.MC_1_19)
                 writeVarInt(0, out); // sequence
         } else if (protocolId >= ProtocolConstants.MC_1_9) {

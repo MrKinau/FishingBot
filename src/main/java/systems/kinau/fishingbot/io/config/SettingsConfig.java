@@ -63,6 +63,8 @@ public class SettingsConfig implements Config {
 
     @Property(key = "logs.log-count", description = "config-logs-log-count") private int logCount = 15;
     @Property(key = "logs.log-packets", description = "config-logs-log-packets") private boolean logPackets = false;
+    @Property(key = "logs.log-entity-data", description = "config-logs-log-entity-data") private boolean logEntityData = false;
+    @Property(key = "logs.log-item-data", description = "config-logs-log-item-data") private boolean logItemData = false;
 
     @Property(key = "announces.discord.enabled", description = "config-announces-discord") private boolean webHookEnabled = false;
     @Property(key = "announces.discord.web-hook", description = "config-announces-discord-web-hook") private String webHook = "YOURWEBHOOK";

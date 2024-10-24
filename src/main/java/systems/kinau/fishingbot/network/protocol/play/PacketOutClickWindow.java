@@ -28,14 +28,14 @@ public class PacketOutClickWindow extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MC_1_16_4) {
-            out.writeByte(windowId);
+            writeContainerId(windowId, out, protocolId);
             out.writeShort(slot);
             out.writeByte(button);
             out.writeShort(actionNumber);
             writeVarInt(mode, out);
             writeSlot(item, out, protocolId);
         } else {
-            out.writeByte(windowId);
+            writeContainerId(windowId, out, protocolId);
             if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_17_1)
                 writeVarInt(0, out); // revision
             out.writeShort(slot);

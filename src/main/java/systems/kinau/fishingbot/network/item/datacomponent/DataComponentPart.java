@@ -9,4 +9,7 @@ public interface DataComponentPart {
 
     void read(ByteArrayDataInputWrapper in, int protocolId);
 
+    default String toString(int protocolId) {
+        return "";
+    }
 }

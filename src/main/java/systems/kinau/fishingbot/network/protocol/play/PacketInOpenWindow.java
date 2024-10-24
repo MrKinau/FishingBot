@@ -35,7 +35,7 @@ public class PacketInOpenWindow extends Packet {
             this.title = readChatComponent(in, protocolId);
             in.readUnsignedByte(); // slots
         } else {
-            this.windowId = readVarInt(in);
+            this.windowId = readContainerIdVarInt(in, protocolId);
             this.windowType = readVarInt(in);
             this.title = readChatComponent(in, protocolId);
         }

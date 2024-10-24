@@ -1,11 +1,10 @@
 package systems.kinau.fishingbot.network.item.datacomponent.components;
 
 import com.google.common.io.ByteArrayDataOutput;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
-import systems.kinau.fishingbot.network.item.datacomponent.DataComponentPart;
+import systems.kinau.fishingbot.network.item.datacomponent.components.parts.Effect;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.Collections;
@@ -18,6 +17,7 @@ public class PotionContentsComponent extends DataComponent {
     private Optional<Integer> potionId;
     private Optional<Integer> customColor;
     private List<Effect> effects = Collections.emptyList();
+    private Optional<String> customName;
 
     public PotionContentsComponent(int componentTypeId) {
         super(componentTypeId);
@@ -32,6 +32,10 @@ public class PotionContentsComponent extends DataComponent {
         Packet.writeVarInt(effects.size(), out);
         for (Effect effect : effects) {
             effect.write(out, protocolId);
+        }
+        if (protocolId >= ProtocolConstants.MC_1_21_2) {
+            out.writeBoolean(customName.isPresent());
+            customName.ifPresent(s -> Packet.writeString(s, out));
         }
     }
 
@@ -56,63 +60,12 @@ public class PotionContentsComponent extends DataComponent {
             effect.read(in, protocolId);
             effects.add(effect);
         }
-    }
 
-    @Getter
-    @NoArgsConstructor
-    public static class Effect implements DataComponentPart {
-
-        private int effectId;
-        private EffectDetails details;
-
-        @Override
-        public void write(ByteArrayDataOutput out, int protocolId) {
-            Packet.writeVarInt(effectId, out);
-            details.write(out, protocolId);
-        }
-
-        @Override
-        public void read(ByteArrayDataInputWrapper in, int protocolId) {
-            this.effectId = Packet.readVarInt(in);
-            EffectDetails details = new EffectDetails();
-            details.read(in, protocolId);
-            this.details = details;
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class EffectDetails implements DataComponentPart {
-
-        private int amplifier;
-        private int duration;
-        private boolean ambient;
-        private boolean showParticle;
-        private boolean showIcon;
-        private Optional<EffectDetails> hiddenEffect;
-
-        @Override
-        public void write(ByteArrayDataOutput out, int protocolId) {
-            Packet.writeVarInt(amplifier, out);
-            Packet.writeVarInt(duration, out);
-            out.writeBoolean(ambient);
-            out.writeBoolean(showParticle);
-            out.writeBoolean(showIcon);
-            out.writeBoolean(hiddenEffect.isPresent());
-            hiddenEffect.ifPresent(effect -> effect.write(out, protocolId));
-        }
-
-        @Override
-        public void read(ByteArrayDataInputWrapper in, int protocolId) {
-            this.amplifier = Packet.readVarInt(in);
-            this.duration = Packet.readVarInt(in);
-            this.ambient = in.readBoolean();
-            this.showParticle = in.readBoolean();
-            this.showIcon = in.readBoolean();
+        if (protocolId >= ProtocolConstants.MC_1_21_2) {
             if (in.readBoolean()) {
-                EffectDetails hiddenEffect = new EffectDetails();
-                hiddenEffect.read(in, protocolId);
-                this.hiddenEffect = Optional.of(hiddenEffect);
+                customName = Optional.of(Packet.readString(in));
+            } else {
+                customName = Optional.empty();
             }
         }
     }

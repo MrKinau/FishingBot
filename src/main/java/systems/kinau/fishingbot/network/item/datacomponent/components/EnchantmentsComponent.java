@@ -9,6 +9,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class EnchantmentsComponent extends DataComponent {
@@ -39,5 +40,10 @@ public class EnchantmentsComponent extends DataComponent {
             enchantments.add(enchantment);
         }
         this.showInTooltip = in.readBoolean();
+    }
+
+    @Override
+    public String toString(int protocolId) {
+        return super.toString(protocolId) + "[enchantments=[" + enchantments.stream().map(enchantment -> enchantment.toString(protocolId)).collect(Collectors.joining(",")) + "],showInTooltip=" + showInTooltip + "]";
     }
 }

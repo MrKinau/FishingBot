@@ -29,6 +29,7 @@ import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutPing;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChunkBatchReceived;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 
@@ -148,7 +149,7 @@ public class ClientDefaultsModule extends Module implements Listener {
             while (!Thread.currentThread().isInterrupted()) {
                 Player player = FishingBot.getInstance().getCurrentBot().getPlayer();
                 if (networkHandler != null && networkHandler.getState() == ProtocolState.PLAY)
-                    networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true));
+                    networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true, true));
                 try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }
         });
@@ -187,5 +188,10 @@ public class ClientDefaultsModule extends Module implements Listener {
         MetaRegistry<Integer, String> metaRegistry = Registries.getByIdentifier(event.getRegistryId(), FishingBot.getInstance().getCurrentBot().getServerProtocol());
         if (metaRegistry == null) return;
         metaRegistry.load(event.getRegistryData(), RegistryLoader.mapped(), FishingBot.getInstance().getCurrentBot().getServerProtocol());
+    }
+
+    @EventHandler
+    public void onChunkBatchFinished(ChunkBatchFinishedEvent event) {
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutChunkBatchReceived(20));
     }
 }

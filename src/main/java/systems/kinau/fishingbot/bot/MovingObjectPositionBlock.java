@@ -12,5 +12,6 @@ public class MovingObjectPositionBlock {
     private float dx;
     private float dy;
     private float dz;
-    private boolean flag;
+    private boolean inside;
+    private boolean worldBorderHit;
 }

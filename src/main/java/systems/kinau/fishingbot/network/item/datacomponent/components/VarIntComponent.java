@@ -24,4 +24,9 @@ public class VarIntComponent extends DataComponent {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.value = Packet.readVarInt(in);
     }
+
+    @Override
+    public String toString(int protocolId) {
+        return super.toString(protocolId) + "[value=" + value + "]";
+    }
 }

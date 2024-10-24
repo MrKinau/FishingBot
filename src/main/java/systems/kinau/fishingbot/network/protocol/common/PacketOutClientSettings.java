@@ -18,7 +18,7 @@ public class PacketOutClientSettings extends Packet {
         switch (protocolId) {
             case ProtocolConstants.MC_1_8: {
                 writeString("en_7s", out);  //use speach "Pirate Speak", arrr
-                out.writeByte(1);           //render-distance
+                out.writeByte(2);           //render-distance
                 out.writeByte(0);           //chat enabled
                 out.writeBoolean(true);     //support colors
                 out.writeByte(128);         //skin bitmask
@@ -51,7 +51,7 @@ public class PacketOutClientSettings extends Packet {
             case ProtocolConstants.MC_1_16_3:
             case ProtocolConstants.MC_1_16_4:
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
-                out.writeByte(1);           //render-distance
+                out.writeByte(2);           //render-distance
                 writeVarInt(0, out);        //chat enabled
                 out.writeBoolean(true);     //support colors
                 out.writeByte(128);         //skin bitmask
@@ -60,7 +60,7 @@ public class PacketOutClientSettings extends Packet {
             case ProtocolConstants.MC_1_17:
             case ProtocolConstants.MC_1_17_1: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
-                out.writeByte(1);           //render-distance
+                out.writeByte(2);           //render-distance
                 writeVarInt(0, out);        //chat enabled
                 out.writeBoolean(true);     //support colors
                 out.writeByte(128);         //skin bitmask
@@ -76,15 +76,30 @@ public class PacketOutClientSettings extends Packet {
             case ProtocolConstants.MC_1_19_4:
             case ProtocolConstants.MC_1_20:
             case ProtocolConstants.MC_1_20_2:
-            default: {
+            case ProtocolConstants.MC_1_20_3:
+            case ProtocolConstants.MC_1_20_5:
+            case ProtocolConstants.MC_1_21: {
                 writeString("lol_aa", out); //use speach "LOLCAT", lol
-                out.writeByte(1);           //render-distance
+                out.writeByte(2);           //render-distance
                 writeVarInt(0, out);        //chat enabled
                 out.writeBoolean(true);     //support colors
                 out.writeByte(128);         //skin bitmask
                 writeVarInt(1, out);        //right = main hand
                 out.writeBoolean(false);     //Disable text filtering
                 out.writeBoolean(true);     //Allow server listings
+                break;
+            }
+            case ProtocolConstants.MC_1_21_2:
+            default: {
+                writeString("lol_aa", out); //use speach "LOLCAT", lol
+                out.writeByte(2);           //render-distance
+                writeVarInt(0, out);        //chat enabled
+                out.writeBoolean(true);     //support colors
+                out.writeByte(128);         //skin bitmask
+                writeVarInt(1, out);        //right = main hand
+                out.writeBoolean(false);     //Disable text filtering
+                out.writeBoolean(true);     //Allow server listings
+                writeVarInt(2, out);     //particle status = minimal
                 break;
             }
         }

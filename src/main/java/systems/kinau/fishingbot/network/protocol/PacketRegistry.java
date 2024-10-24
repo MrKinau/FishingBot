@@ -19,6 +19,8 @@ import systems.kinau.fishingbot.network.protocol.play.*;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 public class PacketRegistry {
@@ -29,6 +31,7 @@ public class PacketRegistry {
     private final JsonParser parser = new JsonParser();
 
     private final BiMap<Integer, Class<? extends Packet>> registeredPackets = HashBiMap.create();
+    private final Map<Integer, String> idToMojMapName = new HashMap<>();
 
     public PacketRegistry(int protocolId, ProtocolState state, ProtocolFlow flow) {
         this.protocolId = protocolId;
@@ -45,15 +48,17 @@ public class PacketRegistry {
         JsonObject flowObj = stateObj.getAsJsonObject(flow.getId());
         if (flowObj == null) throw new IllegalArgumentException("Could not load bundled packets for " + state.getId() + "/" + flow.getId() + "/" + ProtocolConstants.getVersionString(protocolId));
         for (String packetId : flowObj.keySet()) {
+            JsonObject packetData = flowObj.getAsJsonObject(packetId);
+            int packetProtocolId = packetData.getAsJsonPrimitive("protocol_id").getAsInt();
+
+            idToMojMapName.put(packetProtocolId, packetId);
+
             Class<? extends Packet> packetClazz = mapMojangPacketId(packetId);
             if (packetClazz == null) {
                 if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
                     FishingBot.getLog().warning("Could not map packet id " + packetId + " in " + state.name() + " (" + flow.name() + ")");
                 continue;
             }
-
-            JsonObject packetData = flowObj.getAsJsonObject(packetId);
-            int packetProtocolId = packetData.getAsJsonPrimitive("protocol_id").getAsInt();
 
             registerPacket(packetProtocolId, packetClazz);
         }
@@ -78,6 +83,7 @@ public class PacketRegistry {
                 switch (mojangPacketId) {
                     case "minecraft:login_disconnect": return PacketInLoginDisconnect.class;
                     case "minecraft:hello": return PacketInEncryptionRequest.class;
+                    case "minecraft:login_finished":
                     case "minecraft:game_profile": return PacketInLoginSuccess.class;
                     case "minecraft:login_compression": return PacketInSetCompression.class;
                     case "minecraft:custom_query": return PacketInLoginPluginRequest.class;
@@ -129,7 +135,9 @@ public class PacketRegistry {
                     case "minecraft:player_info_remove": return PacketInPlayerListItemRemove.class;
                     case "minecraft:player_info_update": return PacketInPlayerListItem.class;
                     case "minecraft:player_position": return PacketInPlayerPosLook.class;
+                    case "minecraft:player_rotation": return PacketInPlayerLook.class;
                     case "minecraft:resource_pack_push": return PacketInResourcePack.class;
+                    case "minecraft:set_held_slot":
                     case "minecraft:set_carried_item": return PacketInHeldItemChange.class;
                     case "minecraft:set_entity_data": return PacketInEntityMetadata.class;
                     case "minecraft:set_entity_motion": return PacketInEntityVelocity.class;
@@ -142,6 +150,9 @@ public class PacketRegistry {
                     case "minecraft:confirm_transaction": return PacketInConfirmTransaction.class;
                     case "minecraft:play_compression": return PacketInSetCompressionLegacy.class;
                     case "minecraft:ping": return PacketInPing.class;
+                    case "minecraft:set_player_inventory": return PacketInPlayerInventory.class;
+                    case "minecraft:entity_position_sync": return PacketInEntityPositionSync.class;
+                    case "minecraft:chunk_batch_finished": return PacketInChunkBatchFinished.class;
                 }
             } else if (flow == ProtocolFlow.OUTGOING_PACKET) {
                 switch (mojangPacketId) {
@@ -167,6 +178,7 @@ public class PacketRegistry {
                     case "minecraft:swing": return PacketOutArmAnimation.class;
                     case "minecraft:confirm_transaction": return PacketOutConfirmTransaction.class;
                     case "minecraft:pong": return PacketOutPing.class;
+                    case "minecraft:chunk_batch_received": return PacketOutChunkBatchReceived.class;
                 }
             }
         }
@@ -199,6 +211,10 @@ public class PacketRegistry {
             return;
         }
         registeredPackets.put(id, clazz);
+    }
+
+    public String getMojMapPacketName(int id) {
+        return idToMojMapName.get(id);
     }
 
     public Class<? extends Packet> getPacket(int id) {
