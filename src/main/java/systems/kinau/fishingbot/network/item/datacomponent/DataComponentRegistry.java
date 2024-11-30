@@ -31,7 +31,7 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:can_place_on"), AdventureModeComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:can_break"), AdventureModeComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:attribute_modifiers"), AttributeModifiersComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:custom_model_data"), VarIntComponent::new);
+        addToRegistry(dataComponentRegistry.findKey("minecraft:custom_model_data"), CustomModelDataComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:hide_additional_tooltip"), EmptyComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:hide_tooltip"), EmptyComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:repair_cost"), VarIntComponent::new);

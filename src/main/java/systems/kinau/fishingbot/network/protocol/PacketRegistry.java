@@ -179,6 +179,7 @@ public class PacketRegistry {
                     case "minecraft:confirm_transaction": return PacketOutConfirmTransaction.class;
                     case "minecraft:pong": return PacketOutPing.class;
                     case "minecraft:chunk_batch_received": return PacketOutChunkBatchReceived.class;
+                    case "minecraft:player_loaded": return PacketOutPlayerLoaded.class;
                 }
             }
         }

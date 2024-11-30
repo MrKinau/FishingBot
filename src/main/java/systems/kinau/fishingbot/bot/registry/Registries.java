@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.bot.registry;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.registry.registries.*;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
@@ -44,6 +45,7 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_20_5);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_2);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_4_RC_3);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();
@@ -85,7 +87,10 @@ public class Registries {
 
     private JsonObject loadBundledRegistry(int protocolId) {
         String file = getRegistriesFileName(protocolId);
-        if (file == null) return null;
+        if (file == null) {
+            FishingBot.getLog().severe("Could not load registry file for pvn " + protocolId);
+            return null;
+        }
         try {
             return parser.parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(file))).getAsJsonObject();
         } catch (Throwable ex) {
@@ -111,6 +116,7 @@ public class Registries {
             case ProtocolConstants.MC_1_20_5: return "mc_data/1_20_5/registries.json";
             case ProtocolConstants.MC_1_21: return "mc_data/1_21/registries.json";
             case ProtocolConstants.MC_1_21_2: return "mc_data/1_21_2/registries.json";
+            case ProtocolConstants.MC_1_21_4_RC_3: return "mc_data/1_21_4/registries.json";
             default: return null;
         }
     }

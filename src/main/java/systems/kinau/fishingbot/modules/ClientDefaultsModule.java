@@ -28,10 +28,7 @@ import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutPing;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutChunkBatchReceived;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
+import systems.kinau.fishingbot.network.protocol.play.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -95,6 +92,8 @@ public class ClientDefaultsModule extends Module implements Listener {
     public void onJoinGame(JoinGameEvent event) {
         onlinePlayers.clear();
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientSettings());
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_4_RC_3)
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPlayerLoaded());
     }
 
     @EventHandler
