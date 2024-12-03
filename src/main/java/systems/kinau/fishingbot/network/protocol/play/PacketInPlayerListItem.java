@@ -124,7 +124,8 @@ public class PacketInPlayerListItem extends Packet {
             if (in.readBoolean())
                 readChatComponent(in, protocolId);
         }),
-        UPDATE_LIST_ORDER((in, protocolId) -> Packet.readVarInt(in));
+        UPDATE_LIST_ORDER((in, protocolId) -> Packet.readVarInt(in)),
+        UPDATE_HAT((in, protocolId) -> in.readBoolean());
 
         final Action.Reader reader;
 

@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.SetHeldItemEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @Getter
@@ -27,7 +28,10 @@ public class PacketInHeldItemChange extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        this.heldItemSlot = in.readByte() + 36;
+        if (protocolId < ProtocolConstants.MC_1_21_4)
+            this.heldItemSlot = in.readByte() + 36;
+        else
+            this.heldItemSlot = readVarInt(in) + 36;
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new SetHeldItemEvent(heldItemSlot));
     }
