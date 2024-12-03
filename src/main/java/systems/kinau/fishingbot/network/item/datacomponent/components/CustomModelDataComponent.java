@@ -24,7 +24,7 @@ public class CustomModelDataComponent extends DataComponent {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_4_RC_3) {
+        if (protocolId < ProtocolConstants.MC_1_21_4) {
             Packet.writeVarInt(value, out);
         } else {
             Packet.writeVarInt(floats.size(), out);
@@ -48,7 +48,7 @@ public class CustomModelDataComponent extends DataComponent {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_4_RC_3) {
+        if (protocolId < ProtocolConstants.MC_1_21_4) {
             this.value = Packet.readVarInt(in);
         } else {
             int count = Packet.readVarInt(in);
@@ -79,7 +79,7 @@ public class CustomModelDataComponent extends DataComponent {
 
     @Override
     public String toString(int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_4_RC_3) {
+        if (protocolId < ProtocolConstants.MC_1_21_4) {
             return super.toString(protocolId) + "[value=" + value + "]";
         } else {
             return super.toString(protocolId) + "[floats=" + floats + ",flags=" + flags + ",strings=" + strings + ",colors=" + colors + "]";

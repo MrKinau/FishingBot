@@ -28,7 +28,7 @@ public class PacketInHeldItemChange extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_4_RC_3)
+        if (protocolId < ProtocolConstants.MC_1_21_4)
             this.heldItemSlot = in.readByte() + 36;
         else
             this.heldItemSlot = readVarInt(in) + 36;

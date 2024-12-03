@@ -92,7 +92,7 @@ public class ClientDefaultsModule extends Module implements Listener {
     public void onJoinGame(JoinGameEvent event) {
         onlinePlayers.clear();
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientSettings());
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_4_RC_3)
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_4)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPlayerLoaded());
     }
 
