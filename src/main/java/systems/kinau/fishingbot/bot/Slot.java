@@ -4,7 +4,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.item.ComponentItemData;
 import systems.kinau.fishingbot.network.item.ItemData;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageComponent;
@@ -37,12 +36,22 @@ public class Slot {
 
     public void writeItemData(ByteArrayDataOutput output, int protocolId) {
         if (itemData == null) {
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_20_5) {
+            if (protocolId >= ProtocolConstants.MC_1_20_5) {
                 Packet.writeVarInt(0, output);
                 Packet.writeVarInt(0, output);
             }
             return;
         }
         itemData.write(output, protocolId);
+    }
+
+    public void writeHashedItemData(ByteArrayDataOutput output, int protocolId) {
+        if (protocolId < ProtocolConstants.MC_1_21_5_PRE3) return; // should not happen
+        if (itemData == null) {
+            Packet.writeVarInt(0, output);
+            Packet.writeVarInt(0, output);
+            return;
+        }
+        itemData.writeHashes(output, protocolId);
     }
 }

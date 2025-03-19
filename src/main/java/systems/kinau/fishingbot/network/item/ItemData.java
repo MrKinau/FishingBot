@@ -10,4 +10,6 @@ public interface ItemData {
     List<Enchantment> getEnchantments();
 
     void write(ByteArrayDataOutput output, int protocolId);
+
+    default void writeHashes(ByteArrayDataOutput output, int protocolId) {}
 }

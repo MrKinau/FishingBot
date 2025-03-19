@@ -5,6 +5,7 @@ import lombok.Getter;
 import systems.kinau.fishingbot.bot.Enchantment;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.LinkedList;
@@ -27,7 +28,8 @@ public class EnchantmentsComponent extends DataComponent {
         for (Enchantment enchantment : enchantments) {
             enchantment.write(out, protocolId);
         }
-        out.writeBoolean(showInTooltip);
+        if (protocolId < ProtocolConstants.MC_1_21_5_PRE3)
+            out.writeBoolean(showInTooltip);
     }
 
     @Override
@@ -39,7 +41,8 @@ public class EnchantmentsComponent extends DataComponent {
             enchantment.read(in, protocolId);
             enchantments.add(enchantment);
         }
-        this.showInTooltip = in.readBoolean();
+        if (protocolId < ProtocolConstants.MC_1_21_5_PRE3)
+            this.showInTooltip = in.readBoolean();
     }
 
     @Override

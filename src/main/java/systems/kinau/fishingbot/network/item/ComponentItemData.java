@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class ComponentItemData implements ItemData {
 
     private final List<DataComponent> presentComponents;
-    private final List<DataComponent> emptyComponents;
+    private final List<DataComponent> removedComponents;
 
     @Override
     public List<Enchantment> getEnchantments() {
@@ -30,12 +30,26 @@ public class ComponentItemData implements ItemData {
     @Override
     public void write(ByteArrayDataOutput output, int protocolId) {
         Packet.writeVarInt(presentComponents.size(), output);
-        Packet.writeVarInt(emptyComponents.size(), output);
+        Packet.writeVarInt(removedComponents.size(), output);
         for (DataComponent presentComponent : presentComponents) {
             Packet.writeVarInt(presentComponent.getComponentTypeId(), output);
             presentComponent.write(output, protocolId);
         }
-        for (DataComponent emptyComponent : emptyComponents) {
+        for (DataComponent emptyComponent : removedComponents) {
+            Packet.writeVarInt(emptyComponent.getComponentTypeId(), output);
+        }
+    }
+
+    @Override
+    public void writeHashes(ByteArrayDataOutput output, int protocolId) {
+        Packet.writeVarInt(presentComponents.size(), output);
+        for (DataComponent presentComponent : presentComponents) {
+            Packet.writeVarInt(presentComponent.getComponentTypeId(), output);
+            // write hash - I hope this is fine, I really don't want to calculate component hashes
+            output.writeInt(0);
+        }
+        Packet.writeVarInt(removedComponents.size(), output);
+        for (DataComponent emptyComponent : removedComponents) {
             Packet.writeVarInt(emptyComponent.getComponentTypeId(), output);
         }
     }

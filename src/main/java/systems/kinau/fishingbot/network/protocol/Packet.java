@@ -356,6 +356,18 @@ public abstract class Packet {
         }
     }
 
+    public static void writeSlotHash(Slot slot, ByteArrayDataOutput output, int protocolId) {
+        if (protocolId < ProtocolConstants.MC_1_21_5_PRE3) return; // should not happen
+        if (slot == null || slot == Slot.EMPTY || !slot.isPresent()) {
+            output.writeBoolean(false);
+            return;
+        }
+        output.writeBoolean(true);
+        writeVarInt(slot.getItemId(), output);
+        writeVarInt(slot.getItemCount(), output);
+        slot.writeHashedItemData(output, protocolId);
+    }
+
     public static MovingObjectPositionBlock readMovingObjectPosition(ByteArrayDataInputWrapper input, int protocolId) {
         long blockPos = input.readLong();
         PacketOutBlockPlace.BlockFace blockFace = PacketOutBlockPlace.BlockFace.byOrdinal(readVarInt(input));
