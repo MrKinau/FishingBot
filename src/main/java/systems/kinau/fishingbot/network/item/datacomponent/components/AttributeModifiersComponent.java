@@ -5,6 +5,7 @@ import lombok.Getter;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.attributemodifier.AttributeModifier;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.Collections;
@@ -28,7 +29,8 @@ public class AttributeModifiersComponent extends DataComponent {
             modifier.write(out, protocolId);
         }
 
-        out.writeBoolean(showInTooltip);
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+            out.writeBoolean(showInTooltip);
     }
 
     @Override
@@ -43,6 +45,7 @@ public class AttributeModifiersComponent extends DataComponent {
         }
 
         // show_in_tooltip
-        this.showInTooltip = in.readBoolean();
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+            this.showInTooltip = in.readBoolean();
     }
 }

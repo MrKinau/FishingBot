@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponentPart;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.BlockListOrTag;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.utils.nbt.NBTTag;
 
@@ -20,6 +21,7 @@ public class BlockPredicate implements DataComponentPart {
     private Optional<BlockListOrTag> blockPredicate;
     private Optional<List<BlockState>> statePredicate;
     private Optional<NBTTag> nbtPredicate;
+    private DataComponentMatcher dataComponentMatcher;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -34,6 +36,10 @@ public class BlockPredicate implements DataComponentPart {
 
         out.writeBoolean(nbtPredicate.isPresent());
         nbtPredicate.ifPresent(nbt -> Packet.writeNBT(nbt, out));
+
+        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1) {
+            dataComponentMatcher.write(out, protocolId);
+        }
     }
 
     @Override
@@ -63,6 +69,11 @@ public class BlockPredicate implements DataComponentPart {
             this.nbtPredicate = Optional.of(Packet.readNBT(in, protocolId));
         } else {
             this.nbtPredicate = Optional.empty();
+        }
+
+        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1) {
+            this.dataComponentMatcher = new DataComponentMatcher();
+            dataComponentMatcher.read(in, protocolId);
         }
     }
 }

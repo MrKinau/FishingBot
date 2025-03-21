@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.adventuremode.BlockPredicate;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.Collections;
@@ -25,7 +26,8 @@ public class AdventureModeComponent extends DataComponent {
         for (BlockPredicate blockPredicate : blockPredicates) {
             blockPredicate.write(out, protocolId);
         }
-        out.writeBoolean(showInTooltip);
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+            out.writeBoolean(showInTooltip);
     }
 
     @Override
@@ -37,6 +39,7 @@ public class AdventureModeComponent extends DataComponent {
             predicate.read(in, protocolId);
             blockPredicates.add(predicate);
         }
-        this.showInTooltip = in.readBoolean();
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+            this.showInTooltip = in.readBoolean();
     }
 }

@@ -2,6 +2,7 @@ package systems.kinau.fishingbot.network.item.datacomponent.components;
 
 import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
+import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.Optional;
@@ -20,7 +21,7 @@ public class UseCooldownComponent extends DataComponent {
         out.writeFloat(seconds);
         if (cooldownGroup.isPresent()) {
             out.writeBoolean(true);
-            out.writeUTF(cooldownGroup.get());
+            Packet.writeString(cooldownGroup.get(), out);
         }
     }
 
@@ -28,7 +29,7 @@ public class UseCooldownComponent extends DataComponent {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.seconds = in.readFloat();
         if (in.readBoolean()) {
-            this.cooldownGroup = Optional.of(in.readUTF());
+            this.cooldownGroup = Optional.of(Packet.readString(in));
         } else {
             this.cooldownGroup = Optional.empty();
         }

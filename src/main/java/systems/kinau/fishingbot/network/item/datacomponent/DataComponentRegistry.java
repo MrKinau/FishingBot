@@ -18,11 +18,16 @@ public class DataComponentRegistry {
 
     public DataComponentRegistry() {
         Registry<Integer, String> dataComponentRegistry = Registries.DATA_COMPONENT_TYPE.getRegistry(FishingBot.getInstance().getCurrentBot().getServerProtocol());
+        int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
         addToRegistry(dataComponentRegistry.findKey("minecraft:custom_data"), NBTComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:max_stack_size"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:max_damage"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:damage"), DamageComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:unbreakable"), BooleanComponent::new);
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:unbreakable"), BooleanComponent::new);
+        } else {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:unbreakable"), EmptyComponent::new);
+        }
         addToRegistry(dataComponentRegistry.findKey("minecraft:custom_name"), NBTComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:item_name"), NBTComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:lore"), LoreComponent::new);
@@ -32,8 +37,10 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:can_break"), AdventureModeComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:attribute_modifiers"), AttributeModifiersComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:custom_model_data"), CustomModelDataComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:hide_additional_tooltip"), EmptyComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:hide_tooltip"), EmptyComponent::new);
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:hide_additional_tooltip"), EmptyComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:hide_tooltip"), EmptyComponent::new);
+        }
         addToRegistry(dataComponentRegistry.findKey("minecraft:repair_cost"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:creative_slot_lock"), EmptyComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:enchantment_glint_override"), BooleanComponent::new);
@@ -41,7 +48,7 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:food"), componentTypeId -> new FoodComponent(this, componentTypeId));
         addToRegistry(dataComponentRegistry.findKey("minecraft:tool"), ToolComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:stored_enchantments"), EnchantmentsComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:dyed_color"), DyedColorComponent::new);
+        addToRegistry(dataComponentRegistry.findKey("minecraft:dyed_color"), DyedItemColorComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_color"), IntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_id"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_decorations"), NBTComponent::new);
@@ -74,15 +81,15 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:lock"), NBTComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:container_loot"), NBTComponent::new);
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21) {
+        if (protocolId >= ProtocolConstants.MC_1_21) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:jukebox_playable"), JukeboxPlayableComponent::new);
         }
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() <= ProtocolConstants.MC_1_21) {
+        if (protocolId <= ProtocolConstants.MC_1_21) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:fire_resistant"), EmptyComponent::new);
         }
 
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_2) {
+        if (protocolId >= ProtocolConstants.MC_1_21_2) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:item_model"), StringComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:consumable"), ConsumableComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_remainder"), componentTypeId -> new UseRemainderComponent(this, componentTypeId));
@@ -94,6 +101,40 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:glider"), EmptyComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:tooltip_style"), StringComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:death_protection"), DeathProtectionComponent::new);
+        }
+
+        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:tooltip_display"), TooltipDisplayComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:weapon"), WeaponComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:blocks_attacks"), BlocksAttacksComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:potion_duration_scale"), FloatComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:provides_trim_material"), ProvidesTrimMaterialComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:provides_banner_patterns"), StringComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:break_sound"), SoundEventComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:villager/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:wolf/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:wolf/sound_variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:wolf/collar"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:fox/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:salmon/size"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:parrot/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:tropical_fish/pattern"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:tropical_fish/base_color"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:tropical_fish/pattern_color"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:mooshroom/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:rabbit/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:pig/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:cow/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:chicken/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:frog/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:horse/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:painting/variant"), PaintingVariantComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:llama/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:axolotl/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:cat/variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:cat/collar"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:sheep/color"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:shulker/color"), VarIntComponent::new);
         }
 
         dataComponentRegistry.forEach((id, name) -> {

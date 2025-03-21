@@ -42,7 +42,7 @@ public class PacketInChatPlayer extends Packet {
                 FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), getSender()));
         } else {
             try {
-                if (protocolId >= ProtocolConstants.MC_1_21_5_PRE3) {
+                if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1) {
                     readVarInt(in); // global index
                 }
                 if (protocolId >= ProtocolConstants.MC_1_19_3) {

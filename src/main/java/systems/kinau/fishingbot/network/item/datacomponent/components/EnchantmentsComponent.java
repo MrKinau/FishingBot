@@ -28,7 +28,7 @@ public class EnchantmentsComponent extends DataComponent {
         for (Enchantment enchantment : enchantments) {
             enchantment.write(out, protocolId);
         }
-        if (protocolId < ProtocolConstants.MC_1_21_5_PRE3)
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
             out.writeBoolean(showInTooltip);
     }
 
@@ -41,7 +41,7 @@ public class EnchantmentsComponent extends DataComponent {
             enchantment.read(in, protocolId);
             enchantments.add(enchantment);
         }
-        if (protocolId < ProtocolConstants.MC_1_21_5_PRE3)
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
             this.showInTooltip = in.readBoolean();
     }
 

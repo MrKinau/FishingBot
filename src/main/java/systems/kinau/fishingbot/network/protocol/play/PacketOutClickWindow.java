@@ -44,12 +44,12 @@ public class PacketOutClickWindow extends Packet {
             writeVarInt(remaining.size(), out);
             for (Map.Entry<Short, Slot> remainingSlot : remaining.entrySet()) {
                 out.writeShort(remainingSlot.getKey());
-                if (protocolId >= ProtocolConstants.MC_1_21_5_PRE3)
+                if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
                     writeSlotHash(remainingSlot.getValue(), out, protocolId);
                 else
                     writeSlot(remainingSlot.getValue(), out, protocolId);
             }
-            if (protocolId >= ProtocolConstants.MC_1_21_5_PRE3)
+            if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
                 writeSlotHash(item, out, protocolId);
             else
                 writeSlot(item, out, protocolId);

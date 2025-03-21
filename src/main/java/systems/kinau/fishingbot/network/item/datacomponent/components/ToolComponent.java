@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.tool.Rule;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.Collections;
@@ -15,6 +16,7 @@ public class ToolComponent extends DataComponent {
     private List<Rule> rules = Collections.emptyList();
     private float defaultMiningSpeed;
     private int damagePerBlock;
+    private boolean canDestroyBlocksInCreative;
 
     public ToolComponent(int componentTypeId) {
         super(componentTypeId);
@@ -28,6 +30,8 @@ public class ToolComponent extends DataComponent {
         }
         out.writeFloat(defaultMiningSpeed);
         Packet.writeVarInt(damagePerBlock, out);
+        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
+            out.writeBoolean(canDestroyBlocksInCreative);
     }
 
     @Override
@@ -41,5 +45,7 @@ public class ToolComponent extends DataComponent {
         }
         this.defaultMiningSpeed = in.readFloat();
         this.damagePerBlock = Packet.readVarInt(in);
+        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
+            this.canDestroyBlocksInCreative = in.readBoolean();
     }
 }

@@ -35,7 +35,7 @@ public class HolderSetComponentPart implements DataComponentPart {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.id = Packet.readVarInt(in);
         if (id == 0) {
-            this.resourceLocation = in.readUTF();
+            this.resourceLocation = Packet.readString(in);
         } else {
             this.ids = new ArrayList<>(id - 1);
             for (int i = 0; i < id - 1; i++) {

@@ -190,8 +190,8 @@ public class PacketRegistry {
         if (protocolId == ProtocolConstants.AUTOMATIC)
             protocolId = ProtocolConstants.getLatest();
         String version = ProtocolConstants.getVersionString(protocolId);
-        if (version.equals("1.21.5-pre3"))
-            return "mc_data/1_21_5_pre3/packets.json";
+        if (protocolId == ProtocolConstants.MC_1_21_5_RC_1)
+            return "mc_data/1_21_5_rc1/packets.json";
         if (version.contains("/"))
             version = version.split("/")[0];
         if (version.contains("-"))

@@ -357,7 +357,7 @@ public abstract class Packet {
     }
 
     public static void writeSlotHash(Slot slot, ByteArrayDataOutput output, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_5_PRE3) return; // should not happen
+        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1) return; // should not happen
         if (slot == null || slot == Slot.EMPTY || !slot.isPresent()) {
             output.writeBoolean(false);
             return;
