@@ -29,7 +29,7 @@ public class AttributeModifiersComponent extends DataComponent {
             modifier.write(out, protocolId);
         }
 
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             out.writeBoolean(showInTooltip);
     }
 
@@ -45,7 +45,7 @@ public class AttributeModifiersComponent extends DataComponent {
         }
 
         // show_in_tooltip
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             this.showInTooltip = in.readBoolean();
     }
 }

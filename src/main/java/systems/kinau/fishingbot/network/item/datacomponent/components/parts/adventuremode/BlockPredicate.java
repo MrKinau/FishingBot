@@ -37,7 +37,7 @@ public class BlockPredicate implements DataComponentPart {
         out.writeBoolean(nbtPredicate.isPresent());
         nbtPredicate.ifPresent(nbt -> Packet.writeNBT(nbt, out));
 
-        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1) {
+        if (protocolId >= ProtocolConstants.MC_1_21_5) {
             dataComponentMatcher.write(out, protocolId);
         }
     }
@@ -71,7 +71,7 @@ public class BlockPredicate implements DataComponentPart {
             this.nbtPredicate = Optional.empty();
         }
 
-        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1) {
+        if (protocolId >= ProtocolConstants.MC_1_21_5) {
             this.dataComponentMatcher = new DataComponentMatcher();
             dataComponentMatcher.read(in, protocolId);
         }

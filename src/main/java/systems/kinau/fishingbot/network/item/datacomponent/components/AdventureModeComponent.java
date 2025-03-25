@@ -26,7 +26,7 @@ public class AdventureModeComponent extends DataComponent {
         for (BlockPredicate blockPredicate : blockPredicates) {
             blockPredicate.write(out, protocolId);
         }
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             out.writeBoolean(showInTooltip);
     }
 
@@ -39,7 +39,7 @@ public class AdventureModeComponent extends DataComponent {
             predicate.read(in, protocolId);
             blockPredicates.add(predicate);
         }
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             this.showInTooltip = in.readBoolean();
     }
 }

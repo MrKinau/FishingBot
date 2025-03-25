@@ -25,7 +25,7 @@ public class Instrument implements DataComponentPart {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1 || instrumentDefined) {
+        if (protocolId < ProtocolConstants.MC_1_21_5 || instrumentDefined) {
             out.writeBoolean(true);
             Packet.writeVarInt(instrumentId, out);
             if (instrumentId == 0) {
@@ -46,7 +46,7 @@ public class Instrument implements DataComponentPart {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1 || (this.instrumentDefined = in.readBoolean())) {
+        if (protocolId < ProtocolConstants.MC_1_21_5 || (this.instrumentDefined = in.readBoolean())) {
             this.instrumentId = Packet.readVarInt(in);
             if (instrumentId == 0) {
                 this.soundEvent = new SoundEvent();

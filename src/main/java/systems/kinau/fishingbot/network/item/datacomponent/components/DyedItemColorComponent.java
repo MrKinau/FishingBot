@@ -19,14 +19,14 @@ public class DyedItemColorComponent extends DataComponent {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         out.writeInt(color);
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             out.writeBoolean(showInTooltip);
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.color = in.readInt();
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             this.showInTooltip = in.readBoolean();
     }
 }

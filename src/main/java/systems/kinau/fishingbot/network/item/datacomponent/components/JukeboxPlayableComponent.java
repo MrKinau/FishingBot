@@ -27,7 +27,7 @@ public class JukeboxPlayableComponent extends DataComponent {
         } else {
             Packet.writeString(songResourceLocation, out);
         }
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             out.writeBoolean(showInTooltip);
     }
 
@@ -40,7 +40,7 @@ public class JukeboxPlayableComponent extends DataComponent {
         } else {
             this.songResourceLocation = Packet.readString(in);
         }
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             this.showInTooltip = in.readBoolean();
     }
 }

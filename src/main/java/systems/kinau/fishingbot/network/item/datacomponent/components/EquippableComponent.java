@@ -39,7 +39,7 @@ public class EquippableComponent extends DataComponent {
         out.writeBoolean(dispensable);
         out.writeBoolean(swappable);
         out.writeBoolean(damageOnHurt);
-        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId >= ProtocolConstants.MC_1_21_5)
             out.writeBoolean(equipOnInteract);
     }
 
@@ -66,7 +66,7 @@ public class EquippableComponent extends DataComponent {
         this.dispensable = in.readBoolean();
         this.swappable = in.readBoolean();
         this.damageOnHurt = in.readBoolean();
-        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId >= ProtocolConstants.MC_1_21_5)
             this.equipOnInteract = in.readBoolean();
     }
 

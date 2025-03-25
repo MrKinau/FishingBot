@@ -46,7 +46,7 @@ public class Slot {
     }
 
     public void writeHashedItemData(ByteArrayDataOutput output, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1) return; // should not happen
+        if (protocolId < ProtocolConstants.MC_1_21_5) return; // should not happen
         if (itemData == null) {
             Packet.writeVarInt(0, output);
             Packet.writeVarInt(0, output);

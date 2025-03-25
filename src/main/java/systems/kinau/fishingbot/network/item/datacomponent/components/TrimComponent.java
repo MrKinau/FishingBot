@@ -21,7 +21,7 @@ public class TrimComponent extends DataComponent {
     public void write(ByteArrayDataOutput out, int protocolId) {
         trimMaterial.write(out, protocolId);
         trimPattern.write(out, protocolId);
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             out.writeBoolean(showInTooltip);
     }
 
@@ -35,7 +35,7 @@ public class TrimComponent extends DataComponent {
         trimPattern.read(in, protocolId);
         this.trimPattern = trimPattern;
 
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId < ProtocolConstants.MC_1_21_5)
             this.showInTooltip = in.readBoolean();
     }
 }

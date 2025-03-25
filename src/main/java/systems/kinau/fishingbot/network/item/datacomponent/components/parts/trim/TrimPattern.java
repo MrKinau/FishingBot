@@ -24,7 +24,7 @@ public class TrimPattern implements DataComponentPart {
         Packet.writeVarInt(patternId, out);
         if (patternId == 0) {
             Packet.writeString(assetId, out);
-            if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+            if (protocolId < ProtocolConstants.MC_1_21_5)
                 Packet.writeVarInt(templateItem, out);
             Packet.writeNBT(description, out);
             out.writeBoolean(decal);
@@ -36,7 +36,7 @@ public class TrimPattern implements DataComponentPart {
         this.patternId = Packet.readVarInt(in);
         if (patternId == 0) {
             this.assetId = Packet.readString(in);
-            if (protocolId < ProtocolConstants.MC_1_21_5_RC_1)
+            if (protocolId < ProtocolConstants.MC_1_21_5)
                 this.templateItem = Packet.readVarInt(in);
             this.description = Packet.readNBT(in, protocolId);
             this.decal = in.readBoolean();

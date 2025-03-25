@@ -23,7 +23,7 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:max_stack_size"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:max_damage"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:damage"), DamageComponent::new);
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1) {
+        if (protocolId < ProtocolConstants.MC_1_21_5) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:unbreakable"), BooleanComponent::new);
         } else {
             addToRegistry(dataComponentRegistry.findKey("minecraft:unbreakable"), EmptyComponent::new);
@@ -37,7 +37,7 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:can_break"), AdventureModeComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:attribute_modifiers"), AttributeModifiersComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:custom_model_data"), CustomModelDataComponent::new);
-        if (protocolId < ProtocolConstants.MC_1_21_5_RC_1) {
+        if (protocolId < ProtocolConstants.MC_1_21_5) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:hide_additional_tooltip"), EmptyComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:hide_tooltip"), EmptyComponent::new);
         }
@@ -103,7 +103,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:death_protection"), DeathProtectionComponent::new);
         }
 
-        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1) {
+        if (protocolId >= ProtocolConstants.MC_1_21_5) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:tooltip_display"), TooltipDisplayComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:weapon"), WeaponComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:blocks_attacks"), BlocksAttacksComponent::new);

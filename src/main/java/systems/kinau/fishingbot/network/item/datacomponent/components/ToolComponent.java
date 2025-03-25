@@ -30,7 +30,7 @@ public class ToolComponent extends DataComponent {
         }
         out.writeFloat(defaultMiningSpeed);
         Packet.writeVarInt(damagePerBlock, out);
-        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId >= ProtocolConstants.MC_1_21_5)
             out.writeBoolean(canDestroyBlocksInCreative);
     }
 
@@ -45,7 +45,7 @@ public class ToolComponent extends DataComponent {
         }
         this.defaultMiningSpeed = in.readFloat();
         this.damagePerBlock = Packet.readVarInt(in);
-        if (protocolId >= ProtocolConstants.MC_1_21_5_RC_1)
+        if (protocolId >= ProtocolConstants.MC_1_21_5)
             this.canDestroyBlocksInCreative = in.readBoolean();
     }
 }
