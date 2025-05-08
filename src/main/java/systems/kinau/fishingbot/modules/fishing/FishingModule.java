@@ -18,7 +18,15 @@ import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
 import systems.kinau.fishingbot.event.custom.FishCaughtEvent;
-import systems.kinau.fishingbot.event.play.*;
+import systems.kinau.fishingbot.event.play.DestroyEntitiesEvent;
+import systems.kinau.fishingbot.event.play.EntityDataEvent;
+import systems.kinau.fishingbot.event.play.EntityMoveEvent;
+import systems.kinau.fishingbot.event.play.EntityTeleportEvent;
+import systems.kinau.fishingbot.event.play.EntityVelocityEvent;
+import systems.kinau.fishingbot.event.play.JoinGameEvent;
+import systems.kinau.fishingbot.event.play.SpawnEntityEvent;
+import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
+import systems.kinau.fishingbot.event.play.UpdateWindowItemsEvent;
 import systems.kinau.fishingbot.modules.Module;
 import systems.kinau.fishingbot.network.entity.EntityDataValue;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -270,7 +278,7 @@ public class FishingModule extends Module implements Runnable, Listener {
     }
 
     @EventHandler
-    public void onSetDifficulty(DifficultySetEvent event) {
+    public void onJoinGame(JoinGameEvent event) {
         if (isJoined())
             return;
         this.joined = true;

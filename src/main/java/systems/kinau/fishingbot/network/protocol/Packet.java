@@ -23,11 +23,21 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 import systems.kinau.fishingbot.network.utils.OverflowPacketException;
 import systems.kinau.fishingbot.utils.ChatComponentUtils;
-import systems.kinau.fishingbot.utils.nbt.*;
+import systems.kinau.fishingbot.utils.nbt.CompoundTag;
+import systems.kinau.fishingbot.utils.nbt.IntTag;
+import systems.kinau.fishingbot.utils.nbt.NBTTag;
+import systems.kinau.fishingbot.utils.nbt.StringTag;
+import systems.kinau.fishingbot.utils.nbt.Tag;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public abstract class Packet {
 
@@ -217,7 +227,12 @@ public abstract class Packet {
         try {
             if (protocolId < ProtocolConstants.MC_1_20_3) {
                 String text = readString(input);
-                chatComponent = PARSER.parse(text).getAsJsonObject();
+                if (text.startsWith("\"") && text.endsWith("\"")) {
+                    chatComponent = new JsonObject();
+                    chatComponent.addProperty("text", text.substring(1, text.length() - 1));
+                } else {
+                    chatComponent = PARSER.parse(text).getAsJsonObject();
+                }
             } else {
                 NBTTag nbt = readNBT(input, protocolId);
                 if (nbt.getTag() instanceof StringTag)

@@ -19,7 +19,14 @@ import systems.kinau.fishingbot.event.common.PingPacketEvent;
 import systems.kinau.fishingbot.event.common.ResourcePackEvent;
 import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
 import systems.kinau.fishingbot.event.configuration.RegistryDataEvent;
-import systems.kinau.fishingbot.event.play.*;
+import systems.kinau.fishingbot.event.play.ChunkBatchFinishedEvent;
+import systems.kinau.fishingbot.event.play.ConfirmTransactionEvent;
+import systems.kinau.fishingbot.event.play.DisconnectEvent;
+import systems.kinau.fishingbot.event.play.EntityDataEvent;
+import systems.kinau.fishingbot.event.play.JoinGameEvent;
+import systems.kinau.fishingbot.event.play.OpenWindowEvent;
+import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
+import systems.kinau.fishingbot.event.play.UpdatePlayerListEvent;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
@@ -28,7 +35,11 @@ import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutPing;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
-import systems.kinau.fishingbot.network.protocol.play.*;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChunkBatchReceived;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerLoaded;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,7 +65,19 @@ public class ClientDefaultsModule extends Module implements Listener {
     }
 
     @EventHandler
-    public void onSetDifficulty(DifficultySetEvent event) {
+    public void onDisconnect(DisconnectEvent event) {
+        FishingBot.getI18n().info("module-client-disconnected", event.getDisconnectMessage());
+        FishingBot.getInstance().getCurrentBot().setRunning(false);
+        onlinePlayers.clear();
+    }
+
+    @EventHandler
+    public void onJoinGame(JoinGameEvent event) {
+        onlinePlayers.clear();
+        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientSettings());
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_4)
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPlayerLoaded());
+
         if (FishingBot.getInstance().getCurrentBot().getNet().isEncrypted()
                 && FishingBot.getInstance().getCurrentBot().getAuthData().getProfileKeys() != null
                 && FishingBot.getInstance().getCurrentBot().getServerProtocol() > ProtocolConstants.MC_1_19_1) {
@@ -79,21 +102,6 @@ public class ClientDefaultsModule extends Module implements Listener {
             // Start position updates
             startPositionUpdate(FishingBot.getInstance().getCurrentBot().getNet());
         }).start();
-    }
-
-    @EventHandler
-    public void onDisconnect(DisconnectEvent event) {
-        FishingBot.getI18n().info("module-client-disconnected", event.getDisconnectMessage());
-        FishingBot.getInstance().getCurrentBot().setRunning(false);
-        onlinePlayers.clear();
-    }
-
-    @EventHandler
-    public void onJoinGame(JoinGameEvent event) {
-        onlinePlayers.clear();
-        FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientSettings());
-        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_4)
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPlayerLoaded());
     }
 
     @EventHandler

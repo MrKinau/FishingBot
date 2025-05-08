@@ -73,7 +73,8 @@ public class PacketOutChatMessage extends Packet {
                 out.writeBoolean(false);                 // no sig present
                 writeVarInt(0, out);                  // lastSeen sigs offset?
                 writeFixedBitSet(new BitSet(), 20, out);
-                out.writeByte(0);                        // checksum, always 0 should be ok
+                if (protocolId >= ProtocolConstants.MC_1_21_5)
+                    out.writeByte(0);                        // checksum, always 0 should be ok
             } else {
                 CryptManager.MessageSignature signature = CryptManager.signChatMessage(keys, signer, message);
                 out.writeLong(signature.getTimestamp().toEpochMilli());
@@ -82,7 +83,8 @@ public class PacketOutChatMessage extends Packet {
                 out.write(signature.getSignature());
                 writeVarInt(0, out);                  // lastSeen sigs offset?
                 writeFixedBitSet(new BitSet(), 20, out);
-                out.writeByte(0);                        // checksum, always 0 should be ok
+                if (protocolId >= ProtocolConstants.MC_1_21_5)
+                    out.writeByte(0);                        // checksum, always 0 should be ok
                 FishingBot.getInstance().getCurrentBot().getPlayer().setLastUsedSignature(Optional.of(signature));
             }
         }

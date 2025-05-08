@@ -18,7 +18,11 @@ import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
 import systems.kinau.fishingbot.io.logging.LogFormatter;
-import systems.kinau.fishingbot.modules.*;
+import systems.kinau.fishingbot.modules.ChatProxyModule;
+import systems.kinau.fishingbot.modules.ClientDefaultsModule;
+import systems.kinau.fishingbot.modules.HandshakeModule;
+import systems.kinau.fishingbot.modules.LoginModule;
+import systems.kinau.fishingbot.modules.ModuleManager;
 import systems.kinau.fishingbot.modules.command.ChatCommandModule;
 import systems.kinau.fishingbot.modules.command.CommandRegistry;
 import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
@@ -115,7 +119,7 @@ public class Bot {
             if(!logsFolder.exists() && !logsFolder.mkdir() && logsFolder.isDirectory())
                 throw new IOException(FishingBot.getI18n().t("log-failed-creating-folder"));
             FishingBot.getLog().removeHandler(Arrays.stream(FishingBot.getLog().getHandlers()).filter(handler -> handler instanceof FileHandler).findAny().orElse(null));
-            FishingBot.getLog().addHandler(fh = new FileHandler(logsFolder.getPath() + "/log%g.log", 0 /* 0 = infinity */, getConfig().getLogCount()));
+            FishingBot.getLog().addHandler(fh = new FileHandler(logsFolder.getPath() + "/log%g.log", 0 /* 0 = infinity */, Math.max(1, getConfig().getLogCount())));
             fh.setFormatter(new LogFormatter());
             fh.setEncoding("UTF-8");
         } catch (IOException e) {
