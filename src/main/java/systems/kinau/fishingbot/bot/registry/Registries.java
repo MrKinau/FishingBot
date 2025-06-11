@@ -3,7 +3,12 @@ package systems.kinau.fishingbot.bot.registry;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import systems.kinau.fishingbot.FishingBot;
-import systems.kinau.fishingbot.bot.registry.registries.*;
+import systems.kinau.fishingbot.bot.registry.registries.ConsumeEffectTypeRegistry;
+import systems.kinau.fishingbot.bot.registry.registries.DataComponentTypeRegistry;
+import systems.kinau.fishingbot.bot.registry.registries.EnchantmentRegistry;
+import systems.kinau.fishingbot.bot.registry.registries.EntityTypeRegistry;
+import systems.kinau.fishingbot.bot.registry.registries.ItemRegistry;
+import systems.kinau.fishingbot.bot.registry.registries.ParticleTypeRegistry;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
 import java.io.InputStreamReader;
@@ -47,6 +52,7 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_2);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_4);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_5);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_6_PRE_4);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();
@@ -119,6 +125,7 @@ public class Registries {
             case ProtocolConstants.MC_1_21_2: return "mc_data/1_21_2/registries.json";
             case ProtocolConstants.MC_1_21_4: return "mc_data/1_21_4/registries.json";
             case ProtocolConstants.MC_1_21_5: return "mc_data/1_21_5/registries.json";
+            case ProtocolConstants.MC_1_21_6_PRE_4: return "mc_data/1_21_6/registries.json";
             default: return null;
         }
     }
