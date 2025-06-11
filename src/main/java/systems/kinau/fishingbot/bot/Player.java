@@ -15,19 +15,50 @@ import lombok.Setter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
 import systems.kinau.fishingbot.event.custom.RespawnEvent;
-import systems.kinau.fishingbot.event.play.*;
+import systems.kinau.fishingbot.event.play.CommandsRegisteredEvent;
+import systems.kinau.fishingbot.event.play.InventoryCloseEvent;
+import systems.kinau.fishingbot.event.play.JoinGameEvent;
+import systems.kinau.fishingbot.event.play.LookChangeEvent;
+import systems.kinau.fishingbot.event.play.PingChangeEvent;
+import systems.kinau.fishingbot.event.play.PosLookChangeEvent;
+import systems.kinau.fishingbot.event.play.SetHeldItemEvent;
+import systems.kinau.fishingbot.event.play.UpdateExperienceEvent;
+import systems.kinau.fishingbot.event.play.UpdateHealthEvent;
+import systems.kinau.fishingbot.event.play.UpdateSlotEvent;
+import systems.kinau.fishingbot.event.play.UpdateWindowItemsEvent;
 import systems.kinau.fishingbot.modules.command.brigardier.argument.MessageArgumentType;
 import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.play.*;
+import systems.kinau.fishingbot.network.protocol.ProtocolState;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChatCommand;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutChatMessage;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClickWindow;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClientStatus;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutCloseInventory;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutHeldItemChange;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutTeleportConfirm;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutUnsignedChatCommand;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
 import systems.kinau.fishingbot.network.utils.CryptManager;
-import systems.kinau.fishingbot.utils.*;
+import systems.kinau.fishingbot.utils.CommandUtils;
+import systems.kinau.fishingbot.utils.ItemUtils;
+import systems.kinau.fishingbot.utils.LocationUtils;
+import systems.kinau.fishingbot.utils.Pair;
+import systems.kinau.fishingbot.utils.StringUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -70,6 +101,14 @@ public class Player implements Listener {
     public Player() {
         this.inventory = new Inventory();
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
+    }
+
+    @EventHandler
+    public void onStartConfiguration(ConfigurationStartEvent event) {
+        if (lookThread != null) {
+            lookThread.interrupt();
+            this.lookThread = null;
+        }
     }
 
     @EventHandler
@@ -384,9 +423,11 @@ public class Player implements Listener {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true, true));
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException ignore) { }
+            } catch (InterruptedException ignore) {
+                return;
+            }
         }
-        if (onFinish != null)
+        if (onFinish != null && FishingBot.getInstance().getCurrentBot().getNet().getState() == ProtocolState.PLAY)
             onFinish.accept(true);
 
         try {

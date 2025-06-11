@@ -14,9 +14,14 @@ import systems.kinau.fishingbot.network.entity.EntityDataParser;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import systems.kinau.fishingbot.network.utils.CryptManager;
+import systems.kinau.fishingbot.network.utils.InvalidPacketException;
 
 import javax.crypto.SecretKey;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.PublicKey;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -87,7 +92,12 @@ public class NetworkHandler {
                 Packet.writeVarInt(getPlayRegistryOut().getId(packet.getClass()), buf);
                 break;
             case CONFIGURATION:
-                Packet.writeVarInt(getConfigurationRegistryOut().getId(packet.getClass()), buf);
+                try {
+                    Packet.writeVarInt(getConfigurationRegistryOut().getId(packet.getClass()), buf);
+                } catch (InvalidPacketException e) {
+                    e.printStackTrace();
+                    return;
+                }
                 break;
             default:
                 return;
