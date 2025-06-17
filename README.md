@@ -1,4 +1,4 @@
-Minecraft 1.8 - 1.21.5 AFK Fishing bot
+Minecraft 1.8 - 1.21.6 AFK Fishing bot
 =============
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/22e2d15847fb4deaaed97efc3b755ebd)](https://www.codacy.com/gh/MrKinau/FishingBot/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MrKinau/FishingBot&amp;utm_campaign=Badge_Grade)
 [![GitHub issues](https://img.shields.io/github/issues/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/issues)
@@ -85,6 +85,7 @@ A list of all commands can be found in the wiki ([here](https://github.com/MrKin
 - 1.21.3
 - 1.21.4
 - 1.21.5
+- 1.21.6
 
 ## Discord
 To follow the project, get support or request features or bugs you can join my Discord: https://discord.gg/xHpCDYf
