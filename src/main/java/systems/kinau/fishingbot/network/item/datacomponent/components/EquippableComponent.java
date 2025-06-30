@@ -21,6 +21,8 @@ public class EquippableComponent extends DataComponent {
     private boolean swappable;
     private boolean damageOnHurt;
     private boolean equipOnInteract;
+    private boolean canBeSheared;
+    private SoundEvent shearingSound;
 
     public EquippableComponent(int componentTypeId) {
         super(componentTypeId);
@@ -41,6 +43,10 @@ public class EquippableComponent extends DataComponent {
         out.writeBoolean(damageOnHurt);
         if (protocolId >= ProtocolConstants.MC_1_21_5)
             out.writeBoolean(equipOnInteract);
+        if (protocolId >= ProtocolConstants.MC_1_21_6) {
+            out.writeBoolean(canBeSheared);
+            shearingSound.write(out, protocolId);
+        }
     }
 
     @Override
@@ -68,10 +74,15 @@ public class EquippableComponent extends DataComponent {
         this.damageOnHurt = in.readBoolean();
         if (protocolId >= ProtocolConstants.MC_1_21_5)
             this.equipOnInteract = in.readBoolean();
+        if (protocolId >= ProtocolConstants.MC_1_21_6) {
+            this.canBeSheared = in.readBoolean();
+            this.shearingSound = new SoundEvent();
+            shearingSound.read(in, protocolId);
+        }
     }
 
     @Override
     public String toString(int protocolId) {
-        return super.toString(protocolId) + "[equipmentSlot=" + equipmentSlot + ",equipSound=" + equipSound.toString(protocolId) + model.map(s -> ",model=" + s).orElse("") + cameraOverlay.map(string -> ",cameraOverlay=" + string).orElse("") + allowedEntities.map(s -> ",allowedEntities=" + s.toString(protocolId)).orElse("") + ",dispensable=" + dispensable + ",swappable=" + swappable + ",damageOnHurt=" + damageOnHurt + ",equipOnInteract=" + equipOnInteract + "]";
+        return super.toString(protocolId) + "[equipmentSlot=" + equipmentSlot + ",equipSound=" + equipSound.toString(protocolId) + model.map(s -> ",model=" + s).orElse("") + cameraOverlay.map(string -> ",cameraOverlay=" + string).orElse("") + allowedEntities.map(s -> ",allowedEntities=" + s.toString(protocolId)).orElse("") + ",dispensable=" + dispensable + ",swappable=" + swappable + ",damageOnHurt=" + damageOnHurt + ",equipOnInteract=" + equipOnInteract + ",canBeSheared=" + canBeSheared + "]";
     }
 }

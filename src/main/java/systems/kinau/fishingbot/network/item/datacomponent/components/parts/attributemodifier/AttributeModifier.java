@@ -22,6 +22,7 @@ public class AttributeModifier implements DataComponentPart {
     private double amount;
     private int operationId;
     private int equipmentSlotGroupId;
+    private AttributeModifierDisplay display;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
@@ -34,6 +35,10 @@ public class AttributeModifier implements DataComponentPart {
         Packet.writeVarInt(getOperationId(), out);
 
         Packet.writeVarInt(getEquipmentSlotGroupId(), out);
+
+        if (protocolId >= ProtocolConstants.MC_1_21_6) {
+            display.write(out, protocolId);
+        }
     }
 
     @Override
@@ -47,5 +52,10 @@ public class AttributeModifier implements DataComponentPart {
         this.operationId = Packet.readVarInt(in);
 
         this.equipmentSlotGroupId = Packet.readVarInt(in);
+
+        if (protocolId >= ProtocolConstants.MC_1_21_6) {
+            this.display = new AttributeModifierDisplay();
+            display.read(in, protocolId);
+        }
     }
 }

@@ -53,6 +53,7 @@ public class Registries {
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_4);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_5);
         BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_6);
+        BUNDLED_REGISTRY_IDS.add(ProtocolConstants.MC_1_21_7);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();
@@ -126,6 +127,7 @@ public class Registries {
             case ProtocolConstants.MC_1_21_4: return "mc_data/1_21_4/registries.json";
             case ProtocolConstants.MC_1_21_5: return "mc_data/1_21_5/registries.json";
             case ProtocolConstants.MC_1_21_6: return "mc_data/1_21_6/registries.json";
+            case ProtocolConstants.MC_1_21_7: return "mc_data/1_21_7/registries.json";
             default: return null;
         }
     }

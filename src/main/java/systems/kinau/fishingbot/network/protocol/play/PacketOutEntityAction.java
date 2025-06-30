@@ -6,6 +6,7 @@ import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class PacketOutEntityAction extends Packet {
         }
 
         Packet.writeVarInt(FishingBot.getInstance().getCurrentBot().getPlayer().getEntityID(), out);   // Entity ID
-        Packet.writeVarInt(entityAction.ordinal(), out);                               // Action ID (only supported 0-4, see EntityAction enum)
+        Packet.writeVarInt(entityAction.getId(protocolId), out);                               // Action ID (only supported 0-4, see EntityAction enum)
         Packet.writeVarInt(0, out);                                              // Horse jump strength
     }
 
@@ -44,7 +45,14 @@ public class PacketOutEntityAction extends Packet {
         LEAVE_BED,
         START_SPRINTING,
         STOP_SPRINTING,
-        OTHER
+        OTHER,
+        ;
+
+        public int getId(int protocolId) {
+            if (protocolId < ProtocolConstants.MC_1_21_6)
+                return ordinal();
+            return ordinal() - 2; // start and stop sneaking removed
+        }
     }
 
 }

@@ -77,6 +77,7 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutCloseInventory;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutHeldItemChange;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerInput;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerLoaded;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosition;
@@ -248,6 +249,7 @@ public class PacketRegistry {
                     case "minecraft:pong": return PacketOutPing.class;
                     case "minecraft:chunk_batch_received": return PacketOutChunkBatchReceived.class;
                     case "minecraft:player_loaded": return PacketOutPlayerLoaded.class;
+                    case "minecraft:player_input": return PacketOutPlayerInput.class;
                 }
             }
         }
@@ -258,6 +260,11 @@ public class PacketRegistry {
         if (protocolId == ProtocolConstants.AUTOMATIC)
             protocolId = ProtocolConstants.getLatest();
         String version = ProtocolConstants.getVersionString(protocolId);
+        switch (protocolId) {
+            case ProtocolConstants.MC_1_21_7:
+                version = ProtocolConstants.getVersionString(ProtocolConstants.MC_1_21_6);
+                break;
+        }
         if (version.contains("/"))
             version = version.split("/")[0];
         if (version.contains("-"))

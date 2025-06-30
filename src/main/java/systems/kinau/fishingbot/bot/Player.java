@@ -43,6 +43,8 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutCloseInventory;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.EntityAction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutHeldItemChange;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerInput;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerLoaded;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutTeleportConfirm;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUnsignedChatCommand;
@@ -80,7 +82,6 @@ public class Player implements Listener {
     private float health = -1;
     private boolean sentLowHealth;
     private boolean respawning;
-    private boolean sneaking;
 
     private int heldSlot;
     private Slot heldItem;
@@ -213,7 +214,6 @@ public class Player implements Listener {
         if (getHealth() != -1 && event.getHealth() <= 0 && getEntityID() != -1 && !isRespawning()) {
             setRespawning(true);
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new RespawnEvent());
-            this.sneaking = false;
             respawn();
         } else if (event.getHealth() > 0 && isRespawning())
             setRespawning(false);
@@ -262,14 +262,27 @@ public class Player implements Listener {
         setMcCommandDispatcher(event.getCommandDispatcher());
     }
 
+    public void sneak(boolean sneaking) {
+        int protocolId = FishingBot.getInstance().getCurrentBot().getServerProtocol();
+        if (protocolId < ProtocolConstants.MC_1_21_6) {
+            if (sneaking)
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutEntityAction(EntityAction.START_SNEAKING));
+            else
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutEntityAction(EntityAction.STOP_SNEAKING));
+        } else {
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPlayerInput(
+                    new PacketOutPlayerInput.Input(false, false, false, false, false, sneaking, false)
+            ));
+        }
+    }
+
     public void respawn() {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutClientStatus(PacketOutClientStatus.Action.PERFORM_RESPAWN));
+        if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_21_4)
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPlayerLoaded());
 
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoSneak()) {
-            FishingBot.getScheduler().schedule(() -> {
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutEntityAction(EntityAction.START_SNEAKING));
-                this.sneaking = true;
-            }, 250, TimeUnit.MILLISECONDS);
+            FishingBot.getScheduler().schedule(() -> sneak(true), 250, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -458,7 +471,7 @@ public class Player implements Listener {
         } else {
             boolean autoSneak = FishingBot.getInstance().getCurrentBot().getConfig().isAutoSneak();
             if (autoSneak)
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutEntityAction(EntityAction.STOP_SNEAKING));
+                sneak(false);
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutBlockPlace(
                     PacketOutBlockPlace.Hand.MAIN_HAND,
                     x, y, z, blockFace,
@@ -467,7 +480,7 @@ public class Player implements Listener {
                     false
             ));
             if (autoSneak)
-                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutEntityAction(EntityAction.START_SNEAKING));
+                sneak(true);
         }
     }
 

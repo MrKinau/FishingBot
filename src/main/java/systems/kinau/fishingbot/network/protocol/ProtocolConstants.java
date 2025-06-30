@@ -56,6 +56,7 @@ public class ProtocolConstants {
     public static final int MC_1_21_4 = 769;
     public static final int MC_1_21_5 = 770;
     public static final int MC_1_21_6 = 771;
+    public static final int MC_1_21_7 = 772;
 
     public static final List<Integer> SUPPORTED_VERSION_IDS = Arrays.asList(
             ProtocolConstants.AUTOMATIC,
@@ -102,7 +103,8 @@ public class ProtocolConstants {
             ProtocolConstants.MC_1_21_2,
             ProtocolConstants.MC_1_21_4,
             ProtocolConstants.MC_1_21_5,
-            ProtocolConstants.MC_1_21_6
+            ProtocolConstants.MC_1_21_6,
+            ProtocolConstants.MC_1_21_7
     );
 
     public static String getVersionString(int protocolId) {
@@ -152,6 +154,7 @@ public class ProtocolConstants {
             case MC_1_21_4: return "1.21.4";
             case MC_1_21_5: return "1.21.5";
             case MC_1_21_6: return "1.21.6";
+            case MC_1_21_7: return "1.21.7";
             default: return "Unknown version";
         }
     }
@@ -231,6 +234,7 @@ public class ProtocolConstants {
             case "1.21.4": return MC_1_21_4;
             case "1.21.5": return MC_1_21_5;
             case "1.21.6": return MC_1_21_6;
+            case "1.21.7": return MC_1_21_7;
             default: return MC_1_8;
         }
     }
