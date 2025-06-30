@@ -18,6 +18,7 @@ public enum Language implements DisplayNameProvider {
 
     CHINESE_SIMPLIFIED(new Locale("zh", "CN"), "Chinese Simplified"),
     CHINESE_TRADITIONAL(new Locale("zh", "TW"), "Chinese Traditional"),
+    CROATIAN(new Locale("hr", "HR"), "Croatian"),
     ENGLISH(new Locale("en", "EN"), "English"),
     FRENCH(new Locale("fr", "FR"), "French"),
     GERMAN(new Locale("de", "DE"), "German"),
