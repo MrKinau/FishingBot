@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.PublicKey;
 import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 @Getter
@@ -111,27 +112,15 @@ public class NetworkHandler {
         }
 
         if (getThreshold() >= 0) {
-            // Send packet (with 0 threshold, no compression)
-            ByteArrayDataOutput send1 = ByteStreams.newDataOutput();
-            Packet.writeVarInt(0, send1);
-            send1.write(buf.toByteArray());
-            ByteArrayDataOutput send2 = ByteStreams.newDataOutput();
-            Packet.writeVarInt(send1.toByteArray().length, send2);
-            send2.write(send1.toByteArray());
             try {
-                out.write(send2.toByteArray());
-                out.flush();
+                sendCompressed(buf);
             } catch (IOException e) {
                 FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
+                e.printStackTrace();
             }
         } else {
-            // Send packet (without threshold)
-            ByteArrayDataOutput send = ByteStreams.newDataOutput();
-            Packet.writeVarInt(buf.toByteArray().length, send);
-            send.write(buf.toByteArray());
             try {
-                out.write(send.toByteArray());
-                out.flush();
+                sendUncompressed(buf);
             } catch (IOException e) {
                 FishingBot.getLog().severe("Error while trying to send: " + packet.getClass().getSimpleName());
                 e.printStackTrace();
@@ -139,6 +128,58 @@ public class NetworkHandler {
         }
         if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
             FishingBot.getLog().info("[" + getState().name().toUpperCase() + "]  C  >>> |S|: " + packet.getClass().getSimpleName());
+    }
+
+    private void sendCompressed(ByteArrayDataOutput buf) throws IOException {
+        int length = buf.toByteArray().length;
+
+        if (length < getThreshold()) {
+            ByteArrayDataOutput compressedBuf = ByteStreams.newDataOutput();
+            Packet.writeVarInt(0, compressedBuf);
+            compressedBuf.write(buf.toByteArray());
+
+            ByteArrayDataOutput send = prependLength(compressedBuf);
+
+            out.write(send.toByteArray());
+        } else {
+            ByteArrayDataOutput compressedBuf = compress(buf, length);
+
+            ByteArrayDataOutput send = prependLength(compressedBuf);
+
+            out.write(send.toByteArray());
+        }
+
+        out.flush();
+    }
+
+    private ByteArrayDataOutput compress(ByteArrayDataOutput buf, int length) throws IOException {
+        ByteArrayDataOutput compressedBuf = ByteStreams.newDataOutput();
+        Packet.writeVarInt(length, compressedBuf);
+        Deflater deflater = new Deflater();
+        deflater.setInput(buf.toByteArray());
+        deflater.finish();
+
+        byte[] encodeBuf = new byte[8192];
+        while (!deflater.finished()) {
+            int len = deflater.deflate(encodeBuf);
+            compressedBuf.write(encodeBuf, 0, len);
+        }
+
+        deflater.reset();
+        return compressedBuf;
+    }
+
+    private void sendUncompressed(ByteArrayDataOutput buf) throws IOException {
+        ByteArrayDataOutput send = prependLength(buf);
+        out.write(send.toByteArray());
+        out.flush();
+    }
+
+    private ByteArrayDataOutput prependLength(ByteArrayDataOutput buf) {
+        ByteArrayDataOutput lengthPrepended = ByteStreams.newDataOutput();
+        Packet.writeVarInt(buf.toByteArray().length, lengthPrepended);
+        lengthPrepended.write(buf.toByteArray());
+        return lengthPrepended;
     }
 
     public void readData() throws IOException {
