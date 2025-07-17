@@ -154,7 +154,7 @@ public class ProtocolConstants {
             case MC_1_21_4: return "1.21.4";
             case MC_1_21_5: return "1.21.5";
             case MC_1_21_6: return "1.21.6";
-            case MC_1_21_7: return "1.21.7";
+            case MC_1_21_7: return "1.21.7 / 1.21.8";
             default: return "Unknown version";
         }
     }
@@ -168,6 +168,7 @@ public class ProtocolConstants {
             case MC_1_20_3: return "1.20.4";
             case MC_1_20_5: return "1.20.6";
             case MC_1_21_2: return "1.21.3";
+            case MC_1_21_7: return "1.21.8";
             default: return getVersionString(protocolId);
         }
     }
@@ -234,7 +235,9 @@ public class ProtocolConstants {
             case "1.21.4": return MC_1_21_4;
             case "1.21.5": return MC_1_21_5;
             case "1.21.6": return MC_1_21_6;
-            case "1.21.7": return MC_1_21_7;
+            case "1.21.7":
+            case "1.21.8":
+            case "1.21.7 / 1.21.8": return MC_1_21_7;
             default: return MC_1_8;
         }
     }
