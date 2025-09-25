@@ -14,6 +14,7 @@ import systems.kinau.fishingbot.auth.Authenticator;
 import systems.kinau.fishingbot.bot.Player;
 import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.event.EventManager;
+import systems.kinau.fishingbot.event.custom.BotStopEvent;
 import systems.kinau.fishingbot.gui.Dialogs;
 import systems.kinau.fishingbot.i18n.I18n;
 import systems.kinau.fishingbot.io.config.SettingsConfig;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.FileHandler;
 
@@ -61,7 +63,9 @@ public class Bot {
     @Getter @Setter private AuthData authData;
     @Getter @Setter private boolean wontConnect = false;
     @Getter         private ExecutorService commandsThread;
+    @Getter         private ScheduledExecutorService scheduler;
     @Getter         private boolean noGui;
+    @Getter @Setter private int currentCodeOfConduct = 0;
 
     @Getter         private EventManager eventManager;
     @Getter         private CommandRegistry commandRegistry;
@@ -352,8 +356,8 @@ public class Bot {
                 this.socket = new Socket(serverName, port);
 
                 this.net = new NetworkHandler();
-                this.commandsThread = Executors.newSingleThreadExecutor(
-                        new ThreadFactoryBuilder().setNameFormat("command-executor-thread-%d").build());
+                this.commandsThread = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("command-executor-thread-%d").build());
+                this.scheduler = Executors.newScheduledThreadPool(2, new ThreadFactoryBuilder().setNameFormat("scheduler-thread-%d").build());
 
                 registerCommands();
                 if (FishingBot.getInstance().getMainGUIController() != null)
@@ -392,8 +396,10 @@ public class Bot {
                     try {
                         if (socket != null && !socket.isClosed())
                             socket.close();
-                        if (commandsThread != null && !commandsThread.isTerminated())
+                        if (commandsThread != null && !commandsThread.isTerminated() && !commandsThread.isShutdown())
                             commandsThread.shutdownNow();
+                        if (scheduler != null && !scheduler.isTerminated() && !scheduler.isShutdown())
+                            scheduler.shutdownNow();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -405,9 +411,11 @@ public class Bot {
                     try {
                         net.readData();
                     } catch (Throwable ex) {
-                        ex.printStackTrace();
-                        FishingBot.getI18n().severe("packet-could-not-be-received");
-                        break;
+                        if (running) {
+                            ex.printStackTrace();
+                            FishingBot.getI18n().severe("packet-could-not-be-received");
+                            break;
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -425,6 +433,8 @@ public class Bot {
                     getEventManager().unregisterListener(getPlayer());
                 if (commandsThread != null && !commandsThread.isShutdown())
                     commandsThread.shutdownNow();
+                if (scheduler != null && !scheduler.isTerminated() && !scheduler.isShutdown())
+                    scheduler.shutdownNow();
                 getEventManager().getRegisteredListener().clear();
                 getEventManager().getClassToInstanceMapping().clear();
                 if (getFishingModule() != null)
@@ -459,6 +469,20 @@ public class Bot {
                 Thread.sleep(1000);
             } catch (InterruptedException ignore) { }
             FishingBot.getInstance().getMainGUIController().enableStartStop();
+        }
+    }
+
+    public void disconnect(boolean preventReconnect) {
+        if (!isRunning()) return;
+        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new BotStopEvent());
+        if (preventReconnect)
+            setPreventReconnect(true);
+        setRunning(false);
+        if (socket == null || socket.isClosed()) return;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

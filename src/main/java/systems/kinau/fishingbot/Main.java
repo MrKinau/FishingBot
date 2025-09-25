@@ -5,7 +5,12 @@
 
 package systems.kinau.fishingbot;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import systems.kinau.fishingbot.gui.MainGUI;
 import systems.kinau.fishingbot.gui.SwingDialogs;
 
@@ -49,11 +54,7 @@ public class Main {
                     try {
 //                        if (true) throw new IllegalArgumentException("simulate error");
                         new MainGUI(finalArgs);
-                        if (FishingBot.getInstance().getCurrentBot() != null) {
-                            FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
-                            FishingBot.getInstance().getCurrentBot().setRunning(false);
-                        }
-                        FishingBot.getScheduler().shutdownNow();
+                        FishingBot.getInstance().stopBot(true);
                     } catch (Throwable ex) {
                         ex.printStackTrace();
                         SwingDialogs.showJavaFXNotWorking(ex);

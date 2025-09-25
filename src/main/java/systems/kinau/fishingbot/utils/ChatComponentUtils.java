@@ -7,6 +7,7 @@ package systems.kinau.fishingbot.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 
@@ -26,6 +27,10 @@ public class ChatComponentUtils {
     }
 
     private static String getText(Object object, StringBuilder messageBuilder) {
+        if (object instanceof JsonPrimitive) {
+            messageBuilder.append(((JsonPrimitive) object).getAsString());
+            return messageBuilder.toString();
+        }
         if (!(object instanceof JsonObject)) {
             messageBuilder.append(object.toString());
             return messageBuilder.toString();
@@ -33,41 +38,39 @@ public class ChatComponentUtils {
 
         JsonObject jObject = (JsonObject) object;
 
-        if (jObject.has("text")) {
-            String text = jObject.get("text").getAsString();
-            if (!text.isEmpty()) messageBuilder.append(text);
-        }
+        String singleComponent = readSingleComponent(jObject);
+        if (singleComponent != null) messageBuilder.append(singleComponent);
 
         if (jObject.has("extra") && jObject.get("extra").isJsonArray()) {
             JsonArray extras = jObject.getAsJsonArray("extra");
-
             for (int i = 0; i < extras.size(); i++) {
-                if (extras.get(i).isJsonObject()) {
-                    JsonObject extraObject = extras.get(i).getAsJsonObject();
-
-                    if (extraObject.has("text")) {
-                        String text = extraObject.get("text").getAsString();
-                        if (!text.isEmpty()) messageBuilder.append(text);
-                    }
-                } else {
-                    messageBuilder.append(extras.get(i).getAsString());
-                }
+                String extraText = getText(extras.get(i), new StringBuilder());
+                if (!extraText.isEmpty()) messageBuilder.append(extraText);
             }
         }
 
-        if (jObject.has("translate")) {
-            String translationKey = jObject.get("translate").getAsString();
+        return messageBuilder.toString();
+    }
+
+    private static String readSingleComponent(JsonObject object) {
+        if (object.has("text")) {
+            String text = object.get("text").getAsString();
+            if (!text.isEmpty()) return text;
+        }
+
+        if (object.has("translate")) {
+            String translationKey = object.get("translate").getAsString();
             List<String> arguments = new ArrayList<>();
-            if (jObject.has("with")) {
-                JsonArray array = jObject.getAsJsonArray("with");
+            if (object.has("with")) {
+                JsonArray array = object.getAsJsonArray("with");
                 for (Object argument : array) {
                     arguments.add(getText(argument, new StringBuilder()));
                 }
             }
-            messageBuilder.append(FishingBot.getInstance().getCurrentBot().getMinecraftTranslations().getTranslation(translationKey, arguments.toArray(new String[0])));
+            return FishingBot.getInstance().getCurrentBot().getMinecraftTranslations().getTranslation(translationKey, arguments.toArray(new String[0]));
         }
 
-        return messageBuilder.toString();
+        return null;
     }
 
     // If chat types changed in registry, this is not working

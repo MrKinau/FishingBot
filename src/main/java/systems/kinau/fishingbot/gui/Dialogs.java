@@ -3,10 +3,20 @@ package systems.kinau.fishingbot.gui;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -243,6 +253,46 @@ public class Dialogs {
             stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
 
             alert.show();
+        });
+    }
+
+    public static void showCodeOfConduct(Stage parent, String codeOfConduct, Consumer<Boolean> acceptCallback, Consumer<Boolean> saveCallback) {
+        setupJFX();
+
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.NO, ButtonType.YES);
+            alert.setTitle(FishingBot.TITLE);
+            MainGUI.setStyle(alert.getDialogPane().getStylesheets());
+
+            alert.setHeaderText(FishingBot.getI18n().t("dialog-code-of-conduct-header"));
+            VBox box = new VBox();
+            box.setSpacing(10);
+
+            TextArea textArea = new TextArea(codeOfConduct);
+            textArea.wrapTextProperty().setValue(true);
+            textArea.setEditable(false);
+
+            CheckBox doNotShowAgain = new CheckBox(FishingBot.getI18n().t("dialog-code-of-conduct-checkbox"));
+
+            HBox labelBox = new HBox();
+            labelBox.setAlignment(Pos.CENTER_RIGHT);
+            Label label = new Label(FishingBot.getI18n().t("dialog-code-of-conduct-content"));
+            labelBox.getChildren().add(label);
+
+            box.getChildren().addAll(textArea, doNotShowAgain, labelBox);
+
+            alert.getDialogPane().contentProperty().set(box);
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.initOwner(parent);
+            stage.getIcons().add(new Image(Dialogs.class.getClassLoader().getResourceAsStream("img/items/fishing_rod.png")));
+
+            Optional<ButtonType> buttonType = alert.showAndWait();
+            buttonType.ifPresent(buttonType1 -> {
+                boolean accepted = buttonType1 == ButtonType.YES;
+                acceptCallback.accept(accepted);
+                saveCallback.accept(accepted && doNotShowAgain.isSelected());
+            });
         });
     }
 }

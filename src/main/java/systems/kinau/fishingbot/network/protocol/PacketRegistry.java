@@ -20,9 +20,11 @@ import systems.kinau.fishingbot.network.protocol.common.PacketOutClientSettings;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutKeepAlive;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutPing;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
+import systems.kinau.fishingbot.network.protocol.configuration.PacketInCodeOfConduct;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInKnownPacks;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInRegistryData;
+import systems.kinau.fishingbot.network.protocol.configuration.PacketOutCodeOfConduct;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutKnownPacks;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutPluginMessage;
@@ -173,6 +175,7 @@ public class PacketRegistry {
                     case "minecraft:resource_pack_push": return PacketInResourcePack.class;
                     case "minecraft:select_known_packs": return PacketInKnownPacks.class;
                     case "minecraft:registry_data": return PacketInRegistryData.class;
+                    case "minecraft:code_of_conduct": return PacketInCodeOfConduct.class;
                     case "minecraft:disconnect": return PacketInDisconnect.class;
                 }
             } else if (flow == ProtocolFlow.OUTGOING_PACKET) {
@@ -183,6 +186,7 @@ public class PacketRegistry {
                     case "minecraft:pong": return PacketOutPing.class;
                     case "minecraft:resource_pack": return PacketOutResourcePackResponse.class;
                     case "minecraft:select_known_packs": return PacketOutKnownPacks.class;
+                    case "minecraft:accept_code_of_conduct": return PacketOutCodeOfConduct.class;
                 }
             }
         } else if (state == ProtocolState.PLAY) {

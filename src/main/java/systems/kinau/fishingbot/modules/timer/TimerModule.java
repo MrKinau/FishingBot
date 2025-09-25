@@ -28,7 +28,7 @@ public class TimerModule extends Module {
 
     private void startTimers() {
         enabledTimers.forEach(timer -> {
-            runningTimers.add(FishingBot.getScheduler().scheduleAtFixedRate(() -> {
+            runningTimers.add(FishingBot.getInstance().getCurrentBot().getScheduler().scheduleAtFixedRate(() -> {
                 for (String command : timer.getCommands()) {
                     try {
                         Thread.sleep(50);

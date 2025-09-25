@@ -52,6 +52,6 @@ public class NBTTag {
 
     @Override
     public String toString() {
-        return getTag().toString();
+        return "\n" + getTag().toString();
     }
 }

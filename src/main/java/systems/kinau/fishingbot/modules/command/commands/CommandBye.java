@@ -18,8 +18,7 @@ public class CommandBye extends BrigardierCommand {
 
             source.sendTranslatedMessages("command-bye");
 
-            FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
-            FishingBot.getInstance().getCurrentBot().setRunning(false);
+            FishingBot.getInstance().stopBot(true);
             return 0;
         });
     }

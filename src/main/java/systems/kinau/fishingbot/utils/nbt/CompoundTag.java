@@ -61,7 +61,9 @@ public class CompoundTag extends Tag<Map<String, ? extends Tag<?>>> {
     @Override
     public JsonElement toJson() {
         JsonObject jsonObject = new JsonObject();
-        getValue().forEach((name, tag) -> jsonObject.add(name, tag.toJson()));
+        getValue().forEach((name, tag) -> {
+            jsonObject.add(name == null ? "text" : name, tag.toJson()); // this is a bit hacky
+        });
         return jsonObject;
     }
 }

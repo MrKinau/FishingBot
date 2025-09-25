@@ -6,8 +6,11 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -39,6 +42,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 public class GUIController implements Listener {
 
@@ -244,6 +248,10 @@ public class GUIController implements Listener {
 
     public void openAbout(Event e) {
         Dialogs.showAboutWindow((Stage) configButton.getScene().getWindow());
+    }
+
+    public void openCodeOfConduct(String codeOfConduct, Consumer<Boolean> acceptCallback, Consumer<Boolean> saveCallback) {
+        Dialogs.showCodeOfConduct((Stage) configButton.getScene().getWindow(), codeOfConduct, acceptCallback, saveCallback);
     }
 
     public void setImage(String uuid) {

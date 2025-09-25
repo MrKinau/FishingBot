@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.cli.CommandLine;
 import systems.kinau.fishingbot.event.custom.BotStartEvent;
-import systems.kinau.fishingbot.event.custom.BotStopEvent;
 import systems.kinau.fishingbot.gui.GUIController;
 import systems.kinau.fishingbot.gui.MainGUI;
 import systems.kinau.fishingbot.i18n.I18n;
@@ -16,8 +15,6 @@ import systems.kinau.fishingbot.io.logging.LogFormatter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +26,6 @@ public class FishingBot {
     public static String TITLE;
     @Getter private static FishingBot instance;
     @Getter public static Logger log = Logger.getLogger(Bot.class.getSimpleName());
-    @Getter private static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
     @Getter private SettingsConfig config;
     @Getter private File refreshTokenFile;
@@ -102,12 +98,7 @@ public class FishingBot {
     public void stopBot(boolean preventReconnect) {
         if (getCurrentBot() == null)
             return;
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new BotStopEvent());
-        // TODO: Send Disconnect Packet
-        getCurrentBot().setPreventReconnect(preventReconnect);
-        getCurrentBot().setRunning(false);
-        getCurrentBot().setPreventStartup(true);
-        FishingBot.getInstance().interruptMainThread();
+        getCurrentBot().disconnect(preventReconnect);
     }
 
     public void interruptMainThread() {

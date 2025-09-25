@@ -33,12 +33,14 @@ public class SettingsConfig implements Config {
     @Property(key = "server.online-mode", description = "config-server-online-mode") private boolean onlineMode = true;
     @Property(key = "server.default-protocol", description = "config-server-default-protocol") private String defaultProtocol = ProtocolConstants.getVersionString(ProtocolConstants.AUTOMATIC);
     @Property(key = "server.spoof-forge", description = "config-server-spoof-forge") private boolean spoofForge = false;
+    @Property(key = "server.latest-code-of-conduct", description = "") @Setter private int latestCodeOfConduct = 0;
 
     @Property(key = "auto.auto-reconnect", description = "config-auto-auto-reconnect") private boolean autoReconnect = true;
     @Property(key = "auto.auto-reconnect-time", description = "config-auto-auto-reconnect-time") private int autoReconnectTime = 5;
     @Property(key = "auto.auto-disconnect", description = "config-auto-auto-disconnect") private boolean autoDisconnect = false;
     @Property(key = "auto.auto-sneak", description = "config-auto-auto-sneak") private boolean autoSneak = false;
     @Property(key = "auto.auto-disconnect-players-threshold", description = "config-auto-auto-disconnect-players-threshold") private int autoDisconnectPlayersThreshold = 5;
+    @Property(key = "auto.auto-accept-code-of-conduct", description = "config-auto-auto-accept-code-of-conduct") private boolean autoAcceptCodeOfConduct = false;
 
     @Property(key = "auto.auto-command-on-respawn.enabled", description = "config-auto-auto-command-on-respawn") private boolean autoCommandOnRespawnEnabled = false;
     @Property(key = "auto.auto-command-on-respawn.delay", description = "config-auto-auto-command-on-respawn-delay") private long autoCommandOnRespawnDelay = 1000;

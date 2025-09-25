@@ -231,8 +231,7 @@ public class Player implements Listener {
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoQuitBeforeDeathEnabled() && event.getHealth() < getHealth()
                 && event.getHealth() <= FishingBot.getInstance().getCurrentBot().getConfig().getMinHealthBeforeQuit() && event.getHealth() != 0.0) {
             FishingBot.getI18n().warning("module-fishing-health-threshold-reached");
-            FishingBot.getInstance().getCurrentBot().setPreventReconnect(true);
-            FishingBot.getInstance().getCurrentBot().setRunning(false);
+            FishingBot.getInstance().stopBot(true);
         }
 
         this.health = event.getHealth();
@@ -282,7 +281,7 @@ public class Player implements Listener {
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPlayerLoaded());
 
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoSneak()) {
-            FishingBot.getScheduler().schedule(() -> sneak(true), 250, TimeUnit.MILLISECONDS);
+            FishingBot.getInstance().getCurrentBot().getScheduler().schedule(() -> sneak(true), 250, TimeUnit.MILLISECONDS);
         }
     }
 

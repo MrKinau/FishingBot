@@ -9,14 +9,20 @@ import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.EventHandler;
 import systems.kinau.fishingbot.event.Listener;
+import systems.kinau.fishingbot.event.configuration.CodeOfConductEvent;
 import systems.kinau.fishingbot.event.configuration.ConfigurationFinishEvent;
 import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
 import systems.kinau.fishingbot.event.configuration.KnownPacksRequestedEvent;
-import systems.kinau.fishingbot.event.login.*;
+import systems.kinau.fishingbot.event.login.EncryptionRequestEvent;
+import systems.kinau.fishingbot.event.login.LoginDisconnectEvent;
+import systems.kinau.fishingbot.event.login.LoginPluginRequestEvent;
+import systems.kinau.fishingbot.event.login.LoginSuccessEvent;
+import systems.kinau.fishingbot.event.login.SetCompressionEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.ProtocolState;
+import systems.kinau.fishingbot.network.protocol.configuration.PacketOutCodeOfConduct;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutKnownPacks;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutPluginMessage;
@@ -129,6 +135,40 @@ public class LoginModule extends Module implements Listener {
     @EventHandler
     public void onKnownPacksRequested(KnownPacksRequestedEvent event) {
         FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutKnownPacks(event.getKnownPacks()));
+    }
+
+    @EventHandler
+    public void onCodeOfConduct(CodeOfConductEvent event) {
+        if (FishingBot.getInstance().getConfig().isAutoAcceptCodeOfConduct()) {
+            FishingBot.getI18n().info("acknowledged-code-of-conduct");
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCodeOfConduct());
+            return;
+        }
+        int hash = event.getCodeOfConduct().hashCode();
+        if (FishingBot.getInstance().getConfig().getLatestCodeOfConduct() == hash) {
+            FishingBot.getI18n().info("acknowledged-code-of-conduct");
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCodeOfConduct());
+            return;
+        }
+        FishingBot.getInstance().getCurrentBot().setCurrentCodeOfConduct(hash);
+        FishingBot.getI18n().info("received-code-of-conduct", event.getCodeOfConduct());
+        if (FishingBot.getInstance().getMainGUI() != null) {
+            FishingBot.getInstance().getMainGUIController().openCodeOfConduct(event.getCodeOfConduct(), accept -> {
+                if (!accept) {
+                    FishingBot.getInstance().stopBot(true);
+                    FishingBot.getI18n().info("rejected-code-of-conduct");
+                    return;
+                }
+                FishingBot.getI18n().info("acknowledged-code-of-conduct");
+                FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutCodeOfConduct());
+            }, saved -> {
+                if (!saved) return;
+                FishingBot.getInstance().getConfig().setLatestCodeOfConduct(hash);
+                FishingBot.getInstance().getConfig().save();
+                FishingBot.getInstance().getCurrentBot().getConfig().setLatestCodeOfConduct(hash);
+                FishingBot.getInstance().getCurrentBot().getConfig().save();
+            });
+        }
     }
 
     private String sendSessionRequest(String user, String session, String serverid) {
