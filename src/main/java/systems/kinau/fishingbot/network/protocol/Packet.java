@@ -456,4 +456,29 @@ public abstract class Packet {
             writeVarInt(containerId, out);
     }
 
+    private static final double[] ZERO = new double[]{0.0, 0.0, 0.0};
+
+    private static double unpackLpVec3(long param0) {
+        return Math.min((double)(param0 & 32767L), 32766.0) * 2.0 / 32766.0 - 1.0;
+    }
+
+    public static double[] readLpVec3(ByteArrayDataInputWrapper buf) {
+        int firstByte = buf.readUnsignedByte();
+        if (firstByte == 0) {
+            return ZERO;
+        } else {
+            int var1 = buf.readUnsignedByte();
+            long var2 = buf.readInt() & 0xFFFFFFFFL;
+            long var3 = var2 << 16 | var1 << 8 | firstByte;
+            long var4 = firstByte & 3;
+            if ((firstByte & 4) == 4) {
+                var4 |= (readVarInt(buf) & 4294967295L) << 2;
+            }
+
+            double x = unpackLpVec3(var3 >> 3) * var4;
+            double y = unpackLpVec3(var3 >> 18) * var4;
+            double z = unpackLpVec3(var3 >> 33) * var4;
+            return new double[]{x, y, z};
+        }
+    }
 }

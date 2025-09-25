@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.network.protocol.common.PacketInDisconnect;
 import systems.kinau.fishingbot.network.protocol.common.PacketInKeepAlive;
 import systems.kinau.fishingbot.network.protocol.common.PacketInPing;
@@ -133,8 +134,7 @@ public class PacketRegistry {
     }
 
     private JsonObject loadBundledPacketRegistry(int protocolId) {
-        String file = getRegistryFileName(protocolId);
-        if (file == null) return null;
+        String file = Registries.getPacketRegistryLocation(protocolId);
         try {
             return parser.parse(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(file))).getAsJsonObject();
         } catch (Throwable ex) {
@@ -254,23 +254,6 @@ public class PacketRegistry {
             }
         }
         return null;
-    }
-
-    public String getRegistryFileName(int protocolId) {
-        if (protocolId == ProtocolConstants.AUTOMATIC)
-            protocolId = ProtocolConstants.getLatest();
-        String version = ProtocolConstants.getVersionString(protocolId);
-        switch (protocolId) {
-            case ProtocolConstants.MC_1_21_7:
-                version = ProtocolConstants.getVersionString(ProtocolConstants.MC_1_21_6);
-                break;
-        }
-        if (version.contains("/"))
-            version = version.split("/")[0];
-        if (version.contains("-"))
-            version = version.split("-")[0];
-        version = version.replace(".", "_").trim();
-        return "mc_data/" + version + "/packets.json";
     }
 
     private void registerPacket(int id, Class<? extends Packet> clazz) {

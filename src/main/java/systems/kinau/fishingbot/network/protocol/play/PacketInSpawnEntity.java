@@ -67,7 +67,7 @@ public class PacketInSpawnEntity extends Packet {
                 this.yVelocity = in.readShort();
                 this.zVelocity = in.readShort();
             }
-        } else {
+        } else if (protocolId <= ProtocolConstants.MC_1_21_7) {
             this.id = readVarInt(in);               // EID
             readUUID(in);                           // E UUID
             this.type = readVarInt(in);             // Obj type
@@ -83,6 +83,21 @@ public class PacketInSpawnEntity extends Packet {
                 this.yVelocity = in.readShort();
                 this.zVelocity = in.readShort();
             }
+        } else {
+            this.id = readVarInt(in);               // EID
+            readUUID(in);                           // E UUID
+            this.type = readVarInt(in);             // Obj type
+            this.x = in.readDouble();               // X POS (casts are incorrect, but if nobody sees it, nobody can blame it)
+            this.y = in.readDouble();               // Y POS
+            this.z = in.readDouble();               // Z POS
+            double[] velocity = readLpVec3(in);     // Velocity
+            this.xVelocity = (short) (velocity[0] * 8000.0);
+            this.yVelocity = (short) (velocity[1] * 8000.0);
+            this.zVelocity = (short) (velocity[2] * 8000.0);
+            this.pitch = in.readByte();             // Pitch
+            this.yaw = in.readByte();               // Yaw
+            this.headYaw = in.readByte();           // head yaw
+            this.objectData = readVarInt(in);       // Data of object: https://wiki.vg/Object_Data
         }
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(

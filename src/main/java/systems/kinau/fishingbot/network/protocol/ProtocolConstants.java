@@ -5,241 +5,114 @@
 
 package systems.kinau.fishingbot.network.protocol;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProtocolConstants {
 
+    public static final List<Integer> SUPPORTED_VERSION_IDS = new ArrayList<>();
+    public static final Map<String, Integer> VERSION_STRING_TO_PVN = new HashMap<>();
+    public static final Map<Integer, String> PVN_TO_VERSION_STRING = new HashMap<>();
+    public static final Map<Integer, String> PVN_TO_LATEST_VERSION_STRING = new HashMap<>();
+    public static final Map<Integer, String> PVN_TO_FIRST_VERSION_STRING = new HashMap<>();
+
     public static final int AUTOMATIC = -1;
-    public static final int MC_1_8 = 47;
-    public static final int MC_1_9 = 107;
-    public static final int MC_1_9_1 = 108;
-    public static final int MC_1_9_2 = 109;
-    public static final int MC_1_9_4 = 110;
-    public static final int MC_1_10 = 210;
-    public static final int MC_1_11 = 315;
-    public static final int MC_1_11_1 = 316;
-    public static final int MC_1_12 = 335;
-    public static final int MC_1_12_1 = 338;
-    public static final int MC_1_12_2 = 340;
-    public static final int MC_1_13 = 393;
-    public static final int MC_1_13_1 = 401;
-    public static final int MC_1_13_2 = 404;
-    public static final int MC_1_14 = 477;
-    public static final int MC_1_14_1 = 480;
-    public static final int MC_1_14_2 = 485;
-    public static final int MC_1_14_3 = 490;
-    public static final int MC_1_14_4 = 498;
-    public static final int MC_1_15 = 573;
-    public static final int MC_1_15_1 = 575;
-    public static final int MC_1_15_2 = 578;
-    public static final int MC_1_16 = 735;
-    public static final int MC_1_16_1 = 736;
-    public static final int MC_1_16_2 = 751;
-    public static final int MC_1_16_3 = 753;
-    public static final int MC_1_16_4 = 754;
-    public static final int MC_1_17 = 755;
-    public static final int MC_1_17_1 = 756;
-    public static final int MC_1_18 = 757;
-    public static final int MC_1_18_2 = 758;
-    public static final int MC_1_19 = 759;
-    public static final int MC_1_19_1 = 760;
-    public static final int MC_1_19_3 = 761;
-    public static final int MC_1_19_4 = 762;
-    public static final int MC_1_20 = 763;
-    public static final int MC_1_20_2 = 764;
-    public static final int MC_1_20_3 = 765;
-    public static final int MC_1_20_5 = 766;
-    public static final int MC_1_21 = 767;
-    public static final int MC_1_21_2 = 768;
-    public static final int MC_1_21_4 = 769;
-    public static final int MC_1_21_5 = 770;
-    public static final int MC_1_21_6 = 771;
-    public static final int MC_1_21_7 = 772;
-
-    public static final List<Integer> SUPPORTED_VERSION_IDS = Arrays.asList(
-            ProtocolConstants.AUTOMATIC,
-            ProtocolConstants.MC_1_8,
-            ProtocolConstants.MC_1_9,
-            ProtocolConstants.MC_1_9_1,
-            ProtocolConstants.MC_1_9_2,
-            ProtocolConstants.MC_1_9_4,
-            ProtocolConstants.MC_1_10,
-            ProtocolConstants.MC_1_11,
-            ProtocolConstants.MC_1_11_1,
-            ProtocolConstants.MC_1_12,
-            ProtocolConstants.MC_1_12_1,
-            ProtocolConstants.MC_1_12_2,
-            ProtocolConstants.MC_1_13,
-            ProtocolConstants.MC_1_13_1,
-            ProtocolConstants.MC_1_13_2,
-            ProtocolConstants.MC_1_14,
-            ProtocolConstants.MC_1_14_1,
-            ProtocolConstants.MC_1_14_2,
-            ProtocolConstants.MC_1_14_3,
-            ProtocolConstants.MC_1_14_4,
-            ProtocolConstants.MC_1_15,
-            ProtocolConstants.MC_1_15_1,
-            ProtocolConstants.MC_1_15_2,
-            ProtocolConstants.MC_1_16,
-            ProtocolConstants.MC_1_16_1,
-            ProtocolConstants.MC_1_16_2,
-            ProtocolConstants.MC_1_16_3,
-            ProtocolConstants.MC_1_16_4,
-            ProtocolConstants.MC_1_17,
-            ProtocolConstants.MC_1_17_1,
-            ProtocolConstants.MC_1_18,
-            ProtocolConstants.MC_1_18_2,
-            ProtocolConstants.MC_1_19,
-            ProtocolConstants.MC_1_19_1,
-            ProtocolConstants.MC_1_19_3,
-            ProtocolConstants.MC_1_19_4,
-            ProtocolConstants.MC_1_20,
-            ProtocolConstants.MC_1_20_2,
-            ProtocolConstants.MC_1_20_3,
-            ProtocolConstants.MC_1_20_5,
-            ProtocolConstants.MC_1_21,
-            ProtocolConstants.MC_1_21_2,
-            ProtocolConstants.MC_1_21_4,
-            ProtocolConstants.MC_1_21_5,
-            ProtocolConstants.MC_1_21_6,
-            ProtocolConstants.MC_1_21_7
-    );
-
-    public static String getVersionString(int protocolId) {
-        switch (protocolId) {
-            case AUTOMATIC: return "AUTOMATIC";
-            case MC_1_8: return "1.8";
-            case MC_1_9: return "1.9";
-            case MC_1_9_1: return "1.9.1";
-            case MC_1_9_2: return "1.9.2";
-            case MC_1_9_4: return "1.9.4";
-            case MC_1_10: return "1.10";
-            case MC_1_11: return "1.11";
-            case MC_1_11_1: return "1.11.1";
-            case MC_1_12: return "1.12";
-            case MC_1_12_1: return "1.12.1";
-            case MC_1_12_2: return "1.12.2";
-            case MC_1_13: return "1.13";
-            case MC_1_13_1: return "1.13.1";
-            case MC_1_13_2: return "1.13.2";
-            case MC_1_14: return "1.14";
-            case MC_1_14_1: return "1.14.1";
-            case MC_1_14_2: return "1.14.2";
-            case MC_1_14_3: return "1.14.3";
-            case MC_1_14_4: return "1.14.4";
-            case MC_1_15: return "1.15";
-            case MC_1_15_1: return "1.15.1";
-            case MC_1_15_2: return "1.15.2";
-            case MC_1_16: return "1.16";
-            case MC_1_16_1: return "1.16.1";
-            case MC_1_16_2: return "1.16.2";
-            case MC_1_16_3: return "1.16.3";
-            case MC_1_16_4: return "1.16.4 / 1.16.5";
-            case MC_1_17: return "1.17";
-            case MC_1_17_1: return "1.17.1";
-            case MC_1_18: return "1.18 / 1.18.1";
-            case MC_1_18_2: return "1.18.2";
-            case MC_1_19: return "1.19";
-            case MC_1_19_1: return "1.19.1 / 1.19.2";
-            case MC_1_19_3: return "1.19.3";
-            case MC_1_19_4: return "1.19.4";
-            case MC_1_20: return "1.20 / 1.20.1";
-            case MC_1_20_2: return "1.20.2";
-            case MC_1_20_3: return "1.20.3 / 1.20.4";
-            case MC_1_20_5: return "1.20.5 / 1.20.6";
-            case MC_1_21: return "1.21 / 1.21.1";
-            case MC_1_21_2: return "1.21.2 / 1.21.3";
-            case MC_1_21_4: return "1.21.4";
-            case MC_1_21_5: return "1.21.5";
-            case MC_1_21_6: return "1.21.6";
-            case MC_1_21_7: return "1.21.7 / 1.21.8";
-            default: return "Unknown version";
-        }
+    static {
+        SUPPORTED_VERSION_IDS.add(AUTOMATIC);
+        VERSION_STRING_TO_PVN.put("AUTOMATIC", AUTOMATIC);
+        PVN_TO_VERSION_STRING.put(AUTOMATIC, "AUTOMATIC");
     }
 
-    public static String getExactVersionString(int protocolId) {
-        switch (protocolId) {
-            case MC_1_16_4: return "1.16.5";
-            case MC_1_18: return "1.18.1";
-            case MC_1_19_1: return "1.19.2";
-            case MC_1_20: return "1.20.1";
-            case MC_1_20_3: return "1.20.4";
-            case MC_1_20_5: return "1.20.6";
-            case MC_1_21_2: return "1.21.3";
-            case MC_1_21_7: return "1.21.8";
-            default: return getVersionString(protocolId);
+    public static final int MC_1_8 = registerVersion(47, "1.8");
+    public static final int MC_1_9 = registerVersion(107, "1.9");
+    public static final int MC_1_9_1 = registerVersion(108, "1.9.1");
+    public static final int MC_1_9_2 = registerVersion(109, "1.9.2");
+    public static final int MC_1_9_4 = registerVersion(110, "1.9.4");
+    public static final int MC_1_10 = registerVersion(210, "1.10");
+    public static final int MC_1_11 = registerVersion(315, "1.11");
+    public static final int MC_1_11_1 = registerVersion(316, "1.11.1");
+    public static final int MC_1_12 = registerVersion(335, "1.12");
+    public static final int MC_1_12_1 = registerVersion(338, "1.12.1");
+    public static final int MC_1_12_2 = registerVersion(340, "1.12.2");
+    public static final int MC_1_13 = registerVersion(393, "1.13");
+    public static final int MC_1_13_1 = registerVersion(401, "1.13.1");
+    public static final int MC_1_13_2 = registerVersion(404, "1.13.2");
+    public static final int MC_1_14 = registerVersion(477, "1.14");
+    public static final int MC_1_14_1 = registerVersion(480, "1.14.1");
+    public static final int MC_1_14_2 = registerVersion(485, "1.14.2");
+    public static final int MC_1_14_3 = registerVersion(490, "1.14.3");
+    public static final int MC_1_14_4 = registerVersion(498, "1.14.4");
+    public static final int MC_1_15 = registerVersion(573, "1.15");
+    public static final int MC_1_15_1 = registerVersion(575, "1.15.1");
+    public static final int MC_1_15_2 = registerVersion(578, "1.15.2");
+    public static final int MC_1_16 = registerVersion(735, "1.16");
+    public static final int MC_1_16_1 = registerVersion(736, "1.16.1");
+    public static final int MC_1_16_2 = registerVersion(751, "1.16.2");
+    public static final int MC_1_16_3 = registerVersion(753, "1.16.3");
+    public static final int MC_1_16_4 = registerVersion(754, "1.16.4", "1.16.5");
+    public static final int MC_1_17 = registerVersion(755, "1.17");
+    public static final int MC_1_17_1 = registerVersion(756, "1.17.1");
+    public static final int MC_1_18 = registerVersion(757, "1.18", "1.18.1");
+    public static final int MC_1_18_2 = registerVersion(758, "1.18.2");
+    public static final int MC_1_19 = registerVersion(759, "1.19");
+    public static final int MC_1_19_1 = registerVersion(760, "1.19.1", "1.19.2");
+    public static final int MC_1_19_3 = registerVersion(761, "1.19.3");
+    public static final int MC_1_19_4 = registerVersion(762, "1.19.4");
+    public static final int MC_1_20 = registerVersion(763, "1.20", "1.20.1");
+    public static final int MC_1_20_2 = registerVersion(764, "1.20.2");
+    public static final int MC_1_20_3 = registerVersion(765, "1.20.3", "1.20.4");
+    public static final int MC_1_20_5 = registerVersion(766, "1.20.5", "1.20.6");
+    public static final int MC_1_21 = registerVersion(767, "1.21", "1.21.1");
+    public static final int MC_1_21_2 = registerVersion(768, "1.21.2", "1.21.3");
+    public static final int MC_1_21_4 = registerVersion(769, "1.21.4");
+    public static final int MC_1_21_5 = registerVersion(770, "1.21.5");
+    public static final int MC_1_21_6 = registerVersion(771, "1.21.6");
+    public static final int MC_1_21_7 = registerVersion(772, "1.21.7", "1.21.8");
+    public static final int MC_1_21_9_PRE4 = registerSnapshotVersion(272, "1.21.9-pre4");
+
+    public static int getSnapshotVersion(int snapshotNumber) {
+        return (1 << 30) | snapshotNumber;
+    }
+
+    public static int registerSnapshotVersion(int snapshotNumber, String... versionStrings) {
+        return registerVersion(getSnapshotVersion(snapshotNumber), versionStrings);
+    }
+
+    public static int registerVersion(int protocolId, String... versionStrings) {
+        SUPPORTED_VERSION_IDS.add(protocolId);
+        if (versionStrings == null || versionStrings.length == 0) throw new IllegalArgumentException("protocol id " + protocolId + " has no version string");
+        for (String versionString : versionStrings) {
+            VERSION_STRING_TO_PVN.put(versionString, protocolId);
+            PVN_TO_VERSION_STRING.put(protocolId, versionString);
+            PVN_TO_LATEST_VERSION_STRING.put(protocolId, versionString);
+            if (!PVN_TO_FIRST_VERSION_STRING.containsKey(protocolId))
+                PVN_TO_FIRST_VERSION_STRING.put(protocolId, versionString);
         }
+        if (versionStrings.length > 1) {
+            String merged = String.join(" / ", versionStrings);
+            VERSION_STRING_TO_PVN.put(merged, protocolId);
+            PVN_TO_VERSION_STRING.put(protocolId, merged);
+        }
+        return protocolId;
+    }
+
+    public static String getVersionString(int protocolId) {
+        return PVN_TO_VERSION_STRING.getOrDefault(protocolId, "Unknown version");
+    }
+
+    public static String getLatestVersionStringByPVN(int protocolId) {
+        return PVN_TO_LATEST_VERSION_STRING.getOrDefault(protocolId, getVersionString(protocolId));
+    }
+
+    public static String getFirstVersionStringByPVN(int protocolId) {
+        return PVN_TO_FIRST_VERSION_STRING.getOrDefault(protocolId, getVersionString(protocolId));
     }
 
     public static int getProtocolId(String versionString) {
-        switch (versionString) {
-            case "AUTOMATIC": return AUTOMATIC;
-            case "1.9": return MC_1_9;
-            case "1.9.1": return MC_1_9_1;
-            case "1.9.2": return MC_1_9_2;
-            case "1.9.4": return MC_1_9_4;
-            case "1.10": return MC_1_10;
-            case "1.11": return MC_1_11;
-            case "1.11.1": return MC_1_11_1;
-            case "1.12": return MC_1_12;
-            case "1.12.1": return MC_1_12_1;
-            case "1.12.2": return MC_1_12_2;
-            case "1.13": return MC_1_13;
-            case "1.13.1": return MC_1_13_1;
-            case "1.13.2": return MC_1_13_2;
-            case "1.14": return MC_1_14;
-            case "1.14.1": return MC_1_14_1;
-            case "1.14.2": return MC_1_14_2;
-            case "1.14.3": return MC_1_14_3;
-            case "1.14.4": return MC_1_14_4;
-            case "1.15": return MC_1_15;
-            case "1.15.1": return MC_1_15_1;
-            case "1.15.2": return MC_1_15_2;
-            case "1.16": return MC_1_16;
-            case "1.16.1": return MC_1_16_1;
-            case "1.16.2": return MC_1_16_2;
-            case "1.16.3": return MC_1_16_3;
-            case "1.16.4 / 1.16.5":
-            case "1.16.5":
-            case "1.16.4": return MC_1_16_4;
-            case "1.17": return MC_1_17;
-            case "1.17.1": return MC_1_17_1;
-            case "1.18":
-            case "1.18.1":
-            case "1.18 / 1.18.1": return MC_1_18;
-            case "1.18.2": return MC_1_18_2;
-            case "1.19": return MC_1_19;
-            case "1.19.1":
-            case "1.19.2":
-            case "1.19.1 / 1.19.2": return MC_1_19_1;
-            case "1.19.3": return MC_1_19_3;
-            case "1.19.4": return MC_1_19_4;
-            case "1.20":
-            case "1.20.1":
-            case "1.20 / 1.20.1": return MC_1_20;
-            case "1.20.2": return MC_1_20_2;
-            case "1.20.3":
-            case "1.20.4":
-            case "1.20.3 / 1.20.4": return MC_1_20_3;
-            case "1.20.5":
-            case "1.20.6":
-            case "1.20.5 / 1.20.6": return MC_1_20_5;
-            case "1.21":
-            case "1.21.1":
-            case "1.21 / 1.21.1": return MC_1_21;
-            case "1.21.2":
-            case "1.21.3":
-            case "1.21.2 / 1.21.3": return MC_1_21_2;
-            case "1.21.4": return MC_1_21_4;
-            case "1.21.5": return MC_1_21_5;
-            case "1.21.6": return MC_1_21_6;
-            case "1.21.7":
-            case "1.21.8":
-            case "1.21.7 / 1.21.8": return MC_1_21_7;
-            default: return MC_1_8;
-        }
+        return VERSION_STRING_TO_PVN.getOrDefault(versionString, MC_1_8);
     }
 
     public static int getLatest() {

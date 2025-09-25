@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.EntityVelocityEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 @NoArgsConstructor
@@ -30,10 +31,17 @@ public class PacketInEntityVelocity extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        eid = readVarInt(in);
-        x = in.readShort();
-        y = in.readShort();
-        z = in.readShort();
+        this.eid = readVarInt(in);
+        if (protocolId <= ProtocolConstants.MC_1_21_7) {
+            this.x = in.readShort();
+            this.y = in.readShort();
+            this.z = in.readShort();
+        } else {
+            double[] velocity = readLpVec3(in);
+            this.x = (short) (velocity[0] * 8000.0);
+            this.y = (short) (velocity[1] * 8000.0);
+            this.z = (short) (velocity[2] * 8000.0);
+        }
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityVelocityEvent(x, y, z, eid));
     }

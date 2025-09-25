@@ -427,12 +427,8 @@ public class Player implements Listener {
         float pitchPerStep = pitchDiff / steps;
 
         for (int i = 0; i < steps; i++) {
-            setYaw(getYaw() + yawPerStep);
-            setPitch(getPitch() + pitchPerStep);
-            if (getYaw() > 180)
-                setYaw(-180 + (getYaw() - 180));
-            if (getYaw() < -180)
-                setYaw(180 + (getYaw() + 180));
+            setYaw(LocationUtils.normalizeYaw(getYaw() + yawPerStep));
+            setPitch(LocationUtils.normalizePitch(getPitch() + pitchPerStep));
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true, true));
             try {
                 Thread.sleep(50);

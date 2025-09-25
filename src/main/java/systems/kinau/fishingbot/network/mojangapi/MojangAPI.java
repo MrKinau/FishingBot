@@ -54,7 +54,7 @@ public class MojangAPI {
 
         BasicClientCookie sidCookie = new BasicClientCookie("sid", String.join(":", "token", authData.getAccessToken(), UUIDUtils.withoutDashes(authData.getUuid())));
         BasicClientCookie userCookie = new BasicClientCookie("user", authData.getUsername());
-        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getExactVersionString(protocolId));
+        BasicClientCookie versionCookie = new BasicClientCookie("version", ProtocolConstants.getLatestVersionStringByPVN(protocolId));
 
         sidCookie.setDomain(".pc.realms.minecraft.net");
         userCookie.setDomain(".pc.realms.minecraft.net");

@@ -65,6 +65,7 @@ public class PacketOutChatCommand extends Packet {
             CryptManager.ArgumentSignatures signatures = CryptManager.signCommandArguments(keys, signer, arguments);
             out.writeLong(signatures.getTimestamp().toEpochMilli());
             out.writeLong(signatures.getSalt());
+
             writeVarInt(signatures.getArgumentSignatures().size(), out);
             for (int i = 0; i < signatures.getArgumentSignatures().size(); i++) {
                 CryptManager.ArgumentSignature signature = signatures.getArgumentSignatures().get(i);
@@ -77,6 +78,7 @@ public class PacketOutChatCommand extends Packet {
                             new CryptManager.MessageSignature(signature.getSignature(), signatures.getSalt(), signatures.getTimestamp())
                     ));
             }
+
             if (protocolId < ProtocolConstants.MC_1_19_3)
                 out.writeBoolean(false);
             if (protocolId >= ProtocolConstants.MC_1_19_1) {
@@ -85,6 +87,8 @@ public class PacketOutChatCommand extends Packet {
                     out.writeBoolean(false);
                 else
                     writeFixedBitSet(new BitSet(), 20, out);
+                if (protocolId >= ProtocolConstants.MC_1_21_5)
+                    out.writeByte(0); // checksum, always 0 always passes serverside checksum verification
             }
         }
     }

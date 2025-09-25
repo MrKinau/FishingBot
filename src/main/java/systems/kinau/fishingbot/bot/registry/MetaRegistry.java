@@ -45,7 +45,7 @@ public class MetaRegistry<K, V> {
     }
 
     protected void load(RegistryLoader.Json<K, V> registryLoader, Registry<K, V> legacyRegistry) {
-        Registries.BUNDLED_REGISTRY_IDS.forEach(protocolId -> {
+        Registries.BUNDLED_REGISTRIES.forEach(protocolId -> {
             JsonObject registriesData = Registries.get().getRegistriesData(protocolId);
             Registry<K, V> registry = registryLoader.apply(registriesData);
             if (registry == null) return;

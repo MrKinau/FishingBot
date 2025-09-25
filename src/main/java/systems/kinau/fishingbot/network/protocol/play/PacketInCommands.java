@@ -2,22 +2,32 @@ package systems.kinau.fishingbot.network.protocol.play;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.LongArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.RootCommandNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.bot.registry.Registries;
+import systems.kinau.fishingbot.bot.registry.registries.CommandArgumentTypeRegistry;
 import systems.kinau.fishingbot.event.play.CommandsRegisteredEvent;
 import systems.kinau.fishingbot.modules.command.brigardier.CommandNodeData;
 import systems.kinau.fishingbot.modules.command.brigardier.CommandTree;
-import systems.kinau.fishingbot.modules.command.brigardier.argument.*;
+import systems.kinau.fishingbot.modules.command.brigardier.argument.BasicArgumentType;
+import systems.kinau.fishingbot.modules.command.brigardier.argument.IdentifiableArgumentType;
+import systems.kinau.fishingbot.modules.command.brigardier.argument.MessageArgumentType;
+import systems.kinau.fishingbot.modules.command.brigardier.argument.RangeArgumentType;
+import systems.kinau.fishingbot.modules.command.brigardier.argument.StubArgumentType;
 import systems.kinau.fishingbot.modules.command.brigardier.node.ArgumentNode;
 import systems.kinau.fishingbot.modules.command.brigardier.node.LiteralNode;
 import systems.kinau.fishingbot.modules.command.brigardier.node.Node;
 import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
-import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -47,9 +57,9 @@ public class PacketInCommands extends Packet {
             }
             int rootIndex = readVarInt(in);
 
-        RootCommandNode<CommandExecutor> rootNode = (RootCommandNode<CommandExecutor>) new CommandTree(nodes).getNode(rootIndex);
-        this.commandDispatcher = new CommandDispatcher<>(rootNode);
-        FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new CommandsRegisteredEvent(commandDispatcher));
+            RootCommandNode<CommandExecutor> rootNode = (RootCommandNode<CommandExecutor>) new CommandTree(nodes).getNode(rootIndex);
+            this.commandDispatcher = new CommandDispatcher<>(rootNode);
+            FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new CommandsRegisteredEvent(commandDispatcher));
         } catch (Exception ignore) {}
     }
 
@@ -132,29 +142,16 @@ public class PacketInCommands extends Packet {
                     break;
                 }
             }
-            if (parserId >= 18) {
-                if (parserId == 18 && protocolId < ProtocolConstants.MC_1_20_3) // message
+            CommandArgumentTypeRegistry registry = Registries.COMMAND_ARGUMENT_TYPE;
+            String registryName = registry.getCommandArgumentTypeName(parserId, protocolId);
+            if (registryName != null) {
+                if (registryName.equals("minecraft:message"))
                     argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
-                else if (parserId == 19 && protocolId >= ProtocolConstants.MC_1_20_3) // message
-                    argumentType = new BasicArgumentType<>(parserId, MessageArgumentType::new);
-
-                if (parserId == 29 && protocolId < ProtocolConstants.MC_1_20_3) // score_holder
+                else if (registryName.equals("minecraft:score_holder"))
                     in.readByte();
-                else if (parserId == 30 && protocolId >= ProtocolConstants.MC_1_20_3) // score_holder
-                    in.readByte();
-
-                if (parserId == 40 && protocolId < ProtocolConstants.MC_1_20_3) // time
+                else if (registryName.equals("minecraft:time"))
                     in.readInt();
-                else if (parserId == 41 && protocolId >= ProtocolConstants.MC_1_20_3 && protocolId < ProtocolConstants.MC_1_20_5) // time
-                    in.readInt();
-                else if (parserId == 42 && protocolId >= ProtocolConstants.MC_1_20_5) // time
-                    in.readInt();
-
-                if (parserId >= 41 && parserId <= 44 && protocolId < ProtocolConstants.MC_1_20_3) // resource*
-                    readString(in);
-                else if (parserId >= 42 && parserId <= 45 && protocolId >= ProtocolConstants.MC_1_20_3 && protocolId < ProtocolConstants.MC_1_20_5) // resource*
-                    readString(in);
-                else if (parserId >= 43 && parserId <= 46 && protocolId >= ProtocolConstants.MC_1_20_5) // resource*
+                else if (registryName.equals("minecraft:resource_or_tag") || registryName.equals("minecraft:resource_or_tag_key") || registryName.equals("minecraft:resource") || registryName.equals("minecraft:resource_key") || registryName.equals("minecraft:resource_selector"))
                     readString(in);
             }
             if (argumentType == null)

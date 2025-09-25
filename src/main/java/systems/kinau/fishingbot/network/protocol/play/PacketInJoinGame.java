@@ -43,277 +43,222 @@ public class PacketInJoinGame extends Packet {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
-        switch (protocolId) {
-            case ProtocolConstants.MC_1_9:
-            case ProtocolConstants.MC_1_8: {
-                eid = in.readInt();                         // entity ID
-                gamemode = in.readUnsignedByte();           // gamemode
-                dimension = String.valueOf(in.readByte());  // dimension
-                difficulty = in.readUnsignedByte();         // difficulty
-                maxPlayers = in.readUnsignedByte();         // maxPlayer
-                levelType = readString(in);                 // level type
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                break;
+        if (protocolId <= ProtocolConstants.MC_1_9) {
+            this.eid = in.readInt();                         // entity ID
+            this.gamemode = in.readUnsignedByte();           // gamemode
+            this.dimension = String.valueOf(in.readByte());  // dimension
+            this.difficulty = in.readUnsignedByte();         // difficulty
+            this.maxPlayers = in.readUnsignedByte();         // maxPlayer
+            this.levelType = readString(in);                 // level type
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+        } else if (protocolId <= ProtocolConstants.MC_1_13_2) {
+            this.eid = in.readInt();                         // entity ID
+            this.gamemode = in.readUnsignedByte();           // gamemode
+            this.dimension = String.valueOf(in.readInt());   // dimension
+            this.difficulty = in.readUnsignedByte();         // difficulty
+            this.maxPlayers = in.readUnsignedByte();         // maxPlayer
+            this.levelType = readString(in);                 // level type
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+        } else if (protocolId <= ProtocolConstants.MC_1_14_4) {
+            this.eid = in.readInt();                         // entity ID
+            this.gamemode = in.readUnsignedByte();           // gamemode
+            this.dimension = String.valueOf(in.readInt());   // dimension
+            this.maxPlayers = in.readUnsignedByte();         // maxPlayer
+            this.levelType = readString(in);                 // level type
+            this.viewDistance = readVarInt(in);              // view distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+        } else if (protocolId <= ProtocolConstants.MC_1_15_2) {
+            this.eid = in.readInt();                         // entity ID
+            this.gamemode = in.readUnsignedByte();           // gamemode
+            this.dimension = String.valueOf(in.readInt());   // dimension
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.maxPlayers = in.readUnsignedByte();         // maxPlayer
+            this.levelType = readString(in);                 // level type
+            this.viewDistance = readVarInt(in);              // view distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+        } else if (protocolId <= ProtocolConstants.MC_1_16_1) {
+            this.eid = in.readInt();                         // entity ID
+            this.gamemode = in.readUnsignedByte();           // gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            readNBT(in, protocolId);                         // dimension codec (dont use, just skip it)
+            this.dimension = readString(in);                 // dimension
+            this.spawnWorld = readString(in);                // spawn world name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.maxPlayers = in.readUnsignedByte();         // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+        } else if (protocolId <= ProtocolConstants.MC_1_17_1) {
+            this.eid = in.readInt();                         // entity ID
+            this.hardcore = in.readBoolean();                // is hardcore
+            this.gamemode = in.readUnsignedByte();           // current gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            readNBT(in, protocolId);                         // dimension codec (dont use, just skip it)
+            readNBT(in, protocolId);                         // spawn dimension
+            this.spawnWorld = readString(in);                // spawn world name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.maxPlayers = in.readUnsignedByte();         // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+        } else if (protocolId <= ProtocolConstants.MC_1_18_2) {
+            this.eid = in.readInt();                         // entity ID
+            this.hardcore = in.readBoolean();                // is hardcore
+            this.gamemode = in.readUnsignedByte();           // current gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            readNBT(in, protocolId);                         // dimension codec (dont use, just skip it)
+            readNBT(in, protocolId);                         // spawn dimension
+            this.spawnWorld = readString(in);                // spawn world name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.maxPlayers = in.readUnsignedByte();         // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.simulationDistance = readVarInt(in);        // simulation distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+        } else if (protocolId <= ProtocolConstants.MC_1_19_4) {
+            this.eid = in.readInt();                         // entity ID
+            this.hardcore = in.readBoolean();                // is hardcore
+            this.gamemode = in.readUnsignedByte();           // current gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            readNBT(in, protocolId);                         // registry codec
+            readString(in);                                  // dimension type
+            this.spawnWorld = readString(in);                // dimension name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.maxPlayers = readVarInt(in);                // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.simulationDistance = readVarInt(in);        // simulation distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+            if (in.readBoolean()) {                          // has last death location
+                readString(in);                              // last death dimension
+                in.readLong();                               // last death position
             }
-            case ProtocolConstants.MC_1_13_2:
-            case ProtocolConstants.MC_1_13_1:
-            case ProtocolConstants.MC_1_13:
-            case ProtocolConstants.MC_1_12_2:
-            case ProtocolConstants.MC_1_12_1:
-            case ProtocolConstants.MC_1_12:
-            case ProtocolConstants.MC_1_11_1:
-            case ProtocolConstants.MC_1_11:
-            case ProtocolConstants.MC_1_10:
-            case ProtocolConstants.MC_1_9_4:
-            case ProtocolConstants.MC_1_9_2:
-            case ProtocolConstants.MC_1_9_1: {
-                eid = in.readInt();                         // entity ID
-                gamemode = in.readUnsignedByte();           // gamemode
-                dimension = String.valueOf(in.readInt());   // dimension
-                difficulty = in.readUnsignedByte();         // difficulty
-                maxPlayers = in.readUnsignedByte();         // maxPlayer
-                levelType = readString(in);                 // level type
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                break;
+        } else if (protocolId <= ProtocolConstants.MC_1_20) {
+            this.eid = in.readInt();                         // entity ID
+            this.hardcore = in.readBoolean();                // is hardcore
+            this.gamemode = in.readUnsignedByte();           // current gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            readNBT(in, protocolId);                         // registry codec
+            readString(in);                                  // dimension type
+            this.spawnWorld = readString(in);                // dimension name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.maxPlayers = readVarInt(in);                // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.simulationDistance = readVarInt(in);        // simulation distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+            if (in.readBoolean()) {                          // has last death location
+                readString(in);                              // last death dimension
+                in.readLong();                               // last death position
             }
-            case ProtocolConstants.MC_1_14:
-            case ProtocolConstants.MC_1_14_1:
-            case ProtocolConstants.MC_1_14_2:
-            case ProtocolConstants.MC_1_14_3:
-            case ProtocolConstants.MC_1_14_4: {
-                eid = in.readInt();                         // entity ID
-                gamemode = in.readUnsignedByte();           // gamemode
-                dimension = String.valueOf(in.readInt());   // dimension
-                maxPlayers = in.readUnsignedByte();         // maxPlayer
-                levelType = readString(in);                 // level type
-                viewDistance = readVarInt(in);              // view distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                break;
+            this.portalCooldown = readVarInt(in);
+        } else if (protocolId <= ProtocolConstants.MC_1_20_3) {
+            this.eid = in.readInt();                         // entity ID
+            this.hardcore = in.readBoolean();                // is hardcore
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            this.maxPlayers = readVarInt(in);                // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.simulationDistance = readVarInt(in);        // simulation distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            in.readBoolean();                                // doLimitedCrafting
+            readString(in);                                  // dimension type
+            this.spawnWorld = readString(in);                // dimension name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.gamemode = in.readUnsignedByte();           // current gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+            if (in.readBoolean()) {                          // has last death location
+                readString(in);                              // last death dimension
+                in.readLong();                               // last death position
             }
-            case ProtocolConstants.MC_1_15:
-            case ProtocolConstants.MC_1_15_1:
-            case ProtocolConstants.MC_1_15_2: {
-                eid = in.readInt();                         // entity ID
-                gamemode = in.readUnsignedByte();           // gamemode
-                dimension = String.valueOf(in.readInt());   // dimension
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = in.readUnsignedByte();         // maxPlayer
-                levelType = readString(in);                 // level type
-                viewDistance = readVarInt(in);              // view distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                break;
+            this.portalCooldown = readVarInt(in);
+        } else if (protocolId <= ProtocolConstants.MC_1_21) {
+            this.eid = in.readInt();                         // entity ID
+            this.hardcore = in.readBoolean();                // is hardcore
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            this.maxPlayers = readVarInt(in);                // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.simulationDistance = readVarInt(in);        // simulation distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            in.readBoolean();                                // doLimitedCrafting
+            readVarInt(in);                                  // dimension type
+            this.spawnWorld = readString(in);                // dimension name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.gamemode = in.readUnsignedByte();           // current gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+            if (in.readBoolean()) {                          // has last death location
+                readString(in);                              // last death dimension
+                in.readLong();                               // last death position
             }
-            case ProtocolConstants.MC_1_16:
-            case ProtocolConstants.MC_1_16_1: {
-                eid = in.readInt();                         // entity ID
-                gamemode = in.readUnsignedByte();           // gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                readNBT(in, protocolId);                    // dimension codec (dont use, just skip it)
-                dimension = readString(in);                 // dimension
-                spawnWorld = readString(in);                // spawn world name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = in.readUnsignedByte();         // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                break;
+            this.portalCooldown = readVarInt(in);
+        } else {
+            this.eid = in.readInt();                         // entity ID
+            this.hardcore = in.readBoolean();                // is hardcore
+            int worldCount = readVarInt(in);                 // count of worlds
+            this.worldIdentifier = new String[worldCount];   // identifier for all worlds
+            for (int i = 0; i < worldCount; i++)
+                this.worldIdentifier[i] = readString(in);
+            this.maxPlayers = readVarInt(in);                // maxPlayer
+            this.viewDistance = readVarInt(in);              // view distance
+            this.simulationDistance = readVarInt(in);        // simulation distance
+            this.reducedDebugInfo = in.readBoolean();        // reduced Debug info
+            this.enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
+            in.readBoolean();                                // doLimitedCrafting
+            readVarInt(in);                                  // dimension type
+            this.spawnWorld = readString(in);                // dimension name
+            this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
+            this.gamemode = in.readUnsignedByte();           // current gamemode
+            in.readUnsignedByte();                           // previous gamemode
+            this.debug = in.readBoolean();                   // debug world
+            this.flat = in.readBoolean();                    // flat world
+            if (in.readBoolean()) {                          // has last death location
+                readString(in);                              // last death dimension
+                in.readLong();                               // last death position
             }
-            case ProtocolConstants.MC_1_16_2:
-            case ProtocolConstants.MC_1_16_3:
-            case ProtocolConstants.MC_1_16_4:
-            case ProtocolConstants.MC_1_17:
-            case ProtocolConstants.MC_1_17_1: {
-                eid = in.readInt();                         // entity ID
-                hardcore = in.readBoolean();                // is hardcore
-                gamemode = in.readUnsignedByte();           // current gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                readNBT(in, protocolId);                    // dimension codec (dont use, just skip it)
-                readNBT(in, protocolId);                    // spawn dimension
-                spawnWorld = readString(in);                // spawn world name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = in.readUnsignedByte();         // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                break;
-            }
-            case ProtocolConstants.MC_1_18:
-            case ProtocolConstants.MC_1_18_2: {
-                eid = in.readInt();                         // entity ID
-                hardcore = in.readBoolean();                // is hardcore
-                gamemode = in.readUnsignedByte();           // current gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                readNBT(in, protocolId);                    // dimension codec (dont use, just skip it)
-                readNBT(in, protocolId);                    // spawn dimension
-                spawnWorld = readString(in);                // spawn world name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = in.readUnsignedByte();         // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                simulationDistance = readVarInt(in);        // simulation distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                break;
-            }
-            case ProtocolConstants.MC_1_19:
-            case ProtocolConstants.MC_1_19_1:
-            case ProtocolConstants.MC_1_19_3:
-            case ProtocolConstants.MC_1_19_4: {
-                eid = in.readInt();                         // entity ID
-                hardcore = in.readBoolean();                // is hardcore
-                gamemode = in.readUnsignedByte();           // current gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                readNBT(in, protocolId);                    // registry codec
-                readString(in);                             // dimension type
-                spawnWorld = readString(in);                // dimension name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = readVarInt(in);                // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                simulationDistance = readVarInt(in);        // simulation distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                if (in.readBoolean()) {                     // has last death location
-                    readString(in);                         // last death dimension
-                    in.readLong();                          // last death position
-                }
-                break;
-            }
-            case ProtocolConstants.MC_1_20: {
-                eid = in.readInt();                         // entity ID
-                hardcore = in.readBoolean();                // is hardcore
-                gamemode = in.readUnsignedByte();           // current gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                readNBT(in, protocolId);                    // registry codec
-                readString(in);                             // dimension type
-                spawnWorld = readString(in);                // dimension name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                maxPlayers = readVarInt(in);                // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                simulationDistance = readVarInt(in);        // simulation distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                if (in.readBoolean()) {                     // has last death location
-                    readString(in);                         // last death dimension
-                    in.readLong();                          // last death position
-                }
-                portalCooldown = readVarInt(in);
-                break;
-            }
-            case ProtocolConstants.MC_1_20_2:
-            case ProtocolConstants.MC_1_20_3: {
-                eid = in.readInt();                         // entity ID
-                hardcore = in.readBoolean();                // is hardcore
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                maxPlayers = readVarInt(in);                // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                simulationDistance = readVarInt(in);        // simulation distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                in.readBoolean();                           // doLimitedCrafting
-                readString(in);                             // dimension type
-                spawnWorld = readString(in);                // dimension name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                gamemode = in.readUnsignedByte();           // current gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                if (in.readBoolean()) {                     // has last death location
-                    readString(in);                         // last death dimension
-                    in.readLong();                          // last death position
-                }
-                portalCooldown = readVarInt(in);
-                break;
-            }
-            case ProtocolConstants.MC_1_20_5:
-            case ProtocolConstants.MC_1_21: {
-                eid = in.readInt();                         // entity ID
-                hardcore = in.readBoolean();                // is hardcore
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                maxPlayers = readVarInt(in);                // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                simulationDistance = readVarInt(in);        // simulation distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                in.readBoolean();                           // doLimitedCrafting
-                readVarInt(in);                             // dimension type
-                spawnWorld = readString(in);                // dimension name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                gamemode = in.readUnsignedByte();           // current gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                if (in.readBoolean()) {                     // has last death location
-                    readString(in);                         // last death dimension
-                    in.readLong();                          // last death position
-                }
-                portalCooldown = readVarInt(in);
-                break;
-            }
-            case ProtocolConstants.MC_1_21_2:
-            default: {
-                eid = in.readInt();                         // entity ID
-                hardcore = in.readBoolean();                // is hardcore
-                int worldCount = readVarInt(in);            // count of worlds
-                worldIdentifier = new String[worldCount];   // identifier for all worlds
-                for (int i = 0; i < worldCount; i++)
-                    worldIdentifier[i] = readString(in);
-                maxPlayers = readVarInt(in);                // maxPlayer
-                viewDistance = readVarInt(in);              // view distance
-                simulationDistance = readVarInt(in);        // simulation distance
-                reducedDebugInfo = in.readBoolean();        // reduced Debug info
-                enableRespawnScreen = in.readBoolean();     // set to false when the doImmediateRespawn gamerule is true
-                in.readBoolean();                           // doLimitedCrafting
-                readVarInt(in);                             // dimension type
-                spawnWorld = readString(in);                // dimension name
-                hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-                gamemode = in.readUnsignedByte();           // current gamemode
-                in.readUnsignedByte();                      // previous gamemode
-                debug = in.readBoolean();                   // debug world
-                flat = in.readBoolean();                    // flat world
-                if (in.readBoolean()) {                     // has last death location
-                    readString(in);                         // last death dimension
-                    in.readLong();                          // last death position
-                }
-                portalCooldown = readVarInt(in);
-                seaLevel = readVarInt(in);
-                break;
-            }
+            this.portalCooldown = readVarInt(in);
+            this.seaLevel = readVarInt(in);
         }
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(

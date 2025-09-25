@@ -30,6 +30,20 @@ public class LocationUtils {
         return ((long) (x & 0x3FFFFFF) << 38) | ((long) (z & 0x3FFFFFF) << 12) | (y & 0xFFF);
     }
 
+    public static float normalizeYaw(float yaw) {
+        yaw = yaw % 360f;
+        if (yaw < -180f) yaw += 360f;
+        else if (yaw > 180f) yaw -= 360f;
+        return yaw;
+    }
+
+    public static float normalizePitch(float pitch) {
+        pitch = pitch % 180f;
+        if (pitch < -90f) pitch += 180f;
+        else if (pitch > 90f) pitch -= 180f;
+        return pitch;
+    }
+
     @Getter
     public enum Direction implements DisplayNameProvider {
         NORTH(180.0F, "North"),
