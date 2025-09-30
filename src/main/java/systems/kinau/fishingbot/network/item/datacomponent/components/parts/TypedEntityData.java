@@ -14,14 +14,14 @@ public class TypedEntityData implements DataComponentPart {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if (protocolId >= ProtocolConstants.MC_1_21_9_PRE4)
+        if (protocolId >= ProtocolConstants.MC_1_21_9)
             Packet.writeVarInt(entityType, out);
         Packet.writeNBT(entityData, out);
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        if (protocolId >= ProtocolConstants.MC_1_21_9_PRE4)
+        if (protocolId >= ProtocolConstants.MC_1_21_9)
             this.entityType = Packet.readVarInt(in);
         this.entityData = Packet.readNBT(in, protocolId);
     }
