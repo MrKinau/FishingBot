@@ -1,7 +1,9 @@
-version: '3.7'
 services:
   fishing_bot:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fishingbot
     environment:
       # These values are only recognized when no config file exists / is persisted!
       # These are the default values.
