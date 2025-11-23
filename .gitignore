@@ -5,6 +5,8 @@
 
 # User-specific stuff
 .idea/
+.vscode/
+.java-version
 
 # CMake
 cmake-build-debug/
@@ -49,3 +51,7 @@ refreshToken
 # Docker Compose
 .env
 docker-compose.override.yml
+
+# Misc
+DesigniteJava.jar       t
+.DS_Store
