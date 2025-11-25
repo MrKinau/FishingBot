@@ -63,7 +63,7 @@ public class FishingModule extends Module implements Runnable, Listener {
 
     private int currentFishingRodValue;
 
-    private Thread stuckingFix;
+    private Thread stuckDetectionThread;
     private boolean joined;
     private LootHistory lootHistory;
 
@@ -84,16 +84,16 @@ public class FishingModule extends Module implements Runnable, Listener {
     public void onEnable() {
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
         if (FishingBot.getInstance().getCurrentBot().getConfig().isStuckingFixEnabled()) {
-            stuckingFix = new Thread(this);
-            stuckingFix.setName("stuckingFixThread");
-            stuckingFix.start();
+            stuckDetectionThread = new Thread(this);
+            stuckDetectionThread.setName("stuckDetectionThread");
+            stuckDetectionThread.start();
         }
     }
 
     @Override
     public void onDisable() {
-        if (stuckingFix != null)
-            stuckingFix.interrupt();
+        if (stuckDetectionThread != null)
+            stuckDetectionThread.interrupt();
         FishingBot.getInstance().getCurrentBot().getEventManager().unregisterListener(this);
     }
 
