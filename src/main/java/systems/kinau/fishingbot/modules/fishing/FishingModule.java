@@ -167,7 +167,12 @@ public class FishingModule extends Module implements Runnable, Listener {
         itemScore.entrySet().forEach(entry -> {
             Item item = entry.getKey();
             double score = Optional.ofNullable(entry.getValue()).orElse(0.0);
-            double distToBobber = Math.abs(Math.sqrt(Math.pow(bobberUsedForCatch.getCurrentX() - item.getOriginX(), 2) + Math.pow(bobberUsedForCatch.getCurrentY() - item.getOriginY(), 2) + Math.pow(bobberUsedForCatch.getCurrentZ() - item.getOriginZ(), 2)));
+
+            double deltaX = bobberUsedForCatch.getCurrentX() - item.getOriginX();
+            double deltaY = bobberUsedForCatch.getCurrentY() - item.getOriginY();
+            double deltaZ = bobberUsedForCatch.getCurrentZ() - item.getOriginZ();
+            double distToBobber = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+            
             if (distToBobber < 1)
                 score += 20_000;
             else {
