@@ -211,7 +211,7 @@ public class Player implements Listener {
         if (event.getEid() != getEntityID())
             return;
 
-        if (getHealth() != -1 && event.getHealth() <= 0 && getEntityID() != -1 && !isRespawning()) {
+        if (shouldTriggerRespawn(event)) {
             setRespawning(true);
             FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new RespawnEvent());
             respawn();
@@ -503,5 +503,14 @@ public class Player implements Listener {
 
     public int incrementChatSessionIndex() {
         return this.chatSessionIndex++;
+    }
+
+    private boolean shouldTriggerRespawn(UpdateHealthEvent event) {
+        boolean healthWasInitialized = getHealth() != -1;
+        boolean playerJustDied = event.getHealth() <= 0;
+        boolean entityIdIsValid = getEntityID() != -1;
+        boolean notAlreadyRespawning = !isRespawning();
+        
+        return healthWasInitialized && playerJustDied && entityIdIsValid && notAlreadyRespawning;
     }
 }
