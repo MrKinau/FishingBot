@@ -7,6 +7,8 @@ import systems.kinau.fishingbot.bot.loot.LootHistory;
 import systems.kinau.fishingbot.bot.loot.LootItem;
 import systems.kinau.fishingbot.modules.command.BrigardierCommand;
 import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
+import systems.kinau.fishingbot.modules.discord.DiscordModule;
+import systems.kinau.fishingbot.modules.fishing.FishingModule;
 
 import java.util.Comparator;
 
@@ -28,10 +30,11 @@ public class CommandSummary extends BrigardierCommand {
             CommandExecutor source = context.getSource();
             if (FishingBot.getInstance().getCurrentBot() == null)
                 return 0;
-            if (FishingBot.getInstance().getCurrentBot().getFishingModule() == null)
+            FishingModule fishingModule = FishingBot.getInstance().getCurrentBot().getModuleManager().getModule(FishingModule.class);
+            if (fishingModule == null)
                 return 0;
 
-            LootHistory lootHistory = FishingBot.getInstance().getCurrentBot().getFishingModule().getLootHistory();
+            LootHistory lootHistory = fishingModule.getLootHistory();
             if (lootHistory.getItems().isEmpty()) {
                 source.sendTranslatedMessages("command-summary-empty");
                 return 0;
@@ -41,8 +44,9 @@ public class CommandSummary extends BrigardierCommand {
                 source.sendMessage(lootItem.getCount() + "x " + lootItem.getDisplayName());
             });
 
-            if (FishingBot.getInstance().getCurrentBot().getDiscordModule() != null)
-                FishingBot.getInstance().getCurrentBot().getDiscordModule().sendSummary(lootHistory);
+            DiscordModule discordModule = FishingBot.getInstance().getCurrentBot().getModuleManager().getModule(DiscordModule.class);
+            if (discordModule != null)
+                discordModule.sendSummary(lootHistory);
 
             if (clearAfterwards)
                 lootHistory.getItems().clear();
