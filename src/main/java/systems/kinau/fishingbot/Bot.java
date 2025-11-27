@@ -274,17 +274,7 @@ public class Bot {
         }
     }
 
-    public FishingModule getFishingModule() {
-        return (FishingModule) getModuleManager().getLoadedModule(FishingModule.class).orElse(null);
-    }
 
-    public EjectionModule getEjectModule() {
-        return (EjectionModule) getModuleManager().getLoadedModule(EjectionModule.class).orElse(null);
-    }
-
-    public DiscordModule getDiscordModule() {
-        return (DiscordModule) getModuleManager().getLoadedModule(DiscordModule.class).orElse(null);
-    }
 
     public void start(CommandLine cmdLine) {
         if (isRunning() || isPreventStartup()) {
@@ -437,8 +427,9 @@ public class Bot {
                     scheduler.shutdownNow();
                 getEventManager().getRegisteredListener().clear();
                 getEventManager().getClassToInstanceMapping().clear();
-                if (getFishingModule() != null)
-                    savedLootHistory = getFishingModule().getLootHistory();
+                FishingModule fishingModule = getModuleManager().getModule(FishingModule.class);
+                if (fishingModule != null)
+                    savedLootHistory = fishingModule.getLootHistory();
                 getModuleManager().disableAll();
                 this.socket = null;
                 this.net = null;

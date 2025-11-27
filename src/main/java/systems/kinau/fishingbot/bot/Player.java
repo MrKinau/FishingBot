@@ -31,9 +31,9 @@ import systems.kinau.fishingbot.event.play.UpdateWindowItemsEvent;
 import systems.kinau.fishingbot.modules.command.brigardier.argument.MessageArgumentType;
 import systems.kinau.fishingbot.modules.command.executor.CommandExecutor;
 import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
+import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
-import systems.kinau.fishingbot.network.protocol.ProtocolState;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatCommand;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatMessage;
@@ -45,7 +45,6 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction.Enti
 import systems.kinau.fishingbot.network.protocol.play.PacketOutHeldItemChange;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerInput;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerLoaded;
-import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutTeleportConfirm;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUnsignedChatCommand;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutUseItem;
@@ -97,19 +96,17 @@ public class Player implements Listener {
     private int entityID = -1;
     private int lastPing = 500;
 
-    private Thread lookThread;
+    private LookController lookController;
 
     public Player() {
         this.inventory = new Inventory();
+        this.lookController = new LookController(this);
         FishingBot.getInstance().getCurrentBot().getEventManager().registerListener(this);
     }
 
     @EventHandler
     public void onStartConfiguration(ConfigurationStartEvent event) {
-        if (lookThread != null) {
-            lookThread.interrupt();
-            this.lookThread = null;
-        }
+        lookController.interruptLook();
     }
 
     @EventHandler
@@ -164,9 +161,11 @@ public class Player implements Listener {
         if (event.getSlotId() == getHeldSlot())
             this.heldItem = slot;
         if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()
-                && !(event.getSlotId() == getHeldSlot() && ItemUtils.isFishingRod(slot)))
-            FishingBot.getInstance().getCurrentBot().getEjectModule()
-                    .executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), slot, event.getSlotId());
+                && !(event.getSlotId() == getHeldSlot() && ItemUtils.isFishingRod(slot))) {
+            EjectionModule ejectModule = FishingBot.getInstance().getCurrentBot().getModuleManager().getModule(EjectionModule.class);
+            if (ejectModule != null)
+                ejectModule.executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), slot, event.getSlotId());
+        }
     }
 
     @EventHandler
@@ -177,9 +176,11 @@ public class Player implements Listener {
                 if (i == getHeldSlot())
                     this.heldItem = event.getSlots().get(i);
                 if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()
-                        && !(i == getHeldSlot() && ItemUtils.isFishingRod(event.getSlots().get(i))))
-                    FishingBot.getInstance().getCurrentBot().getEjectModule()
-                            .executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), event.getSlots().get(i), (short) i);
+                        && !(i == getHeldSlot() && ItemUtils.isFishingRod(event.getSlots().get(i)))) {
+                    EjectionModule ejectModule = FishingBot.getInstance().getCurrentBot().getModuleManager().getModule(EjectionModule.class);
+                    if (ejectModule != null)
+                        ejectModule.executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), event.getSlots().get(i), (short) i);
+                }
             }
         } else if (event.getWindowId() > 0) {
             Inventory inventory;
@@ -393,58 +394,19 @@ public class Player implements Listener {
     }
 
     public boolean look(LocationUtils.Direction direction, Consumer<Boolean> onFinish) {
-        float yaw = direction.getYaw() == Float.MIN_VALUE ? getYaw() : direction.getYaw();
-        float pitch = direction.getPitch() == Float.MIN_VALUE ? getPitch() : direction.getPitch();
-        return look(yaw, pitch, FishingBot.getInstance().getCurrentBot().getConfig().getLookSpeed(), onFinish);
+        return lookController.look(direction, onFinish);
     }
 
     public boolean look(float yaw, float pitch, int speed) {
-        return look(yaw, pitch, speed, null);
+        return lookController.look(yaw, pitch, speed);
     }
 
     public boolean look(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
-        if (lookThread != null && Thread.currentThread().getId() != lookThread.getId() && lookThread.isAlive()) {
-            return false;
-        } else if (lookThread != null && Thread.currentThread().getId() == lookThread.getId() && lookThread.isAlive()) {
-            internalLook(yaw, pitch, speed, onFinish); // calling look inside onFinish
-            return true;
-        }
-
-        this.lookThread = new Thread(() -> {
-            internalLook(yaw, pitch, speed, onFinish);
-        });
-        getLookThread().start();
-        return true;
-    }
-
-    private void internalLook(float yaw, float pitch, int speed, Consumer<Boolean> onFinish) {
-        float yawDiff = LocationUtils.yawDiff(getYaw(), yaw);
-        float pitchDiff = LocationUtils.yawDiff(getPitch(), pitch);
-
-        int steps = (int) Math.ceil(Math.max(Math.abs(yawDiff), Math.abs(pitchDiff)) / Math.max(1, speed));
-        float yawPerStep = yawDiff / steps;
-        float pitchPerStep = pitchDiff / steps;
-
-        for (int i = 0; i < steps; i++) {
-            setYaw(LocationUtils.normalizeYaw(getYaw() + yawPerStep));
-            setPitch(LocationUtils.normalizePitch(getPitch() + pitchPerStep));
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPosLook(getX(), getY(), getZ(), getYaw(), getPitch(), true, true));
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException ignore) {
-                return;
-            }
-        }
-        if (onFinish != null && FishingBot.getInstance().getCurrentBot().getNet().getState() == ProtocolState.PLAY)
-            onFinish.accept(true);
-
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ignore) { }
+        return lookController.look(yaw, pitch, speed, onFinish);
     }
 
     public boolean isCurrentlyLooking() {
-        return !(lookThread == null || lookThread.isInterrupted() || !lookThread.isAlive());
+        return lookController.isCurrentlyLooking();
     }
 
     public void openAdjacentChest(LocationUtils.Direction direction) {
