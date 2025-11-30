@@ -43,4 +43,8 @@ public class ModuleManager {
             return Optional.empty();
         return getLoadedModules().stream().filter(m -> m.getClass().getName().equals(moduleClass.getName())).findAny();
     }
+
+    public <T extends Module> T getModule(Class<T> moduleClass) {
+        return (T) getLoadedModule(moduleClass).orElse(null);
+    }
 }
