@@ -76,7 +76,7 @@ public class Bot {
     @Getter         private Socket socket;
     @Getter         private NetworkHandler net;
 
-    @Getter @Setter private FishingModule fishingModule;
+    @Getter         private FishingModule fishingModule;
 
     @Getter         private MinecraftTranslations minecraftTranslations;
 
@@ -361,7 +361,7 @@ public class Bot {
                 getModuleManager().enableModule(new HandshakeModule(serverName, port));
                 getModuleManager().enableModule(new LoginModule(getAuthData().getUsername()));
                 getModuleManager().enableModule(new ClientDefaultsModule());
-                getModuleManager().enableModule(new FishingModule(savedLootHistory));
+                getModuleManager().enableModule(this.fishingModule = new FishingModule(savedLootHistory));
                 getModuleManager().enableModule(new ChatProxyModule());
 
                 if (getConfig().isStartTextEnabled())

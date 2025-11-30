@@ -12,7 +12,7 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 public class JukeboxPlayableComponent extends DataComponent {
 
     private JukeboxSong song;
-    private String songResourceLocation;
+    private String songIdentifier;
     private boolean showInTooltip;
 
     public JukeboxPlayableComponent(int componentTypeId) {
@@ -25,7 +25,7 @@ public class JukeboxPlayableComponent extends DataComponent {
         if (song != null) {
             song.write(out, protocolId);
         } else {
-            Packet.writeString(songResourceLocation, out);
+            Packet.writeString(songIdentifier, out);
         }
         if (protocolId < ProtocolConstants.MC_1_21_5)
             out.writeBoolean(showInTooltip);
@@ -38,7 +38,7 @@ public class JukeboxPlayableComponent extends DataComponent {
             this.song = new JukeboxSong();
             song.read(in, protocolId);
         } else {
-            this.songResourceLocation = Packet.readString(in);
+            this.songIdentifier = Packet.readString(in);
         }
         if (protocolId < ProtocolConstants.MC_1_21_5)
             this.showInTooltip = in.readBoolean();

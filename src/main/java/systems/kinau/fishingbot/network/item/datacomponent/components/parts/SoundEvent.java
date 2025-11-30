@@ -14,14 +14,14 @@ import java.util.Optional;
 public class SoundEvent implements DataComponentPart {
 
     private int soundEventId;
-    private String resourceLocation;
+    private String identifier;
     private Optional<Float> fixedRange;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         Packet.writeVarInt(soundEventId, out);
         if (soundEventId == 0) {
-            Packet.writeString(resourceLocation, out);
+            Packet.writeString(identifier, out);
             if (fixedRange.isPresent())
                 out.writeFloat(fixedRange.get());
         }
@@ -31,7 +31,7 @@ public class SoundEvent implements DataComponentPart {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.soundEventId = Packet.readVarInt(in);
         if (soundEventId == 0) {
-            this.resourceLocation = Packet.readString(in);
+            this.identifier = Packet.readString(in);
             if (in.readBoolean())
                 fixedRange = Optional.of(in.readFloat());
             else
@@ -43,6 +43,6 @@ public class SoundEvent implements DataComponentPart {
     public String toString(int protocolId) {
         if (soundEventId != 0)
             return "{soundEventId=" + soundEventId + "}";
-        return "{resourceLocation=" + resourceLocation + (fixedRange.isPresent() ? ",fixedRange=" + fixedRange : "") + "}";
+        return "{identifier=" + identifier + (fixedRange.isPresent() ? ",fixedRange=" + fixedRange : "") + "}";
     }
 }

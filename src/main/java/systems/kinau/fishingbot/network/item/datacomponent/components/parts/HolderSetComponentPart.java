@@ -16,14 +16,14 @@ import java.util.List;
 public class HolderSetComponentPart implements DataComponentPart {
 
     private int id;
-    private String resourceLocation;
+    private String identifier;
     private List<Integer> ids = Collections.emptyList();
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         Packet.writeVarInt(id, out);
         if (id == 0) {
-            Packet.writeString(resourceLocation, out);
+            Packet.writeString(identifier, out);
         } else {
             for (Integer typeId : ids) {
                 Packet.writeVarInt(typeId, out);
@@ -35,7 +35,7 @@ public class HolderSetComponentPart implements DataComponentPart {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.id = Packet.readVarInt(in);
         if (id == 0) {
-            this.resourceLocation = Packet.readString(in);
+            this.identifier = Packet.readString(in);
         } else {
             this.ids = new ArrayList<>(id - 1);
             for (int i = 0; i < id - 1; i++) {

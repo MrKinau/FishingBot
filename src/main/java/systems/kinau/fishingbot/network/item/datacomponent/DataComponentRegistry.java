@@ -4,6 +4,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.bot.registry.Registries;
 import systems.kinau.fishingbot.bot.registry.Registry;
 import systems.kinau.fishingbot.network.item.datacomponent.components.AdventureModeComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.AttackRangeComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.AttributeModifiersComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.BannerPatternsComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.BeesComponent;
@@ -13,8 +14,10 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.BooleanCom
 import systems.kinau.fishingbot.network.item.datacomponent.components.ConsumableComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.CustomModelDataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.DamageTypeComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DeathProtectionComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DyedItemColorComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.EitherVarIntOrIdentifierComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.EmptyComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.EnchantmentsComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.EquippableComponent;
@@ -26,10 +29,12 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.Instrument
 import systems.kinau.fishingbot.network.item.datacomponent.components.IntComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ItemListComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.JukeboxPlayableComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.KineticWeaponComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.LodestoneTrackerComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.LoreComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.NBTComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.PaintingVariantComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.PiercingWeaponComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.PotionContentsComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ProfileComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ProvidesTrimMaterialComponent;
@@ -37,11 +42,13 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.SimpleMapp
 import systems.kinau.fishingbot.network.item.datacomponent.components.SoundEventComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.StringComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.SuspiciousStewEffectsComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.SwingAnimationComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ToolComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.TooltipDisplayComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.TrimComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.TypedEntityDataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.UseCooldownComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.UseEffectsComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.UseRemainderComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.VarIntComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.VarIntListComponent;
@@ -179,6 +186,17 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:cat/collar"), VarIntComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:sheep/color"), VarIntComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:shulker/color"), VarIntComponent::new);
+        }
+
+        if (protocolId >= ProtocolConstants.MC_1_21_11_PRE3) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:use_effects"), UseEffectsComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:minimum_attack_charge"), FloatComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:damage_type"), DamageTypeComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:attack_range"), AttackRangeComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:piercing_weapon"), PiercingWeaponComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:kinetic_weapon"), KineticWeaponComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:swing_animation"), SwingAnimationComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:zombie_nautilus/variant"), EitherVarIntOrIdentifierComponent::new);
         }
 
         dataComponentRegistry.forEach((id, name) -> {

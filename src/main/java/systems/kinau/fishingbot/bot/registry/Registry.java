@@ -4,7 +4,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import systems.kinau.fishingbot.FishingBot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 public class Registry<K, V> {
@@ -55,7 +59,7 @@ public class Registry<K, V> {
         identifiers.addAll(other.values());
 
         List<String> identifierList = new ArrayList<>(identifiers);
-        identifierList.sort(RegistryLoader.RESOURCE_LOCATION_COMPARATOR);
+        identifierList.sort(RegistryLoader.IDENTIFIER_COMPARATOR);
         Integer i = 0;
         reset();
         for (String identifier : identifierList) {
