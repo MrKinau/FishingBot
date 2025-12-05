@@ -8,6 +8,8 @@ public class AttackRangeComponent extends DataComponent {
 
     private float minRange;
     private float maxRange;
+    private float minCreativeReach;
+    private float maxCreativeReach;
     private float hitboxMargin;
     private float mobFactor;
 
@@ -19,6 +21,8 @@ public class AttackRangeComponent extends DataComponent {
     public void write(ByteArrayDataOutput out, int protocolId) {
         out.writeFloat(minRange);
         out.writeFloat(maxRange);
+        out.writeFloat(minCreativeReach);
+        out.writeFloat(maxCreativeReach);
         out.writeFloat(hitboxMargin);
         out.writeFloat(mobFactor);
     }
@@ -27,6 +31,8 @@ public class AttackRangeComponent extends DataComponent {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.minRange = in.readFloat();
         this.maxRange = in.readFloat();
+        this.minCreativeReach = in.readFloat();
+        this.maxCreativeReach = in.readFloat();
         this.hitboxMargin = in.readFloat();
         this.mobFactor = in.readFloat();
     }

@@ -57,7 +57,7 @@ public class Registries {
         BUNDLED_REGISTRIES.add(ProtocolConstants.MC_1_21_6);
         BUNDLED_REGISTRIES.add(ProtocolConstants.MC_1_21_7);
         BUNDLED_REGISTRIES.add(ProtocolConstants.MC_1_21_9);
-        BUNDLED_REGISTRIES.add(ProtocolConstants.MC_1_21_11_PRE3);
+        BUNDLED_REGISTRIES.add(ProtocolConstants.MC_1_21_11_RC1);
 
         ITEM = new ItemRegistry();
         ENTITY_TYPE = new EntityTypeRegistry();

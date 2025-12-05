@@ -188,7 +188,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:shulker/color"), VarIntComponent::new);
         }
 
-        if (protocolId >= ProtocolConstants.MC_1_21_11_PRE3) {
+        if (protocolId >= ProtocolConstants.MC_1_21_11_RC1) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_effects"), UseEffectsComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:minimum_attack_charge"), FloatComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:damage_type"), DamageTypeComponent::new);
