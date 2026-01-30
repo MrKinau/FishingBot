@@ -14,6 +14,7 @@ import systems.kinau.fishingbot.io.logging.LogFormatter;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -108,10 +109,14 @@ public class FishingBot {
     }
 
     public static File getExecutionDirectory() {
-        File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile());
-        if (jarFile.getParentFile() == null)
+        try {
+            File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            if (jarFile.getParentFile() == null)
+                return new File("");
+            return jarFile.getParentFile();
+        } catch (URISyntaxException ex) {
             return new File("");
-        return jarFile.getParentFile();
+        }
     }
 
 }
