@@ -34,6 +34,7 @@ import systems.kinau.fishingbot.modules.command.executor.ConsoleCommandExecutor;
 import systems.kinau.fishingbot.modules.ejection.EjectionModule;
 import systems.kinau.fishingbot.modules.fishing.AnnounceType;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.protocol.ProtocolState;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutBlockPlace;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatCommand;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatMessage;
@@ -349,6 +350,7 @@ public class Player implements Listener {
     }
 
     public void swapToHotBar(int slotId, int hotBarButton) {
+        if (FishingBot.getInstance().getCurrentBot().getNet().getState() != ProtocolState.PLAY) return;
         // This is not notchian behaviour, but it works
         Map<Short, Slot> remainingSlots = new HashMap<>();
         remainingSlots.put((short) slotId, Slot.EMPTY);

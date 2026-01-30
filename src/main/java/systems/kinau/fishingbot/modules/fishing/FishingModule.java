@@ -30,6 +30,7 @@ import systems.kinau.fishingbot.event.play.UpdateWindowItemsEvent;
 import systems.kinau.fishingbot.modules.Module;
 import systems.kinau.fishingbot.network.entity.EntityDataValue;
 import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
+import systems.kinau.fishingbot.network.protocol.ProtocolState;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatMessage;
 import systems.kinau.fishingbot.utils.ItemUtils;
 import systems.kinau.fishingbot.utils.StringUtils;
@@ -374,6 +375,8 @@ public class FishingModule extends Module implements Runnable, Listener {
                 Thread.sleep(100);
             } catch (InterruptedException ignore) {
             }
+            if (FishingBot.getInstance().getCurrentBot() != null && FishingBot.getInstance().getCurrentBot().getNet().getState() != ProtocolState.PLAY)
+                return;
             // check current fishing rod value and swap if a better one is in inventory
             if (ItemUtils.isFishingRod(slot) && !FishingBot.getInstance().getCurrentBot().getConfig().isDisableRodChecking()) {
                 swapWithBestFishingRod();
