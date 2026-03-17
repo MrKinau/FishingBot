@@ -52,6 +52,7 @@ public class Main {
                 String[] finalArgs = args;
                 new Thread(() -> {
                     try {
+                        if (true) SwingDialogs.showJavaFXNotWorking(new RuntimeException("test error, ignore"));
 //                        if (true) throw new IllegalArgumentException("simulate error");
                         new MainGUI(finalArgs);
                         FishingBot.getInstance().stopBot(true);
