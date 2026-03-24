@@ -73,6 +73,7 @@ public class ProtocolConstants {
     public static final int MC_1_21_7 = registerVersion(772, "1.21.7", "1.21.8");
     public static final int MC_1_21_9 = registerVersion(773, "1.21.9", "1.21.10");
     public static final int MC_1_21_11 = registerVersion(774, "1.21.11");
+    public static final int MC_26_1 = registerVersion(775, "26.1");
 
     public static int getSnapshotVersion(int snapshotNumber) {
         return (1 << 30) | snapshotNumber;
