@@ -5,6 +5,7 @@ Minecraft 1.8 - 26.1 AFK Fishing bot
 [![GitHub](https://img.shields.io/github/license/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/blob/master/LICENSE)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/MrKinau/FishingBot)](https://github.com/MrKinau/FishingBot/releases/latest)
 [![Discord](https://img.shields.io/discord/550764567282712583?logo=discord)](https://discord.gg/xHpCDYf)
+[![Hypercommit](https://img.shields.io/badge/Hypercommit-DB2475)](https://hypercommit.com/fishingbot)
 
 ![img](https://screens.kinau.systems/928b8dda-e300-4dc4-b04b-d1798ca833d6.png)
 ## Download
