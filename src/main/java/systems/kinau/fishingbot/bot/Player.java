@@ -161,8 +161,7 @@ public class Player implements Listener {
 
         if (event.getSlotId() == getHeldSlot())
             this.heldItem = slot;
-        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled()
-                && !(event.getSlotId() == getHeldSlot() && ItemUtils.isFishingRod(slot))) {
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isAutoLootEjectionEnabled() && !(event.getSlotId() == getHeldSlot() && ItemUtils.isFishingRod(slot))) {
             EjectionModule ejectModule = FishingBot.getInstance().getCurrentBot().getModuleManager().getModule(EjectionModule.class);
             if (ejectModule != null)
                 ejectModule.executeEjectionRules(FishingBot.getInstance().getCurrentBot().getConfig().getAutoLootEjectionRules(), slot, event.getSlotId());
