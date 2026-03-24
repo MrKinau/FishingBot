@@ -14,6 +14,7 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.BooleanCom
 import systems.kinau.fishingbot.network.item.datacomponent.components.ConsumableComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.CustomModelDataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.DamageResistantComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageTypeComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DeathProtectionComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DyedItemColorComponent;
@@ -37,6 +38,7 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.PaintingVa
 import systems.kinau.fishingbot.network.item.datacomponent.components.PiercingWeaponComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.PotionContentsComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ProfileComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.ProvidesBannerPatternComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ProvidesTrimMaterialComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.SimpleMapperComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.SoundEventComponent;
@@ -145,7 +147,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:consumable"), ConsumableComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_remainder"), componentTypeId -> new UseRemainderComponent(this, componentTypeId));
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_cooldown"), UseCooldownComponent::new);
-            addToRegistry(dataComponentRegistry.findKey("minecraft:damage_resistant"), StringComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:damage_resistant"), DamageResistantComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:enchantable"), VarIntComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:equippable"), EquippableComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:repairable"), HolderSetComponent::new);
@@ -160,7 +162,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:blocks_attacks"), BlocksAttacksComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:potion_duration_scale"), FloatComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:provides_trim_material"), ProvidesTrimMaterialComponent::new);
-            addToRegistry(dataComponentRegistry.findKey("minecraft:provides_banner_patterns"), StringComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:provides_banner_patterns"), ProvidesBannerPatternComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:break_sound"), SoundEventComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:villager/variant"), VarIntComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:wolf/variant"), VarIntComponent::new);
@@ -197,6 +199,15 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:kinetic_weapon"), KineticWeaponComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:swing_animation"), SwingAnimationComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:zombie_nautilus/variant"), EitherVarIntOrIdentifierComponent::new);
+        }
+
+        if (protocolId >= ProtocolConstants.MC_26_1) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:additional_trade_cost"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:cat/sound_variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:chicken/sound_variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:cow/sound_variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:pig/sound_variant"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:dye"), VarIntComponent::new);
         }
 
         dataComponentRegistry.forEach((id, name) -> {

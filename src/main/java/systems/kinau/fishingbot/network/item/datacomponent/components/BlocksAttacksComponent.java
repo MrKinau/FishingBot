@@ -3,10 +3,12 @@ package systems.kinau.fishingbot.network.item.datacomponent.components;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.parts.HolderSetComponentPart;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.SoundEvent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.blocksattacks.DamageReduction;
 import systems.kinau.fishingbot.network.item.datacomponent.components.parts.blocksattacks.ItemDamageFunction;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ public class BlocksAttacksComponent extends DataComponent {
     private List<DamageReduction> damageReductions;
     private ItemDamageFunction itemDamageFunction;
     private Optional<String> optBypassDamageTag;
+    private Optional<HolderSetComponentPart> optBypassedBy;
     private Optional<SoundEvent> optBlockSound;
     private Optional<SoundEvent> optDisableSound;
 
@@ -37,8 +40,13 @@ public class BlocksAttacksComponent extends DataComponent {
             damageReduction.write(out, protocolId);
         }
         itemDamageFunction.write(out, protocolId);
-        out.writeBoolean(optBypassDamageTag.isPresent());
-        optBypassDamageTag.ifPresent(s -> Packet.writeString(s, out));
+        if (protocolId < ProtocolConstants.MC_26_1) {
+            out.writeBoolean(optBypassDamageTag.isPresent());
+            optBypassDamageTag.ifPresent(s -> Packet.writeString(s, out));
+        } else {
+            out.writeBoolean(optBypassedBy.isPresent());
+            optBypassedBy.ifPresent(holderSet -> holderSet.write(out, protocolId));
+        }
         out.writeBoolean(optBlockSound.isPresent());
         optBlockSound.ifPresent(soundEvent -> soundEvent.write(out, protocolId));
         out.writeBoolean(optDisableSound.isPresent());
@@ -57,10 +65,20 @@ public class BlocksAttacksComponent extends DataComponent {
         }
         this.itemDamageFunction = new ItemDamageFunction();
         itemDamageFunction.read(in, protocolId);
-        if (in.readBoolean()) {
-            this.optBypassDamageTag = Optional.of(Packet.readString(in));
+        if (protocolId < ProtocolConstants.MC_26_1) {
+            if (in.readBoolean()) {
+                this.optBypassDamageTag = Optional.of(Packet.readString(in));
+            } else {
+                this.optBypassDamageTag = Optional.empty();
+            }
         } else {
-            this.optBypassDamageTag = Optional.empty();
+            if (in.readBoolean()) {
+                HolderSetComponentPart holderSet = new HolderSetComponentPart();
+                holderSet.read(in, protocolId);
+                this.optBypassedBy = Optional.of(holderSet);
+            } else {
+                this.optBypassedBy = Optional.empty();
+            }
         }
         if (in.readBoolean()) {
             SoundEvent soundEvent = new SoundEvent();
