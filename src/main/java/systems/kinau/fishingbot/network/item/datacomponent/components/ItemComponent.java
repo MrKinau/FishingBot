@@ -8,30 +8,30 @@ import systems.kinau.fishingbot.network.item.datacomponent.DataComponentRegistry
 import systems.kinau.fishingbot.network.protocol.Packet;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
-public class UseRemainderComponent extends DataComponent {
+public class ItemComponent extends DataComponent {
 
     private final DataComponentRegistry dataComponentRegistry;
 
-    private Slot usingConvertsTo = Slot.EMPTY;
+    private Slot item = Slot.EMPTY;
 
-    public UseRemainderComponent(DataComponentRegistry dataComponentRegistry, int componentTypeId) {
+    public ItemComponent(DataComponentRegistry dataComponentRegistry, int componentTypeId) {
         super(componentTypeId);
         this.dataComponentRegistry = dataComponentRegistry;
     }
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        Packet.writeSlot(usingConvertsTo, out, protocolId);
+        Packet.writeSlot(item, out, protocolId);
     }
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         if (FishingBot.getInstance().getConfig().isLogItemData()) {
-            FishingBot.getLog().info("Start reading UseRemainderComponent");
+            FishingBot.getLog().info("Start reading single item component (" + getComponentTypeId() + ")");
         }
-        this.usingConvertsTo = Packet.readSlot(in, protocolId, dataComponentRegistry);
+        this.item = Packet.readSlot(in, protocolId, dataComponentRegistry);
         if (FishingBot.getInstance().getConfig().isLogItemData()) {
-            FishingBot.getLog().info("End of reading UseRemainderComponent");
+            FishingBot.getLog().info("End of reading single item component (" + getComponentTypeId() + ")");
         }
     }
 }

@@ -28,6 +28,7 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.FoodCompon
 import systems.kinau.fishingbot.network.item.datacomponent.components.HolderSetComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.InstrumentComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.IntComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.ItemComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ItemListComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.JukeboxPlayableComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.KineticWeaponComponent;
@@ -51,7 +52,6 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.TrimCompon
 import systems.kinau.fishingbot.network.item.datacomponent.components.TypedEntityDataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.UseCooldownComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.UseEffectsComponent;
-import systems.kinau.fishingbot.network.item.datacomponent.components.UseRemainderComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.VarIntComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.VarIntListComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.WeaponComponent;
@@ -145,7 +145,7 @@ public class DataComponentRegistry {
         if (protocolId >= ProtocolConstants.MC_1_21_2) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:item_model"), StringComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:consumable"), ConsumableComponent::new);
-            addToRegistry(dataComponentRegistry.findKey("minecraft:use_remainder"), componentTypeId -> new UseRemainderComponent(this, componentTypeId));
+            addToRegistry(dataComponentRegistry.findKey("minecraft:use_remainder"), componentTypeId -> new ItemComponent(this, componentTypeId));
             addToRegistry(dataComponentRegistry.findKey("minecraft:use_cooldown"), UseCooldownComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:damage_resistant"), DamageResistantComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:enchantable"), VarIntComponent::new);
@@ -208,6 +208,10 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:cow/sound_variant"), VarIntComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:pig/sound_variant"), VarIntComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:dye"), VarIntComponent::new);
+        }
+
+        if (protocolId >= ProtocolConstants.MC_26_2) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:sulfur_cube_content"), componentTypeId -> new ItemComponent(this, componentTypeId));
         }
 
         dataComponentRegistry.forEach((id, name) -> {

@@ -262,7 +262,7 @@ public class GUIController implements Listener {
             skinPreview.setImage(noSkinImage);
         });
         if (uuid != null && !uuid.isEmpty()) {
-            Image image = new Image(String.format("https://crafatar.com/renders/body/%s?overlay", uuid), true);
+            Image image = new Image(String.format("https://nmsr.nickac.dev/fullbody/%s?src=MrKinau/FishingBot", uuid), true);
             image.progressProperty().addListener((value, oldProgress, progress) -> {
                 if (progress.doubleValue() >= 1) {
                     Platform.runLater(() -> skinPreview.setImage(image));
