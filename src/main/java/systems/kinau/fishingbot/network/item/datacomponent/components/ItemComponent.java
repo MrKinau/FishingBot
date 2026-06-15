@@ -6,6 +6,7 @@ import systems.kinau.fishingbot.bot.Slot;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.DataComponentRegistry;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 public class ItemComponent extends DataComponent {
@@ -21,7 +22,7 @@ public class ItemComponent extends DataComponent {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        Packet.writeSlot(item, out, protocolId);
+        Packet.writeSlot(item, out, protocolId, protocolId >= ProtocolConstants.MC_26_1);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class ItemComponent extends DataComponent {
         if (FishingBot.getInstance().getConfig().isLogItemData()) {
             FishingBot.getLog().info("Start reading single item component (" + getComponentTypeId() + ")");
         }
-        this.item = Packet.readSlot(in, protocolId, dataComponentRegistry);
+        this.item = Packet.readSlot(in, protocolId, dataComponentRegistry, protocolId >= ProtocolConstants.MC_26_1);
         if (FishingBot.getInstance().getConfig().isLogItemData()) {
             FishingBot.getLog().info("End of reading single item component (" + getComponentTypeId() + ")");
         }

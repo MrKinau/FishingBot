@@ -246,14 +246,23 @@ public abstract class Packet {
     }
 
     public static void writeSlot(Slot slot, ByteArrayDataOutput output, int protocolId) {
+        writeSlot(slot, output, protocolId, false);
+    }
+
+    public static void writeSlot(Slot slot, ByteArrayDataOutput output, int protocolId, boolean template) {
         if (protocolId >= ProtocolConstants.MC_1_20_5) {
-            if (!slot.isPresent()) {
-                writeVarInt(0, output);
-                return;
+            if (template) {
+                writeVarInt(slot.getItemId(), output);
+                writeVarInt(slot.getItemCount(), output);
+            } else {
+                if (!slot.isPresent()) {
+                    writeVarInt(0, output);
+                    return;
+                }
+                writeVarInt(slot.getItemCount(), output);
+                if (slot.getItemCount() <= 0) return;
+                writeVarInt(slot.getItemId(), output);
             }
-            writeVarInt(slot.getItemCount(), output);
-            if (slot.getItemCount() <= 0) return;
-            writeVarInt(slot.getItemId(), output);
             slot.writeItemData(output, protocolId);
         } else if (protocolId >= ProtocolConstants.MC_1_13_2) {
             output.writeBoolean(slot.isPresent());
@@ -283,11 +292,21 @@ public abstract class Packet {
     }
 
     public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId, DataComponentRegistry dataComponentRegistry) {
-        if (protocolId >= ProtocolConstants.MC_1_20_5) {
-            int count = readVarInt(input);
-            if (count <= 0) return Slot.EMPTY;
+        return readSlot(input, protocolId, dataComponentRegistry, false);
+    }
 
-            int itemId = readVarInt(input);
+    public static Slot readSlot(ByteArrayDataInputWrapper input, int protocolId, DataComponentRegistry dataComponentRegistry, boolean template) {
+        if (protocolId >= ProtocolConstants.MC_1_20_5) {
+            int itemId;
+            int count;
+            if (template) {
+                itemId = readVarInt(input);
+                count = readVarInt(input);
+            } else {
+                count = readVarInt(input);
+                if (count <= 0) return Slot.EMPTY;
+                itemId = readVarInt(input);
+            }
 
             int presentObjectCount = readVarInt(input);
             int emptyObjectCount = readVarInt(input);
@@ -295,7 +314,7 @@ public abstract class Packet {
             if (presentObjectCount == 0 && emptyObjectCount == 0) {
                 Slot slot = new Slot(true, itemId, (byte) count, -1, null);
                 if (FishingBot.getInstance().getConfig().isLogItemData())
-                    FishingBot.getLog().info("Read slot: " + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
+                    FishingBot.getLog().info("Read slot" + (template ? " (template): " : ": ") + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
                 return slot;
             }
 
@@ -323,7 +342,7 @@ public abstract class Packet {
 
             Slot slot = new Slot(true, itemId, (byte) count, -1, new ComponentItemData(presentComponents, emptyComponents));
             if (FishingBot.getInstance().getConfig().isLogItemData()) {
-                FishingBot.getLog().info("Read slot: " + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
+                FishingBot.getLog().info("Read slot" + (template ? " (template): " : ": ") + slot.getItemCount() + "x " + Registries.ITEM.getItemName(slot.getItemId(), protocolId));
                 for (DataComponent presentComponent : presentComponents) {
                     FishingBot.getLog().info("» + " + presentComponent.toString(protocolId));
                 }

@@ -12,6 +12,7 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.BlockState
 import systems.kinau.fishingbot.network.item.datacomponent.components.BlocksAttacksComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.BooleanComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ConsumableComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.ContainerComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.CustomModelDataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageResistantComponent;
@@ -128,7 +129,7 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:banner_patterns"), BannerPatternsComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:base_color"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:pot_decorations"), VarIntListComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:container"), componentTypeId -> new ItemListComponent(this, componentTypeId));
+        addToRegistry(dataComponentRegistry.findKey("minecraft:container"), componentTypeId -> new ContainerComponent(this, componentTypeId));
         addToRegistry(dataComponentRegistry.findKey("minecraft:block_state"), BlockStateComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:bees"), BeesComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:lock"), NBTComponent::new);

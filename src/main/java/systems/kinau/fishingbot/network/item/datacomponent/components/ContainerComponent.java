@@ -12,13 +12,14 @@ import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
-public class ItemListComponent extends DataComponent {
+public class ContainerComponent extends DataComponent {
 
     private final DataComponentRegistry dataComponentRegistry;
-    private List<Slot> items = Collections.emptyList();
+    private List<Optional<Slot>> items = Collections.emptyList();
 
-    public ItemListComponent(DataComponentRegistry dataComponentRegistry, int componentTypeId) {
+    public ContainerComponent(DataComponentRegistry dataComponentRegistry, int componentTypeId) {
         super(componentTypeId);
         this.dataComponentRegistry = dataComponentRegistry;
     }
@@ -26,8 +27,11 @@ public class ItemListComponent extends DataComponent {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         Packet.writeVarInt(items.size(), out);
-        for (Slot item : items) {
-            Packet.writeSlot(item, out, protocolId, protocolId >= ProtocolConstants.MC_26_1);
+        for (Optional<Slot> item : items) {
+            if (protocolId >= ProtocolConstants.MC_26_1)
+                out.writeBoolean(item.isPresent());
+            if (!item.isPresent()) continue;
+            Packet.writeSlot(item.get(), out, protocolId, protocolId >= ProtocolConstants.MC_26_1);
         }
     }
 
@@ -37,13 +41,17 @@ public class ItemListComponent extends DataComponent {
         int count = Packet.readVarInt(in);
         if (count <= 0) return;
         if (FishingBot.getInstance().getConfig().isLogItemData()) {
-            FishingBot.getLog().info("Start reading item list component with " + count + " elements");
+            FishingBot.getLog().info("Start reading container component with " + count + " elements");
         }
         for (int i = 0; i < count; i++) {
-            this.items.add(Packet.readSlot(in, protocolId, dataComponentRegistry, protocolId >= ProtocolConstants.MC_26_1));
+            if (protocolId >= ProtocolConstants.MC_26_1 && !in.readBoolean()) {
+                items.add(Optional.empty());
+                continue;
+            }
+            items.add(Optional.of(Packet.readSlot(in, protocolId, dataComponentRegistry, protocolId >= ProtocolConstants.MC_26_1)));
         }
         if (FishingBot.getInstance().getConfig().isLogItemData()) {
-            FishingBot.getLog().info("End of reading item list component with " + count + " elements");
+            FishingBot.getLog().info("End of reading container component with " + count + " elements");
         }
     }
 }
