@@ -259,6 +259,7 @@ public class PacketInJoinGame extends Packet {
             }
             this.portalCooldown = readVarInt(in);
             this.seaLevel = readVarInt(in);
+            // + more (boolean onlineMode, boolean enforcesSecureChat)
         }
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(

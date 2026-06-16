@@ -32,6 +32,7 @@ public class PacketInDifficultySet extends Packet {
             this.difficulty = in.readUnsignedByte();
         else
             this.difficulty = Packet.readVarInt(in);
+        // + more (boolean locked)
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new DifficultySetEvent(getDifficulty()));
     }

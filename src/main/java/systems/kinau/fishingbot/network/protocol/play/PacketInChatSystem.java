@@ -33,6 +33,7 @@ public class PacketInChatSystem extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) {
         this.text = readChatComponent(in, protocolId);
         if (text == null) return;
+        // + more (boolean actionbar)
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new ChatEvent(getText(), null));
     }
 }

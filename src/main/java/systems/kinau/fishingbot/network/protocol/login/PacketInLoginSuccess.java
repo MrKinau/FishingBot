@@ -50,6 +50,7 @@ public class PacketInLoginSuccess extends Packet {
                 if (in.readBoolean())
                     readString(in);
             }
+            // + more (sessionId)
         }
 
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new LoginSuccessEvent(uuid, userName));

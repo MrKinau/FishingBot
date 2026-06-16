@@ -272,8 +272,12 @@ public class NetworkHandler {
 
             long endTime = System.currentTimeMillis();
 
-            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets() && endTime - startTime > 2)
-                FishingBot.getLog().info("Handling packet " + clazz.getSimpleName() + " took " + (endTime - startTime) + "ms");
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets()) {
+                if (buf.getAvailable() > 0)
+                    FishingBot.getLog().warning("Packet " + clazz.getSimpleName() + " has " + buf.getAvailable() + " byte(s) left");
+                if (endTime - startTime > 2)
+                    FishingBot.getLog().info("Handling packet " + clazz.getSimpleName() + " took " + (endTime - startTime) + "ms");
+            }
         } catch (InstantiationException | IllegalAccessException e) {
             FishingBot.getLog().warning("Could not create new instance of " + clazz.getSimpleName());
             e.printStackTrace();
