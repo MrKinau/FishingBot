@@ -20,20 +20,20 @@ public class PacketOutClientSettings extends Packet {
             out.writeByte(2);           //render-distance
             out.writeByte(0);           //chat enabled
             out.writeBoolean(true);     //support colors
-            out.writeByte(128);         //skin bitmask
+            out.writeByte(127);         //skin bitmask
         } else if (protocolId <= ProtocolConstants.MC_1_13_2) {
             writeString("lol_aa", out); //use speach "LOLCAT", lol
             out.writeByte(2);           //render-distance
             writeVarInt(0, out);     //chat enabled
             out.writeBoolean(true);     //support colors
-            out.writeByte(128);         //skin bitmask
+            out.writeByte(127);         //skin bitmask
             writeVarInt(1, out);     //right = main hand
         } else if (protocolId <= ProtocolConstants.MC_1_17_1) {
             writeString("lol_aa", out); //use speach "LOLCAT", lol
             out.writeByte(2);           //render-distance
             writeVarInt(0, out);     //chat enabled
             out.writeBoolean(true);     //support colors
-            out.writeByte(128);         //skin bitmask
+            out.writeByte(127);         //skin bitmask
             writeVarInt(1, out);     //right = main hand
             out.writeBoolean(false);    //Disable text filtering
         } else if (protocolId <= ProtocolConstants.MC_1_21) {
@@ -41,7 +41,7 @@ public class PacketOutClientSettings extends Packet {
             out.writeByte(2);           //render-distance
             writeVarInt(0, out);     //chat enabled
             out.writeBoolean(true);     //support colors
-            out.writeByte(128);         //skin bitmask
+            out.writeByte(127);         //skin bitmask
             writeVarInt(1, out);     //right = main hand
             out.writeBoolean(false);    //Disable text filtering
             out.writeBoolean(true);     //Allow server listings
@@ -50,7 +50,7 @@ public class PacketOutClientSettings extends Packet {
             out.writeByte(2);           //render-distance
             writeVarInt(0, out);     //chat enabled
             out.writeBoolean(true);     //support colors
-            out.writeByte(128);         //skin bitmask
+            out.writeByte(127);         //skin bitmask
             writeVarInt(1, out);     //right = main hand
             out.writeBoolean(false);    //Disable text filtering
             out.writeBoolean(true);     //Allow server listings
