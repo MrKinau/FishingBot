@@ -23,6 +23,7 @@ import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackRes
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInCodeOfConduct;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInFinishConfiguration;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInKnownPacks;
+import systems.kinau.fishingbot.network.protocol.configuration.PacketInPluginMessage;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketInRegistryData;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutCodeOfConduct;
 import systems.kinau.fishingbot.network.protocol.configuration.PacketOutFinishConfiguration;
@@ -177,6 +178,7 @@ public class PacketRegistry {
                     case "minecraft:registry_data": return PacketInRegistryData.class;
                     case "minecraft:code_of_conduct": return PacketInCodeOfConduct.class;
                     case "minecraft:disconnect": return PacketInDisconnect.class;
+                    case "minecraft:custom_payload": return PacketInPluginMessage.class;
                 }
             } else if (flow == ProtocolFlow.OUTGOING_PACKET) {
                 switch (mojangPacketId) {

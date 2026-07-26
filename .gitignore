@@ -35,6 +35,7 @@ crashlytics-build.properties
 fabric.properties
 
 # Mine
+.vscode/
 FishingBot.iml
 dependency-reduced-pom.xml
 src/test/

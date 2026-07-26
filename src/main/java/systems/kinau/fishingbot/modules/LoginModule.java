@@ -13,6 +13,7 @@ import systems.kinau.fishingbot.event.configuration.CodeOfConductEvent;
 import systems.kinau.fishingbot.event.configuration.ConfigurationFinishEvent;
 import systems.kinau.fishingbot.event.configuration.ConfigurationStartEvent;
 import systems.kinau.fishingbot.event.configuration.KnownPacksRequestedEvent;
+import systems.kinau.fishingbot.event.configuration.PluginMessageEvent;
 import systems.kinau.fishingbot.event.login.EncryptionRequestEvent;
 import systems.kinau.fishingbot.event.login.LoginDisconnectEvent;
 import systems.kinau.fishingbot.event.login.LoginPluginRequestEvent;
@@ -41,8 +42,13 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class LoginModule extends Module implements Listener {
+
+    // Fabric API kicks clients that never register the registry sync channel
+    private static final String FABRIC_REGISTRY_SYNC_CHANNEL = "fabric:registry/sync";
+    private static final String FABRIC_REGISTRY_SYNC_COMPLETE_CHANNEL = "fabric:registry/sync/complete";
 
     @Getter private String userName;
 
@@ -123,6 +129,18 @@ public class LoginModule extends Module implements Listener {
                 && FishingBot.getInstance().getCurrentBot().getNet().getState() == ProtocolState.PLAY)
             FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutAcknowledgeConfiguration());
         FishingBot.getInstance().getCurrentBot().getNet().setState(ProtocolState.CONFIGURATION);
+        if (FishingBot.getInstance().getCurrentBot().getConfig().isSpoofFabric())
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPluginMessage("minecraft:register",
+                    (out, protocol) -> out.write(FABRIC_REGISTRY_SYNC_CHANNEL.getBytes(StandardCharsets.UTF_8))));
+    }
+
+    @EventHandler
+    public void onPluginMessage(PluginMessageEvent event) {
+        if (!FishingBot.getInstance().getCurrentBot().getConfig().isSpoofFabric())
+            return;
+        // Ack the registry sync so the server doesn't hang waiting on us
+        if (event.getChannel().equals(FABRIC_REGISTRY_SYNC_CHANNEL))
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutPluginMessage(FABRIC_REGISTRY_SYNC_COMPLETE_CHANNEL, (out, protocol) -> { }));
     }
 
     @EventHandler
