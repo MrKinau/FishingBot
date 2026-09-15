@@ -42,7 +42,7 @@ public class Instrument implements DataComponentPart {
                 if (protocolId >= ProtocolConstants.MC_1_21_2) {
                     Packet.writeNBT(description, out);
                 }
-                if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+                if (protocolId >= ProtocolConstants.MC_26_3) {
                     Packet.writeVarInt(durabilityDamage, out);
                 }
             }
@@ -68,7 +68,7 @@ public class Instrument implements DataComponentPart {
                 if (protocolId >= ProtocolConstants.MC_1_21_2) {
                     this.description = Packet.readNBT(in, protocolId);
                 }
-                if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+                if (protocolId >= ProtocolConstants.MC_26_3) {
                     this.durabilityDamage = Packet.readVarInt(in);
                 }
             }

@@ -249,7 +249,7 @@ public class PacketInJoinGame extends Packet {
             readVarInt(in);                                  // dimension type
             this.spawnWorld = readString(in);                // dimension name
             this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
-            if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+            if (protocolId >= ProtocolConstants.MC_26_3) {
                 this.gamemode = Packet.readVarInt(in);       // current gamemode
                 if (in.readBoolean())
                     Packet.readVarInt(in);                   // previous gamemode

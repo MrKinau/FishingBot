@@ -94,7 +94,7 @@ public class LookController {
             player.setPitch(LocationUtils.normalizePitch(player.getPitch() + pitchPerStep));
             NetworkHandler networkHandler = FishingBot.getInstance().getCurrentBot().getNet();
             networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true, true));
-            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_26_3_RC_3) {
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_26_3) {
                 // only needed to prevent Invalid Movement kicks, as the client_tick_end packet resets receivedMovementThisTick and receivedPositionThisTick
                 networkHandler.sendPacket(new PacketOutClientTickEnd());
             }

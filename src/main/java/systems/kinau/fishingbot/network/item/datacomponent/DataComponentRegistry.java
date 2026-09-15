@@ -108,7 +108,7 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:tool"), ToolComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:stored_enchantments"), EnchantmentsComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:dyed_color"), DyedItemColorComponent::new);
-        if (protocolId < ProtocolConstants.MC_26_3_RC_3)
+        if (protocolId < ProtocolConstants.MC_26_3)
             addToRegistry(dataComponentRegistry.findKey("minecraft:map_color"), IntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_id"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_decorations"), NBTComponent::new);
@@ -204,7 +204,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:attack_range"), AttackRangeComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:piercing_weapon"), PiercingWeaponComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:kinetic_weapon"), KineticWeaponComponent::new);
-            addToRegistry(dataComponentRegistry.findKey(protocolId < ProtocolConstants.MC_26_3_RC_3 ? "minecraft:swing_animation" : "minecraft:attack_animation"), SwingAnimationComponent::new);
+            addToRegistry(dataComponentRegistry.findKey(protocolId < ProtocolConstants.MC_26_3 ? "minecraft:swing_animation" : "minecraft:attack_animation"), SwingAnimationComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:zombie_nautilus/variant"), EitherVarIntOrIdentifierComponent::new);
         }
 
@@ -221,7 +221,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:sulfur_cube_content"), componentTypeId -> new ItemComponent(this, componentTypeId));
         }
 
-        if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+        if (protocolId >= ProtocolConstants.MC_26_3) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:interact_animation"), SwingAnimationComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:block_transformer"), VarIntComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:villager_food"), VarIntComponent::new);

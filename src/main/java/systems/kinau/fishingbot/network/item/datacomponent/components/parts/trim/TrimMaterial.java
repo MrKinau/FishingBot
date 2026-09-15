@@ -32,7 +32,7 @@ public class TrimMaterial implements DataComponentPart {
     public void write(ByteArrayDataOutput out, int protocolId) {
         Packet.writeVarInt(materialId, out);
         if (materialId == 0) {
-            if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+            if (protocolId >= ProtocolConstants.MC_26_3) {
                 Packet.writeString(baseSuffix, out);
             } else if (protocolId >= ProtocolConstants.MC_1_21_5) {
                 Packet.writeString(baseSuffix, out);
@@ -67,7 +67,7 @@ public class TrimMaterial implements DataComponentPart {
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.materialId = Packet.readVarInt(in);
         if (materialId == 0) {
-            if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+            if (protocolId >= ProtocolConstants.MC_26_3) {
                 this.baseSuffix = Packet.readString(in);
             } else if (protocolId >= ProtocolConstants.MC_1_21_5) {
                 this.baseSuffix = Packet.readString(in);

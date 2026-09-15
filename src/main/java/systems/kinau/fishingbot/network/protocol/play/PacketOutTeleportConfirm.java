@@ -29,7 +29,7 @@ public class PacketOutTeleportConfirm extends Packet {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) throws IOException {
         writeVarInt(teleportId, out);
-        if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+        if (protocolId >= ProtocolConstants.MC_26_3) {
             out.writeDouble(x);
             out.writeDouble(y);
             out.writeDouble(z);

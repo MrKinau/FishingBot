@@ -21,7 +21,7 @@ public class JukeboxPlayableComponent extends DataComponent {
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_26_3_RC_3) {
+        if (protocolId < ProtocolConstants.MC_26_3) {
             out.writeBoolean(song != null);
         }
         if (song != null) {
@@ -36,7 +36,7 @@ public class JukeboxPlayableComponent extends DataComponent {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        boolean fullJukeboxSong = protocolId >= ProtocolConstants.MC_26_3_RC_3 || in.readBoolean();
+        boolean fullJukeboxSong = protocolId >= ProtocolConstants.MC_26_3 || in.readBoolean();
         if (fullJukeboxSong) {
             this.song = new JukeboxSong();
             song.read(in, protocolId);

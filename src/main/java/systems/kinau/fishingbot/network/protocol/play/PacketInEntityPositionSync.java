@@ -36,7 +36,7 @@ public class PacketInEntityPositionSync extends Packet {
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.entityId = readVarInt(in);
 
-        if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+        if (protocolId >= ProtocolConstants.MC_26_3) {
             int positionPathType = Packet.readVarInt(in);
             if (positionPathType == 1) {
                 int count = Packet.readVarInt(in);

@@ -159,7 +159,7 @@ public class ClientDefaultsModule extends Module implements Listener {
                 Player player = FishingBot.getInstance().getCurrentBot().getPlayer();
                 if (networkHandler != null && networkHandler.getState() == ProtocolState.PLAY) {
                     networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true, true));
-                    if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_26_3_RC_3) {
+                    if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_26_3) {
                         // only needed to prevent Invalid Movement kicks, as the client_tick_end packet resets receivedMovementThisTick and receivedPositionThisTick
                         networkHandler.sendPacket(new PacketOutClientTickEnd());
                     }

@@ -17,7 +17,7 @@ public class TeleportRandomlyConsumeEffectType implements DataComponentPart {
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
         out.writeFloat(diameter);
-        if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+        if (protocolId >= ProtocolConstants.MC_26_3) {
             out.writeBoolean(directionalParticles);
         }
     }
@@ -25,7 +25,7 @@ public class TeleportRandomlyConsumeEffectType implements DataComponentPart {
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
         this.diameter = in.readFloat();
-        if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+        if (protocolId >= ProtocolConstants.MC_26_3) {
             this.directionalParticles = in.readBoolean();
         }
     }
