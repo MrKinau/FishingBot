@@ -120,7 +120,7 @@ public class Player implements Listener {
         this.originYaw = yaw;
         this.originPitch = pitch;
         if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_1_9)
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId()));
+            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(new PacketOutTeleportConfirm(event.getTeleportId(), this.x, this.y, this.z, this.yaw, this.pitch));
     }
 
     @EventHandler

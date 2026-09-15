@@ -76,6 +76,7 @@ import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChunkBatchReceived;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutClickWindow;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutClientStatus;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClientTickEnd;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutCloseInventory;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutEntityAction;
@@ -254,6 +255,7 @@ public class PacketRegistry {
                     case "minecraft:chunk_batch_received": return PacketOutChunkBatchReceived.class;
                     case "minecraft:player_loaded": return PacketOutPlayerLoaded.class;
                     case "minecraft:player_input": return PacketOutPlayerInput.class;
+                    case "minecraft:client_tick_end": return PacketOutClientTickEnd.class;
                 }
             }
         }

@@ -2,7 +2,10 @@ package systems.kinau.fishingbot.bot;
 
 import lombok.Getter;
 import systems.kinau.fishingbot.FishingBot;
+import systems.kinau.fishingbot.network.protocol.NetworkHandler;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.protocol.ProtocolState;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClientTickEnd;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
 import systems.kinau.fishingbot.utils.LocationUtils;
 
@@ -89,9 +92,12 @@ public class LookController {
         for (int i = 0; i < steps; i++) {
             player.setYaw(LocationUtils.normalizeYaw(player.getYaw() + yawPerStep));
             player.setPitch(LocationUtils.normalizePitch(player.getPitch() + pitchPerStep));
-            FishingBot.getInstance().getCurrentBot().getNet().sendPacket(
-                new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true, true)
-            );
+            NetworkHandler networkHandler = FishingBot.getInstance().getCurrentBot().getNet();
+            networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true, true));
+            if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_26_3_RC_3) {
+                // only needed to prevent Invalid Movement kicks, as the client_tick_end packet resets receivedMovementThisTick and receivedPositionThisTick
+                networkHandler.sendPacket(new PacketOutClientTickEnd());
+            }
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ignore) {

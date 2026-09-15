@@ -22,21 +22,29 @@ public class Instrument implements DataComponentPart {
     private float range;
     private NBTTag description;
     private String registryKey;
+    private int durabilityDamage;
 
     @Override
     public void write(ByteArrayDataOutput out, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_5 || instrumentDefined) {
-            out.writeBoolean(true);
+        if (protocolId < ProtocolConstants.MC_1_21_5 || protocolId >= ProtocolConstants.MC_26_1 || instrumentDefined) {
+            if (protocolId < ProtocolConstants.MC_26_1) {
+                out.writeBoolean(true);
+            }
             Packet.writeVarInt(instrumentId, out);
             if (instrumentId == 0) {
                 soundEvent.write(out, protocolId);
-                if (protocolId >= ProtocolConstants.MC_1_21_2)
+                if (protocolId >= ProtocolConstants.MC_1_21_2) {
                     out.writeFloat(useDurationNew);
-                else
+                } else {
                     Packet.writeVarInt(useDuration, out);
+                }
                 out.writeFloat(range);
-                if (protocolId >= ProtocolConstants.MC_1_21_2)
+                if (protocolId >= ProtocolConstants.MC_1_21_2) {
                     Packet.writeNBT(description, out);
+                }
+                if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+                    Packet.writeVarInt(durabilityDamage, out);
+                }
             }
         } else {
             out.writeBoolean(false);
@@ -46,18 +54,23 @@ public class Instrument implements DataComponentPart {
 
     @Override
     public void read(ByteArrayDataInputWrapper in, int protocolId) {
-        if (protocolId < ProtocolConstants.MC_1_21_5 || (this.instrumentDefined = in.readBoolean())) {
+        if (protocolId < ProtocolConstants.MC_1_21_5 || protocolId >= ProtocolConstants.MC_26_1 || (this.instrumentDefined = in.readBoolean())) {
             this.instrumentId = Packet.readVarInt(in);
             if (instrumentId == 0) {
                 this.soundEvent = new SoundEvent();
                 soundEvent.read(in, protocolId);
-                if (protocolId >= ProtocolConstants.MC_1_21_2)
+                if (protocolId >= ProtocolConstants.MC_1_21_2) {
                     this.useDurationNew = in.readFloat();
-                else
+                } else {
                     this.useDuration = Packet.readVarInt(in);
+                }
                 this.range = in.readFloat();
-                if (protocolId >= ProtocolConstants.MC_1_21_2)
+                if (protocolId >= ProtocolConstants.MC_1_21_2) {
                     this.description = Packet.readNBT(in, protocolId);
+                }
+                if (protocolId >= ProtocolConstants.MC_26_3_RC_3) {
+                    this.durabilityDamage = Packet.readVarInt(in);
+                }
             }
         } else {
             this.registryKey = Packet.readString(in);

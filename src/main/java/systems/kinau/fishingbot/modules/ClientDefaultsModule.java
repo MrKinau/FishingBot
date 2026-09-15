@@ -37,6 +37,7 @@ import systems.kinau.fishingbot.network.protocol.common.PacketOutPing;
 import systems.kinau.fishingbot.network.protocol.common.PacketOutResourcePackResponse;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChatSessionUpdate;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutChunkBatchReceived;
+import systems.kinau.fishingbot.network.protocol.play.PacketOutClientTickEnd;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutConfirmTransaction;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPlayerLoaded;
 import systems.kinau.fishingbot.network.protocol.play.PacketOutPosLook;
@@ -156,8 +157,13 @@ public class ClientDefaultsModule extends Module implements Listener {
         positionThread = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 Player player = FishingBot.getInstance().getCurrentBot().getPlayer();
-                if (networkHandler != null && networkHandler.getState() == ProtocolState.PLAY)
+                if (networkHandler != null && networkHandler.getState() == ProtocolState.PLAY) {
                     networkHandler.sendPacket(new PacketOutPosLook(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch(), true, true));
+                    if (FishingBot.getInstance().getCurrentBot().getServerProtocol() >= ProtocolConstants.MC_26_3_RC_3) {
+                        // only needed to prevent Invalid Movement kicks, as the client_tick_end packet resets receivedMovementThisTick and receivedPositionThisTick
+                        networkHandler.sendPacket(new PacketOutClientTickEnd());
+                    }
+                }
                 try { Thread.sleep(1000); } catch (InterruptedException e) { break; }
             }
         });
