@@ -11,8 +11,11 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.BeesCompon
 import systems.kinau.fishingbot.network.item.datacomponent.components.BlockStateComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.BlocksAttacksComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.BooleanComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.BrewingFuelComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.CompostableComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ConsumableComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ContainerComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.CookingFuelComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.CustomModelDataComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.DamageResistantComponent;
@@ -35,6 +38,7 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.JukeboxPla
 import systems.kinau.fishingbot.network.item.datacomponent.components.KineticWeaponComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.LodestoneTrackerComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.LoreComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.MobVisibilityComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.NBTComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.PaintingVariantComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.PiercingWeaponComponent;
@@ -42,6 +46,7 @@ import systems.kinau.fishingbot.network.item.datacomponent.components.PotionCont
 import systems.kinau.fishingbot.network.item.datacomponent.components.ProfileComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ProvidesBannerPatternComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.ProvidesTrimMaterialComponent;
+import systems.kinau.fishingbot.network.item.datacomponent.components.SignTextComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.SimpleMapperComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.SoundEventComponent;
 import systems.kinau.fishingbot.network.item.datacomponent.components.StringComponent;
@@ -103,7 +108,8 @@ public class DataComponentRegistry {
         addToRegistry(dataComponentRegistry.findKey("minecraft:tool"), ToolComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:stored_enchantments"), EnchantmentsComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:dyed_color"), DyedItemColorComponent::new);
-        addToRegistry(dataComponentRegistry.findKey("minecraft:map_color"), IntComponent::new);
+        if (protocolId < ProtocolConstants.MC_26_3)
+            addToRegistry(dataComponentRegistry.findKey("minecraft:map_color"), IntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_id"), VarIntComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_decorations"), NBTComponent::new);
         addToRegistry(dataComponentRegistry.findKey("minecraft:map_post_processing"), VarIntComponent::new);
@@ -198,7 +204,7 @@ public class DataComponentRegistry {
             addToRegistry(dataComponentRegistry.findKey("minecraft:attack_range"), AttackRangeComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:piercing_weapon"), PiercingWeaponComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:kinetic_weapon"), KineticWeaponComponent::new);
-            addToRegistry(dataComponentRegistry.findKey("minecraft:swing_animation"), SwingAnimationComponent::new);
+            addToRegistry(dataComponentRegistry.findKey(protocolId < ProtocolConstants.MC_26_3 ? "minecraft:swing_animation" : "minecraft:attack_animation"), SwingAnimationComponent::new);
             addToRegistry(dataComponentRegistry.findKey("minecraft:zombie_nautilus/variant"), EitherVarIntOrIdentifierComponent::new);
         }
 
@@ -213,6 +219,21 @@ public class DataComponentRegistry {
 
         if (protocolId >= ProtocolConstants.MC_26_2) {
             addToRegistry(dataComponentRegistry.findKey("minecraft:sulfur_cube_content"), componentTypeId -> new ItemComponent(this, componentTypeId));
+        }
+
+        if (protocolId >= ProtocolConstants.MC_26_3) {
+            addToRegistry(dataComponentRegistry.findKey("minecraft:interact_animation"), SwingAnimationComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:block_transformer"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:villager_food"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:compostable"), CompostableComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:cooking_fuel"), CookingFuelComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:brewing_fuel"), BrewingFuelComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:mob_visibility"), MobVisibilityComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:provides_pottery_pattern"), VarIntComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:sign_text_back"), SignTextComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:sign_text_front"), SignTextComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:waxed"), EmptyComponent::new);
+            addToRegistry(dataComponentRegistry.findKey("minecraft:cushion/color"), VarIntComponent::new);
         }
 
         dataComponentRegistry.forEach((id, name) -> {

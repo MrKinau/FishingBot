@@ -7,6 +7,7 @@ import systems.kinau.fishingbot.FishingBot;
 import systems.kinau.fishingbot.event.play.EntityTeleportEvent;
 import systems.kinau.fishingbot.network.protocol.NetworkHandler;
 import systems.kinau.fishingbot.network.protocol.Packet;
+import systems.kinau.fishingbot.network.protocol.ProtocolConstants;
 import systems.kinau.fishingbot.network.utils.ByteArrayDataInputWrapper;
 
 import java.io.IOException;
@@ -34,12 +35,31 @@ public class PacketInEntityPositionSync extends Packet {
     @Override
     public void read(ByteArrayDataInputWrapper in, NetworkHandler networkHandler, int length, int protocolId) throws IOException {
         this.entityId = readVarInt(in);
-        this.x = in.readDouble();
-        this.y = in.readDouble();
-        this.z = in.readDouble();
-        this.dx = in.readDouble();
-        this.dy = in.readDouble();
-        this.dz = in.readDouble();
+
+        if (protocolId >= ProtocolConstants.MC_26_3) {
+            int positionPathType = Packet.readVarInt(in);
+            if (positionPathType == 1) {
+                int count = Packet.readVarInt(in);
+                for (int i = 0; i < count; i++) {
+                    this.x = in.readDouble();
+                    this.y = in.readDouble();
+                    this.z = in.readDouble();
+                    int tickOffset = Packet.readVarInt(in);
+                }
+            } else {
+                this.x = in.readDouble();
+                this.y = in.readDouble();
+                this.z = in.readDouble();
+            }
+        } else {
+            this.x = in.readDouble();
+            this.y = in.readDouble();
+            this.z = in.readDouble();
+            this.dx = in.readDouble();
+            this.dy = in.readDouble();
+            this.dz = in.readDouble();
+        }
+
         this.yaw = in.readFloat();
         this.pitch = in.readFloat();
         this.onGround = in.readBoolean();

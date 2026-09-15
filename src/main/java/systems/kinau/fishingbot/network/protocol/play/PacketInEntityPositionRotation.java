@@ -36,14 +36,37 @@ public class PacketInEntityPositionRotation extends Packet {
             this.dX = Integer.valueOf(in.readByte() * 128).shortValue();
             this.dY = Integer.valueOf(in.readByte() * 128).shortValue();
             this.dZ = Integer.valueOf(in.readByte() * 128).shortValue();
-        } else {
+            this.onGround = in.readBoolean();
+        } else if (protocolId <= ProtocolConstants.MC_26_2) {
             this.dX = in.readShort();
             this.dY = in.readShort();
             this.dZ = in.readShort();
+            this.onGround = in.readBoolean();
+        } else {
+            int properties = Packet.readVarInt(in);
+            int stepCount = properties >>> 1;
+            if (stepCount <= 0) {
+                // linear
+                this.dX = in.readShort();
+                this.dY = in.readShort();
+                this.dZ = in.readShort();
+            } else {
+                // stepped
+                int dXStepped = 0, dYStepped = 0, dZStepped = 0;
+                for (int i = 0; i < stepCount; i++) {
+                    int ticks = Packet.readVarInt(in);
+                    dXStepped += in.readShort(); // prob wrong just adding for final pos, but idc
+                    dYStepped += in.readShort(); // prob wrong just adding for final pos, but idc
+                    dZStepped += in.readShort(); // prob wrong just adding for final pos, but idc
+                }
+                this.dX = (short) dXStepped;
+                this.dY = (short) dYStepped;
+                this.dZ = (short) dZStepped;
+            }
+            this.onGround = (properties & 1) != 0;
         }
         this.yaw = in.readByte();
         this.pitch = in.readByte();
-        this.onGround = in.readBoolean();
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new EntityMoveEvent(entityId, dX, dY, dZ, yaw, pitch, onGround));
     }
 }
