@@ -251,8 +251,7 @@ public class PacketInJoinGame extends Packet {
             this.hashedSeed = in.readLong();                 // first 8 bytes of the SHA-256 hash of the world's seed
             if (protocolId >= ProtocolConstants.MC_26_3) {
                 this.gamemode = Packet.readVarInt(in);       // current gamemode
-                if (in.readBoolean())
-                    Packet.readVarInt(in);                   // previous gamemode
+                Packet.readVarInt(in);                       // previous gamemode (0 = none, otherwise = game mode + 1)
             } else {
                 this.gamemode = in.readUnsignedByte();       // current gamemode
                 in.readUnsignedByte();                       // previous gamemode
