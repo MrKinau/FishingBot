@@ -33,6 +33,7 @@ public class SettingsConfig implements Config {
     @Property(key = "server.online-mode", description = "config-server-online-mode") private boolean onlineMode = true;
     @Property(key = "server.default-protocol", description = "config-server-default-protocol") private String defaultProtocol = ProtocolConstants.getVersionString(ProtocolConstants.AUTOMATIC);
     @Property(key = "server.spoof-forge", description = "config-server-spoof-forge") private boolean spoofForge = false;
+    @Property(key = "server.spoof-fabric", description = "config-server-spoof-fabric") private boolean spoofFabric = false;
     @Property(key = "server.latest-code-of-conduct", description = "") @Setter private int latestCodeOfConduct = 0;
 
     @Property(key = "auto.auto-reconnect", description = "config-auto-auto-reconnect") private boolean autoReconnect = true;

@@ -281,6 +281,11 @@ public class NetworkHandler {
         } catch (InstantiationException | IllegalAccessException e) {
             FishingBot.getLog().warning("Could not create new instance of " + clazz.getSimpleName());
             e.printStackTrace();
+        } catch (Exception e) {
+            // Don't kill the connection over one bad packet, buffer is already fully read
+            FishingBot.getLog().warning("Could not read packet " + clazz.getSimpleName() + ": " + e);
+            if (FishingBot.getInstance().getCurrentBot().getConfig().isLogPackets())
+                e.printStackTrace();
         }
     }
 
