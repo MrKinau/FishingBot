@@ -14,6 +14,7 @@ import systems.kinau.fishingbot.modules.command.commands.CommandHelp;
 import systems.kinau.fishingbot.modules.command.commands.CommandLevel;
 import systems.kinau.fishingbot.modules.command.commands.CommandLook;
 import systems.kinau.fishingbot.modules.command.commands.CommandRightClick;
+import systems.kinau.fishingbot.modules.command.commands.CommandStatus;
 import systems.kinau.fishingbot.modules.command.commands.CommandStuck;
 import systems.kinau.fishingbot.modules.command.commands.CommandSummary;
 import systems.kinau.fishingbot.modules.command.commands.CommandSwap;
@@ -44,6 +45,7 @@ public class CommandRegistry {
         registerCommand(new CommandLevel());
         registerCommand(new CommandLook());
         registerCommand(new CommandRightClick());
+        registerCommand(new CommandStatus());
         registerCommand(new CommandStuck());
         registerCommand(new CommandSummary());
         registerCommand(new CommandSwap());
