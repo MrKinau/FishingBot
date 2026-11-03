@@ -37,19 +37,27 @@ public class PacketInWindowItems extends Packet {
         int count = protocolId >= ProtocolConstants.MC_1_17_1 ? readVarInt(in) : in.readShort();
         if (FishingBot.getInstance().getConfig().isLogItemData())
             FishingBot.getLog().info("Start reading PacketInWindowItems " + count + " slots(s)");
+        boolean desynced = false;
         for (int i = 0; i < count; i++) {
-            this.slots.add(readSlot(in, protocolId, networkHandler.getDataComponentRegistry()));
+            try {
+                this.slots.add(readSlot(in, protocolId, networkHandler.getDataComponentRegistry()));
+            } catch (Exception e) {
+                // Keep the slots read so far instead of tossing the whole snapshot
+                FishingBot.getLog().warning("Could not read slot " + i + "/" + count + " of PacketInWindowItems (window " + windowId + "): " + e);
+                desynced = true;
+                break;
+            }
         }
         if (FishingBot.getInstance().getConfig().isLogItemData())
             FishingBot.getLog().info("End of reading PacketInWindowItems " + count + " slot(s)");
-        if (protocolId >= ProtocolConstants.MC_1_17_1) {
+        if (!desynced && protocolId >= ProtocolConstants.MC_1_17_1) {
             if (FishingBot.getInstance().getConfig().isLogItemData())
                 FishingBot.getLog().info("Start reading PacketInWindowItems carriedItem");
             this.carriedItem = readSlot(in, protocolId, networkHandler.getDataComponentRegistry());
             if (FishingBot.getInstance().getConfig().isLogItemData())
                 FishingBot.getLog().info("End of reading PacketInWindowItems carriedItem");
         }
-        if (in.getAvailable() > 0)
+        if (!desynced && in.getAvailable() > 0)
             FishingBot.getLog().warning("End of reading PacketInWindowItems has " + in.getAvailable() + " byte(s) left");
         FishingBot.getInstance().getCurrentBot().getEventManager().callEvent(new UpdateWindowItemsEvent(windowId, slots));
     }

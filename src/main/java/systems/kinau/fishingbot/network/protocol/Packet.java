@@ -218,6 +218,19 @@ public abstract class Packet {
         return new NBTTag(input, protocolId);
     }
 
+    // Best effort for unknown (modded) components: usually just plain NBT data, better compatability with modded items in inventory
+    private static boolean trySkipAsNbt(ByteArrayDataInputWrapper input, int dataComponentType, int protocolId) {
+        try {
+            int before = input.getAvailable();
+            readNBT(input, protocolId);
+            int consumed = before - input.getAvailable();
+            FishingBot.getLog().warning("Unknown component " + dataComponentType + ": heuristically skipped as NBT (" + consumed + " byte(s))");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static void writeNBT(NBTTag tag, ByteArrayDataOutput output) {
         output.write(tag.getData());
     }
@@ -327,8 +340,10 @@ public abstract class Packet {
                 if (dataComponent != null) {
                     dataComponent.read(input, protocolId);
                     presentComponents.add(dataComponent);
-                } else {
+                } else if (!trySkipAsNbt(input, dataComponentType, protocolId)) {
+                    // no way to know its length, rest of the slot is unneeded
                     FishingBot.getLog().severe("Invalid component: " + dataComponentType);
+                    throw new IllegalStateException("Unknown data component type " + dataComponentType + ", cannot determine its payload length to skip it");
                 }
             }
 
